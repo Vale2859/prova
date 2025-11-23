@@ -1,215 +1,275 @@
-// Mappa reparti → elenco procedure (statiche per la demo)
-const PROCEDURE_DATA = {
+// ===== DATI PROCEDURE (DEMO) =====
+const procedureData = {
   cassa: {
-    title: "Cassa",
-    subtitle: "Scontrini, resi, anticipi, errori di battitura.",
-    items: [
+    label: "Cassa",
+    descrizione:
+      "Procedure operative per chi lavora in cassa: scontrini, resi, errori di pagamento.",
+    coloreChip: "Cassa",
+    elenco: [
       {
-        name: "Doppio scontrino",
-        tag: "Operativo",
-        desc: "Cosa fare se è stato emesso uno scontrino doppio al cliente.",
-        extra: "Tempo lettura: ~30 secondi"
+        id: "doppio-scontrino",
+        titolo: "Doppio scontrino / errore importo",
+        scorciatoia: "Alt + D",
+        passi: [
+          "Avvisa subito il cliente e controlla l'importo corretto.",
+          "Compila la procedura interna per l'annullo (se prevista dal gestionale).",
+          "Registra l'operazione sul registro 'Errori cassa' con data, ora e nome operatore.",
+          "Informa il titolare a fine turno se l'importo è rilevante."
+        ]
       },
       {
-        name: "Reso con scontrino",
-        tag: "Operativo",
-        desc: "Passaggi per effettuare un reso con scontrino fiscale presente.",
-        extra: "Solo titolare o referente autorizzato."
+        id: "reso-contante-card",
+        titolo: "Reso merce con rimborso contanti / carta",
+        scorciatoia: "Alt + R",
+        passi: [
+          "Verifica scontrino e integrità della confezione.",
+          "Segui il flusso 'Reso' del gestionale (motivo reso + operatore).",
+          "Rimborsa il cliente con lo stesso metodo di pagamento, se possibile.",
+          "Archivia lo scontrino di reso nell'apposita busta giornaliera."
+        ]
       },
       {
-        name: "Reso senza scontrino",
-        tag: "Eccezione",
-        desc: "Come gestire la richiesta di reso in assenza di scontrino.",
-        extra: "Verifica sempre con titolare."
-      },
-      {
-        name: "Anticipo ricetta",
-        tag: "Anticipi",
-        desc: "Procedura quando il cliente paga subito e porta la ricetta in un secondo momento.",
-        extra: "Registra sempre il nome del medico."
-      },
-      {
-        name: "Errore pagamento POS",
-        tag: "POS",
-        desc: "Cosa fare se è stato selezionato contanti ma il cliente ha pagato con POS.",
-        extra: "Annotare su registro interni."
-      },
-      {
-        name: "Chiusura cassa serale",
-        tag: "Routine",
-        desc: "Check-list veloce di fine giornata: controlli base sulla cassa.",
-        extra: "Tempo lettura: ~1 minuto"
+        id: "mancanza-resto",
+        titolo: "Mancanza resto in cassa",
+        scorciatoia: "Alt + M",
+        passi: [
+          "Chiedi cambio al collega/titolare senza usare soldi personali.",
+          "Registra sul foglio 'Cambio cassa' data, ora, taglio richiesto e operatore.",
+          "A fine giornata verifica che il cambio sia rientrato correttamente."
+        ]
       }
     ]
   },
-
   banco: {
-    title: "Banco",
-    subtitle: "Procedure rapide per il lavoro al banco.",
-    items: [
+    label: "Banco",
+    descrizione:
+      "Procedure per il banco vendita: consiglio al paziente, ricette e note importanti.",
+    coloreChip: "Banco",
+    elenco: [
       {
-        name: "Raccolta dati ricetta dematerializzata",
-        tag: "Ricette",
-        desc: "Quali dati controllare sempre prima di erogare il farmaco.",
-        extra: "Verifica codice fiscale e NRE."
+        id: "vendita-senza-farmaco",
+        titolo: "Farmaco mancante – cosa dire al cliente",
+        scorciatoia: "B1",
+        passi: [
+          "Controlla subito nel gestionale la disponibilità in altre sedi / magazzino.",
+          "Proponi alternativa equivalente secondo le regole interne e normative.",
+          "Se il cliente vuole, registra una prenotazione con nome, telefono e data.",
+          "Segna sul portale logistica se è un farmaco che manca spesso."
+        ]
       },
       {
-        name: "Consiglio OTC febbre",
-        tag: "Consiglio",
-        desc: "Schema rapido di domande da fare prima del consiglio.",
-        extra: "Richiama sempre il farmacista se dubbio."
-      },
-      {
-        name: "Prodotto non presente a scaffale",
-        tag: "Gestione",
-        desc: "Come verificare disponibilità e proporre alternativa.",
-        extra: "Indica sempre tempi di arrivo."
+        id: "ricetta-illeggibile",
+        titolo: "Ricetta illeggibile o dubbia",
+        scorciatoia: "B2",
+        passi: [
+          "Non consegnare nulla se non sei sicuro del farmaco.",
+          "Chiama il medico o lo studio per conferma, indicando nome paziente e data.",
+          "Segna sul portale una breve nota per il titolare se l'episodio si ripete."
+        ]
       }
     ]
   },
-
   magazzino: {
-    title: "Magazzino",
-    subtitle: "Movimenti interni, scorte e controlli di base.",
-    items: [
+    label: "Magazzino",
+    descrizione:
+      "Procedure per scorte, scadenze e ordine degli scaffali interni.",
+    coloreChip: "Magazzino",
+    elenco: [
       {
-        name: "Controllo scadenze mensile",
-        tag: "Scadenze",
-        desc: "Giro di controllo da fare mensilmente sugli scaffali interni.",
-        extra: "Segna i prodotti critici su registro."
+        id: "controllo-scadenze",
+        titolo: "Controllo scadenze mensile",
+        scorciatoia: "M1",
+        passi: [
+          "Ogni inizio mese controlla il report scadenze dal gestionale.",
+          "Sposta in 'zona da rendere' i prodotti con scadenza entro 3 mesi.",
+          "Aggiorna la lista resa grossista seguendo le indicazioni del titolare."
+        ]
       },
       {
-        name: "Prodotto mancante a scaffale",
-        tag: "Rifornimento",
-        desc: "Cosa fare quando un prodotto è terminato in esposizione.",
-        extra: "Regola: mai scaffale vuoto."
-      },
-      {
-        name: "Gestione merce rotta",
-        tag: "Eccezioni",
-        desc: "Come gestire i prodotti arrivati danneggiati.",
-        extra: "Foto + nota per titolare."
+        id: "prodotto-non-trovato",
+        titolo: "Prodotto non trovato a scaffale",
+        scorciatoia: "M2",
+        passi: [
+          "Controlla se il gestionale lo segna come presente in magazzino.",
+          "Se non lo trovi, segnala sul portale 'Logistica' come 'Prodotto non rintracciato'.",
+          "Se il caso si ripete per lo stesso articolo, avvisa il titolare."
+        ]
       }
     ]
   },
-
   servizi: {
-    title: "Servizi",
-    subtitle: "ECG, holter, CUP e servizi di telemedicina.",
-    items: [
+    label: "Servizi & CUP",
+    descrizione:
+      "Procedure per servizi al banco: CUP, ECG, holter, autoanalisi ecc.",
+    coloreChip: "Servizi & CUP",
+    elenco: [
       {
-        name: "Prenotazione ECG",
-        tag: "Servizio",
-        desc: "Come registrare una prenotazione ECG con dati minimi del paziente.",
-        extra: "Conferma sempre telefono di contatto."
+        id: "prenotazione-cup",
+        titolo: "Prenotazione CUP per il cliente",
+        scorciatoia: "S1",
+        passi: [
+          "Identifica il cliente con documento o codice fiscale, se richiesto.",
+          "Verifica la prescrizione e il servizio da prenotare.",
+          "Registra sul gestionale o portale CUP seguendo i campi obbligatori.",
+          "Consegna al cliente la stampa/riepilogo con data, ora e luogo della prestazione."
+        ]
       },
       {
-        name: "Consegna referto",
-        tag: "Referti",
-        desc: "Modalità di consegna referto al cliente e archiviazione copia.",
-        extra: "Valutare anche invio digitale sicuro."
-      },
-      {
-        name: "Disdetta appuntamento",
-        tag: "Agenda",
-        desc: "Come segnare una disdetta per liberare lo slot.",
-        extra: "Se possibile, avvisa via telefono."
+        id: "referto-ecg",
+        titolo: "Gestione referto ECG / esame",
+        scorciatoia: "S2",
+        passi: [
+          "Verifica che il referto sia associato al paziente giusto.",
+          "Carica, se previsto, il referto sul portale interno o invialo via canale concordato.",
+          "Segna sul portale il campo 'Referto consegnato' con data e operatore."
+        ]
       }
     ]
   },
-
-  sicurezza: {
-    title: "Sicurezza",
-    subtitle: "Procedure obbligatorie e di tutela.",
-    items: [
-      {
-        name: "Infortunio in farmacia",
-        tag: "Emergenza",
-        desc: "Primi passi da seguire in caso di infortunio di cliente o dipendente.",
-        extra: "Avvisa sempre titolare."
-      },
-      {
-        name: "Gestione furto sospetto",
-        tag: "Protocollo",
-        desc: "Cosa fare in caso di sospetto furto senza mettersi in pericolo.",
-        extra: "Niente azioni personali rischiose."
-      }
-    ]
-  },
-
   altro: {
-    title: "Altro",
-    subtitle: "Procedure varie di utilizzo interno.",
-    items: [
+    label: "Altro",
+    descrizione:
+      "Procedure generali: comunicazioni interne, emergenze, chiusura serale.",
+    coloreChip: "Generale",
+    elenco: [
       {
-        name: "Uso portale interno",
-        tag: "Portale",
-        desc: "Linee guida per utilizzare correttamente il portale farmacia.",
-        extra: "Ogni accesso viene registrato."
-      },
-      {
-        name: "Comunicazioni al titolare",
-        tag: "Interno",
-        desc: "Come inviare comunicazioni ordinate al titolare.",
-        extra: "Evita WhatsApp sparsi."
+        id: "chiusura-serale",
+        titolo: "Chiusura serale della farmacia",
+        scorciatoia: "A1",
+        passi: [
+          "Verifica che tutte le casse siano chiuse secondo la procedura di fine turno.",
+          "Controlla porte, allarme, frigoriferi e vetrine frigo.",
+          "Aggiorna, se necessario, le comunicazioni interne sul portale."
+        ]
       }
     ]
   }
 };
 
-// ELEMENTI BASE
-const viewReparti = document.getElementById("viewReparti");
-const viewProcedure = document.getElementById("viewProcedure");
-const btnBackReparti = document.getElementById("btnBackReparti");
-const proceduresTitle = document.getElementById("proceduresTitle");
-const proceduresSubtitle = document.getElementById("proceduresSubtitle");
-const procedureList = document.getElementById("procedureList");
+// ===== RIFERIMENTI DOM =====
+const repartiSection = document.getElementById("repartiSection");
+const procedureSection = document.getElementById("procedureSection");
+const dettaglioSection = document.getElementById("dettaglioSection");
 
-// Gestione click sui reparti
-document.querySelectorAll(".reparto-card").forEach(card => {
-  card.addEventListener("click", () => {
-    const repartoKey = card.dataset.reparto;
-    openReparto(repartoKey);
+const repartiGrid = document.getElementById("repartiGrid");
+const procedureButtons = document.getElementById("procedureButtons");
+
+const currentRepartoTitle = document.getElementById("currentRepartoTitle");
+const currentRepartoDesc = document.getElementById("currentRepartoDesc");
+const dettaglioTitle = document.getElementById("dettaglioTitle");
+const dettaglioTag = document.getElementById("dettaglioTag");
+const dettaglioBody = document.getElementById("dettaglioBody");
+
+const backToRepartiBtn = document.getElementById("backToReparti");
+
+// Statistiche in alto
+const statTotali = document.getElementById("statTotali");
+const statCassa = document.getElementById("statCassa");
+const statBanco = document.getElementById("statBanco");
+const statMagazzino = document.getElementById("statMagazzino");
+
+let currentRepartoKey = null;
+
+// ===== FUNZIONI =====
+function calcolaStatistiche() {
+  let tot = 0;
+  Object.values(procedureData).forEach((rep) => {
+    tot += rep.elenco.length;
   });
-});
 
-// Torna ai reparti principali
-btnBackReparti.addEventListener("click", () => {
-  viewProcedure.classList.remove("active");
-  viewReparti.classList.add("active");
-  procedureList.innerHTML = "";
-});
+  statTotali.textContent = tot;
+  statCassa.textContent = procedureData.cassa.elenco.length;
+  statBanco.textContent = procedureData.banco.elenco.length;
+  statMagazzino.textContent = procedureData.magazzino.elenco.length;
+}
 
-// Funzione per "aprire" un reparto
-function openReparto(key) {
-  const data = PROCEDURE_DATA[key];
-  if (!data) return;
+function creaBottoniReparti() {
+  repartiGrid.innerHTML = "";
 
-  // Aggiorna titoli
-  proceduresTitle.textContent = data.title;
-  proceduresSubtitle.textContent = data.subtitle || "Procedura reparto selezionato.";
+  Object.entries(procedureData).forEach(([key, rep]) => {
+    const btn = document.createElement("button");
+    btn.className = `reparto-btn reparto-${key}`;
+    btn.dataset.key = key;
 
-  // Pulisce lista
-  procedureList.innerHTML = "";
-
-  // Crea card procedure
-  data.items.forEach(item => {
-    const card = document.createElement("article");
-    card.className = "procedure-card";
-
-    card.innerHTML = `
-      <div class="procedure-card-header">
-        <div class="procedure-name">${item.name}</div>
-        <div class="procedure-tag">${item.tag}</div>
-      </div>
-      <p class="procedure-desc">${item.desc}</p>
-      <p class="procedure-chip">${item.extra || ""}</p>
+    btn.innerHTML = `
+      <span>${rep.label}</span>
+      <span class="desc">${rep.descrizione}</span>
+      <span class="count">${rep.elenco.length} procedure</span>
     `;
 
-    procedureList.appendChild(card);
+    btn.addEventListener("click", () => apriReparto(key));
+    repartiGrid.appendChild(btn);
+  });
+}
+
+function apriReparto(key) {
+  currentRepartoKey = key;
+  const rep = procedureData[key];
+
+  // Aggiorna header sezione procedure
+  currentRepartoTitle.textContent = rep.label;
+  currentRepartoDesc.textContent = rep.descrizione;
+
+  // Crea bottoni procedura
+  procedureButtons.innerHTML = "";
+  rep.elenco.forEach((proc) => {
+    const pBtn = document.createElement("button");
+    pBtn.className = "procedure-btn";
+    pBtn.dataset.id = proc.id;
+
+    pBtn.innerHTML = `
+      <span class="label">${proc.titolo}</span>
+      <span class="shortcut">${proc.scorciatoia}</span>
+    `;
+
+    pBtn.addEventListener("click", () => mostraProcedura(key, proc.id));
+    procedureButtons.appendChild(pBtn);
   });
 
-  // Mostra vista procedure
-  viewReparti.classList.remove("active");
-  viewProcedure.classList.add("active");
+  // Mostra sezioni
+  repartiSection.classList.add("hidden");
+  procedureSection.classList.remove("hidden");
+  dettaglioSection.classList.remove("hidden");
+
+  // Reset testo dettaglio
+  dettaglioTitle.textContent = "Seleziona una procedura";
+  dettaglioTag.textContent = rep.coloreChip;
+  dettaglioBody.innerHTML =
+    '<p class="muted">Tocca una procedura per vedere i passaggi.</p>';
+
+  // Scroll in alto (utile su telefono)
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+function mostraProcedura(repartoKey, procId) {
+  const rep = procedureData[repartoKey];
+  const proc = rep.elenco.find((p) => p.id === procId);
+  if (!proc) return;
+
+  dettaglioTitle.textContent = proc.titolo;
+  dettaglioTag.textContent = rep.coloreChip;
+
+  const listaPassi = proc.passi
+    .map((step) => `<li>${step}</li>`)
+    .join("");
+
+  dettaglioBody.innerHTML = `
+    <h3>Passaggi operativi</h3>
+    <ol>${listaPassi}</ol>
+  `;
+}
+
+function tornaAiReparti() {
+  currentRepartoKey = null;
+  repartiSection.classList.remove("hidden");
+  procedureSection.classList.add("hidden");
+  dettaglioSection.classList.add("hidden");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ===== INIZIALIZZAZIONE =====
+document.addEventListener("DOMContentLoaded", () => {
+  calcolaStatistiche();
+  creaBottoniReparti();
+  backToRepartiBtn.addEventListener("click", tornaAiReparti);
+});
