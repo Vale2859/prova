@@ -2,178 +2,108 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Procedure operative - Demo</title>
+  <title>Procedure operative - Portale Farmacia Montesano</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 </head>
 <body>
+
   <main class="page">
+
+    <!-- HEADER SEMPLICE -->
     <header class="page-header">
-      <h1>Procedure operative</h1>
-      <p class="page-subtitle">
-        Tocca un reparto, poi una procedura per vedere i passaggi.  
-        Grafica pensata per dipendenti veloci e poco “pazienti”. 😄
-      </p>
+      <button class="back-dashboard">
+        ← Torna alla dashboard
+      </button>
+
+      <div class="title-block">
+        <p class="eyebrow">Portale interno · Procedure</p>
+        <h1>Procedure operative</h1>
+        <p class="subtitle">
+          Consulta velocemente le procedure interne della farmacia, divise per reparto.
+          Tocca un reparto e poi una procedura per vedere i passaggi.
+        </p>
+      </div>
     </header>
 
-    <!-- STATISTICHE -->
+    <!-- STATISTICHE IN ALTO -->
     <section class="stats-row">
       <article class="stat-pill">
-        <span class="stat-label">Procedure totali</span>
-        <span class="stat-value" id="statTotali">10</span>
+        <p class="stat-label">Procedure totali</p>
+        <p id="statTotali" class="stat-value">0</p>
       </article>
+
       <article class="stat-pill">
-        <span class="stat-label">Cassa</span>
-        <span class="stat-value" id="statCassa">3</span>
+        <p class="stat-label">Cassa</p>
+        <p id="statCassa" class="stat-value">0</p>
       </article>
+
       <article class="stat-pill">
-        <span class="stat-label">Banco</span>
-        <span class="stat-value" id="statBanco">3</span>
+        <p class="stat-label">Banco</p>
+        <p id="statBanco" class="stat-value">0</p>
       </article>
+
       <article class="stat-pill">
-        <span class="stat-label">Magazzino</span>
-        <span class="stat-value" id="statMagazzino">2</span>
-      </article>
-      <article class="stat-pill">
-        <span class="stat-label">Servizi &amp; Cup</span>
-        <span class="stat-value" id="statServizi">2</span>
+        <p class="stat-label">Magazzino</p>
+        <p id="statMagazzino" class="stat-value">0</p>
       </article>
     </section>
 
-    <!-- REPARTI PRINCIPALI -->
-    <section class="reparti">
+    <!-- REPARTI (CASSA / BANCO / MAGAZZINO) -->
+    <section class="reparti-card">
       <header class="reparti-header">
         <h2>Reparti principali</h2>
-        <p>Prima scegli il reparto, poi la procedura. In qualunque momento puoi tornare qui.</p>
+        <p class="small-text">
+          Scegli il reparto in cui stai lavorando. Poi seleziona una procedura
+          dalla lista qui sotto.
+        </p>
       </header>
 
-      <div class="reparti-buttons">
-        <button class="reparto-chip active" data-reparto="cassa">Cassa</button>
-        <button class="reparto-chip" data-reparto="banco">Banco</button>
-        <button class="reparto-chip" data-reparto="magazzino">Magazzino</button>
-        <button class="reparto-chip" data-reparto="servizi">Servizi &amp; Cup</button>
+      <div class="reparti-tabs" id="repartiTabs">
+        <!-- I bottoni vengono creati via JS -->
       </div>
     </section>
 
-    <!-- SEZIONI PROCEDURE -->
-    <section class="sezioni-container">
-
-      <!-- CASSA -->
-      <section class="sezione-procedure active" data-reparto="cassa">
-        <header class="sezione-header">
-          <div>
-            <h3>Cassa</h3>
-            <p>Procedure legate a incassi, resi e operazioni fiscalmente delicate.</p>
-          </div>
-          <button class="btn-outline" id="btnTornaPrincipali1">← Torna ai reparti principali</button>
-        </header>
-
-        <div class="procedure-list">
-          <button class="proc-item" data-id="C1">
-            <span class="proc-item-label">Doppio scontrino / errore importo</span>
-            <span class="proc-item-code code-cassa">C1</span>
-          </button>
-          <button class="proc-item" data-id="C2">
-            <span class="proc-item-label">Scontrino contanti ma pagamento POS</span>
-            <span class="proc-item-code code-cassa">C2</span>
-          </button>
-          <button class="proc-item" data-id="C3">
-            <span class="proc-item-label">Annullamento vendita e riapertura scontrino</span>
-            <span class="proc-item-code code-cassa">C3</span>
-          </button>
+    <!-- LISTA PROCEDURE DEL REPARTO SCELTO -->
+    <section class="lista-card">
+      <header class="lista-header">
+        <div>
+          <p id="currentAreaLabel" class="eyebrow">Reparto</p>
+          <h2 id="currentAreaTitle">Cassa</h2>
+          <p id="currentAreaDesc" class="small-text">
+            Procedure operative per chi lavora in cassa: scontrini, resi, errori di pagamento.
+          </p>
         </div>
-      </section>
 
-      <!-- BANCO -->
-      <section class="sezione-procedure" data-reparto="banco">
-        <header class="sezione-header">
-          <div>
-            <h3>Banco</h3>
-            <p>Procedure per gestione cliente, ricette e consigli al banco.</p>
-          </div>
-          <button class="btn-outline" id="btnTornaPrincipali2">← Torna ai reparti principali</button>
-        </header>
-
-        <div class="procedure-list">
-          <button class="proc-item" data-id="B1">
-            <span class="proc-item-label">Gestione ricetta SSN con anticipi</span>
-            <span class="proc-item-code code-banco">B1</span>
-          </button>
-          <button class="proc-item" data-id="B2">
-            <span class="proc-item-label">Vendita farmaco etico senza ricetta</span>
-            <span class="proc-item-code code-banco">B2</span>
-          </button>
-          <button class="proc-item" data-id="B3">
-            <span class="proc-item-label">Reso merce cliente al banco</span>
-            <span class="proc-item-code code-banco">B3</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- MAGAZZINO -->
-      <section class="sezione-procedure" data-reparto="magazzino">
-        <header class="sezione-header">
-          <div>
-            <h3>Magazzino</h3>
-            <p>Procedure per scorte, scadenze e ordine degli scaffali interni.</p>
-          </div>
-          <button class="btn-outline" id="btnTornaPrincipali3">← Torna ai reparti principali</button>
-        </header>
-
-        <div class="procedure-list">
-          <button class="proc-item" data-id="M1">
-            <span class="proc-item-label">Controllo scadenze mensile</span>
-            <span class="proc-item-code code-magazzino">M1</span>
-          </button>
-          <button class="proc-item" data-id="M2">
-            <span class="proc-item-label">Prodotto non trovato a scaffale</span>
-            <span class="proc-item-code code-magazzino">M2</span>
-          </button>
-        </div>
-      </section>
-
-      <!-- SERVIZI & CUP -->
-      <section class="sezione-procedure" data-reparto="servizi">
-        <header class="sezione-header">
-          <div>
-            <h3>Servizi &amp; Cup</h3>
-            <p>Prestazioni ECG, holter, prenotazioni visite e gestione referti.</p>
-          </div>
-          <button class="btn-outline" id="btnTornaPrincipali4">← Torna ai reparti principali</button>
-        </header>
-
-        <div class="procedure-list">
-          <button class="proc-item" data-id="S1">
-            <span class="proc-item-label">Prenotazione ECG / Holter</span>
-            <span class="proc-item-code code-servizi">S1</span>
-          </button>
-          <button class="proc-item" data-id="S2">
-            <span class="proc-item-label">Consegna referto via mail / app al cliente</span>
-            <span class="proc-item-code code-servizi">S2</span>
-          </button>
-        </div>
-      </section>
-
-    </section>
-
-    <!-- DETTAGLIO PROCEDURA -->
-    <section class="dettaglio">
-      <header class="dettaglio-header">
-        <h2 id="dettaglioTitolo">Seleziona una procedura</h2>
-        <p id="dettaglioReparto" class="dettaglio-tag">—</p>
+        <button id="backToReparti" class="btn-outline">
+          ← Torna ai reparti principali
+        </button>
       </header>
 
-      <p class="dettaglio-intro">
-        Tocca una procedura per vedere i passaggi passo-passo.  
-        Pensato per essere letto in pochi secondi, anche in cassa con il cliente davanti.
-      </p>
+      <div id="procedureList" class="procedure-list">
+        <!-- bottoni procedura creati da JS -->
+      </div>
+    </section>
 
-      <ol id="dettaglioPassi" class="dettaglio-passi">
-        <li>Seleziona prima un reparto.</li>
-        <li>Poi scegli una procedura dal riquadro sopra.</li>
-        <li>Qui appariranno i passaggi in modo semplice e numerato.</li>
+    <!-- DETTAGLIO PROCEDURA SELEZIONATA -->
+    <section class="detail-card">
+      <header class="detail-header">
+        <div class="detail-top-row">
+          <span id="detailAreaChip" class="chip chip-area">Cassa</span>
+          <span id="detailCode" class="chip chip-code">C1</span>
+        </div>
+        <h2 id="detailTitle">Seleziona una procedura</h2>
+        <p id="detailIntro" class="small-text">
+          Tocca una procedura dalla lista in alto per vedere i passaggi da seguire.
+        </p>
+      </header>
+
+      <ol id="detailSteps" class="detail-steps">
+        <!-- step generati da JS -->
       </ol>
+
+      <p id="detailNote" class="detail-note"></p>
     </section>
 
   </main>
