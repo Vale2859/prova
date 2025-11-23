@@ -1,334 +1,379 @@
-/* RESET BASE MOLTO LEGGERO */
+/* ===== RESET VELOCE ===== */
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
-:root {
-  --bg: #050714;
-  --card: rgba(19, 28, 51, 0.92);
-  --card-soft: rgba(22, 32, 64, 0.85);
-  --accent: #00e5b0;
-  --accent-soft: rgba(0, 229, 176, 0.15);
-  --text-main: #f5f7ff;
-  --text-soft: #b3bed8;
-  --border-soft: rgba(255, 255, 255, 0.06);
-  --shadow-strong: 0 22px 40px rgba(0, 0, 0, 0.65);
-  --radius-lg: 24px;
-  --radius-md: 16px;
-  --radius-pill: 999px;
-}
-
-html, body {
+html,
+body {
   height: 100%;
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-  background:
-    radial-gradient(circle at top left, #12254c 0, transparent 50%),
-    radial-gradient(circle at bottom right, #0f6f5f 0, transparent 55%),
-    var(--bg);
-  color: var(--text-main);
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+  color: #f5f7fb;
+  background: #020817;
 }
 
-/* CONTENITORE PRINCIPALE */
+/* ===== SFONDO GRADIENTE ===== */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 0% 0%, #0ecb81 0, transparent 45%),
+    radial-gradient(circle at 100% 0%, #0ea5e9 0, transparent 45%),
+    radial-gradient(circle at 50% 100%, #6366f1 0, #020617 55%);
+  opacity: 0.9;
+  z-index: -2;
+}
 
-.app {
-  width: 100%;
-  max-width: 1200px;
-  min-height: 100vh;
-  padding: 24px 18px 32px;
+/* Velo glass */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(18px);
+  background: linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.72),
+      rgba(15, 23, 42, 0.9)
+    );
+  z-index: -1;
+}
+
+/* ===== LAYOUT PRINCIPALE ===== */
+.page {
+  max-width: 1160px;
+  margin: 32px auto 40px auto;
+  padding: 0 16px 32px;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-/* TOP BAR */
-
-.top-bar {
+/* HEADER */
+.page-header {
   display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 18px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(120deg, rgba(8, 13, 35, 0.95), rgba(14, 32, 45, 0.96));
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(22px);
 }
 
-.top-left {
+/* Mini logo pillola */
+.logo-text {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-.logo-circle {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 20%, #4effd9 0, #0bb88b 40%, #005b59 100%);
+.logo-pill {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 20%, #22c55e, #16a34a);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: #02110f;
-  box-shadow:
-    0 0 0 2px rgba(4, 35, 30, 0.8),
-    0 16px 30px rgba(0, 0, 0, 0.65);
+  font-weight: 800;
+  font-size: 18px;
+  color: #e5fdf2;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.45);
 }
 
-.title-block h1 {
-  font-size: 1.4rem;
+.page-header h1 {
+  font-size: 26px;
   letter-spacing: 0.04em;
 }
 
-.title-block .subtitle {
-  font-size: 0.86rem;
-  color: var(--text-soft);
-  margin-top: 2px;
-}
-
-.top-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pill {
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  font-size: 0.78rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(9, 17, 40, 0.85);
-}
-
-.pill-role {
-  border-color: rgba(0, 229, 176, 0.5);
-  background: linear-gradient(120deg, rgba(0, 229, 176, 0.18), rgba(9, 17, 40, 0.9));
-}
-
-.pill-env {
+.page-header p {
+  font-size: 14px;
   opacity: 0.85;
 }
 
-/* SEZIONI */
-
-.view {
-  display: none;
-  flex-direction: column;
-  gap: 18px;
-  padding: 18px 16px 22px;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(11, 19, 44, 0.96), rgba(8, 32, 40, 0.97));
-  border: 1px solid var(--border-soft);
-  box-shadow: var(--shadow-strong);
-  backdrop-filter: blur(24px);
-}
-
-.view.active {
+/* Badge numeri */
+.header-badges {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.section-title {
-  font-size: 1.2rem;
-  margin-bottom: 4px;
+.stat-pill {
+  min-width: 120px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 0% 0%, #1d4ed8, #020617);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
 }
 
-.section-description {
-  font-size: 0.88rem;
-  color: var(--text-soft);
-  max-width: 650px;
+.stat-pill strong {
+  font-size: 16px;
 }
 
-/* REPARTI GRID */
+/* ===== CARD BASE ===== */
+.card {
+  border-radius: 26px;
+  background: linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.92),
+      rgba(15, 23, 42, 0.86)
+    );
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  padding: 18px 18px 20px;
+  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.6);
+}
 
+/* Colori secondarie/terziarie */
+.card-secondary {
+  background: linear-gradient(
+      135deg,
+      rgba(15, 23, 42, 0.96),
+      rgba(15, 23, 42, 0.9)
+    );
+}
+
+.card-tertiary {
+  background: linear-gradient(
+      145deg,
+      rgba(15, 23, 42, 0.96),
+      rgba(30, 64, 175, 0.88)
+    );
+}
+
+/* Header card */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.card-header h2 {
+  font-size: 20px;
+  margin-bottom: 2px;
+}
+
+.card-header p {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+/* ===== REPARTI GRID ===== */
 .reparti-grid {
-  margin-top: 8px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 4px;
 }
 
-.reparto-card {
+/* Bottone reparto grande */
+.reparto-btn {
   position: relative;
   border: none;
-  outline: none;
-  cursor: pointer;
-  padding: 14px 12px;
-  border-radius: var(--radius-md);
-  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.08) 0, transparent 55%),
-              radial-gradient(circle at bottom right, rgba(0, 229, 176, 0.12) 0, transparent 60%),
-              rgba(9, 19, 46, 0.95);
-  color: var(--text-main);
+  border-radius: 22px;
+  padding: 14px 14px 14px 14px;
   text-align: left;
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  color: #f9fafb;
+  font-weight: 600;
+  font-size: 15px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  transition: transform 0.16s ease-out, box-shadow 0.16s ease-out, border-color 0.16s ease-out, background 0.16s ease-out;
+  transform: translateY(0);
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    filter 0.15s ease, transform 0.08s ease-out;
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.65);
 }
 
-.reparto-card .icon {
-  font-size: 1.6rem;
+.reparto-btn span.desc {
+  font-size: 12px;
+  opacity: 0.9;
 }
 
-.reparto-card .label {
-  font-weight: 600;
-  letter-spacing: 0.03em;
+.reparto-btn span.count {
+  font-size: 11px;
+  opacity: 0.95;
 }
 
-.reparto-card .hint {
-  font-size: 0.8rem;
-  color: var(--text-soft);
+/* colori singoli reparti */
+.reparto-cassa {
+  background: radial-gradient(circle at 0% 0%, #22c55e, #16a34a);
+}
+.reparto-banco {
+  background: radial-gradient(circle at 0% 0%, #38bdf8, #0ea5e9);
+}
+.reparto-magazzino {
+  background: radial-gradient(circle at 0% 0%, #facc15, #eab308);
+}
+.reparto-servizi {
+  background: radial-gradient(circle at 0% 0%, #a855f7, #7c3aed);
+}
+.reparto-altro {
+  background: radial-gradient(circle at 0% 0%, #fb7185, #e11d48);
 }
 
-.reparto-card::after {
-  content: "→";
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.55);
+.reparto-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+  box-shadow: 0 18px 32px rgba(0, 0, 0, 0.7);
 }
 
-.reparto-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 20px 38px rgba(0, 0, 0, 0.75);
-  border-color: rgba(0, 229, 176, 0.6);
+.reparto-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.7);
 }
 
-/* VISTA PROCEDURE */
-
-.view-header {
-  display: flex;
-  flex-direction: column;
+/* ===== BOTTONI PROCEDURE ===== */
+.procedure-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 10px;
+  margin-top: 4px;
 }
 
+.procedure-btn {
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  padding: 10px 12px;
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(148, 163, 184, 0.22),
+    rgba(15, 23, 42, 0.95)
+  );
+  color: #e5e7eb;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.1s ease, transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+
+.procedure-btn span.label {
+  flex: 1;
+}
+
+.procedure-btn span.shortcut {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.procedure-btn:hover {
+  background: radial-gradient(
+    circle at 0% 0%,
+    rgba(251, 191, 36, 0.22),
+    rgba(15, 23, 42, 0.98)
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(0, 0, 0, 0.6);
+}
+
+.procedure-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.65);
+}
+
+/* ===== DETTAGLIO PROCEDURA ===== */
+.dettaglio-body {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dettaglio-body h3 {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.dettaglio-body ol {
+  padding-left: 20px;
+  margin-top: 6px;
+  display: grid;
+  row-gap: 4px;
+}
+
+.dettaglio-body li {
+  margin-bottom: 2px;
+}
+
+.dettaglio-body p {
+  margin-bottom: 6px;
+}
+
+/* Chip reparto */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.chip-reparto {
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+}
+
+/* Bottone ghost */
 .btn-ghost {
-  align-self: flex-start;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(6, 18, 33, 0.88);
-  color: var(--text-main);
-  padding: 6px 14px;
-  font-size: 0.86rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  padding: 7px 14px;
+  background: rgba(15, 23, 42, 0.8);
+  color: #e5e7eb;
+  font-size: 13px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
 .btn-ghost:hover {
-  background: rgba(8, 27, 51, 0.95);
+  background: rgba(30, 64, 175, 0.8);
 }
 
-.view-title-block h2 {
-  font-size: 1.1rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+/* TESTO SECONDARIO */
+.muted {
+  opacity: 0.86;
+  font-size: 13px;
 }
 
-.view-subtitle {
-  font-size: 0.84rem;
-  color: var(--text-soft);
-  margin-top: 2px;
+/* ===== UTILI ===== */
+.hidden {
+  display: none;
 }
 
-/* GRID PROCEDURE */
-
-.procedure-grid {
-  margin-top: 12px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.procedure-card {
-  border-radius: var(--radius-md);
-  padding: 12px 12px 14px;
-  background: var(--card-soft);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.7);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  position: relative;
-}
-
-.procedure-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-}
-
-.procedure-name {
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.procedure-tag {
-  font-size: 0.7rem;
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(3, 16, 28, 0.85);
-}
-
-.procedure-desc {
-  font-size: 0.8rem;
-  color: var(--text-soft);
-}
-
-.procedure-chip {
-  margin-top: 4px;
-  font-size: 0.72rem;
-  color: var(--accent);
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 900px) {
-  .app {
-    max-width: 100%;
-    padding: 18px 10px 24px;
+/* ===== RESPONSIVE ===== */
+@media (max-width: 720px) {
+  .page {
+    margin-top: 20px;
   }
 
-  .top-bar {
+  .page-header {
+    align-items: flex-start;
+  }
+
+  .header-badges {
+    width: 100%;
+  }
+
+  .card-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-  }
-
-  .reparti-grid,
-  .procedure-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .reparti-grid,
-  .procedure-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .view {
-    padding: 14px 10px 18px;
-  }
-
-  .top-bar {
-    padding: 12px 12px;
   }
 }
