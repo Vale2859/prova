@@ -1,1 +1,334 @@
+/* RESET BASE MOLTO LEGGERO */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
+:root {
+  --bg: #050714;
+  --card: rgba(19, 28, 51, 0.92);
+  --card-soft: rgba(22, 32, 64, 0.85);
+  --accent: #00e5b0;
+  --accent-soft: rgba(0, 229, 176, 0.15);
+  --text-main: #f5f7ff;
+  --text-soft: #b3bed8;
+  --border-soft: rgba(255, 255, 255, 0.06);
+  --shadow-strong: 0 22px 40px rgba(0, 0, 0, 0.65);
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-pill: 999px;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  background:
+    radial-gradient(circle at top left, #12254c 0, transparent 50%),
+    radial-gradient(circle at bottom right, #0f6f5f 0, transparent 55%),
+    var(--bg);
+  color: var(--text-main);
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+/* CONTENITORE PRINCIPALE */
+
+.app {
+  width: 100%;
+  max-width: 1200px;
+  min-height: 100vh;
+  padding: 24px 18px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* TOP BAR */
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(120deg, rgba(8, 13, 35, 0.95), rgba(14, 32, 45, 0.96));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(22px);
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 20%, #4effd9 0, #0bb88b 40%, #005b59 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #02110f;
+  box-shadow:
+    0 0 0 2px rgba(4, 35, 30, 0.8),
+    0 16px 30px rgba(0, 0, 0, 0.65);
+}
+
+.title-block h1 {
+  font-size: 1.4rem;
+  letter-spacing: 0.04em;
+}
+
+.title-block .subtitle {
+  font-size: 0.86rem;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill {
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(9, 17, 40, 0.85);
+}
+
+.pill-role {
+  border-color: rgba(0, 229, 176, 0.5);
+  background: linear-gradient(120deg, rgba(0, 229, 176, 0.18), rgba(9, 17, 40, 0.9));
+}
+
+.pill-env {
+  opacity: 0.85;
+}
+
+/* SEZIONI */
+
+.view {
+  display: none;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 16px 22px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(11, 19, 44, 0.96), rgba(8, 32, 40, 0.97));
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-strong);
+  backdrop-filter: blur(24px);
+}
+
+.view.active {
+  display: flex;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  margin-bottom: 4px;
+}
+
+.section-description {
+  font-size: 0.88rem;
+  color: var(--text-soft);
+  max-width: 650px;
+}
+
+/* REPARTI GRID */
+
+.reparti-grid {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.reparto-card {
+  position: relative;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 12px;
+  border-radius: var(--radius-md);
+  background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.08) 0, transparent 55%),
+              radial-gradient(circle at bottom right, rgba(0, 229, 176, 0.12) 0, transparent 60%),
+              rgba(9, 19, 46, 0.95);
+  color: var(--text-main);
+  text-align: left;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.16s ease-out, box-shadow 0.16s ease-out, border-color 0.16s ease-out, background 0.16s ease-out;
+}
+
+.reparto-card .icon {
+  font-size: 1.6rem;
+}
+
+.reparto-card .label {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.reparto-card .hint {
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.reparto-card::after {
+  content: "→";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.reparto-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 38px rgba(0, 0, 0, 0.75);
+  border-color: rgba(0, 229, 176, 0.6);
+}
+
+/* VISTA PROCEDURE */
+
+.view-header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-ghost {
+  align-self: flex-start;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(6, 18, 33, 0.88);
+  color: var(--text-main);
+  padding: 6px 14px;
+  font-size: 0.86rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-ghost:hover {
+  background: rgba(8, 27, 51, 0.95);
+}
+
+.view-title-block h2 {
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.view-subtitle {
+  font-size: 0.84rem;
+  color: var(--text-soft);
+  margin-top: 2px;
+}
+
+/* GRID PROCEDURE */
+
+.procedure-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.procedure-card {
+  border-radius: var(--radius-md);
+  padding: 12px 12px 14px;
+  background: var(--card-soft);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+
+.procedure-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.procedure-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.procedure-tag {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(3, 16, 28, 0.85);
+}
+
+.procedure-desc {
+  font-size: 0.8rem;
+  color: var(--text-soft);
+}
+
+.procedure-chip {
+  margin-top: 4px;
+  font-size: 0.72rem;
+  color: var(--accent);
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+  .app {
+    max-width: 100%;
+    padding: 18px 10px 24px;
+  }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .reparti-grid,
+  .procedure-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .reparti-grid,
+  .procedure-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .view {
+    padding: 14px 10px 18px;
+  }
+
+  .top-bar {
+    padding: 12px 12px;
+  }
+}
