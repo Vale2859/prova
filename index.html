@@ -2,101 +2,357 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Procedure operative – Demo</title>
+  <title>Portale Farmacia Montesano</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
+
+  <!-- Icone per aggiunta a Home su iPhone/iPad -->
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
+  <link rel="apple-touch-icon" sizes="152x152" href="logo.jpg">
+  <link rel="apple-touch-icon" sizes="120x120" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+
+  <!-- Icona per Android / browser -->
+  <link rel="icon" type="image/png" href="logo.jpg">
 </head>
 <body>
-  <main class="app">
 
-    <!-- BARRA ALTA -->
-    <header class="top-bar">
-      <button class="btn-back" id="btnDashboard">
-        ← Dashboard
-      </button>
-      <h1>Procedure operative</h1>
-    </header>
+  <!-- ============ LOGIN ============ -->
+  <div id="authContainer" class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo-wrap">
+        <img src="logo.jpg" alt="Farmacia Montesano" class="auth-logo" />
+      </div>
+      <h1>Portale Farmacia Montesano</h1>
+      <p class="auth-intro">
+        Seleziona il tipo di accesso e inserisci le credenziali.
+      </p>
 
-    <!-- RIQUADRI REPARTI -->
-    <section class="reparti-grid">
-      <!-- CASSA -->
-      <article class="reparto-card" data-reparto="cassa">
-        <h2>Cassa</h2>
-        <p class="reparto-count">
-          <span class="reparto-count-number" id="count-cassa">0</span> procedure
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-role="farmacia">Farmacia</button>
+        <button class="auth-tab" data-role="titolare">Titolare</button>
+        <button class="auth-tab" data-role="dipendente">Dipendente</button>
+      </div>
+
+      <p class="auth-subtitle">
+        Accesso come: <span id="loginRoleLabel">Farmacia</span>
+      </p>
+
+      <form id="loginForm" class="auth-form">
+        <div class="form-row">
+          <label for="loginUsername">Username</label>
+          <input id="loginUsername" type="text" placeholder="Inserisci username" />
+        </div>
+        <div class="form-row">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" placeholder="Inserisci password" />
+        </div>
+        <button type="submit" class="btn-primary wide">Entra</button>
+        <p class="login-hint">
+          Demo: per ora puoi inserire qualsiasi username e password.
         </p>
-        <input
-          type="text"
-          class="search-input"
-          data-reparto="cassa"
-          placeholder="Cerca nelle procedure di cassa..."
-        />
-      </article>
+      </form>
+    </div>
+  </div>
 
-      <!-- BANCO -->
-      <article class="reparto-card" data-reparto="banco">
-        <h2>Banco</h2>
-        <p class="reparto-count">
-          <span class="reparto-count-number" id="count-banco">0</span> procedure
-        </p>
-        <input
-          type="text"
-          class="search-input"
-          data-reparto="banco"
-          placeholder="Cerca nelle procedure di banco..."
-        />
-      </article>
+  <!-- ============ APP PRINCIPALE ============ -->
+  <main id="app" class="app hidden">
 
-      <!-- MAGAZZINO -->
-      <article class="reparto-card" data-reparto="magazzino">
-        <h2>Magazzino</h2>
-        <p class="reparto-count">
-          <span class="reparto-count-number" id="count-magazzino">0</span> procedure
-        </p>
-        <input
-          type="text"
-          class="search-input"
-          data-reparto="magazzino"
-          placeholder="Cerca nelle procedure di magazzino..."
-        />
-      </article>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-row">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="sidebar-logo" />
+          <span class="sidebar-title">Portale interno</span>
+        </div>
+        <button id="closeSidebar" class="icon-button" aria-label="Chiudi menu">✕</button>
+      </div>
 
-      <!-- SERVIZI -->
-      <article class="reparto-card" data-reparto="servizi">
-        <h2>Servizi</h2>
-        <p class="reparto-count">
-          <span class="reparto-count-number" id="count-servizi">0</span> procedure
-        </p>
-        <input
-          type="text"
-          class="search-input"
-          data-reparto="servizi"
-          placeholder="Cerca nelle procedure di servizi..."
-        />
-      </article>
-    </section>
+      <ul class="sidebar-list">
+        <li data-nav="dashboard">Dashboard</li>
+        <li data-nav="assenzePage">Assenze</li>
+        <li data-nav="turniPage">Farmacie di turno</li>
+        <li data-nav="comunicazioniPage">Comunicazioni</li>
+        <li data-nav="procedurePage">Procedure</li>
+        <li class="divider-label">Sezioni dedicate</li>
+        <li data-nav="areaPersonale">Area personale</li>
+        <li data-nav="areaAdmin">Admin</li>
+        <li id="logoutBtn" class="logout">Logout</li>
+      </ul>
+    </aside>
 
-    <!-- AREA DETTAGLIO PROCEDURE -->
-    <section class="procedure-panel">
-      <header class="procedure-header">
-        <h2 id="procedureTitle">Seleziona un reparto</h2>
-        <p id="procedureSubtitle" class="procedure-subtitle">
-          Tocca uno dei reparti sopra per vedere tutte le procedure. Massimo 2 clic per trovare ciò che ti serve.
-        </p>
+    <!-- HAMBURGER -->
+    <button id="hamburger" class="hamburger" aria-label="Apri menu">
+      ☰
+    </button>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section id="dashboard" class="dashboard">
+
+      <header class="dashboard-header">
+        <div class="dashboard-logo-block">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="dash-logo" />
+        </div>
+        <div class="dashboard-header-text">
+          <h1>Farmacia Montesano</h1>
+          <p class="header-subtitle">Portale interno</p>
+          <span id="currentRolePill" class="role-pill">Farmacia (accesso generico)</span>
+        </div>
       </header>
 
-      <div id="procedureList" class="procedure-list procedure-list--empty">
-        <p class="placeholder-text">
-          Nessun reparto selezionato. Scegli un riquadro in alto (Cassa, Banco, Magazzino o Servizi).
-        </p>
-      </div>
+      <div class="dashboard-content">
+        <div class="cards-grid">
 
-      <div class="procedure-footer">
-        <button id="btnBackToReparti" class="btn-secondary hidden">
+          <!-- ASSENZE -->
+          <article class="card card-assenze">
+            <span class="card-badge">2</span>
+            <div class="card-header">
+              <div class="card-icon">📅</div>
+              <div class="card-title-group">
+                <h2 id="assenzeTitle">Assenze del personale</h2>
+                <span class="chip chip-today">Oggi</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="caption">2 richieste in attesa</p>
+              <p class="small-text">
+                Assenti oggi: <strong>Mario G., Anna S.</strong><br />
+                In ferie: <strong>Luca B.</strong>
+              </p>
+            </div>
+            <div class="card-footer">
+              <button id="openAssenze" class="btn-primary">
+                Richiedi la tua assenza
+              </button>
+            </div>
+          </article>
+
+          <!-- FARMACIA DI TURNO -->
+          <article class="card card-turno">
+            <span class="card-badge">1</span>
+            <div class="card-header">
+              <div class="card-icon">⏰</div>
+              <div class="card-title-group">
+                <h2>Farmacia di turno</h2>
+                <span class="chip chip-turno" id="turnoOrarioChip">00:00 – 24:00</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <p><strong id="turnoNome">Farmacia Montesano</strong></p>
+              <p class="small-text" id="turnoIndirizzo">
+                Via Esempio 12, Matera<br />
+                Tel: 0835 000000
+              </p>
+              <div class="divider"></div>
+              <p class="small-text">
+                <strong>Farmacia di appoggio</strong><br />
+                <span id="turnoAppoggio">
+                  Farmacia Centrale – Via Dante 8, Matera – Tel: 0835 111111
+                </span>
+              </p>
+            </div>
+            <div class="card-footer">
+              <button id="openTurni" class="btn-secondary">
+                Lista farmacie di turno
+              </button>
+            </div>
+          </article>
+
+          <!-- COMUNICAZIONI -->
+          <article class="card card-comunicazioni">
+            <span class="card-badge">3</span>
+            <div class="card-header">
+              <div class="card-icon">📢</div>
+              <div class="card-title-group">
+                <h2>Comunicazioni</h2>
+              </div>
+            </div>
+            <div class="card-body card-body-list">
+              <div class="list-item">
+                <span class="list-title">Nuova procedura notturni</span>
+                <span class="list-meta">Oggi · Urgente</span>
+              </div>
+              <div class="list-item">
+                <span class="list-title">Verifica armadietto stupefacenti</span>
+                <span class="list-meta">Ieri · Importante</span>
+              </div>
+              <div class="list-item">
+                <span class="list-title">Aggiornamento promo vetrina</span>
+                <span class="list-meta">2 giorni fa · Informativa</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button id="openComunicazioni" class="btn-primary">
+                Comunica o modifica la comunicazione
+              </button>
+            </div>
+          </article>
+
+          <!-- PROCEDURE -->
+          <article class="card card-procedure">
+            <span class="card-badge" id="procedureBadge">10</span>
+            <div class="card-header">
+              <div class="card-icon">🗂️</div>
+              <div class="card-title-group">
+                <h2>Procedure</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Tutte le procedure divise per reparto (cassa, banco, magazzino, servizi…).
+              </p>
+            </div>
+            <div class="card-footer">
+              <button id="openProcedure" class="btn-secondary">
+                Apri procedure operative
+              </button>
+            </div>
+          </article>
+
+          <!-- LOGISTICA -->
+          <article class="card card-logistica">
+            <span class="card-badge">4</span>
+            <div class="card-header">
+              <div class="card-icon">📦</div>
+              <div class="card-title-group">
+                <h2>Logistica</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Arrivi, corrieri, espositori e materiali per reparto.
+              </p>
+            </div>
+            <div class="card-footer">
+              <button class="btn-secondary">
+                Modifica o inserisci nuova logistica
+              </button>
+            </div>
+          </article>
+
+          <!-- MAGAZZINIERA -->
+          <article class="card card-magazziniera">
+            <span class="card-badge">2</span>
+            <div class="card-header">
+              <div class="card-icon">📋</div>
+              <div class="card-title-group">
+                <h2>Magazziniera</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Controllo scorte, scadenze, arrivi e sistemazione magazzino.
+              </p>
+            </div>
+            <div class="card-footer">
+              <button class="btn-secondary">
+                Modifica
+              </button>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PAGINA ASSENZE ============ -->
+    <!-- (IDENTICA A PRIMA – NON MODIFICATA) -->
+    <!-- ... TUTTA LA TUA PAGINA ASSENZE COME L’HAI INCOLLATA ... -->
+    <!-- Per brevità non la ricopio qui ma tu tieni la tua versione identica -->
+
+    <!-- ============ PAGINA FARMACIE DI TURNO ============ -->
+    <!-- ... ANCHE QUI LASCI LA TUA SEZIONE turniPage IDENTICA ... -->
+
+    <!-- ============ PAGINA COMUNICAZIONI ============ -->
+    <!-- ... SEZIONE comunicazioniPage IDENTICA ALLA TUA ... -->
+
+    <!-- ============ PAGINA PROCEDURE ============ -->
+    <section id="procedurePage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromProcedure" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Procedure operative</h1>
+          <p>
+            Tutte le procedure divise per reparto. L’obiettivo è che un dipendente
+            trovi ciò che gli serve in massimo <strong>2 clic</strong>.
+          </p>
+        </div>
+        <div class="summary-badges">
+          <span class="badge badge-today" id="badgeProcTot">Totali: 0</span>
+          <span class="badge badge-week" id="badgeProcCassa">Cassa: 0</span>
+          <span class="badge badge-month" id="badgeProcBanco">Banco: 0</span>
+        </div>
+      </header>
+
+      <!-- REPARTI PRINCIPALI -->
+      <article class="card">
+        <h2>Seleziona un reparto</h2>
+        <p class="small-text">
+          1) Tocca il reparto · 2) Tocca la procedura · Finito.
+        </p>
+
+        <div class="procedure-reparti-row">
+          <button class="proc-reparto-btn" data-reparto="cassa">
+            <span class="proc-reparto-title">Cassa</span>
+            <span class="proc-reparto-count" id="countCassa">0 procedure</span>
+          </button>
+          <button class="proc-reparto-btn" data-reparto="banco">
+            <span class="proc-reparto-title">Banco</span>
+            <span class="proc-reparto-count" id="countBanco">0 procedure</span>
+          </button>
+          <button class="proc-reparto-btn" data-reparto="magazzino">
+            <span class="proc-reparto-title">Magazzino</span>
+            <span class="proc-reparto-count" id="countMagazzino">0 procedure</span>
+          </button>
+          <button class="proc-reparto-btn" data-reparto="servizi">
+            <span class="proc-reparto-title">Servizi</span>
+            <span class="proc-reparto-count" id="countServizi">0 procedure</span>
+          </button>
+          <button class="proc-reparto-btn" data-reparto="sicurezza">
+            <span class="proc-reparto-title">Sicurezza</span>
+            <span class="proc-reparto-count" id="countSicurezza">0 procedure</span>
+          </button>
+        </div>
+
+        <div class="form-row">
+          <label for="procedureSearch">Ricerca rapida nel reparto selezionato</label>
+          <input
+            type="text"
+            id="procedureSearch"
+            placeholder="Es. doppio scontrino, reso, nota di credito..."
+          />
+        </div>
+      </article>
+
+      <!-- ELENCO PROCEDURE -->
+      <article class="card">
+        <div class="requests-header">
+          <h2 id="procedureListTitle">Procedure – Cassa</h2>
+          <p class="small-text" id="procedureListSubtitle">
+            Tocca una procedura per vedere il dettaglio.
+          </p>
+        </div>
+
+        <div id="procedureList" class="procedure-list">
+          <!-- riempito da JS -->
+        </div>
+
+        <button id="procedureBackToReparti" class="btn-secondary">
           Torna ai reparti principali
         </button>
-      </div>
+      </article>
+
+      <!-- DETTAGLIO PROCEDURA -->
+      <article id="procedureDetailCard" class="card hidden">
+        <div class="requests-header">
+          <h2 id="procedureDetailTitle">Titolo procedura</h2>
+          <p class="small-text" id="procedureDetailReparto">Reparto · Codice</p>
+        </div>
+        <p id="procedureDetailText" class="small-text">
+          Qui apparirà il testo della procedura selezionata (demo statica).
+        </p>
+      </article>
     </section>
 
   </main>
