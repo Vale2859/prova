@@ -1180,3 +1180,156 @@ button {
     opacity: 0;
   }
 }
+/* ====== PROCEDURE OPERATIVE ====== */
+
+.procedure-page {
+  padding: 24px 16px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.procedure-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.proc-stat-pill {
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 0%, #1f4fff, #050b2a);
+  color: #fff;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.proc-stat-pill .value {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.procedure-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.procedure-dept-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.proc-dept-btn {
+  flex: 1;
+  min-width: 120px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #262d60, #131830);
+  color: #fff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+  opacity: 0.7;
+}
+
+.proc-dept-btn.active {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.procedure-search {
+  margin-top: 12px;
+}
+
+.procedure-search input {
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 10px 16px;
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+}
+
+.procedure-buttons {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.procedure-pill {
+  width: 100%;
+  border-radius: 999px;
+  border: none;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #fff;
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.45);
+}
+
+.procedure-code {
+  font-weight: 700;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.procedure-label {
+  flex: 1;
+  text-align: left;
+}
+
+.procedure-hotkey {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+/* Colori diversi per reparto */
+.procedure-pill-cassa {
+  background: linear-gradient(135deg, #ffd54a, #ff9f1c);
+}
+
+.procedure-pill-banco {
+  background: linear-gradient(135deg, #ff4b6a, #ff006e);
+}
+
+.procedure-pill-magazzino {
+  background: linear-gradient(135deg, #ff8a5c, #ffb347);
+}
+
+.procedure-pill-servizi {
+  background: linear-gradient(135deg, #29c7ff, #38e0b9);
+}
+
+.procedure-detail-card .procedure-steps {
+  margin-top: 12px;
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+.procedure-steps li + li {
+  margin-top: 6px;
+}
+
+/* Pulsante piccolo in header lista */
+.procedure-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
