@@ -60,7 +60,7 @@ let comunicazioni = [
     categoria: "urgente",
     autore: "Titolare",
     data: "Oggi",
-    testo: "Dal prossimo turno seguire la nuova check-list chiusura farmacia.",
+    testo: "Dal prossimo turno seguire la nuova check-list di chiusura farmacia.",
     letta: false
   },
   {
@@ -83,76 +83,145 @@ let comunicazioni = [
   }
 ];
 
-// ====== DATI DEMO: NOTIFICHE (per pallino rosso) ======
-const notificationData = {
-  assenze: [
-    {
-      id: "ass-1",
-      title: "Richiesta permesso approvata",
-      message: "La richiesta di permesso del 20/12 è stata approvata dal titolare.",
-      read: false
-    },
-    {
-      id: "ass-2",
-      title: "Richiesta ferie rifiutata",
-      message: "Le ferie richieste per il 10/01 non sono state approvate.",
-      read: false
-    }
-  ],
-  turni: [
-    {
-      id: "tur-1",
-      title: "Cambio turno notturno",
-      message: "Il turno notturno di oggi è stato modificato. Verifica l'elenco turni.",
-      read: false
-    }
-  ],
-  comunicazioni: [
-    {
-      id: "com-1",
-      title: "Nuova comunicazione urgente",
-      message: "È stata pubblicata una nuova comunicazione urgente.",
-      read: false
-    }
-  ],
-  procedure: [
-    {
-      id: "proc-1",
-      title: "Procedura chiusura cassa aggiornata",
-      message: "Consulta la nuova versione della procedura di chiusura cassa.",
-      read: false
-    }
-  ],
-  logistica: [
-    {
-      id: "log-1",
-      title: "Arrivo nuovo espositore",
-      message: "È previsto l'arrivo di un nuovo espositore in magazzino.",
-      read: false
-    }
-  ],
-  magazziniera: [
-    {
-      id: "mag-1",
-      title: "Controllo scadenze",
-      message: "Ricorda il controllo scadenze prodotti reparto banco 1.",
-      read: false
-    }
-  ]
-};
+// ====== DATI DEMO: PROCEDURE ======
+const procedureData = [
+  {
+    id: "proc1",
+    titolo: "Chiusura cassa serale",
+    reparto: "cassa",
+    aggiornamento: "12/11/2025",
+    testo: "1) Verifica giacenza contanti.\n2) Stampa chiusura fiscale.\n3) Conta fondo cassa e registra su modulo chiusura."
+  },
+  {
+    id: "proc2",
+    titolo: "Gestione buoni SSN",
+    reparto: "cassa",
+    aggiornamento: "05/10/2025",
+    testo: "Controllare ricetta, inserire correttamente i dati del paziente, allegare copia scontrino al buono."
+  },
+  {
+    id: "proc3",
+    titolo: "Ricezione merce da grossista",
+    reparto: "magazzino",
+    aggiornamento: "22/09/2025",
+    testo: "Controllo colli, stampa DDT, verifica scadenze, etichettatura e carico in magazzino."
+  },
+  {
+    id: "proc4",
+    titolo: "Reso prodotti danneggiati",
+    reparto: "logistica",
+    aggiornamento: "18/09/2025",
+    testo: "Compilare modulo reso, fotografare prodotto, contattare referente commerciale e attendere autorizzazione."
+  },
+  {
+    id: "proc5",
+    titolo: "Prenotazione servizi CUP / ECG",
+    reparto: "servizi",
+    aggiornamento: "01/10/2025",
+    testo: "Verificare dati anagrafici, orari disponibili, confermare prenotazione e consegnare promemoria al cliente."
+  }
+];
 
-const NOTIF_SECTION_LABELS = {
-  assenze: "Assenze del personale",
-  turni: "Farmacie di turno",
-  comunicazioni: "Comunicazioni interne",
-  procedure: "Procedure",
-  logistica: "Logistica",
-  magazziniera: "Magazziniera"
+// ====== DATI DEMO: NOTIFICHE PER CARD DASHBOARD ======
+const notificationConfig = {
+  assenze: {
+    titolo: "Notifiche assenze personale",
+    descrizioneVuota: "Non hai nuove notifiche sulle assenze.",
+    notifiche: [
+      {
+        id: "ass-1",
+        titolo: "Permesso approvato",
+        testo: "Il permesso del 20/12 è stato approvato dal titolare.",
+        letto: false
+      },
+      {
+        id: "ass-2",
+        titolo: "Permesso rifiutato",
+        testo: "Il permesso del 10/01 è stato rifiutato. Controlla i dettagli con il titolare.",
+        letto: false
+      }
+    ]
+  },
+  turni: {
+    titolo: "Notifiche farmacie di turno",
+    descrizioneVuota: "Nessuna variazione sui turni al momento.",
+    notifiche: [
+      {
+        id: "turni-1",
+        titolo: "Cambio turno notturno",
+        testo: "Il turno notturno del 19/12 è stato scambiato con Farmacia Centrale.",
+        letto: false
+      }
+    ]
+  },
+  comunicazioni: {
+    titolo: "Nuove comunicazioni interne",
+    descrizioneVuota: "Hai già letto tutte le comunicazioni.",
+    notifiche: [
+      {
+        id: "com-1",
+        titolo: "Nuova comunicazione urgente",
+        testo: "È stata pubblicata una nuova comunicazione urgente dall'area titolare.",
+        letto: false
+      },
+      {
+        id: "com-2",
+        titolo: "Messaggio informativo",
+        testo: "Aggiornato il regolamento per l’utilizzo del retro-banco.",
+        letto: false
+      }
+    ]
+  },
+  procedure: {
+    titolo: "Aggiornamenti procedure",
+    descrizioneVuota: "Nessuna procedura nuova da leggere.",
+    notifiche: [
+      {
+        id: "proc-1",
+        titolo: "Procedura chiusura cassa aggiornata",
+        testo: "È stata aggiornata la procedura 'Chiusura cassa serale'.",
+        letto: false
+      }
+    ]
+  },
+  logistica: {
+    titolo: "Notifiche logistica",
+    descrizioneVuota: "Al momento non ci sono avvisi di logistica.",
+    notifiche: [
+      {
+        id: "log-1",
+        titolo: "Nuovo espositore in arrivo",
+        testo: "Venerdì arriverà il nuovo espositore dermocosmesi, da montare in vetrina 2.",
+        letto: false
+      }
+    ]
+  },
+  magazzino: {
+    titolo: "Notifiche magazzino",
+    descrizioneVuota: "Non ci sono nuovi avvisi dal magazzino.",
+    notifiche: [
+      {
+        id: "mag-1",
+        titolo: "Scadenze in avvicinamento",
+        testo: "Sono presenti 5 articoli con scadenza inferiore a 3 mesi.",
+        letto: false
+      },
+      {
+        id: "mag-2",
+        titolo: "Inventario programmato",
+        testo: "Lunedì mattina inventario rapido banco automedicazione.",
+        letto: false
+      }
+    ]
+  }
 };
 
 // ====== STATO ======
 let currentRole = "farmacia"; // farmacia | titolare | dipendente
 let currentTurniView = "oggi"; // oggi | settimana | mese
+let currentProcedureFilter = "tutti";
+let currentProcedureSearch = "";
+let openNotificationCardKey = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   // Elementi principali
@@ -177,6 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const assenzePage = document.getElementById("assenzePage");
   const turniPage = document.getElementById("turniPage");
   const comunicazioniPage = document.getElementById("comunicazioniPage");
+  const procedurePage = document.getElementById("procedurePage");
 
   // Pulsanti navigazione rapida
   const openAssenzeBtn = document.getElementById("openAssenze");
@@ -185,6 +255,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const backFromTurniBtn = document.getElementById("backFromTurni");
   const openComunicazioniBtn = document.getElementById("openComunicazioni");
   const backFromComunicazioniBtn = document.getElementById("backFromComunicazioni");
+  const openProcedureBtn = document.getElementById("openProcedure");
+  const backFromProcedureBtn = document.getElementById("backFromProcedure");
 
   // Turni elementi
   const turnoOggiNome = document.getElementById("turnoOggiNome");
@@ -214,11 +286,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const badgeNonLette = document.getElementById("badgeNonLette");
   const badgeUrgenti = document.getElementById("badgeUrgenti");
 
-  // Notifiche (badge + popup)
-  const notifModal = document.getElementById("notifModal");
-  const notifModalTitle = document.getElementById("notifModalTitle");
-  const notifModalList = document.getElementById("notifModalList");
-  const notifModalClose = document.getElementById("notifModalClose");
+  // Procedure elementi
+  const procedureSearchInput = document.getElementById("procedureSearch");
+  const procedureFilterButtons = document.querySelectorAll(".proc-filter-btn");
+  const procedureListContainer = document.getElementById("procedureList");
+  const procedureDetail = document.getElementById("procedureDetail");
+
+  // Notifiche overlay
+  const notifOverlay = document.getElementById("notificationOverlay");
+  const notifTitle = document.getElementById("notifTitle");
+  const notifIntro = document.getElementById("notifIntro");
+  const notifList = document.getElementById("notifList");
+  const notifClose = document.getElementById("notifClose");
+  const notifCloseBottom = document.getElementById("notifCloseBottom");
 
   // ====== FUNZIONI DI SUPPORTO ======
 
@@ -241,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function showSection(section) {
     if (!section) return;
-    [dashboardSection, assenzePage, turniPage, comunicazioniPage].forEach((sec) => {
+    [dashboardSection, assenzePage, turniPage, comunicazioniPage, procedurePage].forEach(sec => {
       if (sec) sec.classList.add("hidden");
     });
     section.classList.remove("hidden");
@@ -256,104 +336,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeSidebarMenu() {
     if (!sidebar) return;
     sidebar.classList.remove("open");
-  }
-
-  // ====== NOTIFICHE: LOGICA ======
-
-  function getUnreadCount(sectionKey) {
-    const list = notificationData[sectionKey] || [];
-    return list.filter((n) => !n.read).length;
-  }
-
-  function updateNotificationBadge(sectionKey) {
-    const badge = document.querySelector(
-      `.notif-badge[data-section="${sectionKey}"]`
-    );
-    const label = document.querySelector(
-      `.notif-label[data-section="${sectionKey}"]`
-    );
-
-    if (!badge || !label) return;
-
-    const unread = getUnreadCount(sectionKey);
-
-    if (unread === 0) {
-      badge.classList.add("hidden");
-      label.classList.add("hidden");
-      return;
-    }
-
-    badge.classList.remove("hidden");
-    label.classList.remove("hidden");
-
-    badge.textContent = unread;
-    label.textContent = unread === 1 ? "nuovo" : "nuovi";
-  }
-
-  function renderNotificationList(sectionKey) {
-    if (!notifModalList) return;
-
-    notifModalList.innerHTML = "";
-
-    const list = notificationData[sectionKey] || [];
-    const unread = list.filter((n) => !n.read);
-
-    if (unread.length === 0) {
-      const p = document.createElement("p");
-      p.className = "small-text";
-      p.textContent = "Nessuna nuova notifica per questa sezione.";
-      notifModalList.appendChild(p);
-      return;
-    }
-
-    unread.forEach((n) => {
-      const item = document.createElement("div");
-      item.className = "notif-item";
-
-      const title = document.createElement("h3");
-      title.className = "notif-item-title";
-      title.textContent = n.title;
-
-      const text = document.createElement("p");
-      text.className = "notif-item-text";
-      text.textContent = n.message;
-
-      const footer = document.createElement("div");
-      footer.className = "notif-item-footer";
-
-      const btn = document.createElement("button");
-      btn.className = "btn-primary small";
-      btn.textContent = "Presa visione";
-
-      btn.addEventListener("click", () => {
-        n.read = true;
-        updateNotificationBadge(sectionKey);
-        renderNotificationList(sectionKey);
-      });
-
-      footer.appendChild(btn);
-      item.appendChild(title);
-      item.appendChild(text);
-      item.appendChild(footer);
-
-      notifModalList.appendChild(item);
-    });
-  }
-
-  function openNotificationModal(sectionKey) {
-    if (!notifModal || !notifModalTitle) return;
-
-    const label = NOTIF_SECTION_LABELS[sectionKey] || sectionKey;
-    notifModalTitle.textContent = `Notifiche – ${label}`;
-
-    renderNotificationList(sectionKey);
-    notifModal.dataset.section = sectionKey;
-    notifModal.classList.remove("hidden");
-  }
-
-  function closeNotificationModal() {
-    if (!notifModal) return;
-    notifModal.classList.add("hidden");
   }
 
   // ====== LOGIN ======
@@ -386,6 +368,7 @@ document.addEventListener("DOMContentLoaded", () => {
       app.classList.remove("hidden");
 
       showSection(dashboardSection);
+      initNotificationBadges();
     });
   }
 
@@ -420,6 +403,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (target === "comunicazioniPage") {
           showSection(comunicazioniPage);
           renderComunicazioni();
+        } else if (target === "procedurePage") {
+          showSection(procedurePage);
+          renderProcedureList();
         }
         closeSidebarMenu();
       });
@@ -432,6 +418,7 @@ document.addEventListener("DOMContentLoaded", () => {
       app.classList.add("hidden");
       authContainer.classList.remove("hidden");
 
+      // reset login
       loginForm && loginForm.reset();
       authTabs.forEach((t) => t.classList.remove("active"));
       authTabs[0].classList.add("active");
@@ -481,7 +468,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  if (openProcedureBtn) {
+    openProcedureBtn.addEventListener("click", () => {
+      showSection(procedurePage);
+      renderProcedureList();
+    });
+  }
+
+  if (backFromProcedureBtn) {
+    backFromProcedureBtn.addEventListener("click", () => {
+      showSection(dashboardSection);
+    });
+  }
+
   // ====== TURNI: POPOLAMENTO ======
+
   function initTurnoOggi() {
     const oggi = turniFarmacie.find((t) => t.tipoRange === "oggi");
     if (!oggi) return;
@@ -494,10 +495,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (turnoAppoggio) turnoAppoggio.textContent = oggi.appoggio;
 
     if (turnoOggiNome) turnoOggiNome.textContent = oggi.principale;
-    if (turnoOggiIndirizzo)
-      turnoOggiIndirizzo.textContent = "Via Esempio 12, Matera";
-    if (turnoOggiTelefono)
-      turnoOggiTelefono.textContent = `Tel: ${oggi.telefono}`;
+    if (turnoOggiIndirizzo) turnoOggiIndirizzo.textContent = "Via Esempio 12, Matera";
+    if (turnoOggiTelefono) turnoOggiTelefono.textContent = `Tel: ${oggi.telefono}`;
     if (turnoOggiOrario) turnoOggiOrario.textContent = oggi.orario;
     if (turnoOggiAppoggioNome) turnoOggiAppoggioNome.textContent = oggi.appoggio;
     if (turnoOggiAppoggioDettagli) {
@@ -510,9 +509,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!turniRowsContainer) return;
 
     const meseFilter = turniMeseSelect ? turniMeseSelect.value : "all";
-    const farmaciaFilter = turniFarmaciaSelect
-      ? turniFarmaciaSelect.value
-      : "all";
+    const farmaciaFilter = turniFarmaciaSelect ? turniFarmaciaSelect.value : "all";
 
     let filtered = turniFarmacie.filter((t) => t.tipoRange === currentTurniView);
 
@@ -579,6 +576,7 @@ document.addEventListener("DOMContentLoaded", () => {
     turniFarmaciaSelect.addEventListener("change", renderTurniTable);
 
   // ====== COMUNICAZIONI: POPOLAMENTO ======
+
   function aggiornaBadgeComunicazioni() {
     if (!badgeTotComunicazioni || !badgeNonLette || !badgeUrgenti) return;
     const tot = comunicazioni.length;
@@ -610,8 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filtered.length === 0) {
       const empty = document.createElement("div");
       empty.className = "small-text";
-      empty.textContent =
-        "Nessuna comunicazione per i filtri selezionati (demo).";
+      empty.textContent = "Nessuna comunicazione per i filtri selezionati (demo).";
       comunicazioniList.appendChild(empty);
       aggiornaBadgeComunicazioni();
       return;
@@ -710,31 +707,276 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ====== NOTIFICHE: EVENTI ======
-  document.querySelectorAll(".notif-badge, .notif-label").forEach((el) => {
-    const section = el.getAttribute("data-section");
-    if (!section) return;
+  // ====== PROCEDURE: LOGICA SEMPLICE ======
 
-    el.addEventListener("click", () => {
-      openNotificationModal(section);
+  function renderProcedureList() {
+    if (!procedureListContainer) return;
+
+    const term = (currentProcedureSearch || "").trim().toLowerCase();
+
+    let filtered = procedureData.filter((p) => {
+      const matchReparto =
+        currentProcedureFilter === "tutti" ||
+        p.reparto === currentProcedureFilter;
+      const testoRicerca =
+        p.titolo.toLowerCase() +
+        " " +
+        p.testo.toLowerCase();
+      const matchTesto = !term || testoRicerca.includes(term);
+      return matchReparto && matchTesto;
+    });
+
+    procedureListContainer.innerHTML = "";
+
+    if (filtered.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "small-text";
+      empty.textContent = "Nessuna procedura trovata per i filtri impostati (demo).";
+      procedureListContainer.appendChild(empty);
+      if (procedureDetail) {
+        procedureDetail.innerHTML =
+          '<p class="small-text muted">Nessuna procedura selezionata.</p>';
+      }
+      return;
+    }
+
+    filtered.forEach((p) => {
+      const item = document.createElement("div");
+      item.className = "proc-item";
+      item.dataset.procId = p.id;
+
+      const main = document.createElement("div");
+      main.className = "proc-item-main";
+
+      const title = document.createElement("div");
+      title.className = "proc-item-title";
+      title.textContent = p.titolo;
+
+      const meta = document.createElement("div");
+      meta.className = "proc-item-meta";
+      const repLabel =
+        p.reparto === "cassa"
+          ? "Cassa / Banco"
+          : p.reparto === "magazzino"
+          ? "Magazzino"
+          : p.reparto === "servizi"
+          ? "Servizi"
+          : "Logistica";
+      meta.textContent = `${repLabel} · Agg.: ${p.aggiornamento}`;
+
+      main.appendChild(title);
+      main.appendChild(meta);
+
+      const tag = document.createElement("div");
+      tag.className = "proc-tag";
+      tag.textContent = "Apri";
+
+      item.appendChild(main);
+      item.appendChild(tag);
+
+      item.addEventListener("click", () => {
+        showProcedureDetail(p.id);
+      });
+
+      procedureListContainer.appendChild(item);
+    });
+  }
+
+  function showProcedureDetail(procId) {
+    if (!procedureDetail) return;
+    const proc = procedureData.find((p) => p.id === procId);
+    if (!proc) return;
+
+    const repLabel =
+      proc.reparto === "cassa"
+        ? "Cassa / Banco"
+        : proc.reparto === "magazzino"
+        ? "Magazzino"
+        : proc.reparto === "servizi"
+        ? "Servizi"
+        : "Logistica";
+
+    const paragrafi = proc.testo.split("\n").map((row) => `<p>${row}</p>`).join("");
+
+    procedureDetail.innerHTML = `
+      <h3>${proc.titolo}</h3>
+      <p class="small-text">Reparto: <strong>${repLabel}</strong> · Ultimo aggiornamento: <strong>${proc.aggiornamento}</strong></p>
+      <div class="divider"></div>
+      <div>${paragrafi}</div>
+    `;
+  }
+
+  if (procedureSearchInput) {
+    procedureSearchInput.addEventListener("input", (e) => {
+      currentProcedureSearch = e.target.value || "";
+      renderProcedureList();
+    });
+  }
+
+  procedureFilterButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      procedureFilterButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentProcedureFilter = btn.getAttribute("data-reparto") || "tutti";
+      renderProcedureList();
     });
   });
 
-  if (notifModalClose) {
-    notifModalClose.addEventListener("click", closeNotificationModal);
+  // ====== NOTIFICHE DASHBOARD (PALLINO + POPUP) ======
+
+  function getUnreadNotifications(cardKey) {
+    const cfg = notificationConfig[cardKey];
+    if (!cfg) return [];
+    return cfg.notifiche.filter((n) => !n.letto);
   }
 
-  if (notifModal) {
-    const backdrop = notifModal.querySelector(".notif-modal-backdrop");
-    if (backdrop) {
-      backdrop.addEventListener("click", closeNotificationModal);
+  function updateBadgeForCard(cardKey) {
+    const badge = document.querySelector(
+      `.card-badge[data-card-key="${cardKey}"]`
+    );
+    const label = document.querySelector(
+      `.card-badge-label[data-card-key="${cardKey}"]`
+    );
+    if (!badge) return;
+
+    const unread = getUnreadNotifications(cardKey);
+    const count = unread.length;
+    const countSpan = badge.querySelector(".badge-count");
+
+    if (count > 0) {
+      if (countSpan) countSpan.textContent = String(count);
+      badge.classList.add("has-unread");
+      if (label) {
+        label.textContent = count === 1 ? "Nuovo" : "Nuovi";
+        label.style.display = "block";
+      }
+    } else {
+      if (countSpan) countSpan.textContent = "";
+      badge.classList.remove("has-unread");
+      badge.style.display = "none";
+      if (label) {
+        label.textContent = "";
+        label.style.display = "none";
+      }
     }
   }
 
-  // ====== INIT ======
+  function initNotificationBadges() {
+    Object.keys(notificationConfig).forEach((key) =>
+      updateBadgeForCard(key)
+    );
+  }
+
+  function openNotificationPopup(cardKey) {
+    const cfg = notificationConfig[cardKey];
+    if (!cfg || !notifOverlay || !notifList || !notifTitle || !notifIntro) return;
+
+    openNotificationCardKey = cardKey;
+
+    const unread = getUnreadNotifications(cardKey);
+    notifTitle.textContent = cfg.titolo;
+
+    if (unread.length === 0) {
+      notifIntro.textContent = cfg.descrizioneVuota;
+    } else if (unread.length === 1) {
+      notifIntro.textContent = "Hai 1 nuova notifica.";
+    } else {
+      notifIntro.textContent = `Hai ${unread.length} nuove notifiche.`;
+    }
+
+    notifList.innerHTML = "";
+
+    if (unread.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "small-text";
+      empty.textContent = cfg.descrizioneVuota;
+      notifList.appendChild(empty);
+    } else {
+      unread.forEach((n) => {
+        const item = document.createElement("div");
+        item.className = "notif-item";
+        item.dataset.notifId = n.id;
+
+        const textWrap = document.createElement("div");
+        textWrap.className = "notif-text";
+
+        const h3 = document.createElement("h3");
+        h3.textContent = n.titolo;
+
+        const p = document.createElement("p");
+        p.textContent = n.testo;
+
+        textWrap.appendChild(h3);
+        textWrap.appendChild(p);
+
+        const btn = document.createElement("button");
+        btn.className = "btn-primary small";
+        btn.textContent = "Presa visione";
+        btn.addEventListener("click", () => {
+          markNotificationAsRead(cardKey, n.id);
+        });
+
+        item.appendChild(textWrap);
+        item.appendChild(btn);
+
+        notifList.appendChild(item);
+      });
+    }
+
+    notifOverlay.classList.remove("hidden");
+    notifOverlay.classList.add("active");
+  }
+
+  function closeNotificationPopup() {
+    if (!notifOverlay) return;
+    notifOverlay.classList.add("hidden");
+    notifOverlay.classList.remove("active");
+    openNotificationCardKey = null;
+  }
+
+  function markNotificationAsRead(cardKey, notifId) {
+    const cfg = notificationConfig[cardKey];
+    if (!cfg) return;
+    const n = cfg.notifiche.find((x) => x.id === notifId);
+    if (!n || n.letto) return;
+
+    n.letto = true;
+
+    // aggiorna lista nel popup (se è ancora aperto)
+    if (openNotificationCardKey === cardKey) {
+      openNotificationPopup(cardKey);
+    }
+
+    // aggiorna il pallino sulla card
+    updateBadgeForCard(cardKey);
+  }
+
+  // click su pallino di ogni card
+  document.querySelectorAll(".js-card-badge").forEach((badge) => {
+    const key = badge.getAttribute("data-card-key");
+    badge.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openNotificationPopup(key);
+    });
+  });
+
+  // chiusura popup
+  if (notifClose) notifClose.addEventListener("click", closeNotificationPopup);
+  if (notifCloseBottom)
+    notifCloseBottom.addEventListener("click", closeNotificationPopup);
+
+  // chiusura cliccando sullo sfondo scuro
+  if (notifOverlay) {
+    notifOverlay.addEventListener("click", (e) => {
+      if (e.target === notifOverlay || e.target.classList.contains("notif-backdrop")) {
+        closeNotificationPopup();
+      }
+    });
+  }
+
+  // ====== INIT GENERALE ======
   initTurnoOggi();
   renderComunicazioni();
-
-  // inizializza badge notifiche su tutte le sezioni
-  Object.keys(notificationData).forEach(updateNotificationBadge);
+  renderProcedureList();
+  initNotificationBadges();
 });
