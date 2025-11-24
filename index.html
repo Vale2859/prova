@@ -2,77 +2,107 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Procedure operative – Portale Farmacia Montesano</title>
+  <title>Procedure operative - Demo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
 </head>
 <body>
+  <main class="app">
 
-  <main class="proc-app">
-
-    <header class="proc-header">
+    <!-- HEADER -->
+    <header class="page-header">
       <h1>Procedure operative</h1>
-      <p>Seleziona il reparto e poi la procedura. Massimo 2 tocchi.</p>
-
-      <div class="proc-stats-row">
-        <div class="proc-pill">
-          <span class="pill-label">Procedure totali</span>
-          <span class="pill-value" id="statTotali">10</span>
-        </div>
-        <div class="proc-pill">
-          <span class="pill-label">Cassa</span>
-          <span class="pill-value" id="statCassa">3</span>
-        </div>
-        <div class="proc-pill">
-          <span class="pill-label">Banco</span>
-          <span class="pill-value" id="statBanco">3</span>
-        </div>
-        <div class="proc-pill">
-          <span class="pill-label">Magazzino</span>
-          <span class="pill-value" id="statMagazzino">2</span>
-        </div>
-      </div>
+      <p>Seleziona il reparto oppure cerca direttamente una procedura. Massimo 2 tocchi.</p>
     </header>
 
-    <!-- 1° CLICK: SCELTA REPARTO -->
-    <section class="proc-section">
-      <h2>1. Scegli il reparto</h2>
-      <div class="proc-cat-row">
-        <button class="proc-cat-btn active" data-cat="cassa">Cassa</button>
-        <button class="proc-cat-btn" data-cat="banco">Banco</button>
-        <button class="proc-cat-btn" data-cat="magazzino">Magazzino</button>
-        <button class="proc-cat-btn" data-cat="servizi">Servizi / Cup</button>
+    <!-- STATISTICHE + RICERCA -->
+    <section class="stats-search-wrapper">
+      <div class="stats-row">
+        <article class="stat-card">
+          <span class="stat-number" id="statTotali">0</span>
+          <span class="stat-label">Procedure totali</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-number" id="statCassa">0</span>
+          <span class="stat-label">Cassa</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-number" id="statBanco">0</span>
+          <span class="stat-label">Banco</span>
+        </article>
+        <article class="stat-card">
+          <span class="stat-number" id="statMagazzino">0</span>
+          <span class="stat-label">Magazzino</span>
+        </article>
       </div>
-    </section>
 
-    <!-- 2° CLICK: SCELTA PROCEDURA -->
-    <section class="proc-section">
-      <h2>2. Tocca una procedura</h2>
-      <p class="proc-hint">I pulsanti qui sotto cambiano in base al reparto scelto.</p>
-
-      <div id="procButtonsContainer" class="proc-buttons-grid">
-        <!-- I bottoni vengono riempiti via JS -->
-      </div>
-    </section>
-
-    <!-- DETTAGLIO PROCEDURA SCELTA -->
-    <section class="proc-section">
-      <h2 id="procTitle">Seleziona una procedura</h2>
-      <p id="procTag" class="proc-tag">—</p>
-
-      <div id="procStepsCard" class="proc-steps-card proc-steps-card--empty">
-        <p class="proc-empty-text">
-          Tocca un pulsante sopra per vedere i passaggi operativi.
+      <!-- BARRA DI RICERCA -->
+      <div class="procedure-search">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="procedureSearch"
+            placeholder="Cerca una procedura (es. scontrino, reso, scadenze…)"
+            autocomplete="off"
+          />
+          <button id="clearSearch" class="search-clear" aria-label="Pulisci ricerca">✕</button>
+        </div>
+        <p id="searchHint" class="search-hint">
+          Suggerimento: scrivi 2-3 lettere (es. “scon”, “reso”, “scad”) e poi tocca la procedura.
         </p>
-
-        <ol id="procStepsList" class="proc-steps-list">
-          <!-- Passaggi riempiti via JS -->
-        </ol>
       </div>
+    </section>
+
+    <!-- STEP 1: SCEGLI IL REPARTO -->
+    <section class="card step-card">
+      <h2>1. Scegli il reparto</h2>
+      <p class="step-subtitle">Tocca il reparto in cui ti trovi adesso.</p>
+      <div class="reparti-row" id="repartiRow">
+        <button class="reparto-pill active" data-reparto="cassa">Cassa</button>
+        <button class="reparto-pill" data-reparto="banco">Banco</button>
+        <button class="reparto-pill" data-reparto="magazzino">Magazzino</button>
+        <button class="reparto-pill" data-reparto="servizi">Servizi &amp; Cup</button>
+      </div>
+    </section>
+
+    <!-- STEP 2: LISTA PROCEDURE -->
+    <section class="card step-card">
+      <div class="step-header">
+        <h2>2. Tocca una procedura</h2>
+        <span id="currentContextLabel" class="context-label">Reparto: Cassa</span>
+      </div>
+      <p class="step-subtitle">
+        I pulsanti qui sotto cambiano in base al reparto scelto o alla ricerca.
+      </p>
+      <div id="procedureList" class="procedure-list">
+        <!-- Riempito da JavaScript -->
+      </div>
+    </section>
+
+    <!-- DETTAGLIO PROCEDURA -->
+    <section class="card detail-card">
+      <header class="detail-header">
+        <div>
+          <p class="detail-label">Seleziona una procedura</p>
+          <h2 id="detailTitle">Nessuna procedura selezionata</h2>
+        </div>
+        <span id="detailRepartoTag" class="detail-tag">—</span>
+      </header>
+
+      <p id="detailIntro" class="detail-intro">
+        Tocca una procedura sopra per vedere i passaggi operativi.
+      </p>
+
+      <ol id="detailSteps" class="detail-steps">
+        <!-- Passaggi riempiti da JavaScript -->
+      </ol>
+
+      <p id="detailNote" class="detail-note"></p>
     </section>
 
   </main>
 
+  <script src="script.js"></script>
 </body>
 </html>
