@@ -1,5 +1,4 @@
-/* ===== RESET BASE ===== */
-
+/* RESET SEMPLICE */
 *,
 *::before,
 *::after {
@@ -15,349 +14,303 @@ body {
 
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top left, #12b5ff 0, #02091a 55%, #020718 100%);
-  color: #f9fbff;
-  -webkit-font-smoothing: antialiased;
+    "Roboto", sans-serif;
+  color: #ffffff;
+  background: radial-gradient(circle at 0 0, #00b894 0, #0b2440 45%, #050816 100%);
 }
 
-/* ===== LAYOUT PRINCIPALE ===== */
-
+/* LAYOUT GENERALE */
 .app {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 24px 16px 40px;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 40px;
 }
 
-/* ===== HEADER ===== */
+.procedures-page {
+  width: 100%;
+  max-width: 1180px;
+}
 
+/* INTESTAZIONE */
 .page-header {
-  margin-bottom: 18px;
+  margin-bottom: 24px;
 }
 
 .page-header h1 {
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  font-size: 28px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
 }
 
-.page-header p {
-  margin-top: 4px;
+.page-subtitle {
   font-size: 14px;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
-/* ===== STATISTICHE + RICERCA ===== */
-
-.stats-search-wrapper {
+/* CONTATORI + RICERCA */
+.top-row {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 20px;
 }
 
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
 }
 
-.stat-card {
-  padding: 10px 12px;
+.stat-pill {
+  padding: 10px 14px;
   border-radius: 999px;
-  background: radial-gradient(circle at 0% 0%, #1c68ff 0, #01153b 60%, #010b22 100%);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  background: radial-gradient(circle at 0% 0%, #1b9cfc, #0b2657);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 64px;
-}
-
-.stat-number {
-  font-size: 20px;
-  font-weight: 800;
-  line-height: 1;
+  min-height: 60px;
 }
 
 .stat-label {
-  font-size: 12px;
-  opacity: 0.85;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.76;
 }
 
-/* Ricerca */
-
-.procedure-search {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.stat-value {
+  font-size: 22px;
+  font-weight: 800;
 }
 
-.search-box {
+.search-row {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  justify-content: flex-start;
+}
+
+.search-row input {
+  width: min(420px, 100%);
+  padding: 10px 14px;
   border-radius: 999px;
-  background: rgba(1, 11, 34, 0.82);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.55),
-    0 0 0 1px rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(14px);
+  border: none;
+  outline: none;
+  background: rgba(3, 12, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-size: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
 }
 
-.search-icon {
-  font-size: 16px;
+.search-row input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* CARD BASE */
+.card {
+  background: radial-gradient(circle at 0% 0%, rgba(26, 188, 156, 0.32), rgba(6, 26, 49, 0.96));
+  border-radius: 28px;
+  padding: 18px 20px 18px;
+  margin-bottom: 16px;
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(26px);
+}
+
+.card-step {
+  border-radius: 26px;
+}
+
+.card-header {
+  margin-bottom: 12px;
+}
+
+.card-header h2 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 13px;
   opacity: 0.9;
 }
 
-.search-box input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  color: #f9fbff;
-  font-size: 14px;
-  outline: none;
-}
-
-.search-box input::placeholder {
-  color: rgba(245, 248, 255, 0.55);
-}
-
-.search-clear {
-  border: none;
-  background: rgba(255, 255, 255, 0.08);
-  color: #f9fbff;
+.hint {
   font-size: 12px;
-  border-radius: 999px;
-  padding: 3px 8px;
-  cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
+  opacity: 0.8;
 }
 
-.search-clear:hover {
-  background: rgba(255, 255, 255, 0.16);
-  transform: translateY(-1px);
-}
-
-.search-clear.hidden {
-  display: none;
-}
-
-.search-hint {
-  font-size: 11px;
-  opacity: 0.7;
-}
-
-/* ===== CARD GENERICHE ===== */
-
-.card {
-  margin-top: 14px;
-  padding: 16px 16px 18px;
-  border-radius: 22px;
-  background: radial-gradient(circle at top, #04142f 0, #020816 70%);
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* ===== STEP 1 ===== */
-
-.step-card h2 {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.step-subtitle {
-  margin-top: 3px;
-  font-size: 13px;
-  opacity: 0.75;
-}
-
+/* STEP 1 – REPARTI */
 .reparti-row {
-  margin-top: 12px;
+  margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-.reparto-pill {
+.reparto-btn {
+  flex: 1 1 120px;
+  padding: 10px 16px;
   border-radius: 999px;
   border: none;
-  padding: 8px 18px;
+  cursor: pointer;
+  background: radial-gradient(circle at 0% 0%, #1dd1a1, #0c254a);
+  color: #ffffff;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
-  background: linear-gradient(135deg, #0b1220, #111827);
-  color: #e5f2ff;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+  text-align: center;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   opacity: 0.8;
-  transition: background 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
 }
 
-.reparto-pill:hover {
+.reparto-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.55);
+  opacity: 1;
+}
+
+.reparto-btn.active {
   opacity: 1;
   transform: translateY(-1px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7);
 }
 
-.reparto-pill.active {
-  background: linear-gradient(135deg, #16a34a, #22c55e);
-  color: #04101a;
-  opacity: 1;
-}
-
-/* ===== STEP 2: LISTA PROCEDURE ===== */
-
-.step-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.context-label {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(15, 118, 255, 0.12);
-  border: 1px solid rgba(96, 165, 250, 0.4);
-}
-
+/* STEP 2 – LISTA PROCEDURE */
 .procedure-list {
   margin-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .procedure-btn {
+  position: relative;
   width: 100%;
+  padding: 10px 16px;
   border-radius: 999px;
   border: none;
-  padding: 10px 14px;
-  text-align: left;
-  font-size: 14px;
-  cursor: pointer;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  color: #f9fbff;
-  background: linear-gradient(135deg, #1f2937, #020617);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.2s ease;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background: linear-gradient(90deg, #3d3d3d, #5e5e5e); /* default, viene sovrascritto dal tema */
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.55);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
 }
 
 .procedure-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.68);
+  filter: brightness(1.05);
 }
 
-.procedure-btn.active {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-}
-
-.procedure-title {
-  font-weight: 500;
-}
-
-.procedure-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.procedure-btn span.code {
+  margin-left: 10px;
+  padding: 4px 9px;
+  border-radius: 999px;
   font-size: 11px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.35);
 }
 
-.shortcut-pill,
-.rep-tag {
-  border-radius: 999px;
-  padding: 3px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(10px);
-}
-
-/* ===== DETTAGLIO ===== */
-
-.detail-card {
-  margin-bottom: 10px;
-}
-
-.detail-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-.detail-label {
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-.detail-card h2 {
-  font-size: 18px;
-  margin-top: 3px;
-}
-
-.detail-tag {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.7);
-}
-
-.detail-intro {
+/* MESSAGGIO NESSUN RISULTATO */
+.no-results {
   margin-top: 10px;
   font-size: 13px;
   opacity: 0.9;
 }
 
+.hidden {
+  display: none;
+}
+
+/* STEP 3 – DETTAGLIO */
+.card-detail {
+  margin-top: 4px;
+}
+
+.detail-reparto {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-bottom: 10px;
+}
+
 .detail-steps {
-  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.45;
   padding-left: 20px;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 13px;
 }
 
-.detail-steps li {
-  margin-left: 4px;
-}
-
-.detail-note {
+.detail-hint {
   margin-top: 10px;
   font-size: 12px;
   opacity: 0.8;
 }
 
-/* ===== RESPONSIVE ===== */
+/* TEMI COLORATI PER REPARTO
+   Applichiamo la classe sul card step2 e step3 (theme-cassa / theme-banco / etc.)
+*/
 
-@media (max-width: 768px) {
+/* CASSA – giallo */
+.theme-cassa .procedure-btn {
+  background: linear-gradient(135deg, #ffd54f, #f9a825);
+}
+
+/* BANCO – rosa/fucsia */
+.theme-banco .procedure-btn {
+  background: linear-gradient(135deg, #ff5c93, #ff2d55);
+}
+
+/* MAGAZZINO – arancione */
+.theme-magazzino .procedure-btn {
+  background: linear-gradient(135deg, #ffb347, #ff7b02);
+}
+
+/* SERVIZI & CUP – viola */
+.theme-servizi .procedure-btn {
+  background: linear-gradient(135deg, #a66bff, #7e3ff2);
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
   .stats-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
+@media (max-width: 600px) {
   .app {
-    padding-inline: 12px;
+    padding: 20px 10px 28px;
   }
 
   .card {
-    padding-inline: 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-row {
-    grid-template-columns: 1fr 1fr;
-    row-gap: 8px;
+    padding: 16px 14px 16px;
+    border-radius: 20px;
   }
 
   .page-header h1 {
     font-size: 22px;
   }
 
-  .step-header {
+  .reparti-row {
     flex-direction: column;
-    align-items: flex-start;
+  }
+
+  .reparto-btn {
+    flex: 1 1 auto;
+  }
+
+  .stat-pill {
+    min-height: 54px;
   }
 }
