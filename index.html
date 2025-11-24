@@ -6,15 +6,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
-  
+
   <!-- Icone per aggiunta a Home su iPhone/iPad -->
-<link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
-<link rel="apple-touch-icon" sizes="152x152" href="logo.jpg">
-<link rel="apple-touch-icon" sizes="120x120" href="logo.jpg">
-<link rel="apple-touch-icon" href="logo.jpg">
-  <head>
-<!-- Per Android con browser -->
-<link rel="icon" type="image/png" href="logo.jpg"></head>
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
+  <link rel="apple-touch-icon" sizes="152x152" href="logo.jpg">
+  <link rel="apple-touch-icon" sizes="120x120" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+
+  <!-- Icona per Android / browser -->
+  <link rel="icon" type="image/png" href="logo.jpg">
+</head>
 <body>
 
   <!-- ============ LOGIN ============ -->
@@ -73,6 +74,7 @@
         <li data-nav="assenzePage">Assenze</li>
         <li data-nav="turniPage">Farmacie di turno</li>
         <li data-nav="comunicazioniPage">Comunicazioni</li>
+        <li data-nav="procedurePage">Procedure</li>
         <li class="divider-label">Sezioni dedicate</li>
         <li data-nav="areaPersonale">Area personale</li>
         <li data-nav="areaAdmin">Admin</li>
@@ -202,7 +204,7 @@
               </p>
             </div>
             <div class="card-footer">
-              <button class="btn-secondary">
+              <button id="openProcedure" class="btn-secondary">
                 Modifica o aggiungi procedura
               </button>
             </div>
@@ -756,6 +758,58 @@
           </div>
         </div>
       </article>
+    </section>
+
+    <!-- ============ PAGINA PROCEDURE ============ -->
+    <section id="procedurePage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromProcedure" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Procedure operative interne</h1>
+          <p>Ricerca veloce di tutte le procedure, filtrate per reparto.</p>
+        </div>
+        <div class="summary-badges">
+          <span class="badge badge-today" id="badgeProcTotali">Totali: 0</span>
+          <span class="badge badge-week" id="badgeProcCassa">Cassa/Banco: 0</span>
+          <span class="badge badge-month" id="badgeProcAggiornate">Ultimo aggiornamento: —</span>
+        </div>
+      </header>
+
+      <div class="procedure-layout">
+        <article class="card procedure-list-card">
+          <div class="procedure-top-row">
+            <div class="procedure-search">
+              <label for="procedureSearch" class="small-text">Cerca in tutte le procedure</label>
+              <input
+                type="search"
+                id="procedureSearch"
+                placeholder="Es. chiusura cassa, notturno, reso, buono..."
+              />
+            </div>
+            <div class="procedure-filters">
+              <button class="proc-filter active" data-reparto="tutti">Tutte</button>
+              <button class="proc-filter" data-reparto="cassa">Cassa / Banco</button>
+              <button class="proc-filter" data-reparto="magazzino">Magazzino</button>
+              <button class="proc-filter" data-reparto="servizi">Servizi</button>
+              <button class="proc-filter" data-reparto="logistica">Logistica</button>
+            </div>
+          </div>
+
+          <div id="procedureList" class="procedure-list">
+            <!-- riempito da JS -->
+          </div>
+        </article>
+
+        <article class="card procedure-detail-card">
+          <h2 id="procedureDetailTitle">Seleziona una procedura</h2>
+          <p id="procedureDetailMeta" class="procedure-detail-meta small-text">
+            Tocca una procedura a sinistra per visualizzare qui tutti i passaggi operativi.
+          </p>
+          <div id="procedureDetailBody" class="procedure-detail-body">
+            <!-- testo procedura -->
+          </div>
+        </article>
+      </div>
     </section>
 
   </main>
