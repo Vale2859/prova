@@ -1,373 +1,320 @@
-// =====================
-// DATI DI BASE (DEMO)
-// =====================
+"use strict";
+
+/* ======================
+   DATI PROCEDURE (DEMO)
+   ====================== */
 
 const procedureData = {
-  cassa: [
-    {
-      id: "C1",
-      titolo: "Doppio scontrino / errore importo",
-      scorciatoia: "Alt + D",
-      passi: [
-        "Metti subito in pausa il cliente e avvisa che stai correggendo l'errore.",
-        "Annulla lo scontrino errato secondo la procedura fiscale interna.",
-        "Riemetti lo scontrino con l'importo corretto.",
-        "Fai firmare eventuale modulo interno per segnalare l'errore."
-      ],
-      note:
-        "Segnala sempre questi casi al titolare a fine giornata per eventuali controlli."
-    },
-    {
-      id: "C2",
-      titolo: "Reso merce con rimborso contanti / carta",
-      scorciatoia: "Alt + R",
-      passi: [
-        "Verifica scontrino, data di acquisto e stato della merce.",
-        "Applica le regole interne su tempi massimi e condizioni del reso.",
-        "Registra il reso sul gestionale selezionando la causale corretta.",
-        "Eroga il rimborso (contanti o carta) e fai firmare il modulo di reso."
-      ],
-      note: "In caso di dubbi, blocca l'operazione e coinvolgi il titolare."
-    },
-    {
-      id: "C3",
-      titolo: "Mancanza resto in cassa",
-      scorciatoia: "Alt + M",
-      passi: [
-        "Avvisa con calma il cliente e proponi il regolamento interno (es. arrotondamento).",
-        "Se necessario, chiedi supporto al collega di un'altra cassa.",
-        "Registra sul gestionale l'eventuale differenza come previsto dalla procedura.",
-        "Segna l'episodio sul registro cassa per controllo a fine giornata."
-      ],
-      note:
-        "Mantieni sempre la massima trasparenza: niente operazioni 'a memoria'."
-    }
-  ],
+  cassa: {
+    label: "Cassa",
+    themeClass: "theme-cassa",
+    procedures: [
+      {
+        id: "C1",
+        title: "Doppio scontrino / errore importo",
+        short:
+          "Quando è stato emesso uno scontrino sbagliato (importo o modalità di pagamento).",
+        steps: [
+          "Avvisa subito il cliente e conserva lo scontrino errato.",
+          "Compila la procedura interna di annullo / storno secondo indicazioni del titolare.",
+          "Registra un nuovo scontrino corretto.",
+          "Segna la correzione sul registro interno (note cassa) per eventuali controlli."
+        ],
+        keywords: "doppio scontrino errore importo pagamento annullo storno"
+      },
+      {
+        id: "C2",
+        title: "Reso merce con rimborso contanti / carta",
+        short:
+          "Come gestire il reso di un prodotto con rimborso al cliente.",
+        steps: [
+          "Verifica che il prodotto sia conforme alle condizioni di reso (scontrino, integrità, tempi).",
+          "Compila il modulo interno di reso indicando motivo e importo.",
+          "Esegui il rimborso (contanti o carta) secondo la modalità concordata.",
+          "Registra il reso sul gestionale e aggiorna il movimento di magazzino."
+        ],
+        keywords: "reso merce rimborso contanti carta restituzione prodotto"
+      },
+      {
+        id: "C3",
+        title: "Mancanza resto in cassa",
+        short:
+          "Cosa fare se manca il resto per chiudere correttamente l’operazione.",
+        steps: [
+          "Chiedi al collega o al titolare di fornire il taglio mancante (solo da cassa principale).",
+          "Se non disponibile, concorda con il cliente una soluzione (arrotondamento o pagamento elettronico).",
+          "Registra la situazione nelle note di cassa di fine turno.",
+          "Segnala al titolare se l’episodio si ripete spesso (controllo cambio)."
+        ],
+        keywords: "mancanza resto spicci monete contanti"
+      }
+    ]
+  },
 
-  banco: [
-    {
-      id: "B1",
-      titolo: "Vendita con consiglio di banco",
-      scorciatoia: "B1",
-      passi: [
-        "Ascolta il bisogno del cliente e fai le domande minime di sicurezza.",
-        "Verifica controindicazioni principali (età, terapie in corso, allergie note).",
-        "Proponi massimo 2–3 alternative chiare, spiegando differenze principali.",
-        "Registra sul gestionale e verifica eventuali alert (interazioni, duplicati)."
-      ],
-      note:
-        "In caso di dubbio clinico, rimanda sempre al medico o al farmacista responsabile."
-    },
-    {
-      id: "B2",
-      titolo: "Gestione cliente nervoso al banco",
-      scorciatoia: "B2",
-      passi: [
-        "Mantieni tono calmo e professionale, senza alzare la voce.",
-        "Riformula il problema per far capire che hai compreso la richiesta.",
-        "Proponi una soluzione concreta (cambio prodotto, reso, spiegazione).",
-        "Se non basta, coinvolgi un collega o il titolare."
-      ],
-      note:
-        "Mai discutere davanti agli altri clienti: spostati se possibile in zona più tranquilla."
-    }
-  ],
+  banco: {
+    label: "Banco",
+    themeClass: "theme-banco",
+    procedures: [
+      {
+        id: "B1",
+        title: "Consiglio integratore su richiesta cliente",
+        short:
+          "Guida rapida per consigliare integratori nel rispetto delle indicazioni.",
+        steps: [
+          "Ascolta la richiesta del cliente (sintomo, esigenza, età, eventuali terapie).",
+          "Valuta se è possibile un consiglio da banco o se è necessario invio al medico.",
+          "Proponi 1–2 prodotti chiari, spiegando modalità e tempi di assunzione.",
+          "Registra eventuali note utili (cliente abituale, intolleranze) se previsto dalle policy interne."
+        ],
+        keywords: "banco consiglio integratore cliente richiesta"
+      },
+      {
+        id: "B2",
+        title: "Gestione cliente insoddisfatto al banco",
+        short:
+          "Come gestire in modo calmo e standardizzato un reclamo immediato.",
+        steps: [
+          "Ascolta senza interrompere, mantenendo tono calmo.",
+          "Riformula il problema per assicurarti di aver capito bene.",
+          "Se possibile risolvi subito (reso, cambio prodotto, spiegazione).",
+          "Se serve il titolare, accompagna il cliente in uno spazio più tranquillo.",
+          "Registra l’episodio nel registro reclami interno."
+        ],
+        keywords: "cliente arrabbiato reclamo insoddisfatto banco"
+      }
+    ]
+  },
 
-  magazzino: [
-    {
-      id: "M1",
-      titolo: "Controllo scadenze mensile",
-      scorciatoia: "M1",
-      passi: [
-        "Stampa o apri l'elenco scadenze dal gestionale (mese corrente + 2 successivi).",
-        "Controlla fisicamente gli scaffali interni e confronta con la lista.",
-        "Sposta i prodotti in scadenza in area dedicata o evidenziata.",
-        "Compila il report mensile scadenze da condividere col titolare."
-      ],
-      note:
-        "Meglio anticipare di 1 mese il controllo per reparti critici (es. integratori, cosmetica)."
-    },
-    {
-      id: "M2",
-      titolo: "Prodotto non trovato a scaffale",
-      scorciatoia: "M2",
-      passi: [
-        "Verifica sul gestionale se il prodotto risulta presente in giacenza.",
-        "Controlla ripiano, cassetti e eventuale esposizione in vetrina o isola promozionale.",
-        "Se non trovato, segnala sul gestionale come 'mancante a scaffale' o applica etichetta interna.",
-        "Compila la lista prodotti da ricercare/riordinare a fine turno."
-      ],
-      note: "Riduci al minimo il tempo di ricerca per non lasciare il banco scoperto."
-    }
-  ],
+  magazzino: {
+    label: "Magazzino",
+    themeClass: "theme-magazzino",
+    procedures: [
+      {
+        id: "M1",
+        title: "Controllo scadenze mensile",
+        short:
+          "Procedura standard per controllo e gestione scadenze scaffali.",
+        steps: [
+          "Seleziona il reparto da controllare secondo il planning mensile.",
+          "Controlla lotto e scadenza di ogni prodotto sullo scaffale.",
+          "Sposta i prodotti in scadenza a breve nell’area dedicata (offerte / rientri).",
+          "Aggiorna il registro scadenze interno o il modulo digitale previsto."
+        ],
+        keywords: "magazzino scadenze mensile controllo"
+      },
+      {
+        id: "M2",
+        title: "Prodotto non trovato a scaffale",
+        short:
+          "Cosa fare se a gestionale risulta disponibile ma non si trova fisicamente.",
+        steps: [
+          "Verifica rapidamente gli scaffali vicini (possibile spostamento errato).",
+          "Controlla eventuale espositore dedicato o area promozioni.",
+          "Se il prodotto non si trova, segnala l’anomalia in magazzino (tag mancante).",
+          "Registra la discrepanza per successivo inventario / rettifica."
+        ],
+        keywords: "prodotto non trovato scaffale manca inventario"
+      }
+    ]
+  },
 
-  servizi: [
-    {
-      id: "S1",
-      titolo: "Prenotazione servizio (es. ECG, holter, MOC)",
-      scorciatoia: "S1",
-      passi: [
-        "Apri agenda servizi e verifica disponibilità di data e fascia oraria.",
-        "Inserisci i dati essenziali del cliente (nome, telefono, servizio richiesto).",
-        "Conferma la prenotazione e ricorda eventuali preparazioni (es. digiuno).",
-        "Invia o consegna promemoria cartaceo/digitale al cliente."
-      ],
-      note:
-        "Quando sarà attivo il server/NAS potrai collegare direttamente la prenotazione al calendario."
-    },
-    {
-      id: "S2",
-      titolo: "Gestione no-show (cliente non si presenta)",
-      scorciatoia: "S2",
-      passi: [
-        "Segna sull'agenda che il cliente non si è presentato.",
-        "Se previsto dal regolamento, contatta il cliente per riprogrammare.",
-        "Libera la fascia oraria per altri appuntamenti.",
-        "Registra in un elenco i no-show del mese per eventuali valutazioni."
-      ],
-      note:
-        "In futuro questa procedura potrà generare notifiche automatiche al cliente."
-    }
-  ]
+  servizi: {
+    label: "Servizi & Cup",
+    themeClass: "theme-servizi",
+    procedures: [
+      {
+        id: "S1",
+        title: "Prenotazione servizio (es. ECG, Holter, MOC)",
+        short:
+          "Come registrare correttamente una prenotazione di servizio.",
+        steps: [
+          "Raccogli i dati essenziali: nome, telefono, tipologia di servizio, preferenza di giorno/orario.",
+          "Verifica disponibilità sul calendario servizi o sulla piattaforma regionale.",
+          "Conferma al cliente data, ora, luogo e eventuali preparazioni (es. digiuno).",
+          "Registra la prenotazione sul gestionale interno / portale Cup.",
+          "Consegnare promemoria cartaceo o digitale (SMS / WhatsApp aziendale) se previsto."
+        ],
+        keywords: "prenotazione servizio ecg holter moc appuntamento"
+      },
+      {
+        id: "S2",
+        title: "Gestione no-show (cliente non si presenta)",
+        short:
+          "Procedura rapida quando il cliente salta un appuntamento.",
+        steps: [
+          "Segna il servizio come &quot;non presentato&quot; sul calendario interno.",
+          "Contatta il cliente per capire se desidera riprogrammare.",
+          "Se necessario libera lo slot per nuovi appuntamenti.",
+          "Registra l’episodio secondo le regole interne (es. dopo 3 no-show serve caparra)."
+        ],
+        keywords: "no-show cliente non si presenta appuntamento mancato"
+      }
+    ]
+  }
 };
 
-// =====================
-// STATO
-// =====================
-
-let currentReparto = "cassa";
-let currentProcedureId = null;
-
-// =====================
-// INIZIALIZZAZIONE
-// =====================
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Statistiche
-  aggiornaStatistiche();
-
-  // Reparti
-  const repartoButtons = document.querySelectorAll(".reparto-pill");
-  repartoButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const reparto = btn.dataset.reparto;
-      selezionaReparto(reparto);
-    });
-  });
-
-  // Barra di ricerca
-  const searchInput = document.getElementById("procedureSearch");
-  const clearBtn = document.getElementById("clearSearch");
-
-  searchInput.addEventListener("input", () => {
-    const query = searchInput.value.trim().toLowerCase();
-    if (query.length === 0) {
-      clearBtn.classList.add("hidden");
-      document.getElementById("searchHint").textContent =
-        "Suggerimento: scrivi 2-3 lettere (es. “scon”, “reso”, “scad”) e poi tocca la procedura.";
-      // Torna alla lista del reparto corrente
-      renderProcedureListForReparto(currentReparto);
-    } else {
-      clearBtn.classList.remove("hidden");
-      filtraProcedure(query);
-    }
-  });
-
-  clearBtn.addEventListener("click", () => {
-    searchInput.value = "";
-    clearBtn.classList.add("hidden");
-    document.getElementById("searchHint").textContent =
-      "Suggerimento: scrivi 2-3 lettere (es. “scon”, “reso”, “scad”) e poi tocca la procedura.";
-    renderProcedureListForReparto(currentReparto);
-  });
-
-  // Prima visualizzazione
-  selezionaReparto(currentReparto);
-});
-
-// =====================
-// FUNZIONI
-// =====================
-
-function aggiornaStatistiche() {
+/* ===== CALCOLO STATISTICHE ===== */
+function computeStats() {
   const totali =
-    procedureData.cassa.length +
-    procedureData.banco.length +
-    procedureData.magazzino.length +
-    procedureData.servizi.length;
+    procedureData.cassa.procedures.length +
+    procedureData.banco.procedures.length +
+    procedureData.magazzino.procedures.length +
+    procedureData.servizi.procedures.length;
 
-  document.getElementById("statTotali").textContent = totali;
-  document.getElementById("statCassa").textContent = procedureData.cassa.length;
-  document.getElementById("statBanco").textContent = procedureData.banco.length;
-  document.getElementById("statMagazzino").textContent =
-    procedureData.magazzino.length + procedureData.servizi.length; // se vuoi tenerli insieme
+  return {
+    totali,
+    cassa: procedureData.cassa.procedures.length,
+    banco: procedureData.banco.procedures.length,
+    magazzino: procedureData.magazzino.procedures.length,
+    servizi: procedureData.servizi.procedures.length
+  };
 }
 
-function selezionaReparto(reparto) {
-  currentReparto = reparto;
-  currentProcedureId = null;
+/* ===== STATO CORRENTE ===== */
+let currentReparto = "cassa";
+let currentSearch = "";
 
-  // Aggiorna pill attiva
-  document.querySelectorAll(".reparto-pill").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.reparto === reparto);
+/* ===== UTILITY DOM ===== */
+function $(selector) {
+  return document.querySelector(selector);
+}
+
+/* ===== RENDER ===== */
+
+function applyTheme() {
+  const step2 = $("#step2Card");
+  const step3 = $("#step3Card");
+
+  step2.classList.remove("theme-cassa", "theme-banco", "theme-magazzino", "theme-servizi");
+  step3.classList.remove("theme-cassa", "theme-banco", "theme-magazzino", "theme-servizi");
+
+  const themeClass = procedureData[currentReparto].themeClass;
+  step2.classList.add(themeClass);
+  step3.classList.add(themeClass);
+}
+
+function renderStats() {
+  const stats = computeStats();
+  $("#statTotali").textContent = stats.totali;
+  $("#statCassa").textContent = stats.cassa;
+  $("#statBanco").textContent = stats.banco;
+  $("#statMagazzino").textContent = stats.magazzino;
+  $("#statServizi").textContent = stats.servizi;
+}
+
+function renderProcedureButtons() {
+  const container = $("#procedureList");
+  container.innerHTML = "";
+
+  const search = currentSearch.trim().toLowerCase();
+
+  const all = procedureData[currentReparto].procedures;
+  const filtered = all.filter((p) => {
+    if (!search) return true;
+    const text = (p.title + " " + (p.keywords || "")).toLowerCase();
+    return text.includes(search);
   });
 
-  // Aggiorna etichetta contesto
-  const label = document.getElementById("currentContextLabel");
-  const nomeReparto = formatRepartoName(reparto);
-  label.textContent = `Reparto: ${nomeReparto}`;
-
-  // Svuota ricerca se c'era qualcosa
-  const searchInput = document.getElementById("procedureSearch");
-  const clearBtn = document.getElementById("clearSearch");
-  if (searchInput.value.trim() !== "") {
-    searchInput.value = "";
-    clearBtn.classList.add("hidden");
+  if (filtered.length === 0) {
+    $("#noResults").classList.remove("hidden");
+  } else {
+    $("#noResults").classList.add("hidden");
   }
 
-  document.getElementById("searchHint").textContent =
-    "Suggerimento: scrivi 2-3 lettere (es. “scon”, “reso”, “scad”) e poi tocca la procedura.";
+  filtered.forEach((proc) => {
+    const btn = document.createElement("button");
+    btn.className = "procedure-btn";
+    btn.type = "button";
+    btn.dataset.id = proc.id;
 
-  // Mostra lista del reparto
-  renderProcedureListForReparto(reparto);
+    const titleSpan = document.createElement("span");
+    titleSpan.textContent = proc.title;
 
-  // Reset dettaglio
-  resetDettaglio();
-}
+    const codeSpan = document.createElement("span");
+    codeSpan.className = "code";
+    codeSpan.textContent = proc.id;
 
-function renderProcedureListForReparto(reparto) {
-  const listEl = document.getElementById("procedureList");
-  listEl.innerHTML = "";
+    btn.appendChild(titleSpan);
+    btn.appendChild(codeSpan);
 
-  const lista = procedureData[reparto] || [];
-  lista.forEach((proc) => {
-    const btn = creaBottoneProcedura(proc, reparto);
-    listEl.appendChild(btn);
-  });
-}
+    btn.addEventListener("click", () => showProcedureDetail(proc));
 
-function creaBottoneProcedura(proc, reparto, daRicerca = false) {
-  const btn = document.createElement("button");
-  btn.className = "procedure-btn";
-  btn.dataset.id = proc.id;
-  btn.dataset.reparto = reparto;
-
-  const titleSpan = document.createElement("span");
-  titleSpan.className = "procedure-title";
-  titleSpan.textContent = proc.titolo;
-
-  const metaDiv = document.createElement("div");
-  metaDiv.className = "procedure-meta";
-
-  if (proc.scorciatoia) {
-    const shortSpan = document.createElement("span");
-    shortSpan.className = "shortcut-pill";
-    shortSpan.textContent = proc.scorciatoia;
-    metaDiv.appendChild(shortSpan);
-  }
-
-  if (daRicerca) {
-    const repSpan = document.createElement("span");
-    repSpan.className = "rep-tag";
-    repSpan.textContent = formatRepartoName(reparto);
-    metaDiv.appendChild(repSpan);
-  }
-
-  btn.appendChild(titleSpan);
-  btn.appendChild(metaDiv);
-
-  btn.addEventListener("click", () => {
-    // quando viene da ricerca, seleziono anche il reparto corretto
-    if (daRicerca) {
-      selezionaReparto(reparto);
-    }
-    mostraDettaglioProcedura(proc, reparto);
-
-    // evidenzia il bottone selezionato
-    document.querySelectorAll(".procedure-btn").forEach((b) => {
-      b.classList.toggle(
-        "active",
-        b.dataset.id === proc.id && b.dataset.reparto === reparto
-      );
-    });
+    container.appendChild(btn);
   });
 
-  return btn;
+  // Se dopo filtro c'è almeno una procedura, selezioniamo la prima di default
+  if (filtered.length > 0) {
+    showProcedureDetail(filtered[0], false);
+  } else {
+    resetDetail();
+  }
 }
 
-function mostraDettaglioProcedura(proc, reparto) {
-  currentProcedureId = proc.id;
+function resetDetail() {
+  $("#detailTitle").textContent = "Seleziona una procedura";
+  $("#detailReparto").textContent =
+    "Tocca una procedura sopra per vedere i passaggi operativi.";
+  $("#detailSteps").innerHTML = "";
+}
 
-  document.getElementById("detailTitle").textContent = proc.titolo;
-  document.getElementById("detailRepartoTag").textContent =
-    formatRepartoName(reparto);
-  document.getElementById("detailIntro").textContent =
-    "Passaggi operativi da seguire:";
+/* Mostra i passaggi della procedura scelta */
+function showProcedureDetail(proc, scrollIntoView = true) {
+  const repartoLabel = procedureData[currentReparto].label;
 
-  const stepsEl = document.getElementById("detailSteps");
-  stepsEl.innerHTML = "";
-  proc.passi.forEach((step) => {
+  $("#detailTitle").textContent = proc.title;
+  $("#detailReparto").textContent = repartoLabel + " · " + (proc.short || "");
+
+  const list = $("#detailSteps");
+  list.innerHTML = "";
+  proc.steps.forEach((step) => {
     const li = document.createElement("li");
     li.textContent = step;
-    stepsEl.appendChild(li);
+    list.appendChild(li);
   });
 
-  document.getElementById("detailNote").textContent = proc.note || "";
+  if (scrollIntoView) {
+    // Su mobile porta il dettaglio a metà schermo
+    $("#step3Card").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
-function resetDettaglio() {
-  document.getElementById("detailTitle").textContent =
-    "Nessuna procedura selezionata";
-  document.getElementById("detailRepartoTag").textContent = "—";
-  document.getElementById("detailIntro").textContent =
-    "Tocca una procedura sopra per vedere i passaggi operativi.";
-  document.getElementById("detailSteps").innerHTML = "";
-  document.getElementById("detailNote").textContent = "";
-}
+/* ===== EVENTI ===== */
 
-function filtraProcedure(query) {
-  const listEl = document.getElementById("procedureList");
-  listEl.innerHTML = "";
+function setupRepartiButtons() {
+  const buttons = document.querySelectorAll(".reparto-btn");
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const reparto = btn.dataset.reparto;
+      if (!reparto || reparto === currentReparto) return;
 
-  const risultati = [];
+      currentReparto = reparto;
 
-  Object.keys(procedureData).forEach((reparto) => {
-    procedureData[reparto].forEach((proc) => {
-      const testo = `${proc.titolo} ${proc.scorciatoia || ""}`.toLowerCase();
-      if (testo.includes(query)) {
-        risultati.push({ reparto, proc });
-      }
+      // Aggiorna stato visivo
+      buttons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      // Reset ricerca quando cambio reparto
+      currentSearch = $("#searchInput").value.trim();
+      applyTheme();
+      renderProcedureButtons();
     });
   });
+}
 
-  const hintEl = document.getElementById("searchHint");
-
-  if (risultati.length === 0) {
-    hintEl.textContent = "Nessuna procedura trovata per questa ricerca.";
-    return;
-  }
-
-  hintEl.textContent = `Risultati: ${risultati.length} procedur${
-    risultati.length === 1 ? "a" : "e"
-  } trovate. Tocca per vedere i passaggi.`;
-
-  risultati.forEach(({ reparto, proc }) => {
-    const btn = creaBottoneProcedura(proc, reparto, true);
-    listEl.appendChild(btn);
+function setupSearch() {
+  const input = $("#searchInput");
+  input.addEventListener("input", () => {
+    currentSearch = input.value;
+    renderProcedureButtons();
   });
 }
 
-function formatRepartoName(key) {
-  switch (key) {
-    case "cassa":
-      return "Cassa";
-    case "banco":
-      return "Banco";
-    case "magazzino":
-      return "Magazzino";
-    case "servizi":
-      return "Servizi & Cup";
-    default:
-      return key;
-  }
-}
+/* ===== INIT ===== */
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderStats();
+  setupRepartiButtons();
+  setupSearch();
+  applyTheme();
+  renderProcedureButtons();
+});
