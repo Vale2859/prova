@@ -1,382 +1,245 @@
-/* =======================
-   BASE
-   ======================= */
-
+/* RESET MOLTO LEGGERO */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-:root {
-  --bg-page: radial-gradient(circle at top left, #0fd4c4, #052c53 55%, #020817);
-  --card-bg: rgba(5, 22, 45, 0.9);
-  --card-radius: 26px;
-  --text-main: #ffffff;
-  --text-soft: #c3cfdd;
-  --accent-green: #22c55e;
-  --accent-blue: #1d4ed8;
-  --accent-amber: #f59e0b;
-  --accent-pink: #ec4899;
-  --chip-bg: rgba(15, 23, 42, 0.8);
-  --shadow-soft: 0 22px 45px rgba(0, 0, 0, 0.55);
-  --transition-fast: 0.18s ease-out;
-  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Segoe UI", sans-serif;
-}
-
-html,
-body {
-  height: 100%;
   margin: 0;
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
-  font-family: var(--font-main);
-  background: var(--bg-page);
-  color: var(--text-main);
-  -webkit-font-smoothing: antialiased;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  background: radial-gradient(circle at top, #0fdc9b 0, #01233b 45%, #020716 100%);
+  color: #f9fbff;
 }
 
-/* layout principale */
-
-.page {
-  min-height: 100vh;
-  max-width: 1024px;
+/* LAYOUT PRINCIPALE */
+.proc-app {
+  max-width: 980px;
   margin: 0 auto;
-  padding: 20px 16px 40px;
+  padding: 18px 16px 40px;
 }
 
-/* =======================
-   HEADER
-   ======================= */
-
-.page-header {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-bottom: 18px;
+/* HEADER */
+.proc-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
 }
 
-.back-dashboard {
-  align-self: flex-start;
-  padding: 8px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: rgba(15, 23, 42, 0.75);
-  color: #e5e7eb;
-  font-size: 13px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: background var(--transition-fast), transform var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.back-dashboard:hover {
-  background: rgba(30, 64, 175, 0.9);
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.85);
-  transform: translateY(-1px);
-}
-
-.title-block h1 {
-  font-size: clamp(28px, 4vw, 34px);
-  margin: 4px 0 4px;
-}
-
-.subtitle {
-  margin: 0;
-  color: var(--text-soft);
+.proc-header p {
   font-size: 14px;
-  max-width: 620px;
+  opacity: 0.8;
+  margin-bottom: 16px;
 }
 
-.eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 11px;
-  color: rgba(148, 163, 184, 0.9);
-  margin: 0;
+/* PILL STATISTICHE */
+.proc-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
 }
 
-/* =======================
-   STATISTICHE
-   ======================= */
-
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.stat-pill {
-  background: radial-gradient(circle at top left, #1d4ed8, #020617 60%);
-  border-radius: 40px;
-  padding: 14px 16px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.85);
+.proc-pill {
+  flex: 1 1 120px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 10% 0, #24a4ff 0, #001b3f 60%);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.45);
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-.stat-label {
-  font-size: 12px;
-  color: #cbd5f5;
-  margin: 0 0 4px;
+.pill-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.8;
 }
 
-.stat-value {
-  font-size: 22px;
+.pill-value {
+  font-size: 18px;
   font-weight: 800;
-  margin: 0;
 }
 
-/* =======================
-   REPARTI CARD
-   ======================= */
-
-.reparti-card,
-.lista-card,
-.detail-card {
-  background: var(--card-bg);
-  border-radius: var(--card-radius);
-  padding: 18px 18px 20px;
-  box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(20px);
-  margin-bottom: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.25);
+/* SEZIONI */
+.proc-section {
+  margin-bottom: 26px;
+  padding: 16px 18px 18px;
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(1,20,40,0.95), rgba(1,40,90,0.96));
+  box-shadow:
+    0 18px 35px rgba(0,0,0,0.65),
+    inset 0 0 0 1px rgba(255,255,255,0.03);
 }
 
-.reparti-header h2 {
-  margin: 0 0 4px;
-  font-size: 20px;
+.proc-section h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
 }
 
-.small-text {
-  margin: 0;
+.proc-hint {
   font-size: 13px;
-  color: var(--text-soft);
+  opacity: 0.8;
+  margin-bottom: 10px;
 }
 
-.reparti-tabs {
-  margin-top: 14px;
+/* 1° CLICK: REPARTI */
+.proc-cat-row {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-.reparto-chip {
+.proc-cat-btn {
+  flex: 1 1 130px;
+  padding: 10px 14px;
   border-radius: 999px;
-  padding: 8px 16px;
+  border: none;
+  background: radial-gradient(circle at 10% 0, #1a244a 0, #020814 70%);
+  color: #f9fbff;
   font-size: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.55);
-  background: rgba(15, 23, 42, 0.85);
-  color: #e5e7eb;
+  font-weight: 600;
+  text-align: center;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: background var(--transition-fast), transform var(--transition-fast),
-    box-shadow var(--transition-fast), border-color var(--transition-fast);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.6);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
-.reparto-chip span.count {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.85);
-  color: #e5e7eb;
+.proc-cat-btn.active {
+  background: radial-gradient(circle at 10% 0, #27d18a 0, #035b3a 65%);
 }
 
-.reparto-chip.active {
-  background: linear-gradient(135deg, #22c55e, #15803d);
-  border-color: transparent;
-  box-shadow: 0 16px 36px rgba(22, 163, 74, 0.9);
-  transform: translateY(-1px);
+.proc-cat-btn:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.7);
 }
 
-/* =======================
-   LISTA PROCEDURE
-   ======================= */
-
-.lista-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.lista-header h2 {
-  margin: 2px 0 6px;
-  font-size: 22px;
-}
-
-.btn-outline {
-  border-radius: 999px;
-  padding: 8px 18px;
-  border: 1px solid rgba(148, 163, 184, 0.7);
-  background: transparent;
-  color: #e5e7eb;
-  font-size: 13px;
-  cursor: pointer;
-  white-space: nowrap;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: background var(--transition-fast), transform var(--transition-fast),
-    box-shadow var(--transition-fast);
-}
-
-.btn-outline:hover {
-  background: rgba(15, 23, 42, 0.9);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.9);
-  transform: translateY(-1px);
-}
-
-.procedure-list {
+/* 2° CLICK: PULSANTONI PROCEDURE */
+.proc-buttons-grid {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* pill procedura COLORATO */
-
-.procedure-item {
-  position: relative;
+.proc-btn {
   width: 100%;
-  border-radius: 999px;
-  border: 1px solid rgba(15, 23, 42, 0.9);
-  padding: 12px 18px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: none;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  cursor: pointer;
+  align-items: center;
+  color: #f9fbff;
   font-size: 14px;
-  color: #f9fafb;
-  background: linear-gradient(135deg, #111827, #020617);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.95);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
-    filter var(--transition-fast), border-color var(--transition-fast);
-}
-
-/* colori per reparto */
-.procedure-item.area-cassa {
-  background: linear-gradient(135deg, #0ea5e9, #1d4ed8);
-}
-.procedure-item.area-banco {
-  background: linear-gradient(135deg, #22c55e, #16a34a);
-}
-.procedure-item.area-magazzino {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-}
-
-.procedure-item:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.06);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 1);
-}
-
-.procedure-item.active {
-  border-color: rgba(248, 250, 252, 0.9);
-  box-shadow: 0 22px 48px rgba(15, 23, 42, 1);
-}
-
-.procedure-title {
   font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 26px rgba(0,0,0,0.65);
+  transition: transform 0.14s ease, box-shadow 0.14s ease, filter 0.14s ease;
+}
+
+.proc-btn-main {
+  display: flex;
+  flex-direction: column;
   text-align: left;
 }
 
-.procedure-shortcut {
+.proc-btn-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.proc-btn-sub {
+  font-size: 11px;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+
+.proc-btn-short {
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.9);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  color: #e5e7eb;
-  white-space: nowrap;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.18);
 }
 
-/* =======================
-   DETTAGLIO PROCEDURA
-   ======================= */
-
-.detail-header {
-  margin-bottom: 12px;
+/* Colori diversi per reparto */
+.proc-btn--cassa {
+  background: linear-gradient(145deg, #2d86ff, #001f66);
 }
 
-.detail-top-row {
-  display: flex;
-  gap: 8px;
+.proc-btn--banco {
+  background: linear-gradient(145deg, #ff4f7b, #7c0433);
+}
+
+.proc-btn--magazzino {
+  background: linear-gradient(145deg, #f5b739, #a66a00);
+}
+
+.proc-btn--servizi {
+  background: linear-gradient(145deg, #9b6bff, #361f88);
+}
+
+.proc-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.proc-btn:active {
+  transform: translateY(1px) scale(0.99);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.7);
+}
+
+/* DETTAGLIO PROCEDURA */
+#procTitle {
+  margin-bottom: 4px;
+}
+
+.proc-tag {
+  font-size: 12px;
+  opacity: 0.75;
   margin-bottom: 10px;
 }
 
-.chip {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+.proc-steps-card {
+  border-radius: 18px;
+  padding: 14px 14px 16px;
+  background: radial-gradient(circle at 0 0, #0046a8 0, #020b20 60%);
+  box-shadow: 0 16px 30px rgba(0,0,0,0.65);
 }
 
-.chip-area {
-  background: rgba(15, 23, 42, 0.95);
-  color: #a5b4fc;
+.proc-steps-card--empty {
+  background: radial-gradient(circle at 0 0, #1b2640 0, #010711 70%);
 }
 
-.chip-code {
-  background: rgba(15, 23, 42, 0.95);
-  color: #f97316;
+.proc-empty-text {
+  font-size: 13px;
+  opacity: 0.8;
 }
 
-.detail-header h2 {
-  margin: 0 0 4px;
-  font-size: 20px;
-}
-
-.detail-steps {
-  margin: 8px 0 10px 20px;
-  padding: 0;
+.proc-steps-list {
+  list-style: decimal;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   font-size: 14px;
-  color: #e5e7eb;
 }
 
-.detail-steps li {
-  margin-bottom: 6px;
-}
-
-.detail-note {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: #9ca3af;
-}
-
-/* =======================
-   RESPONSIVE
-   ======================= */
-
-@media (max-width: 768px) {
-  .page {
-    padding: 16px 10px 28px;
+/* RESPONSIVE */
+@media (min-width: 768px) {
+  .proc-app {
+    padding-top: 26px;
   }
 
-  .stats-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .lista-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .btn-outline {
-    width: 100%;
-    justify-content: center;
+  .proc-section {
+    padding: 18px 24px 20px;
   }
 }
