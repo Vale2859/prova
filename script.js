@@ -1,283 +1,235 @@
-// =========================
-// DATI PROCEDURE (DEMO)
-// =========================
-
+// Dati demo procedure – 2 click
 const procedureData = {
-  cassa: {
-    nome: "Cassa",
-    descrizione:
-      "Procedure operative per chi lavora in cassa: scontrini, resi, errori di pagamento.",
-    coloreClasse: "area-cassa",
-    items: [
-      {
-        codice: "C1",
-        scorciatoia: "Alt + D",
-        titolo: "Doppio scontrino / errore importo",
-        intro:
-          "Da usare quando è stato emesso uno scontrino con importo errato oppure duplicato.",
-        passi: [
-          "Avvisa subito il cliente spiegando l'errore in modo chiaro e tranquillo.",
-          "Chiudi la vendita errata come da procedura del gestionale (annullo o nota di credito).",
-          "Emetti lo scontrino corretto verificando bene articolo, quantità e modalità di pagamento.",
-          "Compila, se previsto, il registro interno errori cassa."
-        ],
-        nota:
-          "In caso di dubbi su annullo / storno, contatta subito il titolare o il referente amministrativo."
-      },
-      {
-        codice: "C2",
-        scorciatoia: "Alt + R",
-        titolo: "Reso merce con rimborso contanti / carta",
-        intro:
-          "Da usare quando un cliente restituisce un prodotto e deve essere effettuato un rimborso.",
-        passi: [
-          "Verifica che il prodotto sia reso integro e con scontrino, seguendo le regole della farmacia.",
-          "Apri il gestionale, richiama la vendita originale e registra il reso.",
-          "Storna l'importo con la stessa modalità di pagamento (contanti o POS).",
-          "Metti il prodotto nell'area resi / da verificare indicata dal titolare."
-        ],
-        nota:
-          "Per prodotti da distruggere o resi particolari (es. SSN) seguire sempre le istruzioni del titolare."
-      },
-      {
-        codice: "C3",
-        scorciatoia: "Alt + M",
-        titolo: "Mancanza resto in cassa",
-        intro:
-          "Da usare quando non hai abbastanza monete/banconote per dare il resto esatto al cliente.",
-        passi: [
-          "Avvisa il collega alla cassa accanto, se presente, per un cambio rapido.",
-          "Se non è possibile, spiega al cliente la situazione e proponi un pagamento elettronico.",
-          "Se il cliente paga comunque in contanti, segnala la necessità di cambio nel quaderno cassa.",
-          "A fine turno segnala al titolare o al referente di cassa il taglio mancante."
-        ],
-        nota:
-          "Questa procedura aiuta a non lasciare buchi di cassa non tracciati e a programmare meglio il cambio."
-      }
-    ]
-  },
-  banco: {
-    nome: "Banco",
-    descrizione:
-      "Procedure per il banco vendita: gestione cliente, consigli, problemi su prodotti.",
-    coloreClasse: "area-banco",
-    items: [
-      {
-        codice: "B1",
-        scorciatoia: "Alt + C",
-        titolo: "Cliente insoddisfatto per prodotto",
-        intro:
-          "Da usare quando un cliente torna lamentando un prodotto che non ha funzionato come si aspettava.",
-        passi: [
-          "Ascolta con calma il cliente lasciandolo spiegare senza interrompere.",
-          "Valuta se il problema è di utilizzo, aspettativa o difetto del prodotto.",
-          "Se possibile, proponi una soluzione (spiegazione migliore, sostituzione, rimborso secondo regole interne).",
-          "Segna sul quaderno banco il caso, indicando nome prodotto e tipo di lamentela."
-        ],
-        nota:
-          "I casi ripetuti sullo stesso prodotto vanno segnalati al titolare per eventuale rimozione dall'assortimento."
-      },
-      {
-        codice: "B2",
-        scorciatoia: "Alt + P",
-        titolo: "Prodotto non disponibile a scaffale",
-        intro:
-          "Da usare quando il cliente chiede un prodotto che di solito c'è ma non è disponibile a scaffale.",
-        passi: [
-          "Verifica subito a magazzino o al terminale la reale disponibilità.",
-          "Se è disponibile in magazzino, recuperalo e riempi anche lo scaffale.",
-          "Se non è disponibile, proponi un'alternativa adeguata spiegando bene le differenze.",
-          "Offri la possibilità di prenotarlo e avvisare il cliente quando arriva."
-        ],
-        nota:
-          "Questa procedura riduce i 'no stock' al banco e migliora la percezione di servizio al cliente."
-      }
-    ]
-  },
-  magazzino: {
-    nome: "Magazzino",
-    descrizione:
-      "Procedure per scorte, scadenze e ordine degli scaffali interni.",
-    coloreClasse: "area-magazzino",
-    items: [
-      {
-        codice: "M1",
-        scorciatoia: "M1",
-        titolo: "Controllo scadenze mensile",
-        intro:
-          "Da usare per il controllo periodico delle scadenze in magazzino e a scaffale.",
-        passi: [
-          "Seleziona il reparto da controllare (OTC, integratori, cosmetica, ecc.).",
-          "Controlla le date di scadenza partendo dai ripiani più alti verso il basso.",
-          "Sposta in area 'scadenze prossime' i prodotti con scadenza entro la soglia decisa dal titolare.",
-          "Aggiorna il foglio o il file dedicato alle scadenze segnando reparto, prodotto e quantità."
-        ],
-        nota:
-          "Le scadenze devono essere controllate almeno una volta al mese o con la frequenza decisa dal titolare."
-      },
-      {
-        codice: "M2",
-        scorciatoia: "M2",
-        titolo: "Prodotto non trovato a scaffale",
-        intro:
-          "Da usare quando il gestionale indica disponibilità ma il prodotto fisicamente non si trova.",
-        passi: [
-          "Controlla se il prodotto è stato spostato nei cestoni promo o in espositori speciali.",
-          "Verifica anche nel retro/magazzino in eventuali scatole di arrivo non ancora sistemate.",
-          "Se non viene trovato, segnala l'anomalia nel registro mancanze di magazzino.",
-          "A fine giornata confronta le mancanze con il titolare per eventuale rettifica di giacenza."
-        ],
-        nota:
-          "Ridurre al minimo le differenze tra gestionale e scorte reali evita problemi di ordini e di servizio al cliente."
-      }
-    ]
-  }
+  cassa: [
+    {
+      id: 'c1',
+      titolo: 'Doppio scontrino / errore importo',
+      breve: 'Correggere uno scontrino battuto male.',
+      codice: 'C1',
+      tag: 'Reparto: Cassa · Tempo medio: 2 min',
+      passi: [
+        'Avvisa subito il cliente dell’errore.',
+        'Chiama il titolare o chi è abilitato alla rettifica.',
+        'Segui la procedura di storno sul gestionale (tasto apposito).',
+        'Emetti lo scontrino corretto e consegnalo al cliente.',
+        'Annota l’errore sul registro interno errori cassa.'
+      ]
+    },
+    {
+      id: 'c2',
+      titolo: 'Reso merce con rimborso contanti / carta',
+      breve: 'Quando il cliente restituisce un prodotto.',
+      codice: 'C2',
+      tag: 'Reparto: Cassa · Tempo medio: 3 min',
+      passi: [
+        'Verifica che il prodotto sia rendibile (scontrino, stato della confezione, normative).',
+        'Controlla la data sullo scontrino e le note del gestionale.',
+        'Esegui la procedura di reso su gestionale selezionando la causale corretta.',
+        'Rimborsa il cliente con il metodo concordato (contanti / carta).',
+        'Archivia lo scontrino di reso nella cartellina dedicata.'
+      ]
+    },
+    {
+      id: 'c3',
+      titolo: 'Mancanza resto in cassa',
+      breve: 'Gestire quando mancano monete o piccoli tagli.',
+      codice: 'C3',
+      tag: 'Reparto: Cassa · Tempo medio: 1 min',
+      passi: [
+        'Mettiti d’accordo con il collega più vicino per avere il cambio.',
+        'Segna sul foglio “Cambio cassa” quanto è stato spostato e in che tagli.',
+        'Aggiorna la scatola del resto secondo la procedura interna.',
+        'Comunica al titolare se la mancanza di resto è frequente.'
+      ]
+    }
+  ],
+  banco: [
+    {
+      id: 'b1',
+      titolo: 'Gestione anticipi con ricetta SSR',
+      breve: 'Cliente lascia anticipo e ritira dopo la ricetta.',
+      codice: 'B1',
+      tag: 'Reparto: Banco · Tempo medio: 3 min',
+      passi: [
+        'Raccogli i dati del cliente (nome, telefono) e del medico se necessario.',
+        'Compila il modulo interno “Anticipi” con data e importo.',
+        'Applica l’etichetta al prodotto e riponilo nell’area dedicata anticipi.',
+        'Avvisa il cliente su tempi e modalità di ritiro.',
+        'Aggiorna il registro quando la ricetta viene consegnata e il cliente ritira.'
+      ]
+    },
+    {
+      id: 'b2',
+      titolo: 'Prodotto non disponibile a magazzino',
+      breve: 'Gestione ordine al fornitore / altra farmacia.',
+      codice: 'B2',
+      tag: 'Reparto: Banco · Tempo medio: 2 min',
+      passi: [
+        'Verifica a computer la disponibilità presso i grossisti.',
+        'Se necessario, proponi un equivalente conforme alla normativa.',
+        'Se il cliente accetta l’ordine, registra la prenotazione con nominativo e recapito.',
+        'Spiega tempi indicativi di arrivo e modalità di avviso (telefono / SMS / app).'
+      ]
+    },
+    {
+      id: 'b3',
+      titolo: 'Cliente in attesa di ricetta dematerializzata',
+      breve: 'Ricetta non ancora arrivata dal medico.',
+      codice: 'B3',
+      tag: 'Reparto: Banco · Tempo medio: 2 min',
+      passi: [
+        'Verifica con il cliente dati anagrafici e medico di riferimento.',
+        'Controlla nel gestionale se la ricetta è già stata generata.',
+        'Se non presente, compila il modulo interno “Ricetta in attesa”.',
+        'Concorda con il cliente se tornare più tardi o essere ricontattato.'
+      ]
+    }
+  ],
+  magazzino: [
+    {
+      id: 'm1',
+      titolo: 'Controllo scadenze mensile',
+      breve: 'Verifica mensile delle scadenze a scaffale.',
+      codice: 'M1',
+      tag: 'Reparto: Magazzino · Tempo medio: 20 min a reparto',
+      passi: [
+        'Prendi il carrellino e l’apposito contenitore per prodotti in scadenza.',
+        'Controlla scaffale per scaffale i prodotti con scadenza ≤ 6 mesi.',
+        'Sposta i prodotti in scadenza nel ripiano dedicato.',
+        'Compila il foglio “Scadenze” con codice prodotto, lotto e data.',
+        'Consegna il foglio al titolare / responsabile acquisti.'
+      ]
+    },
+    {
+      id: 'm2',
+      titolo: 'Prodotto non trovato a scaffale',
+      breve: 'Gestire quando il gestionale dice “presente” ma non si trova.',
+      codice: 'M2',
+      tag: 'Reparto: Magazzino · Tempo medio: 4 min',
+      passi: [
+        'Controlla eventuali espositori fuori banco o vetrine dedicate.',
+        'Verifica se il prodotto è stato spostato in promozione / isola tematica.',
+        'Se non trovato, registra la mancanza sul modulo “Prodotto non rintracciato”.',
+        'Avvisa il titolare per eventuale rettifica giacenza sul gestionale.'
+      ]
+    }
+  ],
+  servizi: [
+    {
+      id: 's1',
+      titolo: 'Prenotazione servizio (es. ECG, holter, MOC)',
+      breve: 'Registrare la prenotazione del cliente.',
+      codice: 'S1',
+      tag: 'Reparto: Servizi / Cup · Tempo medio: 3 min',
+      passi: [
+        'Verifica il servizio richiesto e le eventuali preparazioni (digiuno, ecc.).',
+        'Consulta l’agenda servizi e proponi gli slot disponibili.',
+        'Registra i dati del cliente (nome, telefono, eventuale email).',
+        'Consegna il promemoria cartaceo o digitale con data e ora.',
+        'Segna eventuali note importanti (farmaci, patologie rilevanti).'
+      ]
+    },
+    {
+      id: 's2',
+      titolo: 'Gestione no-show (cliente non si presenta)',
+      breve: 'Cosa fare se il cliente non arriva all’appuntamento.',
+      codice: 'S2',
+      tag: 'Reparto: Servizi / Cup · Tempo medio: 2 min',
+      passi: [
+        'Dopo 10–15 minuti chiama il cliente per capire il motivo.',
+        'Se richiede un nuovo appuntamento, riprogramma seguendo le disponibilità.',
+        'Segna il no-show nell’agenda con una nota.',
+        'Se i no-show sono frequenti, segnala il nominativo al titolare.'
+      ]
+    }
+  ]
 };
 
-// =========================
-// INIZIALIZZAZIONE PAGINA
-// =========================
+// Stato attuale
+let currentCategory = 'cassa';
 
-document.addEventListener("DOMContentLoaded", () => {
-  const statTotali = document.getElementById("statTotali");
-  const statCassa = document.getElementById("statCassa");
-  const statBanco = document.getElementById("statBanco");
-  const statMagazzino = document.getElementById("statMagazzino");
+// Riferimenti DOM
+document.addEventListener('DOMContentLoaded', () => {
+  const catButtons = document.querySelectorAll('.proc-cat-btn');
+  const procButtonsContainer = document.getElementById('procButtonsContainer');
+  const procTitle = document.getElementById('procTitle');
+  const procTag = document.getElementById('procTag');
+  const procStepsCard = document.getElementById('procStepsCard');
+  const procStepsList = document.getElementById('procStepsList');
 
-  const repartiTabs = document.getElementById("repartiTabs");
-  const procedureList = document.getElementById("procedureList");
+  // Cambia categoria (primo click)
+  catButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.cat;
+      if (cat === currentCategory) return;
 
-  const currentAreaLabel = document.getElementById("currentAreaLabel");
-  const currentAreaTitle = document.getElementById("currentAreaTitle");
-  const currentAreaDesc = document.getElementById("currentAreaDesc");
+      currentCategory = cat;
 
-  const detailAreaChip = document.getElementById("detailAreaChip");
-  const detailCode = document.getElementById("detailCode");
-  const detailTitle = document.getElementById("detailTitle");
-  const detailIntro = document.getElementById("detailIntro");
-  const detailSteps = document.getElementById("detailSteps");
-  const detailNote = document.getElementById("detailNote");
-
-  const backToReparti = document.getElementById("backToReparti");
-
-  // Calcolo statistiche
-  const countCassa = procedureData.cassa.items.length;
-  const countBanco = procedureData.banco.items.length;
-  const countMagazzino = procedureData.magazzino.items.length;
-  const countTotali = countCassa + countBanco + countMagazzino;
-
-  statTotali.textContent = countTotali;
-  statCassa.textContent = countCassa;
-  statBanco.textContent = countBanco;
-  statMagazzino.textContent = countMagazzino;
-
-  // Crea tab dei reparti
-  let currentAreaKey = "cassa";
-
-  function renderRepartiTabs() {
-    repartiTabs.innerHTML = "";
-
-    Object.entries(procedureData).forEach(([key, area]) => {
-      const btn = document.createElement("button");
-      btn.className =
-        "reparto-chip" + (key === currentAreaKey ? " active" : "");
-      btn.dataset.areaKey = key;
-
-      const label = document.createElement("span");
-      label.textContent = area.nome;
-
-      const countSpan = document.createElement("span");
-      countSpan.className = "count";
-      countSpan.textContent = area.items.length;
-
-      btn.appendChild(label);
-      btn.appendChild(countSpan);
-
-      btn.addEventListener("click", () => {
-        if (currentAreaKey === key) return;
-        currentAreaKey = key;
-        renderRepartiTabs();
-        renderProcedureList();
-        resetDetailForArea();
-      });
-
-      repartiTabs.appendChild(btn);
+      catButtons.forEach(b => b.classList.toggle('active', b === btn));
+      renderProcedureButtons();
+      clearCurrentProcedure();
     });
-  }
-
-  // Crea lista procedure del reparto selezionato
-  function renderProcedureList() {
-    const area = procedureData[currentAreaKey];
-    procedureList.innerHTML = "";
-
-    currentAreaLabel.textContent = "Reparto";
-    currentAreaTitle.textContent = area.nome;
-    currentAreaDesc.textContent = area.descrizione;
-
-    area.items.forEach((proc) => {
-      const btn = document.createElement("button");
-      btn.className = `procedure-item ${area.coloreClasse}`;
-      btn.dataset.code = proc.codice;
-
-      const titleSpan = document.createElement("span");
-      titleSpan.className = "procedure-title";
-      titleSpan.textContent = proc.titolo;
-
-      const shortcutSpan = document.createElement("span");
-      shortcutSpan.className = "procedure-shortcut";
-      shortcutSpan.textContent = proc.scorciatoia;
-
-      btn.appendChild(titleSpan);
-      btn.appendChild(shortcutSpan);
-
-      btn.addEventListener("click", () => {
-        document
-          .querySelectorAll(".procedure-item.active")
-          .forEach((el) => el.classList.remove("active"));
-        btn.classList.add("active");
-        renderDetail(proc, area);
-      });
-
-      procedureList.appendChild(btn);
-    });
-  }
-
-  // Mostra dettaglio procedura
-  function renderDetail(proc, area) {
-    detailAreaChip.textContent = area.nome;
-    detailCode.textContent = proc.codice;
-    detailTitle.textContent = proc.titolo;
-    detailIntro.textContent = proc.intro;
-
-    detailSteps.innerHTML = "";
-    proc.passi.forEach((step) => {
-      const li = document.createElement("li");
-      li.textContent = step;
-      detailSteps.appendChild(li);
-    });
-
-    detailNote.textContent = proc.nota || "";
-  }
-
-  // Quando cambio reparto resetto il dettaglio
-  function resetDetailForArea() {
-    const area = procedureData[currentAreaKey];
-    detailAreaChip.textContent = area.nome;
-    detailCode.textContent = "";
-    detailTitle.textContent = "Seleziona una procedura";
-    detailIntro.textContent =
-      "Tocca una procedura dalla lista in alto per vedere i passaggi da seguire.";
-    detailSteps.innerHTML = "";
-    detailNote.textContent = "";
-  }
-
-  // Bottone "torna ai reparti principali"
-  backToReparti.addEventListener("click", () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
   });
 
-  // Inizializzo
-  renderRepartiTabs();
-  renderProcedureList();
-  resetDetailForArea();
+  // Mostra i pulsanti della categoria attuale
+  function renderProcedureButtons() {
+    procButtonsContainer.innerHTML = '';
+
+    const list = procedureData[currentCategory] || [];
+
+    list.forEach(proc => {
+      const button = document.createElement('button');
+      button.className = `proc-btn proc-btn--${currentCategory}`;
+      button.setAttribute('data-id', proc.id);
+
+      button.innerHTML = `
+        <div class="proc-btn-main">
+          <span class="proc-btn-title">${proc.titolo}</span>
+          <span class="proc-btn-sub">${proc.breve}</span>
+        </div>
+        <span class="proc-btn-short">${proc.codice}</span>
+      `;
+
+      button.addEventListener('click', () => {
+        showProcedure(proc);
+      });
+
+      procButtonsContainer.appendChild(button);
+    });
+  }
+
+  // Mostra i passaggi della procedura scelta (secondo click)
+  function showProcedure(proc) {
+    procTitle.textContent = proc.titolo;
+    procTag.textContent = proc.tag;
+
+    procStepsList.innerHTML = '';
+    proc.passi.forEach(p => {
+      const li = document.createElement('li');
+      li.textContent = p;
+      procStepsList.appendChild(li);
+    });
+
+    procStepsCard.classList.remove('proc-steps-card--empty');
+    document.querySelector('.proc-empty-text')?.remove();
+  }
+
+  // Quando cambio reparto, svuoto il dettaglio
+  function clearCurrentProcedure() {
+    procTitle.textContent = 'Seleziona una procedura';
+    procTag.textContent = '—';
+    procStepsList.innerHTML = '';
+    procStepsCard.classList.add('proc-steps-card--empty');
+
+    if (!document.querySelector('.proc-empty-text')) {
+      const p = document.createElement('p');
+      p.className = 'proc-empty-text';
+      p.textContent = 'Tocca un pulsante sopra per vedere i passaggi operativi.';
+      procStepsCard.prepend(p);
+    }
+  }
+
+  // Inizializzazione
+  renderProcedureButtons();
+  clearCurrentProcedure();
 });
