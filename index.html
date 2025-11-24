@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Portale Farmacia Montesano</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 
@@ -13,7 +14,7 @@
   <link rel="apple-touch-icon" sizes="120x120" href="logo.jpg">
   <link rel="apple-touch-icon" href="logo.jpg">
 
-  <!-- Icona per Android / browser -->
+  <!-- Icona per browser / Android -->
   <link rel="icon" type="image/png" href="logo.jpg">
 </head>
 <body>
@@ -74,10 +75,10 @@
         <li data-nav="assenzePage">Assenze</li>
         <li data-nav="turniPage">Farmacie di turno</li>
         <li data-nav="comunicazioniPage">Comunicazioni</li>
-        <li data-nav="procedurePage">Procedure</li>
+        <li data-nav="procedurePage">Procedure operative</li>
         <li class="divider-label">Sezioni dedicate</li>
-        <li data-nav="areaPersonale">Area personale</li>
-        <li data-nav="areaAdmin">Admin</li>
+        <li data-nav="areaPersonale">Area personale (demo)</li>
+        <li data-nav="areaAdmin">Admin (demo)</li>
         <li id="logoutBtn" class="logout">Logout</li>
       </ul>
     </aside>
@@ -191,7 +192,7 @@
 
           <!-- PROCEDURE -->
           <article class="card card-procedure">
-            <span class="card-badge" id="procedureBadge">10</span>
+            <span class="card-badge">12</span>
             <div class="card-header">
               <div class="card-icon">🗂️</div>
               <div class="card-title-group">
@@ -200,17 +201,17 @@
             </div>
             <div class="card-body">
               <p class="small-text">
-                Tutte le procedure divise per reparto (cassa, banco, magazzino, servizi…).
+                Tutte le procedure operative divise per reparto. Obiettivo: massimo 2 tocchi.
               </p>
             </div>
             <div class="card-footer">
               <button id="openProcedure" class="btn-secondary">
-                Apri procedure operative
+                Modifica o aggiungi procedura
               </button>
             </div>
           </article>
 
-          <!-- LOGISTICA -->
+          <!-- LOGISTICA (per dopo) -->
           <article class="card card-logistica">
             <span class="card-badge">4</span>
             <div class="card-header">
@@ -257,102 +258,112 @@
     </section>
 
     <!-- ============ PAGINA ASSENZE ============ -->
-    <!-- (IDENTICA A PRIMA – NON MODIFICATA) -->
-    <!-- ... TUTTA LA TUA PAGINA ASSENZE COME L’HAI INCOLLATA ... -->
-    <!-- Per brevità non la ricopio qui ma tu tieni la tua versione identica -->
+    <section id="assenzePage" class="page hidden">
+      <!-- (QUI lascio invariato: è identico al tuo codice attuale) -->
+      <!-- ... TUTTO IL BLOCCO ASSENZE COME CE L’HAI GIÀ ... -->
+    </section>
 
-    <!-- ============ PAGINA FARMACIE DI TURNO ============ -->
-    <!-- ... ANCHE QUI LASCI LA TUA SEZIONE turniPage IDENTICA ... -->
+    <!-- ============ PAGINA TURNI ============ -->
+    <section id="turniPage" class="page hidden">
+      <!-- ... tutto il tuo blocco “Farmacie di turno” identico a prima ... -->
+    </section>
 
     <!-- ============ PAGINA COMUNICAZIONI ============ -->
-    <!-- ... SEZIONE comunicazioniPage IDENTICA ALLA TUA ... -->
+    <section id="comunicazioniPage" class="page hidden">
+      <!-- ... tutto il tuo blocco comunicazioni identico a prima ... -->
+    </section>
 
-    <!-- ============ PAGINA PROCEDURE ============ -->
-    <section id="procedurePage" class="page hidden">
+    <!-- ============ PAGINA PROCEDURE OPERATIVE ============ -->
+    <section id="procedurePage" class="page hidden procedure-page">
+
       <header class="page-header">
         <button id="backFromProcedure" class="back-button">← Dashboard</button>
         <div class="page-title-block">
           <h1>Procedure operative</h1>
           <p>
-            Tutte le procedure divise per reparto. L’obiettivo è che un dipendente
-            trovi ciò che gli serve in massimo <strong>2 clic</strong>.
+            Tutte le procedure divise per reparto. Obiettivo: che un dipendente trovi quello che gli serve in massimo 2 tocchi.
           </p>
         </div>
-        <div class="summary-badges">
-          <span class="badge badge-today" id="badgeProcTot">Totali: 0</span>
-          <span class="badge badge-week" id="badgeProcCassa">Cassa: 0</span>
-          <span class="badge badge-month" id="badgeProcBanco">Banco: 0</span>
+        <div class="procedure-stats">
+          <div class="proc-stat-pill">
+            <span class="label">Procedure totali</span>
+            <span class="value" id="badgeProcTotali">0</span>
+          </div>
+          <div class="proc-stat-pill">
+            <span class="label">Cassa</span>
+            <span class="value" id="badgeProcCassa">0</span>
+          </div>
+          <div class="proc-stat-pill">
+            <span class="label">Banco</span>
+            <span class="value" id="badgeProcBanco">0</span>
+          </div>
+          <div class="proc-stat-pill">
+            <span class="label">Magazzino</span>
+            <span class="value" id="badgeProcMagazzino">0</span>
+          </div>
+          <div class="proc-stat-pill">
+            <span class="label">Servizi &amp; CUP</span>
+            <span class="value" id="badgeProcServizi">0</span>
+          </div>
         </div>
       </header>
 
-      <!-- REPARTI PRINCIPALI -->
-      <article class="card">
-        <h2>Seleziona un reparto</h2>
-        <p class="small-text">
-          1) Tocca il reparto · 2) Tocca la procedura · Finito.
-        </p>
+      <div class="procedure-layout">
 
-        <div class="procedure-reparti-row">
-          <button class="proc-reparto-btn" data-reparto="cassa">
-            <span class="proc-reparto-title">Cassa</span>
-            <span class="proc-reparto-count" id="countCassa">0 procedure</span>
-          </button>
-          <button class="proc-reparto-btn" data-reparto="banco">
-            <span class="proc-reparto-title">Banco</span>
-            <span class="proc-reparto-count" id="countBanco">0 procedure</span>
-          </button>
-          <button class="proc-reparto-btn" data-reparto="magazzino">
-            <span class="proc-reparto-title">Magazzino</span>
-            <span class="proc-reparto-count" id="countMagazzino">0 procedure</span>
-          </button>
-          <button class="proc-reparto-btn" data-reparto="servizi">
-            <span class="proc-reparto-title">Servizi</span>
-            <span class="proc-reparto-count" id="countServizi">0 procedure</span>
-          </button>
-          <button class="proc-reparto-btn" data-reparto="sicurezza">
-            <span class="proc-reparto-title">Sicurezza</span>
-            <span class="proc-reparto-count" id="countSicurezza">0 procedure</span>
-          </button>
-        </div>
-
-        <div class="form-row">
-          <label for="procedureSearch">Ricerca rapida nel reparto selezionato</label>
-          <input
-            type="text"
-            id="procedureSearch"
-            placeholder="Es. doppio scontrino, reso, nota di credito..."
-          />
-        </div>
-      </article>
-
-      <!-- ELENCO PROCEDURE -->
-      <article class="card">
-        <div class="requests-header">
-          <h2 id="procedureListTitle">Procedure – Cassa</h2>
-          <p class="small-text" id="procedureListSubtitle">
-            Tocca una procedura per vedere il dettaglio.
+        <!-- SELETTORE REPARTO + RICERCA -->
+        <article class="card procedure-selector-card">
+          <h2>Seleziona un reparto</h2>
+          <p class="small-text">
+            1) Tocca il reparto · 2) Tocca la procedura · Finito.
           </p>
-        </div>
 
-        <div id="procedureList" class="procedure-list">
-          <!-- riempito da JS -->
-        </div>
+          <div id="procedureDepartments" class="procedure-dept-row">
+            <button class="proc-dept-btn active" data-reparto="cassa">Cassa</button>
+            <button class="proc-dept-btn" data-reparto="banco">Banco</button>
+            <button class="proc-dept-btn" data-reparto="magazzino">Magazzino</button>
+            <button class="proc-dept-btn" data-reparto="servizi">Servizi &amp; CUP</button>
+          </div>
 
-        <button id="procedureBackToReparti" class="btn-secondary">
-          Torna ai reparti principali
-        </button>
-      </article>
+          <div class="procedure-search">
+            <input
+              type="text"
+              id="procedureSearch"
+              placeholder="Ricerca rapida nel reparto selezionato (es. doppio scontrino, no-show, scadenze...)"
+            />
+          </div>
+        </article>
 
-      <!-- DETTAGLIO PROCEDURA -->
-      <article id="procedureDetailCard" class="card hidden">
-        <div class="requests-header">
-          <h2 id="procedureDetailTitle">Titolo procedura</h2>
-          <p class="small-text" id="procedureDetailReparto">Reparto · Codice</p>
-        </div>
-        <p id="procedureDetailText" class="small-text">
-          Qui apparirà il testo della procedura selezionata (demo statica).
-        </p>
-      </article>
+        <!-- LISTA PROCEDURE -->
+        <article class="card procedure-list-card">
+          <header class="procedure-list-header">
+            <div>
+              <h2 id="procedureCurrentDeptTitle">Procedure – Cassa</h2>
+              <p class="small-text">
+                Tocca una procedura per vedere i passaggi operativi.
+              </p>
+            </div>
+            <button id="backToDepts" class="btn-secondary small">
+              ← Torna ai reparti principali
+            </button>
+          </header>
+
+          <div id="procedureButtons" class="procedure-buttons">
+            <!-- riempito da JS -->
+          </div>
+        </article>
+
+        <!-- DETTAGLIO PROCEDURA -->
+        <article class="card procedure-detail-card">
+          <h2 id="procedureDetailTitle">Seleziona una procedura</h2>
+          <p id="procedureDetailSubtitle" class="small-text">
+            Tocca una voce sopra per vedere i passaggi passo-passo.
+          </p>
+          <ol id="procedureSteps" class="procedure-steps">
+            <!-- riempito da JS -->
+          </ol>
+        </article>
+
+      </div>
     </section>
 
   </main>
