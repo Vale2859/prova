@@ -83,6 +83,33 @@ let comunicazioni = [
   }
 ];
 
+// ====== DATI DEMO: NOTIFICHE ======
+let notifiche = [
+  {
+    id: 1,
+    sezione: "assenze",
+    titolo: "Permesso approvato",
+    testo: "La tua richiesta di permesso del 10/01 è stata approvata.",
+    data: "Oggi",
+    letto: false
+  },
+  {
+    id: 2,
+    sezione: "assenze",
+    titolo: "Ferie rifiutate",
+    testo: "Le ferie dal 03/02 al 05/02 sono state rifiutate.",
+    data: "Ieri",
+    letto: false
+  },
+  {
+    id: 3,
+    sezione: "assenze",
+    titolo: "Promemoria",
+    testo: "Ricorda di consegnare il certificato per la malattia del 05/11.",
+    data: "2 giorni fa",
+    letto: false
+  }
+];
 // ====== DATI DEMO: PROCEDURE ======
 const procedureData = [
   {
