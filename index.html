@@ -2,110 +2,77 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Procedure operative - Portale Farmacia Montesano</title>
+  <title>Procedure operative – Portale Farmacia Montesano</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 </head>
 <body>
 
-  <main class="page">
+  <main class="proc-app">
 
-    <!-- HEADER SEMPLICE -->
-    <header class="page-header">
-      <button class="back-dashboard">
-        ← Torna alla dashboard
-      </button>
+    <header class="proc-header">
+      <h1>Procedure operative</h1>
+      <p>Seleziona il reparto e poi la procedura. Massimo 2 tocchi.</p>
 
-      <div class="title-block">
-        <p class="eyebrow">Portale interno · Procedure</p>
-        <h1>Procedure operative</h1>
-        <p class="subtitle">
-          Consulta velocemente le procedure interne della farmacia, divise per reparto.
-          Tocca un reparto e poi una procedura per vedere i passaggi.
-        </p>
+      <div class="proc-stats-row">
+        <div class="proc-pill">
+          <span class="pill-label">Procedure totali</span>
+          <span class="pill-value" id="statTotali">10</span>
+        </div>
+        <div class="proc-pill">
+          <span class="pill-label">Cassa</span>
+          <span class="pill-value" id="statCassa">3</span>
+        </div>
+        <div class="proc-pill">
+          <span class="pill-label">Banco</span>
+          <span class="pill-value" id="statBanco">3</span>
+        </div>
+        <div class="proc-pill">
+          <span class="pill-label">Magazzino</span>
+          <span class="pill-value" id="statMagazzino">2</span>
+        </div>
       </div>
     </header>
 
-    <!-- STATISTICHE IN ALTO -->
-    <section class="stats-row">
-      <article class="stat-pill">
-        <p class="stat-label">Procedure totali</p>
-        <p id="statTotali" class="stat-value">0</p>
-      </article>
-
-      <article class="stat-pill">
-        <p class="stat-label">Cassa</p>
-        <p id="statCassa" class="stat-value">0</p>
-      </article>
-
-      <article class="stat-pill">
-        <p class="stat-label">Banco</p>
-        <p id="statBanco" class="stat-value">0</p>
-      </article>
-
-      <article class="stat-pill">
-        <p class="stat-label">Magazzino</p>
-        <p id="statMagazzino" class="stat-value">0</p>
-      </article>
-    </section>
-
-    <!-- REPARTI (CASSA / BANCO / MAGAZZINO) -->
-    <section class="reparti-card">
-      <header class="reparti-header">
-        <h2>Reparti principali</h2>
-        <p class="small-text">
-          Scegli il reparto in cui stai lavorando. Poi seleziona una procedura
-          dalla lista qui sotto.
-        </p>
-      </header>
-
-      <div class="reparti-tabs" id="repartiTabs">
-        <!-- I bottoni vengono creati via JS -->
+    <!-- 1° CLICK: SCELTA REPARTO -->
+    <section class="proc-section">
+      <h2>1. Scegli il reparto</h2>
+      <div class="proc-cat-row">
+        <button class="proc-cat-btn active" data-cat="cassa">Cassa</button>
+        <button class="proc-cat-btn" data-cat="banco">Banco</button>
+        <button class="proc-cat-btn" data-cat="magazzino">Magazzino</button>
+        <button class="proc-cat-btn" data-cat="servizi">Servizi / Cup</button>
       </div>
     </section>
 
-    <!-- LISTA PROCEDURE DEL REPARTO SCELTO -->
-    <section class="lista-card">
-      <header class="lista-header">
-        <div>
-          <p id="currentAreaLabel" class="eyebrow">Reparto</p>
-          <h2 id="currentAreaTitle">Cassa</h2>
-          <p id="currentAreaDesc" class="small-text">
-            Procedure operative per chi lavora in cassa: scontrini, resi, errori di pagamento.
-          </p>
-        </div>
+    <!-- 2° CLICK: SCELTA PROCEDURA -->
+    <section class="proc-section">
+      <h2>2. Tocca una procedura</h2>
+      <p class="proc-hint">I pulsanti qui sotto cambiano in base al reparto scelto.</p>
 
-        <button id="backToReparti" class="btn-outline">
-          ← Torna ai reparti principali
-        </button>
-      </header>
-
-      <div id="procedureList" class="procedure-list">
-        <!-- bottoni procedura creati da JS -->
+      <div id="procButtonsContainer" class="proc-buttons-grid">
+        <!-- I bottoni vengono riempiti via JS -->
       </div>
     </section>
 
-    <!-- DETTAGLIO PROCEDURA SELEZIONATA -->
-    <section class="detail-card">
-      <header class="detail-header">
-        <div class="detail-top-row">
-          <span id="detailAreaChip" class="chip chip-area">Cassa</span>
-          <span id="detailCode" class="chip chip-code">C1</span>
-        </div>
-        <h2 id="detailTitle">Seleziona una procedura</h2>
-        <p id="detailIntro" class="small-text">
-          Tocca una procedura dalla lista in alto per vedere i passaggi da seguire.
+    <!-- DETTAGLIO PROCEDURA SCELTA -->
+    <section class="proc-section">
+      <h2 id="procTitle">Seleziona una procedura</h2>
+      <p id="procTag" class="proc-tag">—</p>
+
+      <div id="procStepsCard" class="proc-steps-card proc-steps-card--empty">
+        <p class="proc-empty-text">
+          Tocca un pulsante sopra per vedere i passaggi operativi.
         </p>
-      </header>
 
-      <ol id="detailSteps" class="detail-steps">
-        <!-- step generati da JS -->
-      </ol>
-
-      <p id="detailNote" class="detail-note"></p>
+        <ol id="procStepsList" class="proc-steps-list">
+          <!-- Passaggi riempiti via JS -->
+        </ol>
+      </div>
     </section>
 
   </main>
+
 </body>
 </html>
