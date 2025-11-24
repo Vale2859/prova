@@ -1,15 +1,138 @@
-/* ======================================================
-   PORTALE FARMACIA MONTESANO – SCRIPT COMPLETO DA ZERO
-   JS1 – LOGIN, NAVIGAZIONE, DASHBOARD
-====================================================== */
+// ======================================================
+// PORTALE FARMACIA MONTESANO – SCRIPT COMPLETO
+// ======================================================
 
-/* ===== STATO GLOBALE ===== */
-let currentRole = "farmacia"; // farmacia | titolare | dipendente
-let currentPage = "dashboard";
+// ===== DATI DEMO TURNI =====
+const turniFarmacie = [
+  {
+    data: "2025-12-17",
+    orario: "00:00 – 24:00",
+    principale: "Farmacia Montesano",
+    appoggio: "Farmacia Centrale",
+    telefono: "0835 335921",
+    note: "Turno completo",
+    tipoRange: "oggi",
+    mese: 12
+  },
+  {
+    data: "2025-12-18",
+    orario: "08:00 – 20:00",
+    principale: "Farmacia Centrale",
+    appoggio: "Farmacia Montesano",
+    telefono: "0835 111111",
+    note: "Diurno",
+    tipoRange: "settimana",
+    mese: 12
+  },
+  {
+    data: "2025-12-19",
+    orario: "20:00 – 08:00",
+    principale: "Farmacia Madonna delle Grazie",
+    appoggio: "Farmacia Montesano",
+    telefono: "0835 222222",
+    note: "Notturno",
+    tipoRange: "settimana",
+    mese: 12
+  },
+  {
+    data: "2025-12-24",
+    orario: "00:00 – 24:00",
+    principale: "Farmacia Montesano",
+    appoggio: "Farmacia Centrale",
+    telefono: "0835 000000",
+    note: "Vigilia di Natale",
+    tipoRange: "mese",
+    mese: 12
+  }
+];
 
-/* ===== ELEMENTI PRINCIPALI ===== */
+// ===== DATI DEMO COMUNICAZIONI =====
+let comunicazioni = [
+  {
+    id: 1,
+    titolo: "Nuova procedura notturni",
+    categoria: "urgente",
+    autore: "Titolare",
+    data: "Oggi",
+    testo: "Dal prossimo turno seguire la nuova check-list di chiusura.",
+    letta: false
+  },
+  {
+    id: 2,
+    titolo: "Verifica armadietto stupefacenti",
+    categoria: "importante",
+    autore: "Titolare",
+    data: "Ieri",
+    testo: "Controllare giacenze e scadenze.",
+    letta: false
+  },
+  {
+    id: 3,
+    titolo: "Aggiornamento promo vetrina",
+    categoria: "informativa",
+    autore: "Admin",
+    data: "2 giorni fa",
+    testo: "Aggiornata esposizione stagionale.",
+    letta: true
+  }
+];
+
+// ===== DATI DEMO PROCEDURE =====
+const procedureData = [
+  {
+    id: "p1",
+    titolo: "Chiusura cassa serale",
+    reparto: "cassa",
+    aggiornamento: "12/11/2025",
+    testo: "1) Controllo giacenza.\n2) Stampa chiusura.\n3) Conta fondo cassa."
+  },
+  {
+    id: "p2",
+    titolo: "Gestione buoni SSN",
+    reparto: "cassa",
+    aggiornamento: "05/10/2025",
+    testo: "Controllare ricetta, dati paziente e allegare copia scontrino al buono."
+  },
+  {
+    id: "p3",
+    titolo: "Ricezione merce da grossista",
+    reparto: "magazzino",
+    aggiornamento: "22/09/2025",
+    testo: "Controllo colli, stampa DDT, verifica scadenze, etichettatura e carico."
+  },
+  {
+    id: "p4",
+    titolo: "Reso prodotti danneggiati",
+    reparto: "logistica",
+    aggiornamento: "18/09/2025",
+    testo: "Compilare modulo reso, fotografare prodotto, contattare referente."
+  },
+  {
+    id: "p5",
+    titolo: "Prenotazione servizi CUP / ECG",
+    reparto: "servizi",
+    aggiornamento: "01/10/2025",
+    testo: "Verificare dati anagrafici, orari disponibili, confermare e stampare promemoria."
+  }
+];
+
+let currentRole = "farmacia";
+let currentTurniView = "oggi";
+let procedureFilter = "tutti";
+let procSearchTerm = "";
+
+// ===== ARCHIVIO FILE: stato =====
+let fsRoot = null;
+let currentFolder = null;
+let selectedItem = null;
+let clipboardItem = null;
+
+// ======================================================
+// DOM READY
+// ======================================================
 document.addEventListener("DOMContentLoaded", () => {
 
+  // ----- ELEMENTI BASE -----
   const authContainer = document.getElementById("authContainer");
   const app = document.getElementById("app");
 
@@ -17,15 +140,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginRoleLabel = document.getElementById("loginRoleLabel");
   const authTabs = document.querySelectorAll(".auth-tab");
 
-  /* PAGINE */
-  const dashboard = document.getElementById("dashboard");
+  // Sezioni
+  const dashboardSection = document.getElementById("dashboard");
   const assenzePage = document.getElementById("assenzePage");
   const turniPage = document.getElementById("turniPage");
   const comunicazioniPage = document.getElementById("comunicazioniPage");
   const procedurePage = document.getElementById("procedurePage");
   const archivioPage = document.getElementById("archivioPage");
 
-  /* SIDEBAR */
+  // Sidebar
   const sidebar = document.getElementById("sidebar");
   const hamburger = document.getElementById("hamburger");
   const closeSidebar = document.getElementById("closeSidebar");
@@ -33,54 +156,92 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const rolePill = document.getElementById("currentRolePill");
 
+  // Dashboard turno card
+  const turnoOrarioChip = document.getElementById("turnoOrarioChip");
+  const turnoNome = document.getElementById("turnoNome");
+  const turnoIndirizzo = document.getElementById("turnoIndirizzo");
+  const turnoAppoggio = document.getElementById("turnoAppoggio");
 
-  /* ======================================================
-     FUNZIONI BASE
-  ====================================================== */
+  const turnoOggiNome = document.getElementById("turnoOggiNome");
+  const turnoOggiIndirizzo = document.getElementById("turnoOggiIndirizzo");
+  const turnoOggiTelefono = document.getElementById("turnoOggiTelefono");
+  const turnoOggiOrario = document.getElementById("turnoOggiOrario");
+  const turnoOggiAppoggioNome = document.getElementById("turnoOggiAppoggioNome");
+  const turnoOggiAppoggioDettagli = document.getElementById("turnoOggiAppoggioDettagli");
 
+  // Bottoni rapidi dashboard
+  const openAssenzeBtn = document.getElementById("openAssenze");
+  const openTurniBtn = document.getElementById("openTurni");
+  const openComunicazioniBtn = document.getElementById("openComunicazioni");
+  const openProcedureBtn = document.getElementById("openProcedure");
+  const openArchivioBtn = document.getElementById("openArchivio");
+
+  // Bottoni back
+  const backFromAssenzeBtn = document.getElementById("backFromAssenze");
+  const backFromTurniBtn = document.getElementById("backFromTurni");
+  const backFromComunicazioniBtn = document.getElementById("backFromComunicazioni");
+  const backFromProcedureBtn = document.getElementById("backFromProcedure");
+  const backFromArchivioBtn = document.getElementById("backFromArchivio");
+
+  // Turni elenco
+  const turniTabs = document.querySelectorAll(".turni-tab");
+  const turniRows = document.getElementById("turniRows");
+  const turniMeseSelect = document.getElementById("turniMeseSelect");
+  const turniFarmaciaSelect = document.getElementById("turniFarmaciaSelect");
+
+  // Comunicazioni
+  const comunicazioniList = document.getElementById("comunicazioniList");
+  const filtroCategoria = document.getElementById("filtroCategoria");
+  const filtroSoloNonLette = document.getElementById("filtroSoloNonLette");
+  const comunicazioneForm = document.getElementById("comunicazioneForm");
+  const comunicazioneFeedback = document.getElementById("comunicazioneFeedback");
+
+  // Procedure
+  const procedureListEl = document.getElementById("procedureList");
+  const procedureDetail = document.getElementById("procedureDetail");
+  const procedureSearch = document.getElementById("procedureSearch");
+  const procedureButtons = document.querySelectorAll(".proc-filter-btn");
+
+  // Archivio
+  const archivioGrid = document.getElementById("archivioGrid");
+  const archivioPath = document.getElementById("archivioPath");
+  const archivioUpload = document.getElementById("archivioUpload");
+  const archivioBtnUpload = document.getElementById("archivioBtnUpload");
+  const archivioUpBtn = document.getElementById("archivioUp");
+  const archivioNewFolderBtn = document.getElementById("archivioNewFolder");
+  const archivioContextMenu = document.getElementById("archivioContextMenu");
+  const menuNuova = document.getElementById("menuNuova");
+  const menuRinomina = document.getElementById("menuRinomina");
+  const menuElimina = document.getElementById("menuElimina");
+  const menuCopia = document.getElementById("menuCopia");
+  const menuIncolla = document.getElementById("menuIncolla");
+  const menuDownload = document.getElementById("menuDownload");
+
+  // ======================================================
+  // FUNZIONI BASE
+  // ======================================================
   function setRole(role) {
     currentRole = role;
     if (!rolePill) return;
-
-    if (role === "farmacia") rolePill.textContent = "Farmacia (Accesso Generico)";
+    if (role === "farmacia") rolePill.textContent = "Farmacia (accesso generico)";
     if (role === "titolare") rolePill.textContent = "Titolare";
     if (role === "dipendente") rolePill.textContent = "Dipendente";
   }
 
-  function showPage(pageName) {
-    currentPage = pageName;
-
-    [dashboard, assenzePage, turniPage, comunicazioniPage, procedurePage, archivioPage]
-      .forEach(p => p.classList.add("hidden"));
-
-    if (pageName === "dashboard") dashboard.classList.remove("hidden");
-    if (pageName === "assenze") assenzePage.classList.remove("hidden");
-    if (pageName === "turni") turniPage.classList.remove("hidden");
-    if (pageName === "comunicazioni") comunicazioniPage.classList.remove("hidden");
-    if (pageName === "procedure") procedurePage.classList.remove("hidden");
-    if (pageName === "archivio") archivioPage.classList.remove("hidden");
-
-    window.scrollTo(0,0);
+  function showSection(section) {
+    [dashboardSection, assenzePage, turniPage, comunicazioniPage, procedurePage, archivioPage]
+      .forEach(sec => sec && sec.classList.add("hidden"));
+    if (section) section.classList.remove("hidden");
+    window.scrollTo(0, 0);
   }
 
-  function openSidebarMenu() {
-    sidebar.classList.add("open");
-  }
-
-  function closeSidebarMenu() {
-    sidebar.classList.remove("open");
-  }
-
-
-  /* ======================================================
-     LOGIN
-  ====================================================== */
-
+  // ======================================================
+  // LOGIN
+  // ======================================================
   authTabs.forEach(tab => {
     tab.addEventListener("click", () => {
       authTabs.forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
-
       const role = tab.dataset.role;
       loginRoleLabel.textContent =
         role === "farmacia" ? "Farmacia" :
@@ -98,126 +259,109 @@ document.addEventListener("DOMContentLoaded", () => {
 
     authContainer.classList.add("hidden");
     app.classList.remove("hidden");
-
-    showPage("dashboard");
+    showSection(dashboardSection);
   });
 
+  // ======================================================
+  // SIDEBAR / NAV
+  // ======================================================
+  hamburger.addEventListener("click", () => {
+    sidebar.classList.add("open");
+  });
 
-  /* ======================================================
-     SIDEBAR / NAVIGAZIONE
-  ====================================================== */
-
-  hamburger.addEventListener("click", openSidebarMenu);
-  closeSidebar.addEventListener("click", closeSidebarMenu);
+  closeSidebar.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+  });
 
   document.addEventListener("click", (e) => {
     if (sidebar.classList.contains("open") &&
         !sidebar.contains(e.target) &&
         e.target !== hamburger) {
-      closeSidebarMenu();
+      sidebar.classList.remove("open");
     }
   });
 
   sidebar.querySelectorAll("li[data-nav]").forEach(item => {
     item.addEventListener("click", () => {
       const target = item.dataset.nav;
+      if (target === "dashboard") showSection(dashboardSection);
+      if (target === "assenzePage") showSection(assenzePage);
+      if (target === "turniPage") { showSection(turniPage); renderTurniTable(); }
+      if (target === "comunicazioniPage") { showSection(comunicazioniPage); renderComunicazioni(); }
+      if (target === "procedurePage") { showSection(procedurePage); renderProcedureList(); }
+      if (target === "archivioPage") { showSection(archivioPage); renderArchivio(); }
 
-      if (target === "dashboard") showPage("dashboard");
-      if (target === "assenzePage") showPage("assenze");
-      if (target === "turniPage") showPage("turni");
-      if (target === "comunicazioniPage") showPage("comunicazioni");
-      if (target === "procedurePage") showPage("procedure");
-      if (target === "archivioPage") showPage("archivio");
-
-      closeSidebarMenu();
+      sidebar.classList.remove("open");
     });
   });
 
   logoutBtn.addEventListener("click", () => {
     app.classList.add("hidden");
     authContainer.classList.remove("hidden");
-
     loginForm.reset();
     authTabs.forEach(t => t.classList.remove("active"));
     authTabs[0].classList.add("active");
-
     loginRoleLabel.textContent = "Farmacia";
     setRole("farmacia");
-
-    closeSidebarMenu();
   });
 
+  // ======================================================
+  // NAVIGAZIONE BOTTONI DASHBOARD
+  // ======================================================
+  if (openAssenzeBtn) openAssenzeBtn.addEventListener("click", () => showSection(assenzePage));
+  if (backFromAssenzeBtn) backFromAssenzeBtn.addEventListener("click", () => showSection(dashboardSection));
 
-  /* ======================================================
-     QUI FINISCE JS1
-     Dopo continua JS2 → Turni / Comunicazioni / Procedure
-  ====================================================== */
+  if (openTurniBtn) openTurniBtn.addEventListener("click", () => {
+    showSection(turniPage);
+    renderTurniTable();
+  });
+  if (backFromTurniBtn) backFromTurniBtn.addEventListener("click", () => showSection(dashboardSection));
 
-});
-/* ======================================================
-   JS2 – TURNI / COMUNICAZIONI / PROCEDURE / NOTIFICHE
-====================================================== */
+  if (openComunicazioniBtn) openComunicazioniBtn.addEventListener("click", () => {
+    showSection(comunicazioniPage);
+    renderComunicazioni();
+  });
+  if (backFromComunicazioniBtn) backFromComunicazioniBtn.addEventListener("click", () => showSection(dashboardSection));
 
-document.addEventListener("DOMContentLoaded", () => {
+  if (openProcedureBtn) openProcedureBtn.addEventListener("click", () => {
+    showSection(procedurePage);
+    renderProcedureList();
+  });
+  if (backFromProcedureBtn) backFromProcedureBtn.addEventListener("click", () => showSection(dashboardSection));
 
-  /* ======================================================
-     TURNI FARMACIE – DATI DEMO
-  ====================================================== */
+  if (openArchivioBtn) openArchivioBtn.addEventListener("click", () => {
+    showSection(archivioPage);
+    renderArchivio();
+  });
+  if (backFromArchivioBtn) backFromArchivioBtn.addEventListener("click", () => showSection(dashboardSection));
 
-  const turniFarmacie = [
-    {
-      data: "2025-12-17",
-      orario: "00:00 – 24:00",
-      principale: "Farmacia Montesano",
-      appoggio: "Farmacia Centrale",
-      telefono: "0835 335921",
-      note: "Turno completo",
-      tipoRange: "oggi",
-      mese: 12
-    },
-    {
-      data: "2025-12-18",
-      orario: "08:00 – 20:00",
-      principale: "Farmacia Centrale",
-      appoggio: "Farmacia Montesano",
-      telefono: "0835 111111",
-      note: "Diurno",
-      tipoRange: "settimana",
-      mese: 12
-    },
-    {
-      data: "2025-12-19",
-      orario: "20:00 – 08:00",
-      principale: "Farmacia Madonna delle Grazie",
-      appoggio: "Farmacia Montesano",
-      telefono: "0835 222222",
-      note: "Notturno",
-      tipoRange: "settimana",
-      mese: 12
-    },
-    {
-      data: "2025-12-24",
-      orario: "00:00 – 24:00",
-      principale: "Farmacia Montesano",
-      appoggio: "Farmacia Centrale",
-      telefono: "0835 000000",
-      note: "Vigilia di Natale",
-      tipoRange: "mese",
-      mese: 12
-    }
-  ];
-
-  /* Elementi Turni */
-  const turniTabs = document.querySelectorAll(".turni-tab");
-  const turniRows = document.getElementById("turniRows");
-  const turniMeseSelect = document.getElementById("turniMeseSelect");
-  const turniFarmaciaSelect = document.getElementById("turniFarmaciaSelect");
-
-  let currentTurniView = "oggi";
-
+  // ======================================================
+  // TURNI
+  // ======================================================
   function formatDateIT(iso) {
     const [y, m, d] = iso.split("-");
     return `${d}/${m}/${y}`;
+  }
+
+  function initTurnoOggi() {
+    const oggi = turniFarmacie.find(t => t.tipoRange === "oggi");
+    if (!oggi) return;
+
+    if (turnoOrarioChip) turnoOrarioChip.textContent = oggi.orario;
+    if (turnoNome) turnoNome.textContent = oggi.principale;
+    if (turnoIndirizzo) {
+      turnoIndirizzo.innerHTML = `Via Esempio 12, Matera<br />Tel: ${oggi.telefono}`;
+    }
+    if (turnoAppoggio) turnoAppoggio.textContent = oggi.appoggio;
+
+    if (turnoOggiNome) turnoOggiNome.textContent = oggi.principale;
+    if (turnoOggiIndirizzo) turnoOggiIndirizzo.textContent = "Via Esempio 12, Matera";
+    if (turnoOggiTelefono) turnoOggiTelefono.textContent = `Tel: ${oggi.telefono}`;
+    if (turnoOggiOrario) turnoOggiOrario.textContent = oggi.orario;
+    if (turnoOggiAppoggioNome) turnoOggiAppoggioNome.textContent = oggi.appoggio;
+    if (turnoOggiAppoggioDettagli) {
+      turnoOggiAppoggioDettagli.textContent = "Via Dante 8, Matera – Tel: 0835 111111";
+    }
   }
 
   function renderTurniTable() {
@@ -231,7 +375,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (mese !== "all") {
       filtered = filtered.filter(t => t.mese === Number(mese));
     }
-
     if (farmacia !== "all") {
       filtered = filtered.filter(t => t.principale === farmacia);
     }
@@ -239,21 +382,23 @@ document.addEventListener("DOMContentLoaded", () => {
     turniRows.innerHTML = "";
 
     if (filtered.length === 0) {
-      turniRows.innerHTML =
-        "<div class='turni-row'><span>Nessun turno con questi filtri.</span></div>";
+      const row = document.createElement("div");
+      row.className = "turni-row";
+      row.innerHTML = "<span>Nessun turno per questi filtri.</span>";
+      turniRows.appendChild(row);
       return;
     }
 
     filtered.forEach(t => {
-      const li = document.createElement("div");
-      li.className = "turni-row";
+      const row = document.createElement("div");
+      row.className = "turni-row";
 
       let noteClass = "normale";
       const lower = t.note.toLowerCase();
       if (lower.includes("notturno")) noteClass = "notturno";
       if (lower.includes("vigilia") || lower.includes("festivo")) noteClass = "festivo";
 
-      li.innerHTML = `
+      row.innerHTML = `
         <span>${formatDateIT(t.data)}</span>
         <span>${t.orario}</span>
         <span>${t.principale}</span>
@@ -261,16 +406,15 @@ document.addEventListener("DOMContentLoaded", () => {
         <span>${t.telefono}</span>
         <span><span class="turno-type-pill ${noteClass}">${t.note}</span></span>
       `;
-
-      turniRows.appendChild(li);
+      turniRows.appendChild(row);
     });
   }
 
+  // Eventi tab turni
   turniTabs.forEach(tab => {
     tab.addEventListener("click", () => {
       turniTabs.forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
-
       currentTurniView = tab.dataset.view;
       renderTurniTable();
     });
@@ -279,57 +423,20 @@ document.addEventListener("DOMContentLoaded", () => {
   if (turniMeseSelect) turniMeseSelect.addEventListener("change", renderTurniTable);
   if (turniFarmaciaSelect) turniFarmaciaSelect.addEventListener("change", renderTurniTable);
 
-
-  /* ======================================================
-     COMUNICAZIONI – DEMO
-  ====================================================== */
-
-  let comunicazioni = [
-    {
-      id: 1,
-      titolo: "Nuova procedura notturni",
-      categoria: "urgente",
-      autore: "Titolare",
-      data: "Oggi",
-      testo: "Dal prossimo turno seguire la nuova check-list di chiusura.",
-      letta: false
-    },
-    {
-      id: 2,
-      titolo: "Verifica armadietto stupefacenti",
-      categoria: "importante",
-      autore: "Titolare",
-      data: "Ieri",
-      testo: "Controllare giacenze e scadenze.",
-      letta: false
-    },
-    {
-      id: 3,
-      titolo: "Aggiornamento promo vetrina",
-      categoria: "informativa",
-      autore: "Admin",
-      data: "2 giorni fa",
-      testo: "Aggiornata esposizione stagionale.",
-      letta: true
-    }
-  ];
-
-  const comunicazioniList = document.getElementById("comunicazioniList");
-  const filtroCategoria = document.getElementById("filtroCategoria");
-  const filtroSoloNonLette = document.getElementById("filtroSoloNonLette");
-
+  // ======================================================
+  // COMUNICAZIONI
+  // ======================================================
   function renderComunicazioni() {
     if (!comunicazioniList) return;
 
     const cat = filtroCategoria.value;
     const soloNL = filtroSoloNonLette.checked;
 
-    let filtered = comunicazioni;
+    let filtered = [...comunicazioni];
 
     if (cat !== "tutte") {
       filtered = filtered.filter(c => c.categoria === cat);
     }
-
     if (soloNL) {
       filtered = filtered.filter(c => !c.letta);
     }
@@ -337,14 +444,16 @@ document.addEventListener("DOMContentLoaded", () => {
     comunicazioniList.innerHTML = "";
 
     if (filtered.length === 0) {
-      comunicazioniList.innerHTML = "<div class='small-text'>Nessuna comunicazione.</div>";
+      const empty = document.createElement("div");
+      empty.className = "small-text";
+      empty.textContent = "Nessuna comunicazione.";
+      comunicazioniList.appendChild(empty);
       return;
     }
 
     filtered.forEach(c => {
       const card = document.createElement("div");
       card.className = "com-card";
-
       card.innerHTML = `
         <div class="com-pill ${c.categoria}">
           ${c.categoria.toUpperCase()}
@@ -353,7 +462,6 @@ document.addEventListener("DOMContentLoaded", () => {
         <div class="com-meta">${c.data} · ${c.autore} · ${c.letta ? "Letta" : "Non letta"}</div>
         <div class="com-text">${c.testo}</div>
       `;
-
       comunicazioniList.appendChild(card);
     });
   }
@@ -361,43 +469,47 @@ document.addEventListener("DOMContentLoaded", () => {
   if (filtroCategoria) filtroCategoria.addEventListener("change", renderComunicazioni);
   if (filtroSoloNonLette) filtroSoloNonLette.addEventListener("change", renderComunicazioni);
 
+  if (comunicazioneForm && comunicazioneFeedback) {
+    comunicazioneForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const titolo = document.getElementById("comTitolo").value.trim();
+      const categoria = document.getElementById("comCategoria").value;
+      const testo = document.getElementById("comTesto").value.trim();
 
-  /* ======================================================
-     PROCEDURE – DEMO
-  ====================================================== */
+      if (!titolo || !testo) {
+        comunicazioneFeedback.textContent = "⚠️ Inserisci almeno titolo e testo.";
+        comunicazioneFeedback.classList.remove("hidden");
+        return;
+      }
 
-  const procedureData = [
-    {
-      id: "p1",
-      titolo: "Chiusura Cassa Serale",
-      reparto: "cassa",
-      aggiornamento: "12/11/2025",
-      testo: "1. Controllo giacenza.\n2. Stampa chiusura.\n3. Conta fondo cassa."
-    },
-    {
-      id: "p2",
-      titolo: "Ricezione Merce",
-      reparto: "magazzino",
-      aggiornamento: "22/09/2025",
-      testo: "Controllo colli.\nVerifica scadenze.\nCarico in magazzino."
-    }
-  ];
+      const nuova = {
+        id: comunicazioni.length + 1,
+        titolo,
+        categoria,
+        autore: "Demo utente",
+        data: "Oggi",
+        testo,
+        letta: false
+      };
 
-  const procedureListEl = document.getElementById("procedureList");
-  const procedureDetail = document.getElementById("procedureDetail");
-  const procedureSearch = document.getElementById("procedureSearch");
-  const procedureButtons = document.querySelectorAll(".proc-filter-btn");
+      comunicazioni.unshift(nuova);
+      comunicazioneFeedback.textContent = "✅ Comunicazione registrata (demo).";
+      comunicazioneFeedback.classList.remove("hidden");
+      comunicazioneForm.reset();
+      renderComunicazioni();
+    });
+  }
 
-  let procedureFilter = "tutti";
-  let procSearchTerm = "";
-
+  // ======================================================
+  // PROCEDURE
+  // ======================================================
   function renderProcedureList() {
     if (!procedureListEl) return;
 
     let filtered = procedureData.filter(p => {
       const matchCat = (procedureFilter === "tutti" || p.reparto === procedureFilter);
-      const matchSearch = p.titolo.toLowerCase().includes(procSearchTerm) ||
-                          p.testo.toLowerCase().includes(procSearchTerm);
+      const testoRicerca = (p.titolo + " " + p.testo).toLowerCase();
+      const matchSearch = !procSearchTerm || testoRicerca.includes(procSearchTerm);
       return matchCat && matchSearch;
     });
 
@@ -405,7 +517,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (filtered.length === 0) {
       procedureListEl.innerHTML = "<div class='small-text'>Nessuna procedura trovata.</div>";
-      procedureDetail.innerHTML = "<p class='muted small-text'>Seleziona una procedura.</p>";
+      if (procedureDetail) {
+        procedureDetail.innerHTML = "<p class='small-text muted'>Nessuna procedura selezionata.</p>";
+      }
       return;
     }
 
@@ -423,22 +537,25 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
 
       el.addEventListener("click", () => showProcedure(p.id));
-
       procedureListEl.appendChild(el);
     });
   }
 
   function showProcedure(procId) {
+    if (!procedureDetail) return;
     const p = procedureData.find(x => x.id === procId);
     if (!p) return;
 
-    let paragraphs = p.testo.split("\n").map(r => `<p>${r}</p>`).join("");
+    const paragrafi = p.testo
+      .split("\n")
+      .map(r => `<p>${r}</p>`)
+      .join("");
 
     procedureDetail.innerHTML = `
       <h3>${p.titolo}</h3>
       <p class="small-text">Reparto: <strong>${p.reparto}</strong> · Agg.: <strong>${p.aggiornamento}</strong></p>
       <div class="divider"></div>
-      ${paragraphs}
+      ${paragrafi}
     `;
   }
 
@@ -446,7 +563,6 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       procedureButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-
       procedureFilter = btn.dataset.reparto;
       renderProcedureList();
     });
@@ -459,361 +575,57 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // ======================================================
+  // ARCHIVIO FILE
+  // ======================================================
 
-  /* ======================================================
-     BADGE NOTIFICHE CARD DASHBOARD
-  ====================================================== */
-
-  const notificationConfig = {
-    assenze: 1,
-    turni: 1,
-    comunicazioni: comunicazioni.filter(c => !c.letta).length,
-    procedure: 1,
-    logistica: 1,
-    magazzino: 1
-  };
-
-  function initDashboardBadges() {
-    Object.keys(notificationConfig).forEach(key => {
-      const badge = document.querySelector(`.card-badge[data-card-key="${key}"]`);
-      const label = document.querySelector(`.card-badge-label[data-card-key="${key}"]`);
-      if (!badge) return;
-
-      const n = notificationConfig[key];
-
-      if (n > 0) {
-        badge.classList.add("has-unread");
-        badge.querySelector(".badge-count").textContent = n;
-        if (label) {
-          label.style.display = "block";
-          label.textContent = n === 1 ? "Nuovo" : "Nuovi";
-        }
-      } else {
-        badge.classList.remove("has-unread");
-        badge.style.display = "none";
-        if (label) label.style.display = "none";
-      }
-    });
+  function loadFS() {
+    const saved = localStorage.getItem("fs_montesano");
+    if (saved) {
+      fsRoot = JSON.parse(saved);
+    } else {
+      fsRoot = {
+        name: "root",
+        type: "folder",
+        children: [
+          { type: "folder", name: "Documenti", children: [] },
+          { type: "folder", name: "Foto", children: [] },
+          { type: "folder", name: "Procedure", children: [] },
+          {
+            type: "file",
+            name: "Benvenuto.txt",
+            content: btoa("Benvenuto nell’Archivio File della Farmacia Montesano!")
+          }
+        ]
+      };
+      saveFS();
+    }
+    currentFolder = fsRoot;
   }
-
-  initDashboardBadges();
-  renderComunicazioni();
-  renderProcedureList();
-  renderTurniTable();
-
-});
-/* ======================================================
-   JS3 – ARCHIVIO FILE (FILE SYSTEM COMPLETO)
-====================================================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  /* ===== ELEMENTI ===== */
-  const archivioGrid = document.getElementById("archivioGrid");
-  const archivioPath = document.getElementById("archivioPath");
-  const archivioUpload = document.getElementById("archivioUpload");
-  const archivioBtnUpload = document.getElementById("archivioBtnUpload");
-
-  const contextMenu = document.getElementById("archivioMenu");
-  const renameModal = document.getElementById("renameModal");
-  const renameInput = document.getElementById("renameInput");
-  const renameConfirm = document.getElementById("renameConfirm");
-  const renameCancel = document.getElementById("renameCancel");
-
-  /* ===== FILE SYSTEM ===== */
-
-  // Ogni cartella avrà struttura:
-  // { type: "folder", name: "Cartella", children: [...] }
-  // File:
-  // { type: "file", name: "Documento.txt", content: base64 }
-
-  let fileSystem = JSON.parse(localStorage.getItem("fs_montesano")) || {
-
-    name: "root",
-    type: "folder",
-    children: [
-      {
-        type: "folder",
-        name: "Documenti",
-        children: []
-      },
-      {
-        type: "folder",
-        name: "Foto",
-        children: []
-      },
-      {
-        type: "folder",
-        name: "Procedure",
-        children: []
-      },
-      {
-        type: "file",
-        name: "Benvenuto.txt",
-        content: btoa("Benvenuto nell’Archivio File della Farmacia Montesano!")
-      }
-    ]
-  };
-
-  let currentFolder = fileSystem;
-  let itemToRename = null;
-
-
-  /* ======================================================
-     SALVATAGGIO
-  ====================================================== */
 
   function saveFS() {
-    localStorage.setItem("fs_montesano", JSON.stringify(fileSystem));
+    localStorage.setItem("fs_montesano", JSON.stringify(fsRoot));
   }
 
+  function getPathArray(target) {
+    const path = [];
 
-  /* ======================================================
-     RENDER GRIGLIA
-  ====================================================== */
-
-  function renderArchivio() {
-    archivioGrid.innerHTML = "";
-
-    archivioPath.textContent = "/" + currentFolder.name;
-
-    currentFolder.children.forEach(item => {
-      const el = document.createElement("div");
-      el.className = "fs-item";
-      el.dataset.name = item.name;
-
-      // Icona cartella o file
-      if (item.type === "folder") {
-        el.innerHTML = `
-          <div class="fs-icon folder"></div>
-          <div class="fs-label">${item.name}</div>
-        `;
-      } else {
-        el.innerHTML = `
-          <div class="fs-icon file"></div>
-          <div class="fs-label">${item.name}</div>
-        `;
+    function helper(node, stack) {
+      if (node === target) {
+        path.push(...stack, node.name);
+        return true;
       }
-
-      archivioGrid.appendChild(el);
-
-      /* ===== DOPPIO CLICK = APRI CARTELLA ===== */
-      el.addEventListener("dblclick", () => {
-        if (item.type === "folder") {
-          currentFolder = item;
-          renderArchivio();
-        }
-      });
-
-      /* ===== TASTO DESTRO ===== */
-      el.addEventListener("contextmenu", (e) => {
-        e.preventDefault();
-        openContextMenu(e.pageX, e.pageY, item);
-      });
-
-      /* ===== MOBILE – long press ===== */
-      let pressTimer;
-      el.addEventListener("touchstart", (e) => {
-        pressTimer = setTimeout(() => {
-          openContextMenu(e.touches[0].pageX, e.touches[0].pageY, item);
-        }, 600);
-      });
-
-      el.addEventListener("touchend", () => clearTimeout(pressTimer));
-    });
-  }
-
-
-  /* ======================================================
-     MENU TASTO DESTRO
-  ====================================================== */
-
-  let selectedItem = null;
-
-  function openContextMenu(x, y, item) {
-    selectedItem = item;
-
-    contextMenu.style.top = y + "px";
-    contextMenu.style.left = x + "px";
-    contextMenu.classList.add("active");
-  }
-
-  function closeContextMenu() {
-    contextMenu.classList.remove("active");
-  }
-
-  document.addEventListener("click", () => closeContextMenu());
-
-
-  /* ======================================================
-     AZIONI MENU: NUOVA CARTELLA, RINOMINA, ELIMINA
-  ====================================================== */
-
-  document.getElementById("menuNuova").addEventListener("click", () => {
-    const newFolder = {
-      type: "folder",
-      name: "Nuova Cartella",
-      children: []
-    };
-    currentFolder.children.push(newFolder);
-    saveFS();
-    renderArchivio();
-  });
-
-  document.getElementById("menuRinomina").addEventListener("click", () => {
-    if (!selectedItem) return;
-
-    itemToRename = selectedItem;
-    renameInput.value = selectedItem.name;
-
-    renameModal.classList.add("active");
-    renameInput.focus();
-  });
-
-  renameConfirm.addEventListener("click", () => {
-    if (itemToRename) {
-      itemToRename.name = renameInput.value.trim() || itemToRename.name;
-      saveFS();
-      renderArchivio();
-    }
-    renameModal.classList.remove("active");
-  });
-
-  renameCancel.addEventListener("click", () => {
-    renameModal.classList.remove("active");
-  });
-
-
-  document.getElementById("menuElimina").addEventListener("click", () => {
-    if (!selectedItem) return;
-
-    currentFolder.children = currentFolder.children.filter(i => i !== selectedItem);
-    saveFS();
-    renderArchivio();
-  });
-
-
-  /* ======================================================
-     CARICAMENTO FILE
-  ====================================================== */
-
-  archivioBtnUpload.addEventListener("click", () => {
-    archivioUpload.click();
-  });
-
-  archivioUpload.addEventListener("change", () => {
-    const files = Array.from(archivioUpload.files);
-
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result.split(",")[1];
-
-        const newFile = {
-          type: "file",
-          name: file.name,
-          content: base64
-        };
-
-        currentFolder.children.push(newFile);
-        saveFS();
-        renderArchivio();
-      };
-
-      reader.readAsDataURL(file);
-    });
-  });
-
-  /* ===== START ===== */
-  renderArchivio();
-
-});
-/* ======================================================
-   JS3B – ARCHIVIO FILE FUNZIONI AVANZATE
-====================================================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-  /* ====== ELEMENTI ====== */
-  const archivioBackBtn = document.getElementById("archivioBack");
-
-  /* Queste variabili arrivano da JS3A */
-  // fileSystem
-  // currentFolder
-  // saveFS()
-  // renderArchivio()
-  // selectedItem
-  // contextMenu, openContextMenu()
-
-  /* ======================================================
-     NAVIGAZIONE INDIETRO
-  ====================================================== */
-
-  archivioBackBtn.addEventListener("click", () => {
-    if (currentFolder === fileSystem) return;
-
-    function findParent(root, target) {
-      for (let child of root.children) {
-        if (child === target) return root;
-        if (child.type === "folder") {
-          const deep = findParent(child, target);
-          if (deep) return deep;
+      if (node.type === "folder" && node.children) {
+        for (const child of node.children) {
+          if (helper(child, [...stack, node.name])) return true;
         }
       }
-      return null;
+      return false;
     }
 
-    const parent = findParent(fileSystem, currentFolder);
-    if (parent) {
-      currentFolder = parent;
-      renderArchivio();
-    }
-  });
-
-
-  /* ======================================================
-     COPIA & INCOLLA
-  ====================================================== */
-
-  let clipboardItem = null;
-
-  document.getElementById("menuCopia").addEventListener("click", () => {
-    if (!selectedItem) return;
-    clipboardItem = JSON.parse(JSON.stringify(selectedItem)); // copia profonda
-  });
-
-  document.getElementById("menuIncolla").addEventListener("click", () => {
-    if (!clipboardItem) return;
-
-    let newName = clipboardItem.name;
-    newName = ensureUniqueName(newName, currentFolder.children);
-
-    const clone = JSON.parse(JSON.stringify(clipboardItem));
-    clone.name = newName;
-
-    currentFolder.children.push(clone);
-    saveFS();
-    renderArchivio();
-  });
-
-
-  /* ======================================================
-     DOWNLOAD FILE
-  ====================================================== */
-
-  document.getElementById("menuDownload").addEventListener("click", () => {
-    if (!selectedItem || selectedItem.type !== "file") return;
-
-    const a = document.createElement("a");
-    a.href = "data:application/octet-stream;base64," + selectedItem.content;
-    a.download = selectedItem.name;
-    a.click();
-  });
-
-
-  /* ======================================================
-     EVITA NOMI DUPLICATI
-  ====================================================== */
+    helper(fsRoot, []);
+    return path;
+  }
 
   function ensureUniqueName(base, list) {
     let name = base;
@@ -833,33 +645,297 @@ document.addEventListener("DOMContentLoaded", () => {
     return name;
   }
 
+  function getFileIconClass(item) {
+    if (item.type === "folder") return "folder";
+    const parts = item.name.split(".");
+    if (parts.length < 2) return "";
+    const ext = parts.pop().toLowerCase();
+    if (ext === "pdf") return "pdf";
+    if (["jpg", "jpeg", "png", "gif", "webp", "heic"].includes(ext)) return "image";
+    if (["doc", "docx"].includes(ext)) return "word";
+    if (["txt", "log"].includes(ext)) return "txt";
+    return "";
+  }
 
-  /* ======================================================
-     ORDINE AUTOMATICO: CARTELLE SOPRA, FILE SOTTO
-  ====================================================== */
+  let lastSelectedEl = null;
 
-  const oldRender = renderArchivio;
-  renderArchivio = function () {
+  function clearSelection() {
+    if (lastSelectedEl) lastSelectedEl.classList.remove("selected");
+    lastSelectedEl = null;
+    selectedItem = null;
+  }
+
+  function renderArchivio() {
+    if (!archivioGrid || !currentFolder) return;
+
+    // Ordina: cartelle prima, poi file
     currentFolder.children.sort((a, b) => {
       if (a.type === b.type) return a.name.localeCompare(b.name);
       return a.type === "folder" ? -1 : 1;
     });
-    oldRender();
-  };
 
+    const pathArr = getPathArray(currentFolder);
+    archivioPath.textContent = "/" + pathArr.join("/");
 
-  /* ======================================================
-     EFFETTINI EXTRA
-  ====================================================== */
+    archivioGrid.innerHTML = "";
 
-  document.querySelectorAll(".fs-item").forEach(el => {
-    el.addEventListener("mousedown", () => {
-      el.classList.add("active");
+    if (currentFolder.children.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "small-text";
+      empty.textContent = "Nessun file in questa cartella.";
+      archivioGrid.appendChild(empty);
+      return;
+    }
+
+    currentFolder.children.forEach(item => {
+      const el = document.createElement("div");
+      el.className = "file-item";
+
+      const icon = document.createElement("div");
+      icon.className = "file-icon " + getFileIconClass(item);
+      icon.textContent = item.type === "folder" ? "📁" : "📄";
+
+      const name = document.createElement("div");
+      name.className = "file-name";
+      name.textContent = item.name;
+
+      el.appendChild(icon);
+      el.appendChild(name);
+      archivioGrid.appendChild(el);
+
+      // click selezione
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        clearSelection();
+        el.classList.add("selected");
+        lastSelectedEl = el;
+        selectedItem = item;
+      });
+
+      // doppio click -> apri cartella
+      el.addEventListener("dblclick", (e) => {
+        e.stopPropagation();
+        if (item.type === "folder") {
+          currentFolder = item;
+          clearSelection();
+          renderArchivio();
+        }
+      });
+
+      // tasto destro
+      el.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        clearSelection();
+        el.classList.add("selected");
+        lastSelectedEl = el;
+        selectedItem = item;
+        openContextMenu(e.pageX, e.pageY);
+      });
+
+      // long press mobile
+      let pressTimer;
+      el.addEventListener("touchstart", (e) => {
+        pressTimer = setTimeout(() => {
+          const touch = e.touches[0];
+          clearSelection();
+          el.classList.add("selected");
+          lastSelectedEl = el;
+          selectedItem = item;
+          openContextMenu(touch.pageX, touch.pageY);
+        }, 600);
+      });
+      el.addEventListener("touchend", () => clearTimeout(pressTimer));
     });
-    el.addEventListener("mouseup", () => {
-      el.classList.remove("active");
-    });
+  }
+
+  function openContextMenu(x, y) {
+    if (!archivioContextMenu) return;
+    archivioContextMenu.style.left = x + "px";
+    archivioContextMenu.style.top = y + "px";
+    archivioContextMenu.classList.remove("hidden");
+  }
+
+  function closeContextMenu() {
+    if (!archivioContextMenu) return;
+    archivioContextMenu.classList.add("hidden");
+  }
+
+  document.addEventListener("click", (e) => {
+    if (!archivioContextMenu) return;
+    if (!archivioContextMenu.contains(e.target)) {
+      closeContextMenu();
+      clearSelection();
+    }
   });
 
-  /* FINE JS3B */
+  // Nuova cartella (toolbar + menu)
+  function creaNuovaCartella() {
+    if (!currentFolder) return;
+    const base = "Nuova cartella";
+    const name = ensureUniqueName(base, currentFolder.children);
+    currentFolder.children.push({
+      type: "folder",
+      name,
+      children: []
+    });
+    saveFS();
+    renderArchivio();
+  }
+
+  if (archivioNewFolderBtn) {
+    archivioNewFolderBtn.addEventListener("click", () => {
+      creaNuovaCartella();
+    });
+  }
+
+  if (menuNuova) {
+    menuNuova.addEventListener("click", () => {
+      creaNuovaCartella();
+      closeContextMenu();
+    });
+  }
+
+  // Rinomina
+  if (menuRinomina) {
+    menuRinomina.addEventListener("click", () => {
+      if (!selectedItem || !currentFolder) return;
+      const nuovo = prompt("Nuovo nome:", selectedItem.name);
+      if (!nuovo) {
+        closeContextMenu();
+        return;
+      }
+      const safeName = ensureUniqueName(nuovo.trim(), currentFolder.children.filter(i => i !== selectedItem));
+      selectedItem.name = safeName;
+      saveFS();
+      renderArchivio();
+      closeContextMenu();
+    });
+  }
+
+  // Elimina
+  if (menuElimina) {
+    menuElimina.addEventListener("click", () => {
+      if (!selectedItem || !currentFolder) return;
+      const ok = confirm(`Vuoi eliminare "${selectedItem.name}"?`);
+      if (!ok) {
+        closeContextMenu();
+        return;
+      }
+      currentFolder.children = currentFolder.children.filter(i => i !== selectedItem);
+      saveFS();
+      renderArchivio();
+      closeContextMenu();
+      clearSelection();
+    });
+  }
+
+  // Copia
+  if (menuCopia) {
+    menuCopia.addEventListener("click", () => {
+      if (!selectedItem) return;
+      clipboardItem = JSON.parse(JSON.stringify(selectedItem));
+      closeContextMenu();
+    });
+  }
+
+  // Incolla
+  if (menuIncolla) {
+    menuIncolla.addEventListener("click", () => {
+      if (!clipboardItem || !currentFolder) return;
+      const clone = JSON.parse(JSON.stringify(clipboardItem));
+      clone.name = ensureUniqueName(clone.name, currentFolder.children);
+      currentFolder.children.push(clone);
+      saveFS();
+      renderArchivio();
+      closeContextMenu();
+    });
+  }
+
+  // Download file
+  if (menuDownload) {
+    menuDownload.addEventListener("click", () => {
+      if (!selectedItem || selectedItem.type !== "file") {
+        alert("Seleziona un file prima di scaricare.");
+        closeContextMenu();
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = "data:application/octet-stream;base64," + selectedItem.content;
+      a.download = selectedItem.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      closeContextMenu();
+    });
+  }
+
+  // Upload file
+  if (archivioBtnUpload && archivioUpload) {
+    archivioBtnUpload.addEventListener("click", () => archivioUpload.click());
+
+    archivioUpload.addEventListener("change", () => {
+      const files = Array.from(archivioUpload.files);
+      if (!files.length || !currentFolder) return;
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result.split(",")[1];
+          let name = ensureUniqueName(file.name, currentFolder.children);
+          currentFolder.children.push({
+            type: "file",
+            name,
+            content: base64
+          });
+          saveFS();
+          renderArchivio();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      archivioUpload.value = "";
+    });
+  }
+
+  // Cartella su
+  if (archivioUpBtn) {
+    archivioUpBtn.addEventListener("click", () => {
+      if (!currentFolder || currentFolder === fsRoot) return;
+
+      function findParent(node, target) {
+        if (!node.children) return null;
+        for (const child of node.children) {
+          if (child === target) return node;
+          if (child.type === "folder") {
+            const found = findParent(child, target);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
+
+      const parent = findParent(fsRoot, currentFolder);
+      if (parent) {
+        currentFolder = parent;
+        clearSelection();
+        renderArchivio();
+      }
+    });
+  }
+
+  function initArchivio() {
+    loadFS();
+    renderArchivio();
+  }
+
+  // ======================================================
+  // INIT GENERALE
+  // ======================================================
+  initTurnoOggi();
+  renderTurniTable();
+  renderComunicazioni();
+  renderProcedureList();
+  initArchivio();
+
 });
