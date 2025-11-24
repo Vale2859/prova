@@ -12,7 +12,8 @@
   <link rel="apple-touch-icon" sizes="152x152" href="logo.jpg">
   <link rel="apple-touch-icon" sizes="120x120" href="logo.jpg">
   <link rel="apple-touch-icon" href="logo.jpg">
-  <!-- Per Android con browser -->
+
+  <!-- Favicon Android / browser -->
   <link rel="icon" type="image/png" href="logo.jpg">
 </head>
 <body>
@@ -73,9 +74,10 @@
         <li data-nav="assenzePage">Assenze</li>
         <li data-nav="turniPage">Farmacie di turno</li>
         <li data-nav="comunicazioniPage">Comunicazioni</li>
+        <li data-nav="procedurePage">Procedure</li>
         <li class="divider-label">Sezioni dedicate</li>
-        <li data-nav="areaPersonale">Area personale</li>
-        <li data-nav="areaAdmin">Admin</li>
+        <li data-nav="areaPersonale">Area personale (coming soon)</li>
+        <li data-nav="areaAdmin">Admin (coming soon)</li>
         <li id="logoutBtn" class="logout">Logout</li>
       </ul>
     </aside>
@@ -103,9 +105,11 @@
         <div class="cards-grid">
 
           <!-- ASSENZE -->
-          <article class="card card-assenze">
-            <span class="card-badge notif-badge" data-section="assenze">0</span>
-            <span class="card-badge-label notif-label" data-section="assenze"></span>
+          <article class="card card-assenze" data-card="assenze">
+            <span class="card-badge js-card-badge" data-card-key="assenze">
+              <span class="badge-count" id="badgeCount-assenze">0</span>
+            </span>
+            <span class="card-badge-label js-card-badge-label" data-card-key="assenze"></span>
 
             <div class="card-header">
               <div class="card-icon">📅</div>
@@ -129,9 +133,11 @@
           </article>
 
           <!-- FARMACIA DI TURNO -->
-          <article class="card card-turno">
-            <span class="card-badge notif-badge" data-section="turni">0</span>
-            <span class="card-badge-label notif-label" data-section="turni"></span>
+          <article class="card card-turno" data-card="turni">
+            <span class="card-badge js-card-badge" data-card-key="turni">
+              <span class="badge-count" id="badgeCount-turni">0</span>
+            </span>
+            <span class="card-badge-label js-card-badge-label" data-card-key="turni"></span>
 
             <div class="card-header">
               <div class="card-icon">⏰</div>
@@ -162,9 +168,11 @@
           </article>
 
           <!-- COMUNICAZIONI -->
-          <article class="card card-comunicazioni">
-            <span class="card-badge notif-badge" data-section="comunicazioni">0</span>
-            <span class="card-badge-label notif-label" data-section="comunicazioni"></span>
+          <article class="card card-comunicazioni" data-card="comunicazioni">
+            <span class="card-badge js-card-badge" data-card-key="comunicazioni">
+              <span class="badge-count" id="badgeCount-comunicazioni">0</span>
+            </span>
+            <span class="card-badge-label js-card-badge-label" data-card-key="comunicazioni"></span>
 
             <div class="card-header">
               <div class="card-icon">📢</div>
@@ -194,9 +202,11 @@
           </article>
 
           <!-- PROCEDURE -->
-          <article class="card card-procedure">
-            <span class="card-badge notif-badge" data-section="procedure">0</span>
-            <span class="card-badge-label notif-label" data-section="procedure"></span>
+          <article class="card card-procedure" data-card="procedure">
+            <span class="card-badge js-card-badge" data-card-key="procedure">
+              <span class="badge-count" id="badgeCount-procedure">0</span>
+            </span>
+            <span class="card-badge-label js-card-badge-label" data-card-key="procedure"></span>
 
             <div class="card-header">
               <div class="card-icon">🗂️</div>
@@ -210,16 +220,18 @@
               </p>
             </div>
             <div class="card-footer">
-              <button class="btn-secondary">
+              <button id="openProcedure" class="btn-secondary">
                 Modifica o aggiungi procedura
               </button>
             </div>
           </article>
 
           <!-- LOGISTICA -->
-          <article class="card card-logistica">
-            <span class="card-badge notif-badge" data-section="logistica">0</span>
-            <span class="card-badge-label notif-label" data-section="logistica"></span>
+          <article class="card card-logistica" data-card="logistica">
+            <span class="card-badge js-card-badge" data-card-key="logistica">
+              <span class="badge-count" id="badgeCount-logistica">0</span>
+            </span>
+            <span class="card-badge-label js-card-badge-label" data-card-key="logistica"></span>
 
             <div class="card-header">
               <div class="card-icon">📦</div>
@@ -240,9 +252,11 @@
           </article>
 
           <!-- MAGAZZINIERA -->
-          <article class="card card-magazziniera">
-            <span class="card-badge notif-badge" data-section="magazziniera">0</span>
-            <span class="card-badge-label notif-label" data-section="magazziniera"></span>
+          <article class="card card-magazziniera" data-card="magazzino">
+            <span class="card-badge js-card-badge" data-card-key="magazzino">
+              <span class="badge-count" id="badgeCount-magazzino">0</span>
+            </span>
+            <span class="card-badge-label js-card-badge-label" data-card-key="magazzino"></span>
 
             <div class="card-header">
               <div class="card-icon">📋</div>
@@ -770,16 +784,62 @@
       </article>
     </section>
 
-    <!-- ============ MODAL NOTIFICHE ============ -->
-    <div id="notifModal" class="notif-modal hidden">
-      <div class="notif-modal-backdrop"></div>
-      <div class="notif-modal-panel">
-        <div class="notif-modal-header">
-          <h2 id="notifModalTitle">Notifiche</h2>
-          <button id="notifModalClose" class="icon-button modal-close" aria-label="Chiudi notifiche">✕</button>
+    <!-- ============ PAGINA PROCEDURE (SEMPLICE DEMO) ============ -->
+    <section id="procedurePage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromProcedure" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Procedure interne</h1>
+          <p>Ricerca veloce e consultazione delle procedure divise per reparto.</p>
         </div>
-        <div id="notifModalList" class="notif-modal-list">
+      </header>
+
+      <article class="card">
+        <div class="form-row">
+          <label for="procedureSearch">Cerca tra le procedure</label>
+          <input id="procedureSearch" type="text" placeholder="Es. chiusura cassa, buono SSN, reso fornitore..." />
+        </div>
+
+        <div class="procedure-filters">
+          <button class="proc-filter-btn active" data-reparto="tutti">Tutti</button>
+          <button class="proc-filter-btn" data-reparto="cassa">Cassa / Banco</button>
+          <button class="proc-filter-btn" data-reparto="magazzino">Magazzino</button>
+          <button class="proc-filter-btn" data-reparto="servizi">Servizi</button>
+          <button class="proc-filter-btn" data-reparto="logistica">Logistica</button>
+        </div>
+
+        <div id="procedureList" class="procedure-list">
           <!-- riempito da JS -->
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Dettaglio procedura</h2>
+        <p class="small-text">
+          Tocca una procedura dall’elenco per visualizzare qui il dettaglio completo.
+        </p>
+        <div id="procedureDetail" class="procedure-detail">
+          <p class="small-text muted">Nessuna procedura selezionata.</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============ OVERLAY NOTIFICHE ============ -->
+    <div id="notificationOverlay" class="notif-overlay hidden">
+      <div class="notif-backdrop"></div>
+      <div class="notif-modal">
+        <button id="notifClose" class="notif-close" aria-label="Chiudi">✕</button>
+        <h2 id="notifTitle">Notifiche</h2>
+        <p id="notifIntro" class="small-text"></p>
+
+        <div id="notifList" class="notif-list">
+          <!-- riempito da JS -->
+        </div>
+
+        <div class="notif-footer">
+          <button id="notifCloseBottom" class="btn-secondary small">
+            Chiudi
+          </button>
         </div>
       </div>
     </div>
