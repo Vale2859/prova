@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const turniPage = document.getElementById("turniPage");
   const comunicazioniPage = document.getElementById("comunicazioniPage");
   const procedurePage = document.getElementById("procedurePage");
-  
+
   // Notifiche / badge
   const badgeAssenze = document.getElementById("badgeAssenze");
   const labelAssenze = document.getElementById("labelAssenze");
@@ -805,6 +805,37 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+    // Click sul pallino della card Assenze → apre popup
+  if (badgeAssenze) {
+    badgeAssenze.addEventListener("click", apriPopupNotificheAssenze);
+  }
+
+  // Pulsante "Chiudi" nel popup
+  if (notifChiudi) {
+    notifChiudi.addEventListener("click", chiudiPopupNotifiche);
+  }
+
+  // Click fuori dal box per chiudere (overlay)
+  if (notifOverlay) {
+    notifOverlay.addEventListener("click", (e) => {
+      if (e.target === notifOverlay) {
+        chiudiPopupNotifiche();
+      }
+    });
+  }
+
+  // Segna tutte come viste
+  if (notifSegnaTutte) {
+    notifSegnaTutte.addEventListener("click", () => {
+      notifiche
+        .filter(n => n.sezione === "assenze")
+        .forEach(n => { n.letto = true; });
+
+      aggiornaBadgeAssenze();
+      renderNotificheAssenze();
+    });
+  }
+  
   // ====== PROCEDURE: LOGICA ======
 
   function aggiornaBadgeProcedure() {
