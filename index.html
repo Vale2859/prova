@@ -7,13 +7,8 @@
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 
-  <!-- Icone per aggiunta a Home su iPhone/iPad -->
+  <!-- Icone (puoi cambiare logo.jpg) -->
   <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
-  <link rel="apple-touch-icon" sizes="152x152" href="logo.jpg">
-  <link rel="apple-touch-icon" sizes="120x120" href="logo.jpg">
-  <link rel="apple-touch-icon" href="logo.jpg">
-
-  <!-- Favicon Android / browser -->
   <link rel="icon" type="image/png" href="logo.jpg">
 </head>
 <body>
@@ -75,7 +70,7 @@
         <li data-nav="turniPage">Farmacie di turno</li>
         <li data-nav="comunicazioniPage">Comunicazioni</li>
         <li data-nav="procedurePage">Procedure</li>
-        <li class="divider-label">Sezioni dedicate</li>
+        <li class="divider-label">Strumenti</li>
         <li data-nav="archivioPage">Archivio file</li>
         <li id="logoutBtn" class="logout">Logout</li>
       </ul>
@@ -88,7 +83,6 @@
 
     <!-- ============ DASHBOARD ============ -->
     <section id="dashboard" class="dashboard">
-
       <header class="dashboard-header">
         <div class="dashboard-logo-block">
           <img src="logo.jpg" alt="Farmacia Montesano" class="dash-logo" />
@@ -104,7 +98,12 @@
         <div class="cards-grid">
 
           <!-- ASSENZE -->
-          <article class="card card-assenze" data-card="assenze">
+          <article class="card card-assenze">
+            <div class="card-badge js-card-badge" data-card-key="assenze">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="assenze"></div>
+
             <div class="card-header">
               <div class="card-icon">📅</div>
               <div class="card-title-group">
@@ -115,7 +114,7 @@
             <div class="card-body">
               <p class="caption">Demo grafica assenze.</p>
               <p class="small-text">
-                Vedi calendario, richieste e stato assenze.
+                Consulta calendario, richieste e stato assenze.
               </p>
             </div>
             <div class="card-footer">
@@ -125,8 +124,13 @@
             </div>
           </article>
 
-          <!-- FARMACIA DI TURNO -->
-          <article class="card card-turno" data-card="turni">
+          <!-- FARMACIE DI TURNO -->
+          <article class="card card-turno">
+            <div class="card-badge js-card-badge" data-card-key="turni">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="turni"></div>
+
             <div class="card-header">
               <div class="card-icon">⏰</div>
               <div class="card-title-group">
@@ -137,8 +141,7 @@
             <div class="card-body">
               <p><strong id="turnoNome">Farmacia Montesano</strong></p>
               <p class="small-text" id="turnoIndirizzo">
-                Via Esempio 12, Matera<br />
-                Tel: 0835 000000
+                Via Esempio 12, Matera<br />Tel: 0835 000000
               </p>
               <div class="divider"></div>
               <p class="small-text">
@@ -156,7 +159,12 @@
           </article>
 
           <!-- COMUNICAZIONI -->
-          <article class="card card-comunicazioni" data-card="comunicazioni">
+          <article class="card card-comunicazioni">
+            <div class="card-badge js-card-badge" data-card-key="comunicazioni">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="comunicazioni"></div>
+
             <div class="card-header">
               <div class="card-icon">📢</div>
               <div class="card-title-group">
@@ -181,7 +189,12 @@
           </article>
 
           <!-- PROCEDURE -->
-          <article class="card card-procedure" data-card="procedure">
+          <article class="card card-procedure">
+            <div class="card-badge js-card-badge" data-card-key="procedure">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="procedure"></div>
+
             <div class="card-header">
               <div class="card-icon">🗂️</div>
               <div class="card-title-group">
@@ -190,7 +203,7 @@
             </div>
             <div class="card-body">
               <p class="small-text">
-                Consulta, modifica o inserisci nuove procedure operative interne.
+                Consulta rapidamente le procedure interne della farmacia.
               </p>
             </div>
             <div class="card-footer">
@@ -201,7 +214,12 @@
           </article>
 
           <!-- LOGISTICA -->
-          <article class="card card-logistica" data-card="logistica">
+          <article class="card card-logistica">
+            <div class="card-badge js-card-badge" data-card-key="logistica">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="logistica"></div>
+
             <div class="card-header">
               <div class="card-icon">📦</div>
               <div class="card-title-group">
@@ -210,18 +228,21 @@
             </div>
             <div class="card-body">
               <p class="small-text">
-                Arrivi, corrieri, espositori e materiali per reparto. (demo)
+                Arrivi corrieri, espositori e materiale (sezione demo).
               </p>
             </div>
             <div class="card-footer">
-              <button class="btn-secondary">
-                In arrivo
-              </button>
+              <button class="btn-secondary">In arrivo</button>
             </div>
           </article>
 
           <!-- MAGAZZINIERA -->
-          <article class="card card-magazziniera" data-card="magazzino">
+          <article class="card card-magazziniera">
+            <div class="card-badge js-card-badge" data-card-key="magazzino">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="magazzino"></div>
+
             <div class="card-header">
               <div class="card-icon">📋</div>
               <div class="card-title-group">
@@ -230,18 +251,16 @@
             </div>
             <div class="card-body">
               <p class="small-text">
-                Controllo scorte, scadenze, arrivi e sistemazione magazzino. (demo)
+                Scorte, scadenze e inventari veloci (sezione demo).
               </p>
             </div>
             <div class="card-footer">
-              <button class="btn-secondary">
-                In arrivo
-              </button>
+              <button class="btn-secondary">In arrivo</button>
             </div>
           </article>
 
           <!-- ARCHIVIO FILE -->
-          <article class="card card-archivio" data-card="archivio">
+          <article class="card card-archivio">
             <div class="card-header">
               <div class="card-icon">🗄️</div>
               <div class="card-title-group">
@@ -251,9 +270,9 @@
             </div>
             <div class="card-body">
               <p class="small-text">
-                Carica, organizza e scarica file in cartelle, come su un PC.
-                Doppio click per aprire, tasto destro o pressione prolungata
-                per più opzioni.
+                Gestisci file e cartelle come su un PC:
+                doppio click per aprire, tasto destro o pressione lunga
+                per copiare, incollare, rinominare o eliminare.
               </p>
             </div>
             <div class="card-footer">
@@ -273,14 +292,136 @@
         <button id="backFromAssenze" class="back-button">← Dashboard</button>
         <div class="page-title-block">
           <h1>Assenze del personale</h1>
-          <p>Consulta le tue assenze, verifica chi è assente oggi e invia una nuova richiesta.</p>
+          <p>Calendario, assenti di oggi e richieste di ferie/permessi (demo).</p>
+        </div>
+        <div class="summary-badges">
+          <span class="badge badge-today">Oggi</span>
+          <span class="badge badge-week">Settimana</span>
+          <span class="badge badge-month">Mese</span>
         </div>
       </header>
 
-      <!-- resto identico a quello che avevi (calendario + tabelle) -->
-      <!-- per brevità non lo ripeto, puoi riusare il tuo markup originale qui,
-           NON influisce sull'archivio file. -->
-      <!-- ... -->
+      <div class="assenze-top-cards">
+        <div class="mini-card">
+          <h3>Richieste in attesa</h3>
+          <p class="big-number">2</p>
+          <p class="small-text">Permessi/ferie da approvare.</p>
+        </div>
+        <div class="mini-card">
+          <h3>Assenti oggi</h3>
+          <p class="big-number">1</p>
+          <p class="small-text">Demo statica.</p>
+        </div>
+        <div class="mini-card">
+          <h3>Ferie mese</h3>
+          <p class="big-number">4</p>
+          <p class="small-text">Totale giornate ferie richieste.</p>
+        </div>
+      </div>
+
+      <div class="assenze-layout">
+        <!-- Calendario DEMO -->
+        <article class="card calendar-card">
+          <div class="calendar-header">
+            <h2>Calendario assenze (demo)</h2>
+            <div class="calendar-controls">
+              <select>
+                <option>Dicembre 2025</option>
+                <option>Gennaio 2026</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calendar-grid">
+            <div class="calendar-row calendar-header-row">
+              <span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span>
+            </div>
+            <!-- Riga esempio -->
+            <div class="calendar-row">
+              <span class="empty">.</span>
+              <span class="empty">.</span>
+              <span class="day"><span>1</span></span>
+              <span class="day"><span>2</span></span>
+              <span class="day day-holiday"><span>3</span></span>
+              <span class="day"><span>4</span></span>
+              <span class="day"><span>5</span></span>
+            </div>
+          </div>
+
+          <div class="calendar-legend">
+            <span><span class="legend-dot ferie"></span>Ferie</span>
+            <span><span class="legend-dot permesso"></span>Permesso</span>
+            <span><span class="legend-dot oggi"></span>Oggi</span>
+          </div>
+        </article>
+
+        <!-- Oggi demo -->
+        <article class="card oggi-card">
+          <h2>Assenti oggi (demo)</h2>
+          <ul class="assenze-list small">
+            <li>
+              <span>Mario Rossi</span>
+              <span class="tag tag-ferie">Ferie</span>
+            </li>
+          </ul>
+        </article>
+      </div>
+
+      <!-- Richieste assenza demo -->
+      <article class="card requests-card">
+        <h2>Richieste di assenza (demo)</h2>
+        <div class="requests-table">
+          <div class="requests-row header">
+            <span>Nome</span>
+            <span>Dal</span>
+            <span>Al</span>
+            <span>Tipo</span>
+            <span>Stato</span>
+          </div>
+          <div class="requests-row">
+            <span>Mario Rossi</span>
+            <span>20/12</span>
+            <span>22/12</span>
+            <span>Ferie</span>
+            <span><span class="status status-pending">In attesa</span></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Form assenza demo -->
+      <article class="card form-card">
+        <h2>Invia richiesta di assenza (demo)</h2>
+        <form class="assenze-form">
+          <div class="form-row two-cols">
+            <div class="form-row">
+              <label>Dal</label>
+              <input type="date" />
+            </div>
+            <div class="form-row">
+              <label>Al</label>
+              <input type="date" />
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Tipo</label>
+            <select>
+              <option>Ferie</option>
+              <option>Permesso</option>
+              <option>Malattia</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Note</label>
+            <textarea rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Invia richiesta (demo)</button>
+          </div>
+        </form>
+        <p id="assenzeFeedback" class="form-feedback hidden">
+          ✅ Richiesta inviata (demo). In futuro verrà salvata sul server.
+        </p>
+      </article>
     </section>
 
     <!-- ============ PAGINA TURNI ============ -->
@@ -289,7 +430,7 @@
         <button id="backFromTurni" class="back-button">← Dashboard</button>
         <div class="page-title-block">
           <h1>Farmacie di turno</h1>
-          <p>Consulta le farmacie in turno oggi, nei prossimi giorni e per il mese corrente.</p>
+          <p>Oggi, prossimi giorni e mese (demo dati).</p>
         </div>
       </header>
 
@@ -302,7 +443,7 @@
       <div class="turni-layout">
         <article class="card turni-oggi-card">
           <h2>Turno di oggi</h2>
-          <p class="small-text">Farmacia principale e farmacia di appoggio per la giornata odierna.</p>
+          <p class="small-text">Farmacia principale e farmacia di appoggio.</p>
 
           <div class="turno-main">
             <h3 id="turnoOggiNome">Farmacia Montesano</h3>
@@ -331,7 +472,7 @@
             <div>
               <h2>Elenco turni</h2>
               <p class="small-text">
-                Visualizza i turni in base al periodo selezionato.
+                Filtra per mese e farmacia.
               </p>
             </div>
             <div class="turni-filters">
@@ -339,7 +480,6 @@
                 <option value="all">Tutti i mesi</option>
                 <option value="12">Dicembre</option>
                 <option value="1">Gennaio</option>
-                <option value="2">Febbraio</option>
               </select>
               <select id="turniFarmaciaSelect">
                 <option value="all">Tutte le farmacie</option>
@@ -371,27 +511,29 @@
         <button id="backFromComunicazioni" class="back-button">← Dashboard</button>
         <div class="page-title-block">
           <h1>Comunicazioni interne</h1>
-          <p>Avvisi, note operative e messaggi tra titolare e dipendenti.</p>
+          <p>Avvisi, note e messaggi (demo).</p>
+        </div>
+        <div class="summary-badges">
+          <span id="badgeTotComunicazioni" class="badge badge-week">Totali: 0</span>
+          <span id="badgeNonLette" class="badge badge-pending">Non lette: 0</span>
+          <span id="badgeUrgenti" class="badge badge-pending">Urgenti: 0</span>
         </div>
       </header>
 
       <div class="comunicazioni-layout">
         <article class="card comunicazioni-list-card">
-          <div class="comunicazioni-list-header">
-            <h2>Ultime comunicazioni</h2>
-            <p class="small-text">
-              In ordine dalla più recente. Demo statica per ora.
-            </p>
-          </div>
-
+          <h2>Ultime comunicazioni</h2>
+          <p class="small-text">
+            Ordinato dalla più recente (demo).
+          </p>
           <div id="comunicazioniList" class="comunicazioni-list"></div>
         </article>
 
         <article class="card comunicazioni-side-card">
-          <h2>Filtra e nuova comunicazione</h2>
+          <h2>Filtri & nuova comunicazione (demo)</h2>
 
           <div class="form-row">
-            <label for="filtroCategoria">Filtra per categoria</label>
+            <label for="filtroCategoria">Categoria</label>
             <select id="filtroCategoria">
               <option value="tutte">Tutte</option>
               <option value="urgente">Urgente</option>
@@ -399,7 +541,6 @@
               <option value="informativa">Informativa</option>
             </select>
           </div>
-
           <div class="form-row">
             <label class="checkbox-inline">
               <input type="checkbox" id="filtroSoloNonLette" />
@@ -409,17 +550,11 @@
 
           <div class="divider"></div>
 
-          <h3>Invia nuova comunicazione (demo)</h3>
-          <p class="small-text">
-            Questo modulo è dimostrativo. In futuro invierà davvero al server.
-          </p>
-
           <form id="comunicazioneForm" class="comunicazione-form">
             <div class="form-row">
               <label for="comTitolo">Titolo</label>
-              <input type="text" id="comTitolo" placeholder="Es. Aggiornamento procedure notturne" />
+              <input id="comTitolo" type="text" placeholder="Es. Aggiornamento notturni" />
             </div>
-
             <div class="form-row">
               <label for="comCategoria">Categoria</label>
               <select id="comCategoria">
@@ -428,17 +563,13 @@
                 <option value="informativa">Informativa</option>
               </select>
             </div>
-
             <div class="form-row">
-              <label for="comTesto">Testo breve</label>
-              <textarea id="comTesto" rows="3"
-                placeholder="Scrivi qui una breve comunicazione..."></textarea>
+              <label for="comTesto">Testo</label>
+              <textarea id="comTesto" rows="3"></textarea>
             </div>
-
             <div class="form-actions">
               <button type="submit" class="btn-primary">Invia comunicazione (demo)</button>
             </div>
-
             <p id="comunicazioneFeedback" class="form-feedback hidden">
               ✅ Comunicazione registrata (demo).
             </p>
@@ -453,14 +584,14 @@
         <button id="backFromProcedure" class="back-button">← Dashboard</button>
         <div class="page-title-block">
           <h1>Procedure interne</h1>
-          <p>Ricerca veloce e consultazione delle procedure divise per reparto.</p>
+          <p>Ricerca veloce per reparto.</p>
         </div>
       </header>
 
       <article class="card">
         <div class="form-row">
-          <label for="procedureSearch">Cerca tra le procedure</label>
-          <input id="procedureSearch" type="text" placeholder="Es. chiusura cassa, buono SSN, reso fornitore..." />
+          <label for="procedureSearch">Cerca</label>
+          <input id="procedureSearch" type="text" placeholder="Es. chiusura cassa, buoni SSN..." />
         </div>
 
         <div class="procedure-filters">
@@ -477,7 +608,7 @@
       <article class="card">
         <h2>Dettaglio procedura</h2>
         <p class="small-text">
-          Tocca una procedura dall’elenco per visualizzare qui il dettaglio completo.
+          Tocca una procedura per vedere qui i dettagli.
         </p>
         <div id="procedureDetail" class="procedure-detail">
           <p class="small-text muted">Nessuna procedura selezionata.</p>
@@ -491,7 +622,7 @@
         <button id="backFromArchivio" class="back-button">← Dashboard</button>
         <div class="page-title-block">
           <h1>Archivio file</h1>
-          <p>Archivia documenti in cartelle, con funzioni tipo PC.</p>
+          <p>Cartelle e file stile PC, super semplice.</p>
         </div>
       </header>
 
@@ -513,32 +644,34 @@
         </p>
 
         <div id="archivioGrid" class="file-grid">
-          <!-- riempito da JS -->
+          <!-- Popolato da JS -->
         </div>
       </article>
-
-      <!-- MENU TASTO DESTRO -->
-      <div id="archivioContextMenu" class="context-menu hidden">
-        <button id="menuNuova" class="context-menu-item">
-          📁 Nuova cartella
-        </button>
-        <button id="menuRinomina" class="context-menu-item">
-          ✏️ Rinomina
-        </button>
-        <button id="menuCopia" class="context-menu-item">
-          📄 Copia
-        </button>
-        <button id="menuIncolla" class="context-menu-item">
-          📥 Incolla
-        </button>
-        <button id="menuDownload" class="context-menu-item">
-          ⬇️ Scarica file
-        </button>
-        <button id="menuElimina" class="context-menu-item danger">
-          🗑 Elimina
-        </button>
-      </div>
     </section>
+
+    <!-- MENU TASTO DESTRO ARCHIVIO -->
+    <div id="archivioContextMenu" class="context-menu hidden">
+      <button id="menuNuova" class="context-menu-item">📁 Nuova cartella</button>
+      <button id="menuRinomina" class="context-menu-item">✏️ Rinomina</button>
+      <button id="menuCopia" class="context-menu-item">📄 Copia</button>
+      <button id="menuIncolla" class="context-menu-item">📥 Incolla</button>
+      <button id="menuDownload" class="context-menu-item">⬇️ Scarica file</button>
+      <button id="menuElimina" class="context-menu-item danger">🗑 Elimina</button>
+    </div>
+
+    <!-- OVERLAY NOTIFICHE CARD -->
+    <div id="notificationOverlay" class="notif-overlay hidden">
+      <div class="notif-backdrop"></div>
+      <div class="notif-modal">
+        <button id="notifClose" class="notif-close" aria-label="Chiudi">✕</button>
+        <h2 id="notifTitle">Notifiche</h2>
+        <p id="notifIntro" class="small-text"></p>
+        <div id="notifList" class="notif-list"></div>
+        <div class="notif-footer">
+          <button id="notifCloseBottom" class="btn-secondary small">Chiudi</button>
+        </div>
+      </div>
+    </div>
 
   </main>
 </body>
