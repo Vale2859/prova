@@ -83,9 +83,111 @@ let comunicazioni = [
   }
 ];
 
+// ====== DATI DEMO: PROCEDURE ======
+const procedureData = [
+  {
+    id: 1,
+    titolo: "Chiusura cassa - procedura standard",
+    reparto: "cassa",
+    repartoLabel: "Cassa / Banco",
+    ultimoAggiornamento: "12/11/2025",
+    testoBreve: "Passaggi per chiudere la cassa a fine giornata senza differenze.",
+    testoCompleto:
+      "1. Verificare che non ci siano scontrini sospesi o non chiusi.\n" +
+      "2. Stampare il rapporto di cassa dal gestionale.\n" +
+      "3. Contare fisicamente il contante presente in cassa.\n" +
+      "4. Confrontare il totale contante con quanto indicato dal gestionale.\n" +
+      "5. Registrare eventuali differenze sul registro cassa indicando data, ora e nome operatore.\n" +
+      "6. Riporre il denaro nella cassaforte secondo la procedura interna.\n" +
+      "7. Riporre le chiavi della cassa nel posto dedicato.",
+    tags: ["cassa", "chiusura", "incassi", "fine giornata"]
+  },
+  {
+    id: 2,
+    titolo: "Errore pagamento POS con scontrino contanti",
+    reparto: "cassa",
+    repartoLabel: "Cassa / Banco",
+    ultimoAggiornamento: "10/11/2025",
+    testoBreve: "Gestione errore quando lo scontrino è contanti ma il cliente paga con POS.",
+    testoCompleto:
+      "1. Se è stato emesso scontrino come CONTANTI ma il cliente ha pagato con POS:\n" +
+      "   - NON annullare l'operazione POS se è già andata a buon fine.\n" +
+      "2. Registrare sul quaderno errori di cassa:\n" +
+      "   - Data, ora, numero scontrino, importo e descrizione.\n" +
+      "3. A fine giornata verificare la differenza tra corrispettivi e incassi POS:\n" +
+      "   - La differenza dovrà essere spiegata tramite il registro errori.\n" +
+      "4. Informare il titolare se la situazione si ripete spesso.",
+    tags: ["pos", "errore", "cassa", "corrispettivi"]
+  },
+  {
+    id: 3,
+    titolo: "Gestione reso cliente con scontrino",
+    reparto: "cassa",
+    repartoLabel: "Cassa / Banco",
+    ultimoAggiornamento: "05/11/2025",
+    testoBreve: "Come gestire un reso con scontrino fiscale presente.",
+    testoCompleto:
+      "1. Verificare che il prodotto sia integro, non aperto e rivendibile.\n" +
+      "2. Controllare lo scontrino fiscale (data, importo, prodotto).\n" +
+      "3. Procedere con il reso sul gestionale seguendo la funzione dedicata.\n" +
+      "4. Emettere documento di reso o buono secondo procedura interna.\n" +
+      "5. Riporre il prodotto nella zona dedicata ai resi in attesa di gestione magazzino.",
+    tags: ["reso", "cliente", "scontrino"]
+  },
+  {
+    id: 4,
+    titolo: "Ricezione merce da corriere",
+    reparto: "logistica",
+    repartoLabel: "Logistica",
+    ultimoAggiornamento: "08/11/2025",
+    testoBreve: "Controlli da effettuare quando arriva merce in farmacia.",
+    testoCompleto:
+      "1. Controllare che il numero di colli consegnati corrisponda al DDT.\n" +
+      "2. Verificare integrità dei colli (nessun danneggiamento evidente).\n" +
+      "3. Firmare il DDT solo dopo verifica visiva.\n" +
+      "4. Consegnare il DDT alla magazziniera per il carico in magazzino.\n" +
+      "5. Segnalare subito eventuali anomalie al titolare (prodotti mancanti o rotti).",
+    tags: ["corriere", "merce", "logistica", "ddt"]
+  },
+  {
+    id: 5,
+    titolo: "Carico merce in magazzino",
+    reparto: "magazzino",
+    repartoLabel: "Magazzino",
+    ultimoAggiornamento: "09/11/2025",
+    testoBreve: "Come caricare correttamente la merce nel gestionale.",
+    testoCompleto:
+      "1. Recuperare il DDT o fattura di acquisto.\n" +
+      "2. Dal gestionale aprire la funzione di carico magazzino.\n" +
+      "3. Inserire o controllare il fornitore e la data documento.\n" +
+      "4. Verificare codici, quantità e scadenze dei prodotti.\n" +
+      "5. Salvare il carico solo dopo aver controllato tutti i dati.\n" +
+      "6. Sistemare fisicamente i prodotti negli scaffali dedicati, rispettando FEFO/ FIFO.",
+    tags: ["magazzino", "carico", "fornitori", "ddt"]
+  },
+  {
+    id: 6,
+    titolo: "Gestione servizi CUP / prenotazioni",
+    reparto: "servizi",
+    repartoLabel: "Servizi",
+    ultimoAggiornamento: "07/11/2025",
+    testoBreve: "Linee guida per prenotazioni e gestione appuntamenti.",
+    testoCompleto:
+      "1. Verificare sempre i dati anagrafici del paziente prima di confermare la prenotazione.\n" +
+      "2. Illustrare eventuali ticket o costi aggiuntivi.\n" +
+      "3. Stampare o comunicare chiaramente data, ora e luogo della prestazione.\n" +
+      "4. In caso di modifica o annullo, seguire la procedura ufficiale del portale.\n" +
+      "5. Annotare eventuali note importanti (es. arrivo anticipato, documenti da portare).",
+    tags: ["servizi", "cup", "prenotazioni"]
+  }
+];
+
 // ====== STATO ======
 let currentRole = "farmacia"; // farmacia | titolare | dipendente
 let currentTurniView = "oggi"; // oggi | settimana | mese
+
+let currentProcedureReparto = "tutti";
+let currentProcedureSearch = "";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Elementi principali
@@ -110,6 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const assenzePage = document.getElementById("assenzePage");
   const turniPage = document.getElementById("turniPage");
   const comunicazioniPage = document.getElementById("comunicazioniPage");
+  const procedurePage = document.getElementById("procedurePage");
 
   // Pulsanti navigazione rapida
   const openAssenzeBtn = document.getElementById("openAssenze");
@@ -118,6 +221,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const backFromTurniBtn = document.getElementById("backFromTurni");
   const openComunicazioniBtn = document.getElementById("openComunicazioni");
   const backFromComunicazioniBtn = document.getElementById("backFromComunicazioni");
+  const openProcedureBtn = document.getElementById("openProcedure");
+  const backFromProcedureBtn = document.getElementById("backFromProcedure");
 
   // Turni elementi
   const turnoOggiNome = document.getElementById("turnoOggiNome");
@@ -147,6 +252,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const badgeNonLette = document.getElementById("badgeNonLette");
   const badgeUrgenti = document.getElementById("badgeUrgenti");
 
+  // Procedure elementi
+  const procedureSearchInput = document.getElementById("procedureSearch");
+  const procedureListContainer = document.getElementById("procedureList");
+  const procedureDetailTitle = document.getElementById("procedureDetailTitle");
+  const procedureDetailMeta = document.getElementById("procedureDetailMeta");
+  const procedureDetailBody = document.getElementById("procedureDetailBody");
+  const procedureFilterButtons = document.querySelectorAll(".proc-filter");
+  const badgeProcTotali = document.getElementById("badgeProcTotali");
+  const badgeProcCassa = document.getElementById("badgeProcCassa");
+  const badgeProcAggiornate = document.getElementById("badgeProcAggiornate");
+
   // ====== FUNZIONI DI SUPPORTO ======
 
   function setRole(role) {
@@ -169,9 +285,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function showSection(section) {
     if (!section) return;
     // Nasconde tutte le sezioni principali
-    [dashboardSection, assenzePage, turniPage, comunicazioniPage].forEach(sec => {
-      if (sec) sec.classList.add("hidden");
-    });
+    [dashboardSection, assenzePage, turniPage, comunicazioniPage, procedurePage].forEach(
+      (sec) => {
+        if (sec) sec.classList.add("hidden");
+      }
+    );
     section.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -250,6 +368,9 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (target === "comunicazioniPage") {
           showSection(comunicazioniPage);
           renderComunicazioni();
+        } else if (target === "procedurePage") {
+          showSection(procedurePage);
+          initProcedurePage();
         }
         closeSidebarMenu();
       });
@@ -263,9 +384,9 @@ document.addEventListener("DOMContentLoaded", () => {
       authContainer.classList.remove("hidden");
 
       // reset login
-      loginForm && loginForm.reset();
+      if (loginForm) loginForm.reset();
       authTabs.forEach((t) => t.classList.remove("active"));
-      authTabs[0].classList.add("active");
+      if (authTabs[0]) authTabs[0].classList.add("active");
       loginRoleLabel.textContent = "Farmacia";
       setRole("farmacia");
 
@@ -308,6 +429,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (backFromComunicazioniBtn) {
     backFromComunicazioniBtn.addEventListener("click", () => {
+      showSection(dashboardSection);
+    });
+  }
+
+  if (openProcedureBtn) {
+    openProcedureBtn.addEventListener("click", () => {
+      showSection(procedurePage);
+      initProcedurePage();
+    });
+  }
+
+  if (backFromProcedureBtn) {
+    backFromProcedureBtn.addEventListener("click", () => {
       showSection(dashboardSection);
     });
   }
@@ -535,6 +669,124 @@ document.addEventListener("DOMContentLoaded", () => {
       e.preventDefault();
       assenzeFeedback.classList.remove("hidden");
       assenzeFeedback.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }
+
+  // ====== PROCEDURE: LOGICA ======
+
+  function aggiornaBadgeProcedure() {
+    if (!badgeProcTotali || !badgeProcCassa || !badgeProcAggiornate) return;
+
+    const tot = procedureData.length;
+    const cassaCount = procedureData.filter((p) => p.reparto === "cassa").length;
+    const ultimo = procedureData[0] ? procedureData[0].ultimoAggiornamento : "—";
+
+    badgeProcTotali.textContent = `Totali: ${tot}`;
+    badgeProcCassa.textContent = `Cassa/Banco: ${cassaCount}`;
+    badgeProcAggiornate.textContent = `Ultimo aggiornamento: ${ultimo}`;
+  }
+
+  function renderProcedureList() {
+    if (!procedureListContainer) return;
+
+    const term = currentProcedureSearch.trim().toLowerCase();
+
+    let filtered = procedureData.filter((p) => {
+      const matchReparto =
+        currentProcedureReparto === "tutti" || p.reparto === currentProcedureReparto;
+
+      const fullText =
+        (p.titolo + " " + p.testoBreve + " " + p.tags.join(" ")).toLowerCase();
+
+      const matchSearch = term === "" || fullText.includes(term);
+
+      return matchReparto && matchSearch;
+    });
+
+    procedureListContainer.innerHTML = "";
+
+    if (filtered.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "small-text";
+      empty.textContent = "Nessuna procedura trovata per i filtri selezionati.";
+      procedureListContainer.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach((p) => {
+      const item = document.createElement("div");
+      item.className = "procedure-item";
+      item.setAttribute("data-id", String(p.id));
+
+      const pillClass = `procedure-reparto-pill ${p.reparto}`;
+
+      item.innerHTML = `
+        <div class="procedure-item-title">${p.titolo}</div>
+        <div class="procedure-item-meta">
+          <span class="${pillClass}">${p.repartoLabel}</span>
+          <span>Ult. agg.: ${p.ultimoAggiornamento}</span>
+        </div>
+      `;
+
+      procedureListContainer.appendChild(item);
+    });
+  }
+
+  function mostraDettaglioProcedura(proc) {
+    if (!procedureDetailTitle || !procedureDetailMeta || !procedureDetailBody) return;
+
+    procedureDetailTitle.textContent = proc.titolo;
+    procedureDetailMeta.textContent = `${proc.repartoLabel} · Ultimo aggiornamento: ${proc.ultimoAggiornamento}`;
+    procedureDetailBody.textContent = proc.testoCompleto;
+  }
+
+  function initProcedurePage() {
+    aggiornaBadgeProcedure();
+
+    // Se è la prima volta che entro, resetto filtri e ricerca
+    currentProcedureReparto = "tutti";
+    currentProcedureSearch = "";
+    if (procedureSearchInput) procedureSearchInput.value = "";
+
+    if (procedureFilterButtons.length > 0) {
+      procedureFilterButtons.forEach((b) => b.classList.remove("active"));
+      // attivo il primo (Tutte)
+      procedureFilterButtons[0].classList.add("active");
+    }
+
+    renderProcedureList();
+
+    if (procedureData[0]) {
+      mostraDettaglioProcedura(procedureData[0]);
+    }
+  }
+
+  if (procedureSearchInput) {
+    procedureSearchInput.addEventListener("input", (e) => {
+      currentProcedureSearch = e.target.value || "";
+      renderProcedureList();
+    });
+  }
+
+  if (procedureFilterButtons.length > 0) {
+    procedureFilterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        procedureFilterButtons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentProcedureReparto = btn.getAttribute("data-reparto") || "tutti";
+        renderProcedureList();
+      });
+    });
+  }
+
+  if (procedureListContainer) {
+    procedureListContainer.addEventListener("click", (e) => {
+      const item = e.target.closest(".procedure-item");
+      if (!item) return;
+      const id = Number(item.getAttribute("data-id"));
+      const proc = procedureData.find((p) => p.id === id);
+      if (!proc) return;
+      mostraDettaglioProcedura(proc);
     });
   }
 
