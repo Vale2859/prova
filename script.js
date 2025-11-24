@@ -2,7 +2,7 @@
 // PORTALE FARMACIA MONTESANO – SCRIPT COMPLETO
 // ======================================================
 
-// ===== DATI DEMO TURNI =====
+// ====== DATI DEMO: TURNI FARMACIE ======
 const turniFarmacie = [
   {
     data: "2025-12-17",
@@ -46,7 +46,7 @@ const turniFarmacie = [
   }
 ];
 
-// ===== DATI DEMO COMUNICAZIONI =====
+// ====== DATI DEMO: COMUNICAZIONI ======
 let comunicazioni = [
   {
     id: 1,
@@ -54,7 +54,7 @@ let comunicazioni = [
     categoria: "urgente",
     autore: "Titolare",
     data: "Oggi",
-    testo: "Dal prossimo turno seguire la nuova check-list di chiusura.",
+    testo: "Dal prossimo turno seguire la nuova check-list di chiusura farmacia.",
     letta: false
   },
   {
@@ -63,7 +63,7 @@ let comunicazioni = [
     categoria: "importante",
     autore: "Titolare",
     data: "Ieri",
-    testo: "Controllare giacenze e scadenze.",
+    testo: "Controllare giacenze e scadenze entro fine settimana.",
     letta: false
   },
   {
@@ -72,60 +72,157 @@ let comunicazioni = [
     categoria: "informativa",
     autore: "Admin",
     data: "2 giorni fa",
-    testo: "Aggiornata esposizione stagionale.",
+    testo: "Nuova esposizione prodotti stagionali in vetrina principale.",
     letta: true
   }
 ];
 
-// ===== DATI DEMO PROCEDURE =====
+// ====== DATI DEMO: PROCEDURE ======
 const procedureData = [
   {
-    id: "p1",
+    id: "proc1",
     titolo: "Chiusura cassa serale",
     reparto: "cassa",
     aggiornamento: "12/11/2025",
-    testo: "1) Controllo giacenza.\n2) Stampa chiusura.\n3) Conta fondo cassa."
+    testo: "1) Verifica giacenza contanti.\n2) Stampa chiusura fiscale.\n3) Conta fondo cassa e registra su modulo chiusura."
   },
   {
-    id: "p2",
+    id: "proc2",
     titolo: "Gestione buoni SSN",
     reparto: "cassa",
     aggiornamento: "05/10/2025",
-    testo: "Controllare ricetta, dati paziente e allegare copia scontrino al buono."
+    testo: "Controllare ricetta, inserire correttamente i dati del paziente, allegare copia scontrino al buono."
   },
   {
-    id: "p3",
+    id: "proc3",
     titolo: "Ricezione merce da grossista",
     reparto: "magazzino",
     aggiornamento: "22/09/2025",
-    testo: "Controllo colli, stampa DDT, verifica scadenze, etichettatura e carico."
+    testo: "Controllo colli, stampa DDT, verifica scadenze, etichettatura e carico in magazzino."
   },
   {
-    id: "p4",
+    id: "proc4",
     titolo: "Reso prodotti danneggiati",
     reparto: "logistica",
     aggiornamento: "18/09/2025",
-    testo: "Compilare modulo reso, fotografare prodotto, contattare referente."
+    testo: "Compilare modulo reso, fotografare prodotto, contattare referente commerciale e attendere autorizzazione."
   },
   {
-    id: "p5",
+    id: "proc5",
     titolo: "Prenotazione servizi CUP / ECG",
     reparto: "servizi",
     aggiornamento: "01/10/2025",
-    testo: "Verificare dati anagrafici, orari disponibili, confermare e stampare promemoria."
+    testo: "Verificare dati anagrafici, orari disponibili, confermare prenotazione e consegnare promemoria al cliente."
   }
 ];
 
+// ====== DATI DEMO: NOTIFICHE PER CARD DASHBOARD ======
+const notificationConfig = {
+  assenze: {
+    titolo: "Notifiche assenze personale",
+    descrizioneVuota: "Non hai nuove notifiche sulle assenze.",
+    notifiche: [
+      {
+        id: "ass-1",
+        titolo: "Permesso approvato",
+        testo: "Il permesso del 20/12 è stato approvato dal titolare.",
+        letto: false
+      },
+      {
+        id: "ass-2",
+        titolo: "Permesso rifiutato",
+        testo: "Il permesso del 10/01 è stato rifiutato. Controlla i dettagli con il titolare.",
+        letto: false
+      }
+    ]
+  },
+  turni: {
+    titolo: "Notifiche farmacie di turno",
+    descrizioneVuota: "Nessuna variazione sui turni al momento.",
+    notifiche: [
+      {
+        id: "turni-1",
+        titolo: "Cambio turno notturno",
+        testo: "Il turno notturno del 19/12 è stato scambiato con Farmacia Centrale.",
+        letto: false
+      }
+    ]
+  },
+  comunicazioni: {
+    titolo: "Nuove comunicazioni interne",
+    descrizioneVuota: "Hai già letto tutte le comunicazioni.",
+    notifiche: [
+      {
+        id: "com-1",
+        titolo: "Nuova comunicazione urgente",
+        testo: "È stata pubblicata una nuova comunicazione urgente dall'area titolare.",
+        letto: false
+      },
+      {
+        id: "com-2",
+        titolo: "Messaggio informativo",
+        testo: "Aggiornato il regolamento per l’utilizzo del retro-banco.",
+        letto: false
+      }
+    ]
+  },
+  procedure: {
+    titolo: "Aggiornamenti procedure",
+    descrizioneVuota: "Nessuna procedura nuova da leggere.",
+    notifiche: [
+      {
+        id: "proc-1",
+        titolo: "Procedura chiusura cassa aggiornata",
+        testo: "È stata aggiornata la procedura 'Chiusura cassa serale'.",
+        letto: false
+      }
+    ]
+  },
+  logistica: {
+    titolo: "Notifiche logistica",
+    descrizioneVuota: "Al momento non ci sono avvisi di logistica.",
+    notifiche: [
+      {
+        id: "log-1",
+        titolo: "Nuovo espositore in arrivo",
+        testo: "Venerdì arriverà il nuovo espositore dermocosmesi, da montare in vetrina 2.",
+        letto: false
+      }
+    ]
+  },
+  magazzino: {
+    titolo: "Notifiche magazzino",
+    descrizioneVuota: "Non ci sono nuovi avvisi dal magazzino.",
+    notifiche: [
+      {
+        id: "mag-1",
+        titolo: "Scadenze in avvicinamento",
+        testo: "Sono presenti 5 articoli con scadenza inferiore a 3 mesi.",
+        letto: false
+      },
+      {
+        id: "mag-2",
+        titolo: "Inventario programmato",
+        testo: "Lunedì mattina inventario rapido banco automedicazione.",
+        letto: false
+      }
+    ]
+  }
+};
+
+// ====== STATO GENERALE ======
 let currentRole = "farmacia";
 let currentTurniView = "oggi";
 let procedureFilter = "tutti";
 let procSearchTerm = "";
+let openNotificationCardKey = null;
 
-// ===== ARCHIVIO FILE: stato =====
+// ====== ARCHIVIO FILE: STATO ======
 let fsRoot = null;
 let currentFolder = null;
 let selectedItem = null;
 let clipboardItem = null;
+let lastSelectedEl = null;
 
 // ======================================================
 // DOM READY
@@ -155,13 +252,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const logoutBtn = document.getElementById("logoutBtn");
 
   const rolePill = document.getElementById("currentRolePill");
+  const assenzeTitle = document.getElementById("assenzeTitle");
 
-  // Dashboard turno card
+  // Dashboard: turno card
   const turnoOrarioChip = document.getElementById("turnoOrarioChip");
   const turnoNome = document.getElementById("turnoNome");
   const turnoIndirizzo = document.getElementById("turnoIndirizzo");
   const turnoAppoggio = document.getElementById("turnoAppoggio");
 
+  // Turni pagina
   const turnoOggiNome = document.getElementById("turnoOggiNome");
   const turnoOggiIndirizzo = document.getElementById("turnoOggiIndirizzo");
   const turnoOggiTelefono = document.getElementById("turnoOggiTelefono");
@@ -169,7 +268,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const turnoOggiAppoggioNome = document.getElementById("turnoOggiAppoggioNome");
   const turnoOggiAppoggioDettagli = document.getElementById("turnoOggiAppoggioDettagli");
 
-  // Bottoni rapidi dashboard
+  const turniTabs = document.querySelectorAll(".turni-tab");
+  const turniRows = document.getElementById("turniRows");
+  const turniMeseSelect = document.getElementById("turniMeseSelect");
+  const turniFarmaciaSelect = document.getElementById("turniFarmaciaSelect");
+
+  // Bottoni dashboard -> pagine
   const openAssenzeBtn = document.getElementById("openAssenze");
   const openTurniBtn = document.getElementById("openTurni");
   const openComunicazioniBtn = document.getElementById("openComunicazioni");
@@ -183,18 +287,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const backFromProcedureBtn = document.getElementById("backFromProcedure");
   const backFromArchivioBtn = document.getElementById("backFromArchivio");
 
-  // Turni elenco
-  const turniTabs = document.querySelectorAll(".turni-tab");
-  const turniRows = document.getElementById("turniRows");
-  const turniMeseSelect = document.getElementById("turniMeseSelect");
-  const turniFarmaciaSelect = document.getElementById("turniFarmaciaSelect");
-
   // Comunicazioni
   const comunicazioniList = document.getElementById("comunicazioniList");
   const filtroCategoria = document.getElementById("filtroCategoria");
   const filtroSoloNonLette = document.getElementById("filtroSoloNonLette");
   const comunicazioneForm = document.getElementById("comunicazioneForm");
   const comunicazioneFeedback = document.getElementById("comunicazioneFeedback");
+  const badgeTotComunicazioni = document.getElementById("badgeTotComunicazioni");
+  const badgeNonLette = document.getElementById("badgeNonLette");
+  const badgeUrgenti = document.getElementById("badgeUrgenti");
+
+  // Assenze form
+  const assenzeForm = document.querySelector(".assenze-form");
+  const assenzeFeedback = document.getElementById("assenzeFeedback");
 
   // Procedure
   const procedureListEl = document.getElementById("procedureList");
@@ -217,20 +322,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuIncolla = document.getElementById("menuIncolla");
   const menuDownload = document.getElementById("menuDownload");
 
+  // Notifiche overlay
+  const notifOverlay = document.getElementById("notificationOverlay");
+  const notifTitle = document.getElementById("notifTitle");
+  const notifIntro = document.getElementById("notifIntro");
+  const notifList = document.getElementById("notifList");
+  const notifClose = document.getElementById("notifClose");
+  const notifCloseBottom = document.getElementById("notifCloseBottom");
+
   // ======================================================
   // FUNZIONI BASE
   // ======================================================
   function setRole(role) {
     currentRole = role;
-    if (!rolePill) return;
-    if (role === "farmacia") rolePill.textContent = "Farmacia (accesso generico)";
-    if (role === "titolare") rolePill.textContent = "Titolare";
-    if (role === "dipendente") rolePill.textContent = "Dipendente";
+    if (rolePill) {
+      if (role === "farmacia") rolePill.textContent = "Farmacia (accesso generico)";
+      if (role === "titolare") rolePill.textContent = "Titolare";
+      if (role === "dipendente") rolePill.textContent = "Dipendente";
+    }
+    if (assenzeTitle) {
+      if (role === "dipendente") assenzeTitle.textContent = "Le mie assenze";
+      else assenzeTitle.textContent = "Assenze del personale";
+    }
   }
 
   function showSection(section) {
-    [dashboardSection, assenzePage, turniPage, comunicazioniPage, procedurePage, archivioPage]
-      .forEach(sec => sec && sec.classList.add("hidden"));
+    [
+      dashboardSection,
+      assenzePage,
+      turniPage,
+      comunicazioniPage,
+      procedurePage,
+      archivioPage
+    ].forEach(sec => sec && sec.classList.add("hidden"));
     if (section) section.classList.remove("hidden");
     window.scrollTo(0, 0);
   }
@@ -252,11 +376,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loginForm.addEventListener("submit", (e) => {
     e.preventDefault();
-
     const activeTab = document.querySelector(".auth-tab.active");
     const role = activeTab.dataset.role;
     setRole(role);
-
     authContainer.classList.add("hidden");
     app.classList.remove("hidden");
     showSection(dashboardSection);
@@ -290,7 +412,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (target === "comunicazioniPage") { showSection(comunicazioniPage); renderComunicazioni(); }
       if (target === "procedurePage") { showSection(procedurePage); renderProcedureList(); }
       if (target === "archivioPage") { showSection(archivioPage); renderArchivio(); }
-
       sidebar.classList.remove("open");
     });
   });
@@ -410,7 +531,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Eventi tab turni
   turniTabs.forEach(tab => {
     tab.addEventListener("click", () => {
       turniTabs.forEach(t => t.classList.remove("active"));
@@ -426,11 +546,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // ======================================================
   // COMUNICAZIONI
   // ======================================================
+  function aggiornaBadgeComunicazioni() {
+    if (!badgeTotComunicazioni || !badgeNonLette || !badgeUrgenti) return;
+    const tot = comunicazioni.length;
+    const nonLette = comunicazioni.filter(c => !c.letta).length;
+    const urgenti = comunicazioni.filter(c => c.categoria === "urgente").length;
+
+    badgeTotComunicazioni.textContent = `Totali: ${tot}`;
+    badgeNonLette.textContent = `Non lette: ${nonLette}`;
+    badgeUrgenti.textContent = `Urgenti: ${urgenti}`;
+  }
+
   function renderComunicazioni() {
     if (!comunicazioniList) return;
 
-    const cat = filtroCategoria.value;
-    const soloNL = filtroSoloNonLette.checked;
+    const cat = filtroCategoria ? filtroCategoria.value : "tutte";
+    const soloNL = filtroSoloNonLette ? filtroSoloNonLette.checked : false;
 
     let filtered = [...comunicazioni];
 
@@ -446,24 +577,47 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filtered.length === 0) {
       const empty = document.createElement("div");
       empty.className = "small-text";
-      empty.textContent = "Nessuna comunicazione.";
+      empty.textContent = "Nessuna comunicazione per i filtri selezionati (demo).";
       comunicazioniList.appendChild(empty);
+      aggiornaBadgeComunicazioni();
       return;
     }
 
     filtered.forEach(c => {
       const card = document.createElement("div");
       card.className = "com-card";
-      card.innerHTML = `
-        <div class="com-pill ${c.categoria}">
-          ${c.categoria.toUpperCase()}
-        </div>
-        <div class="com-title">${c.titolo}</div>
-        <div class="com-meta">${c.data} · ${c.autore} · ${c.letta ? "Letta" : "Non letta"}</div>
-        <div class="com-text">${c.testo}</div>
-      `;
+
+      const pill = document.createElement("div");
+      pill.className = `com-pill ${c.categoria}`;
+      pill.textContent =
+        c.categoria === "urgente"
+          ? "URGENTE"
+          : c.categoria === "importante"
+          ? "IMPORTANTE"
+          : "INFORMATIVA";
+
+      const title = document.createElement("div");
+      title.className = "com-title";
+      title.textContent = c.titolo;
+
+      const meta = document.createElement("div");
+      meta.className = "com-meta";
+      const stato = c.letta ? "Letta" : "Non letta";
+      meta.textContent = `${c.data} · ${c.autore} · ${stato}`;
+
+      const text = document.createElement("div");
+      text.className = "com-text";
+      text.textContent = c.testo;
+
+      card.appendChild(pill);
+      card.appendChild(title);
+      card.appendChild(meta);
+      card.appendChild(text);
+
       comunicazioniList.appendChild(card);
     });
+
+    aggiornaBadgeComunicazioni();
   }
 
   if (filtroCategoria) filtroCategoria.addEventListener("change", renderComunicazioni);
@@ -472,12 +626,17 @@ document.addEventListener("DOMContentLoaded", () => {
   if (comunicazioneForm && comunicazioneFeedback) {
     comunicazioneForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const titolo = document.getElementById("comTitolo").value.trim();
-      const categoria = document.getElementById("comCategoria").value;
-      const testo = document.getElementById("comTesto").value.trim();
+
+      const titoloInput = document.getElementById("comTitolo");
+      const categoriaSelect = document.getElementById("comCategoria");
+      const testoInput = document.getElementById("comTesto");
+
+      const titolo = titoloInput.value.trim();
+      const categoria = categoriaSelect.value;
+      const testo = testoInput.value.trim();
 
       if (!titolo || !testo) {
-        comunicazioneFeedback.textContent = "⚠️ Inserisci almeno titolo e testo.";
+        comunicazioneFeedback.textContent = "⚠️ Inserisci almeno un titolo e un testo.";
         comunicazioneFeedback.classList.remove("hidden");
         return;
       }
@@ -493,10 +652,24 @@ document.addEventListener("DOMContentLoaded", () => {
       };
 
       comunicazioni.unshift(nuova);
-      comunicazioneFeedback.textContent = "✅ Comunicazione registrata (demo).";
+
+      comunicazioneFeedback.textContent =
+        "✅ Comunicazione registrata (demo). In futuro sarà salvata su server.";
       comunicazioneFeedback.classList.remove("hidden");
+
       comunicazioneForm.reset();
       renderComunicazioni();
+    });
+  }
+
+  // ======================================================
+  // ASSENZE: FORM DEMO
+  // ======================================================
+  if (assenzeForm && assenzeFeedback) {
+    assenzeForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      assenzeFeedback.classList.remove("hidden");
+      assenzeFeedback.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   }
 
@@ -516,46 +689,80 @@ document.addEventListener("DOMContentLoaded", () => {
     procedureListEl.innerHTML = "";
 
     if (filtered.length === 0) {
-      procedureListEl.innerHTML = "<div class='small-text'>Nessuna procedura trovata.</div>";
+      const empty = document.createElement("div");
+      empty.className = "small-text";
+      empty.textContent = "Nessuna procedura trovata per i filtri impostati (demo).";
+      procedureListEl.appendChild(empty);
       if (procedureDetail) {
-        procedureDetail.innerHTML = "<p class='small-text muted'>Nessuna procedura selezionata.</p>";
+        procedureDetail.innerHTML =
+          '<p class="small-text muted">Nessuna procedura selezionata.</p>';
       }
       return;
     }
 
     filtered.forEach(p => {
-      const el = document.createElement("div");
-      el.className = "proc-item";
-      el.dataset.procId = p.id;
+      const item = document.createElement("div");
+      item.className = "proc-item";
+      item.dataset.procId = p.id;
 
-      el.innerHTML = `
-        <div class="proc-item-main">
-          <div class="proc-item-title">${p.titolo}</div>
-          <div class="proc-item-meta">${p.reparto} · Agg.: ${p.aggiornamento}</div>
-        </div>
-        <div class="proc-tag">Apri</div>
-      `;
+      const main = document.createElement("div");
+      main.className = "proc-item-main";
 
-      el.addEventListener("click", () => showProcedure(p.id));
-      procedureListEl.appendChild(el);
+      const title = document.createElement("div");
+      title.className = "proc-item-title";
+      title.textContent = p.titolo;
+
+      const meta = document.createElement("div");
+      meta.className = "proc-item-meta";
+      const repLabel =
+        p.reparto === "cassa"
+          ? "Cassa / Banco"
+          : p.reparto === "magazzino"
+          ? "Magazzino"
+          : p.reparto === "servizi"
+          ? "Servizi"
+          : "Logistica";
+      meta.textContent = `${repLabel} · Agg.: ${p.aggiornamento}`;
+
+      main.appendChild(title);
+      main.appendChild(meta);
+
+      const tag = document.createElement("div");
+      tag.className = "proc-tag";
+      tag.textContent = "Apri";
+
+      item.appendChild(main);
+      item.appendChild(tag);
+
+      item.addEventListener("click", () => {
+        showProcedure(p.id);
+      });
+
+      procedureListEl.appendChild(item);
     });
   }
 
   function showProcedure(procId) {
     if (!procedureDetail) return;
-    const p = procedureData.find(x => x.id === procId);
-    if (!p) return;
+    const proc = procedureData.find(p => p.id === procId);
+    if (!proc) return;
 
-    const paragrafi = p.testo
-      .split("\n")
-      .map(r => `<p>${r}</p>`)
-      .join("");
+    const repLabel =
+      proc.reparto === "cassa"
+        ? "Cassa / Banco"
+        : proc.reparto === "magazzino"
+        ? "Magazzino"
+        : proc.reparto === "servizi"
+        ? "Servizi"
+        : "Logistica";
+
+    const paragrafi = proc.testo.split("\n").map((row) => `<p>${row}</p>`).join("");
 
     procedureDetail.innerHTML = `
-      <h3>${p.titolo}</h3>
-      <p class="small-text">Reparto: <strong>${p.reparto}</strong> · Agg.: <strong>${p.aggiornamento}</strong></p>
+      <h3>${proc.titolo}</h3>
+      <p class="small-text">Reparto: <strong>${repLabel}</strong> · Ultimo aggiornamento: <strong>${proc.aggiornamento}</strong></p>
       <div class="divider"></div>
-      ${paragrafi}
+      <div>${paragrafi}</div>
     `;
   }
 
@@ -563,13 +770,13 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", () => {
       procedureButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
-      procedureFilter = btn.dataset.reparto;
+      procedureFilter = btn.getAttribute("data-reparto") || "tutti";
       renderProcedureList();
     });
   });
 
   if (procedureSearch) {
-    procedureSearch.addEventListener("input", e => {
+    procedureSearch.addEventListener("input", (e) => {
       procSearchTerm = e.target.value.trim().toLowerCase();
       renderProcedureList();
     });
@@ -578,6 +785,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // ======================================================
   // ARCHIVIO FILE
   // ======================================================
+  function saveFS() {
+    if (!fsRoot) return;
+    localStorage.setItem("fs_montesano", JSON.stringify(fsRoot));
+  }
 
   function loadFS() {
     const saved = localStorage.getItem("fs_montesano");
@@ -603,8 +814,16 @@ document.addEventListener("DOMContentLoaded", () => {
     currentFolder = fsRoot;
   }
 
-  function saveFS() {
-    localStorage.setItem("fs_montesano", JSON.stringify(fsRoot));
+  function getParent(target, node = fsRoot, parent = null) {
+    if (!node) return null;
+    if (node === target) return parent;
+    if (node.type === "folder" && node.children) {
+      for (const child of node.children) {
+        const res = getParent(target, child, node);
+        if (res) return res;
+      }
+    }
+    return null;
   }
 
   function getPathArray(target) {
@@ -657,25 +876,67 @@ document.addEventListener("DOMContentLoaded", () => {
     return "";
   }
 
-  let lastSelectedEl = null;
-
   function clearSelection() {
     if (lastSelectedEl) lastSelectedEl.classList.remove("selected");
     lastSelectedEl = null;
     selectedItem = null;
   }
 
+  function hideContextMenu() {
+    if (!archivioContextMenu) return;
+    archivioContextMenu.style.display = "none";
+  }
+
+  function showContextMenu(x, y) {
+    if (!archivioContextMenu) return;
+    archivioContextMenu.style.left = `${x}px`;
+    archivioContextMenu.style.top = `${y}px`;
+    archivioContextMenu.style.display = "block";
+  }
+
+  function cloneItem(item) {
+    return JSON.parse(JSON.stringify(item));
+  }
+
+  function updatePasteState() {
+    if (!menuIncolla) return;
+    if (clipboardItem) {
+      menuIncolla.classList.remove("disabled");
+      menuIncolla.style.opacity = "1";
+      menuIncolla.style.pointerEvents = "auto";
+    } else {
+      menuIncolla.classList.add("disabled");
+      menuIncolla.style.opacity = "0.4";
+      menuIncolla.style.pointerEvents = "none";
+    }
+  }
+
+  function createNewFolderInCurrent() {
+    if (!currentFolder || currentFolder.type !== "folder") return;
+    const nameBase = "Nuova cartella";
+    const name = ensureUniqueName(nameBase, currentFolder.children);
+    currentFolder.children.push({
+      type: "folder",
+      name,
+      children: []
+    });
+    saveFS();
+    renderArchivio();
+  }
+
   function renderArchivio() {
     if (!archivioGrid || !currentFolder) return;
 
-    // Ordina: cartelle prima, poi file
+    hideContextMenu();
+    clearSelection();
+
     currentFolder.children.sort((a, b) => {
       if (a.type === b.type) return a.name.localeCompare(b.name);
       return a.type === "folder" ? -1 : 1;
     });
 
     const pathArr = getPathArray(currentFolder);
-    archivioPath.textContent = "/" + pathArr.join("/");
+    if (archivioPath) archivioPath.textContent = "/" + pathArr.join("/");
 
     archivioGrid.innerHTML = "";
 
@@ -706,23 +967,31 @@ document.addEventListener("DOMContentLoaded", () => {
       // click selezione
       el.addEventListener("click", (e) => {
         e.stopPropagation();
+        hideContextMenu();
         clearSelection();
         el.classList.add("selected");
         lastSelectedEl = el;
         selectedItem = item;
       });
 
-      // doppio click -> apri cartella
+      // doppio click: apri cartella / file
       el.addEventListener("dblclick", (e) => {
         e.stopPropagation();
+        hideContextMenu();
         if (item.type === "folder") {
           currentFolder = item;
           clearSelection();
           renderArchivio();
+        } else {
+          if (item.content) {
+            alert(`In futuro qui potrai aprire il file "${item.name}" (demo).`);
+          } else {
+            alert(`File "${item.name}" archiviato (demo).`);
+          }
         }
       });
 
-      // tasto destro
+      // tasto destro: menu contestuale
       el.addEventListener("contextmenu", (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -730,159 +999,75 @@ document.addEventListener("DOMContentLoaded", () => {
         el.classList.add("selected");
         lastSelectedEl = el;
         selectedItem = item;
-        openContextMenu(e.pageX, e.pageY);
+        showContextMenu(e.pageX, e.pageY);
       });
 
-      // long press mobile
-      let pressTimer;
+      // pressione lunga su mobile
+      let longPressTimer = null;
       el.addEventListener("touchstart", (e) => {
-        pressTimer = setTimeout(() => {
+        longPressTimer = setTimeout(() => {
           const touch = e.touches[0];
           clearSelection();
           el.classList.add("selected");
           lastSelectedEl = el;
           selectedItem = item;
-          openContextMenu(touch.pageX, touch.pageY);
+          showContextMenu(touch.pageX, touch.pageY);
         }, 600);
       });
-      el.addEventListener("touchend", () => clearTimeout(pressTimer));
+      ["touchend", "touchcancel", "touchmove"].forEach(ev => {
+        el.addEventListener(ev, () => {
+          if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+        });
+      });
     });
   }
 
-  function openContextMenu(x, y) {
-    if (!archivioContextMenu) return;
-    archivioContextMenu.style.left = x + "px";
-    archivioContextMenu.style.top = y + "px";
-    archivioContextMenu.classList.remove("hidden");
-  }
-
-  function closeContextMenu() {
-    if (!archivioContextMenu) return;
-    archivioContextMenu.classList.add("hidden");
-  }
-
-  document.addEventListener("click", (e) => {
-    if (!archivioContextMenu) return;
-    if (!archivioContextMenu.contains(e.target)) {
-      closeContextMenu();
+  // click vuoto nello spazio dell’archivio: deseleziona
+  if (archivioGrid) {
+    archivioGrid.addEventListener("click", () => {
       clearSelection();
+      hideContextMenu();
+    });
+
+    archivioGrid.addEventListener("contextmenu", (e) => {
+      // tasto destro su area vuota
+      if (e.target === archivioGrid) {
+        e.preventDefault();
+        clearSelection();
+        selectedItem = null;
+        showContextMenu(e.pageX, e.pageY);
+      }
+    });
+  }
+
+  document.addEventListener("scroll", hideContextMenu, true);
+  document.addEventListener("click", (e) => {
+    if (archivioContextMenu && !archivioContextMenu.contains(e.target)) {
+      hideContextMenu();
     }
   });
 
-  // Nuova cartella (toolbar + menu)
-  function creaNuovaCartella() {
-    if (!currentFolder) return;
-    const base = "Nuova cartella";
-    const name = ensureUniqueName(base, currentFolder.children);
-    currentFolder.children.push({
-      type: "folder",
-      name,
-      children: []
-    });
-    saveFS();
-    renderArchivio();
-  }
-
-  if (archivioNewFolderBtn) {
-    archivioNewFolderBtn.addEventListener("click", () => {
-      creaNuovaCartella();
-    });
-  }
-
-  if (menuNuova) {
-    menuNuova.addEventListener("click", () => {
-      creaNuovaCartella();
-      closeContextMenu();
-    });
-  }
-
-  // Rinomina
-  if (menuRinomina) {
-    menuRinomina.addEventListener("click", () => {
-      if (!selectedItem || !currentFolder) return;
-      const nuovo = prompt("Nuovo nome:", selectedItem.name);
-      if (!nuovo) {
-        closeContextMenu();
-        return;
-      }
-      const safeName = ensureUniqueName(nuovo.trim(), currentFolder.children.filter(i => i !== selectedItem));
-      selectedItem.name = safeName;
-      saveFS();
-      renderArchivio();
-      closeContextMenu();
-    });
-  }
-
-  // Elimina
-  if (menuElimina) {
-    menuElimina.addEventListener("click", () => {
-      if (!selectedItem || !currentFolder) return;
-      const ok = confirm(`Vuoi eliminare "${selectedItem.name}"?`);
-      if (!ok) {
-        closeContextMenu();
-        return;
-      }
-      currentFolder.children = currentFolder.children.filter(i => i !== selectedItem);
-      saveFS();
-      renderArchivio();
-      closeContextMenu();
-      clearSelection();
-    });
-  }
-
-  // Copia
-  if (menuCopia) {
-    menuCopia.addEventListener("click", () => {
-      if (!selectedItem) return;
-      clipboardItem = JSON.parse(JSON.stringify(selectedItem));
-      closeContextMenu();
-    });
-  }
-
-  // Incolla
-  if (menuIncolla) {
-    menuIncolla.addEventListener("click", () => {
-      if (!clipboardItem || !currentFolder) return;
-      const clone = JSON.parse(JSON.stringify(clipboardItem));
-      clone.name = ensureUniqueName(clone.name, currentFolder.children);
-      currentFolder.children.push(clone);
-      saveFS();
-      renderArchivio();
-      closeContextMenu();
-    });
-  }
-
-  // Download file
-  if (menuDownload) {
-    menuDownload.addEventListener("click", () => {
-      if (!selectedItem || selectedItem.type !== "file") {
-        alert("Seleziona un file prima di scaricare.");
-        closeContextMenu();
-        return;
-      }
-      const a = document.createElement("a");
-      a.href = "data:application/octet-stream;base64," + selectedItem.content;
-      a.download = selectedItem.name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      closeContextMenu();
-    });
-  }
-
-  // Upload file
+  // Toolbar archivio
   if (archivioBtnUpload && archivioUpload) {
-    archivioBtnUpload.addEventListener("click", () => archivioUpload.click());
+    archivioBtnUpload.addEventListener("click", () => {
+      archivioUpload.click();
+    });
 
-    archivioUpload.addEventListener("change", () => {
-      const files = Array.from(archivioUpload.files);
+    archivioUpload.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files || []);
       if (!files.length || !currentFolder) return;
 
-      files.forEach(file => {
+      files.forEach((file) => {
         const reader = new FileReader();
-        reader.onload = () => {
-          const base64 = reader.result.split(",")[1];
-          let name = ensureUniqueName(file.name, currentFolder.children);
+        reader.onload = (ev) => {
+          const dataUrl = ev.target.result;
+          const base64 = typeof dataUrl === "string" && dataUrl.includes(",")
+            ? dataUrl.split(",")[1]
+            : "";
+          const name = ensureUniqueName(file.name, currentFolder.children);
           currentFolder.children.push({
             type: "file",
             name,
@@ -894,48 +1079,280 @@ document.addEventListener("DOMContentLoaded", () => {
         reader.readAsDataURL(file);
       });
 
-      archivioUpload.value = "";
+      e.target.value = "";
     });
   }
 
-  // Cartella su
   if (archivioUpBtn) {
     archivioUpBtn.addEventListener("click", () => {
       if (!currentFolder || currentFolder === fsRoot) return;
-
-      function findParent(node, target) {
-        if (!node.children) return null;
-        for (const child of node.children) {
-          if (child === target) return node;
-          if (child.type === "folder") {
-            const found = findParent(child, target);
-            if (found) return found;
-          }
-        }
-        return null;
-      }
-
-      const parent = findParent(fsRoot, currentFolder);
+      const parent = getParent(currentFolder);
       if (parent) {
         currentFolder = parent;
-        clearSelection();
         renderArchivio();
       }
     });
   }
 
-  function initArchivio() {
-    loadFS();
-    renderArchivio();
+  if (archivioNewFolderBtn) {
+    archivioNewFolderBtn.addEventListener("click", () => {
+      hideContextMenu();
+      createNewFolderInCurrent();
+    });
+  }
+
+  // Menu contestuale ARCHIVIO
+  if (menuNuova) {
+    menuNuova.addEventListener("click", () => {
+      hideContextMenu();
+      createNewFolderInCurrent();
+    });
+  }
+
+  if (menuRinomina) {
+    menuRinomina.addEventListener("click", () => {
+      hideContextMenu();
+      if (!selectedItem || !currentFolder) return;
+      const nuovo = prompt("Nuovo nome:", selectedItem.name);
+      if (!nuovo) return;
+      const name = ensureUniqueName(nuovo.trim(), currentFolder.children.filter(i => i !== selectedItem));
+      selectedItem.name = name;
+      saveFS();
+      renderArchivio();
+    });
+  }
+
+  if (menuElimina) {
+    menuElimina.addEventListener("click", () => {
+      hideContextMenu();
+      if (!selectedItem) return;
+      const conferma = confirm(`Eliminare "${selectedItem.name}"?`);
+      if (!conferma) return;
+
+      const parent = getParent(selectedItem);
+      if (!parent || !parent.children) return;
+      parent.children = parent.children.filter(i => i !== selectedItem);
+      saveFS();
+      selectedItem = null;
+      renderArchivio();
+    });
+  }
+
+  if (menuCopia) {
+    menuCopia.addEventListener("click", () => {
+      hideContextMenu();
+      if (!selectedItem) return;
+      clipboardItem = cloneItem(selectedItem);
+      updatePasteState();
+    });
+  }
+
+  if (menuIncolla) {
+    menuIncolla.addEventListener("click", () => {
+      hideContextMenu();
+      if (!clipboardItem || !currentFolder) return;
+      const clone = cloneItem(clipboardItem);
+      clone.name = ensureUniqueName(clone.name, currentFolder.children);
+      currentFolder.children.push(clone);
+      saveFS();
+      renderArchivio();
+    });
+  }
+
+  if (menuDownload) {
+    menuDownload.addEventListener("click", () => {
+      hideContextMenu();
+      if (!selectedItem || selectedItem.type !== "file") {
+        alert("Seleziona un file per il download (demo).");
+        return;
+      }
+      if (!selectedItem.content) {
+        alert("Questo file è solo dimostrativo, nessun contenuto salvato.");
+        return;
+      }
+      try {
+        const byteChars = atob(selectedItem.content);
+        const byteNumbers = new Array(byteChars.length);
+        for (let i = 0; i < byteChars.length; i++) {
+          byteNumbers[i] = byteChars.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = selectedItem.name;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert("Download non riuscito (demo).");
+      }
+    });
+  }
+
+  updatePasteState();
+
+  // ======================================================
+  // NOTIFICHE DASHBOARD (PALLINI + POPUP)
+  // ======================================================
+  function getUnreadNotifications(cardKey) {
+    const cfg = notificationConfig[cardKey];
+    if (!cfg) return [];
+    return cfg.notifiche.filter((n) => !n.letto);
+  }
+
+  function updateBadgeForCard(cardKey) {
+    const badge = document.querySelector(
+      `.card-badge[data-card-key="${cardKey}"]`
+    );
+    const label = document.querySelector(
+      `.card-badge-label[data-card-key="${cardKey}"]`
+    );
+    if (!badge) return;
+
+    const unread = getUnreadNotifications(cardKey);
+    const count = unread.length;
+    const countSpan = badge.querySelector(".badge-count");
+
+    if (count > 0) {
+      if (countSpan) countSpan.textContent = String(count);
+      badge.classList.add("has-unread");
+      // label "Nuovo / Nuovi"
+      if (label) {
+        label.textContent = count === 1 ? "Nuovo" : "Nuovi";
+        label.style.display = "block";
+      }
+    } else {
+      if (countSpan) countSpan.textContent = "";
+      badge.classList.remove("has-unread");
+      badge.style.display = "none";
+      if (label) {
+        label.textContent = "";
+        label.style.display = "none";
+      }
+    }
+  }
+
+  function initNotificationBadges() {
+    Object.keys(notificationConfig).forEach((key) => updateBadgeForCard(key));
+  }
+
+  function openNotificationPopup(cardKey) {
+    const cfg = notificationConfig[cardKey];
+    if (!cfg || !notifOverlay || !notifList || !notifTitle || !notifIntro) return;
+
+    openNotificationCardKey = cardKey;
+
+    const unread = getUnreadNotifications(cardKey);
+    notifTitle.textContent = cfg.titolo;
+
+    if (unread.length === 0) {
+      notifIntro.textContent = cfg.descrizioneVuota;
+    } else if (unread.length === 1) {
+      notifIntro.textContent = "Hai 1 nuova notifica.";
+    } else {
+      notifIntro.textContent = `Hai ${unread.length} nuove notifiche.`;
+    }
+
+    notifList.innerHTML = "";
+
+    if (unread.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "small-text";
+      empty.textContent = cfg.descrizioneVuota;
+      notifList.appendChild(empty);
+    } else {
+      unread.forEach((n) => {
+        const item = document.createElement("div");
+        item.className = "notif-item";
+        item.dataset.notifId = n.id;
+
+        const textWrap = document.createElement("div");
+        textWrap.className = "notif-text";
+
+        const h3 = document.createElement("h3");
+        h3.textContent = n.titolo;
+
+        const p = document.createElement("p");
+        p.textContent = n.testo;
+
+        textWrap.appendChild(h3);
+        textWrap.appendChild(p);
+
+        const btn = document.createElement("button");
+        btn.className = "btn-primary small";
+        btn.textContent = "Presa visione";
+        btn.addEventListener("click", () => {
+          markNotificationAsRead(cardKey, n.id);
+        });
+
+        item.appendChild(textWrap);
+        item.appendChild(btn);
+
+        notifList.appendChild(item);
+      });
+    }
+
+    notifOverlay.classList.remove("hidden");
+    notifOverlay.classList.add("active");
+  }
+
+  function closeNotificationPopup() {
+    if (!notifOverlay) return;
+    notifOverlay.classList.add("hidden");
+    notifOverlay.classList.remove("active");
+    openNotificationCardKey = null;
+  }
+
+  function markNotificationAsRead(cardKey, notifId) {
+    const cfg = notificationConfig[cardKey];
+    if (!cfg) return;
+    const n = cfg.notifiche.find((x) => x.id === notifId);
+    if (!n || n.letto) return;
+
+    n.letto = true;
+
+    // aggiorna lista nel popup (se è ancora aperto)
+    if (openNotificationCardKey === cardKey) {
+      openNotificationPopup(cardKey);
+    }
+
+    // aggiorna il pallino sulla card
+    updateBadgeForCard(cardKey);
+  }
+
+  // click su pallino di ogni card
+  document.querySelectorAll(".js-card-badge").forEach((badge) => {
+    const key = badge.getAttribute("data-card-key");
+    badge.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openNotificationPopup(key);
+    });
+  });
+
+  // chiusura popup
+  if (notifClose) notifClose.addEventListener("click", closeNotificationPopup);
+  if (notifCloseBottom)
+    notifCloseBottom.addEventListener("click", closeNotificationPopup);
+
+  // chiusura cliccando sullo sfondo scuro
+  if (notifOverlay) {
+    notifOverlay.addEventListener("click", (e) => {
+      if (e.target === notifOverlay || e.target.classList.contains("notif-backdrop")) {
+        closeNotificationPopup();
+      }
+    });
   }
 
   // ======================================================
   // INIT GENERALE
   // ======================================================
   initTurnoOggi();
-  renderTurniTable();
   renderComunicazioni();
   renderProcedureList();
-  initArchivio();
-
+  loadFS();
+  renderArchivio();
+  initNotificationBadges();
 });
