@@ -83,138 +83,76 @@ let comunicazioni = [
   }
 ];
 
-// ====== DATI DEMO: NOTIFICHE ======
-let notifiche = [
-  {
-    id: 1,
-    sezione: "assenze",
-    titolo: "Permesso approvato",
-    testo: "La tua richiesta di permesso del 10/01 è stata approvata.",
-    data: "Oggi",
-    letto: false
-  },
-  {
-    id: 2,
-    sezione: "assenze",
-    titolo: "Ferie rifiutate",
-    testo: "Le ferie dal 03/02 al 05/02 sono state rifiutate.",
-    data: "Ieri",
-    letto: false
-  },
-  {
-    id: 3,
-    sezione: "assenze",
-    titolo: "Promemoria",
-    testo: "Ricorda di consegnare il certificato per la malattia del 05/11.",
-    data: "2 giorni fa",
-    letto: false
-  }
-];
-// ====== DATI DEMO: PROCEDURE ======
-const procedureData = [
-  {
-    id: 1,
-    titolo: "Chiusura cassa - procedura standard",
-    reparto: "cassa",
-    repartoLabel: "Cassa / Banco",
-    ultimoAggiornamento: "12/11/2025",
-    testoBreve: "Passaggi per chiudere la cassa a fine giornata senza differenze.",
-    testoCompleto:
-      "1. Verificare che non ci siano scontrini sospesi o non chiusi.\n" +
-      "2. Stampare il rapporto di cassa dal gestionale.\n" +
-      "3. Contare fisicamente il contante presente in cassa.\n" +
-      "4. Confrontare il totale contante con quanto indicato dal gestionale.\n" +
-      "5. Registrare eventuali differenze sul registro cassa indicando data, ora e nome operatore.\n" +
-      "6. Riporre il denaro nella cassaforte secondo la procedura interna.\n" +
-      "7. Riporre le chiavi della cassa nel posto dedicato.",
-    tags: ["cassa", "chiusura", "incassi", "fine giornata"]
-  },
-  {
-    id: 2,
-    titolo: "Errore pagamento POS con scontrino contanti",
-    reparto: "cassa",
-    repartoLabel: "Cassa / Banco",
-    ultimoAggiornamento: "10/11/2025",
-    testoBreve: "Gestione errore quando lo scontrino è contanti ma il cliente paga con POS.",
-    testoCompleto:
-      "1. Se è stato emesso scontrino come CONTANTI ma il cliente ha pagato con POS:\n" +
-      "   - NON annullare l'operazione POS se è già andata a buon fine.\n" +
-      "2. Registrare sul quaderno errori di cassa:\n" +
-      "   - Data, ora, numero scontrino, importo e descrizione.\n" +
-      "3. A fine giornata verificare la differenza tra corrispettivi e incassi POS:\n" +
-      "   - La differenza dovrà essere spiegata tramite il registro errori.\n" +
-      "4. Informare il titolare se la situazione si ripete spesso.",
-    tags: ["pos", "errore", "cassa", "corrispettivi"]
-  },
-  {
-    id: 3,
-    titolo: "Gestione reso cliente con scontrino",
-    reparto: "cassa",
-    repartoLabel: "Cassa / Banco",
-    ultimoAggiornamento: "05/11/2025",
-    testoBreve: "Come gestire un reso con scontrino fiscale presente.",
-    testoCompleto:
-      "1. Verificare che il prodotto sia integro, non aperto e rivendibile.\n" +
-      "2. Controllare lo scontrino fiscale (data, importo, prodotto).\n" +
-      "3. Procedere con il reso sul gestionale seguendo la funzione dedicata.\n" +
-      "4. Emettere documento di reso o buono secondo procedura interna.\n" +
-      "5. Riporre il prodotto nella zona dedicata ai resi in attesa di gestione magazzino.",
-    tags: ["reso", "cliente", "scontrino"]
-  },
-  {
-    id: 4,
-    titolo: "Ricezione merce da corriere",
-    reparto: "logistica",
-    repartoLabel: "Logistica",
-    ultimoAggiornamento: "08/11/2025",
-    testoBreve: "Controlli da effettuare quando arriva merce in farmacia.",
-    testoCompleto:
-      "1. Controllare che il numero di colli consegnati corrisponda al DDT.\n" +
-      "2. Verificare integrità dei colli (nessun danneggiamento evidente).\n" +
-      "3. Firmare il DDT solo dopo verifica visiva.\n" +
-      "4. Consegnare il DDT alla magazziniera per il carico in magazzino.\n" +
-      "5. Segnalare subito eventuali anomalie al titolare (prodotti mancanti o rotti).",
-    tags: ["corriere", "merce", "logistica", "ddt"]
-  },
-  {
-    id: 5,
-    titolo: "Carico merce in magazzino",
-    reparto: "magazzino",
-    repartoLabel: "Magazzino",
-    ultimoAggiornamento: "09/11/2025",
-    testoBreve: "Come caricare correttamente la merce nel gestionale.",
-    testoCompleto:
-      "1. Recuperare il DDT o fattura di acquisto.\n" +
-      "2. Dal gestionale aprire la funzione di carico magazzino.\n" +
-      "3. Inserire o controllare il fornitore e la data documento.\n" +
-      "4. Verificare codici, quantità e scadenze dei prodotti.\n" +
-      "5. Salvare il carico solo dopo aver controllato tutti i dati.\n" +
-      "6. Sistemare fisicamente i prodotti negli scaffali dedicati, rispettando FEFO/ FIFO.",
-    tags: ["magazzino", "carico", "fornitori", "ddt"]
-  },
-  {
-    id: 6,
-    titolo: "Gestione servizi CUP / prenotazioni",
-    reparto: "servizi",
-    repartoLabel: "Servizi",
-    ultimoAggiornamento: "07/11/2025",
-    testoBreve: "Linee guida per prenotazioni e gestione appuntamenti.",
-    testoCompleto:
-      "1. Verificare sempre i dati anagrafici del paziente prima di confermare la prenotazione.\n" +
-      "2. Illustrare eventuali ticket o costi aggiuntivi.\n" +
-      "3. Stampare o comunicare chiaramente data, ora e luogo della prestazione.\n" +
-      "4. In caso di modifica o annullo, seguire la procedura ufficiale del portale.\n" +
-      "5. Annotare eventuali note importanti (es. arrivo anticipato, documenti da portare).",
-    tags: ["servizi", "cup", "prenotazioni"]
-  }
-];
+// ====== DATI DEMO: NOTIFICHE (per pallino rosso) ======
+const notificationData = {
+  assenze: [
+    {
+      id: "ass-1",
+      title: "Richiesta permesso approvata",
+      message: "La richiesta di permesso del 20/12 è stata approvata dal titolare.",
+      read: false
+    },
+    {
+      id: "ass-2",
+      title: "Richiesta ferie rifiutata",
+      message: "Le ferie richieste per il 10/01 non sono state approvate.",
+      read: false
+    }
+  ],
+  turni: [
+    {
+      id: "tur-1",
+      title: "Cambio turno notturno",
+      message: "Il turno notturno di oggi è stato modificato. Verifica l'elenco turni.",
+      read: false
+    }
+  ],
+  comunicazioni: [
+    {
+      id: "com-1",
+      title: "Nuova comunicazione urgente",
+      message: "È stata pubblicata una nuova comunicazione urgente.",
+      read: false
+    }
+  ],
+  procedure: [
+    {
+      id: "proc-1",
+      title: "Procedura chiusura cassa aggiornata",
+      message: "Consulta la nuova versione della procedura di chiusura cassa.",
+      read: false
+    }
+  ],
+  logistica: [
+    {
+      id: "log-1",
+      title: "Arrivo nuovo espositore",
+      message: "È previsto l'arrivo di un nuovo espositore in magazzino.",
+      read: false
+    }
+  ],
+  magazziniera: [
+    {
+      id: "mag-1",
+      title: "Controllo scadenze",
+      message: "Ricorda il controllo scadenze prodotti reparto banco 1.",
+      read: false
+    }
+  ]
+};
+
+const NOTIF_SECTION_LABELS = {
+  assenze: "Assenze del personale",
+  turni: "Farmacie di turno",
+  comunicazioni: "Comunicazioni interne",
+  procedure: "Procedure",
+  logistica: "Logistica",
+  magazziniera: "Magazziniera"
+};
 
 // ====== STATO ======
 let currentRole = "farmacia"; // farmacia | titolare | dipendente
 let currentTurniView = "oggi"; // oggi | settimana | mese
-
-let currentProcedureReparto = "tutti";
-let currentProcedureSearch = "";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Elementi principali
@@ -239,17 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const assenzePage = document.getElementById("assenzePage");
   const turniPage = document.getElementById("turniPage");
   const comunicazioniPage = document.getElementById("comunicazioniPage");
-  const procedurePage = document.getElementById("procedurePage");
 
-  // Notifiche / badge
-  const badgeAssenze = document.getElementById("badgeAssenze");
-  const labelAssenze = document.getElementById("labelAssenze");
-
-  const notifOverlay = document.getElementById("notificheOverlay");
-  const notifList = document.getElementById("notifList");
-  const notifChiudi = document.getElementById("notifChiudi");
-  const notifSegnaTutte = document.getElementById("notifSegnaTutte");
-  
   // Pulsanti navigazione rapida
   const openAssenzeBtn = document.getElementById("openAssenze");
   const backFromAssenzeBtn = document.getElementById("backFromAssenze");
@@ -257,8 +185,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const backFromTurniBtn = document.getElementById("backFromTurni");
   const openComunicazioniBtn = document.getElementById("openComunicazioni");
   const backFromComunicazioniBtn = document.getElementById("backFromComunicazioni");
-  const openProcedureBtn = document.getElementById("openProcedure");
-  const backFromProcedureBtn = document.getElementById("backFromProcedure");
 
   // Turni elementi
   const turnoOggiNome = document.getElementById("turnoOggiNome");
@@ -288,16 +214,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const badgeNonLette = document.getElementById("badgeNonLette");
   const badgeUrgenti = document.getElementById("badgeUrgenti");
 
-  // Procedure elementi
-  const procedureSearchInput = document.getElementById("procedureSearch");
-  const procedureListContainer = document.getElementById("procedureList");
-  const procedureDetailTitle = document.getElementById("procedureDetailTitle");
-  const procedureDetailMeta = document.getElementById("procedureDetailMeta");
-  const procedureDetailBody = document.getElementById("procedureDetailBody");
-  const procedureFilterButtons = document.querySelectorAll(".proc-filter");
-  const badgeProcTotali = document.getElementById("badgeProcTotali");
-  const badgeProcCassa = document.getElementById("badgeProcCassa");
-  const badgeProcAggiornate = document.getElementById("badgeProcAggiornate");
+  // Notifiche (badge + popup)
+  const notifModal = document.getElementById("notifModal");
+  const notifModalTitle = document.getElementById("notifModalTitle");
+  const notifModalList = document.getElementById("notifModalList");
+  const notifModalClose = document.getElementById("notifModalClose");
 
   // ====== FUNZIONI DI SUPPORTO ======
 
@@ -317,112 +238,12 @@ document.addEventListener("DOMContentLoaded", () => {
       assenzeTitle.textContent = "Le mie assenze";
     }
   }
-  // ====== NOTIFICHE / BADGE ASSENZE ======
 
-  function getUnreadCount(sezione) {
-    return notifiche.filter(n => n.sezione === sezione && !n.letto).length;
-  }
-
-  function aggiornaBadgeAssenze() {
-    if (!badgeAssenze || !labelAssenze) return;
-
-    const count = getUnreadCount("assenze");
-
-    if (count <= 0) {
-      badgeAssenze.classList.add("hidden");
-      labelAssenze.textContent = "";
-      return;
-    }
-
-    badgeAssenze.classList.remove("hidden");
-    badgeAssenze.textContent = count;
-    labelAssenze.textContent = count === 1 ? "nuovo" : "nuovi";
-  }
-    function apriPopupNotificheAssenze() {
-    if (!notifOverlay || !notifList) return;
-
-    notifOverlay.classList.remove("hidden");
-    document.body.style.overflow = "hidden"; // blocca lo scroll sotto
-
-    renderNotificheAssenze();
-  }
-
-  function chiudiPopupNotifiche() {
-    if (!notifOverlay) return;
-    notifOverlay.classList.add("hidden");
-    document.body.style.overflow = "";
-  }
-
-  function renderNotificheAssenze() {
-    if (!notifList) return;
-
-    const lista = notifiche.filter(n => n.sezione === "assenze" && !n.letto);
-
-    notifList.innerHTML = "";
-
-    if (lista.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "small-text";
-      empty.textContent = "Non ci sono nuove notifiche sulle assenze.";
-      notifList.appendChild(empty);
-      return;
-    }
-
-    lista.forEach(n => {
-      const item = document.createElement("div");
-      item.className = "notif-item";
-
-      const header = document.createElement("div");
-      header.className = "notif-item-header";
-
-      const title = document.createElement("div");
-      title.className = "notif-item-title";
-      title.textContent = n.titolo;
-
-      const meta = document.createElement("div");
-      meta.className = "notif-item-meta";
-      meta.textContent = n.data;
-
-      header.appendChild(title);
-      header.appendChild(meta);
-
-      const body = document.createElement("div");
-      body.className = "notif-item-body";
-      body.textContent = n.testo;
-
-      const actionsRow = document.createElement("div");
-      actionsRow.style.marginTop = "6px";
-      actionsRow.style.display = "flex";
-      actionsRow.style.justifyContent = "flex-end";
-
-      const btnVista = document.createElement("button");
-      btnVista.className = "btn-primary small";
-      btnVista.textContent = "Presa visione";
-
-      btnVista.addEventListener("click", () => {
-        n.letto = true;
-        aggiornaBadgeAssenze();
-        renderNotificheAssenze();
-      });
-
-      actionsRow.appendChild(btnVista);
-
-      item.appendChild(header);
-      item.appendChild(body);
-      item.appendChild(actionsRow);
-
-      notifList.appendChild(item);
-    });
-  }
-  
   function showSection(section) {
     if (!section) return;
-    // Nasconde tutte le sezioni principali
-    [dashboardSection, assenzePage, turniPage, comunicazioniPage, procedurePage].forEach(
-      (sec) => {
-        if (sec) sec.classList.add("hidden");
-      }
-    );
+    [dashboardSection, assenzePage, turniPage, comunicazioniPage].forEach((sec) => {
+      if (sec) sec.classList.add("hidden");
+    });
     section.classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: "instant" });
   }
@@ -435,6 +256,104 @@ document.addEventListener("DOMContentLoaded", () => {
   function closeSidebarMenu() {
     if (!sidebar) return;
     sidebar.classList.remove("open");
+  }
+
+  // ====== NOTIFICHE: LOGICA ======
+
+  function getUnreadCount(sectionKey) {
+    const list = notificationData[sectionKey] || [];
+    return list.filter((n) => !n.read).length;
+  }
+
+  function updateNotificationBadge(sectionKey) {
+    const badge = document.querySelector(
+      `.notif-badge[data-section="${sectionKey}"]`
+    );
+    const label = document.querySelector(
+      `.notif-label[data-section="${sectionKey}"]`
+    );
+
+    if (!badge || !label) return;
+
+    const unread = getUnreadCount(sectionKey);
+
+    if (unread === 0) {
+      badge.classList.add("hidden");
+      label.classList.add("hidden");
+      return;
+    }
+
+    badge.classList.remove("hidden");
+    label.classList.remove("hidden");
+
+    badge.textContent = unread;
+    label.textContent = unread === 1 ? "nuovo" : "nuovi";
+  }
+
+  function renderNotificationList(sectionKey) {
+    if (!notifModalList) return;
+
+    notifModalList.innerHTML = "";
+
+    const list = notificationData[sectionKey] || [];
+    const unread = list.filter((n) => !n.read);
+
+    if (unread.length === 0) {
+      const p = document.createElement("p");
+      p.className = "small-text";
+      p.textContent = "Nessuna nuova notifica per questa sezione.";
+      notifModalList.appendChild(p);
+      return;
+    }
+
+    unread.forEach((n) => {
+      const item = document.createElement("div");
+      item.className = "notif-item";
+
+      const title = document.createElement("h3");
+      title.className = "notif-item-title";
+      title.textContent = n.title;
+
+      const text = document.createElement("p");
+      text.className = "notif-item-text";
+      text.textContent = n.message;
+
+      const footer = document.createElement("div");
+      footer.className = "notif-item-footer";
+
+      const btn = document.createElement("button");
+      btn.className = "btn-primary small";
+      btn.textContent = "Presa visione";
+
+      btn.addEventListener("click", () => {
+        n.read = true;
+        updateNotificationBadge(sectionKey);
+        renderNotificationList(sectionKey);
+      });
+
+      footer.appendChild(btn);
+      item.appendChild(title);
+      item.appendChild(text);
+      item.appendChild(footer);
+
+      notifModalList.appendChild(item);
+    });
+  }
+
+  function openNotificationModal(sectionKey) {
+    if (!notifModal || !notifModalTitle) return;
+
+    const label = NOTIF_SECTION_LABELS[sectionKey] || sectionKey;
+    notifModalTitle.textContent = `Notifiche – ${label}`;
+
+    renderNotificationList(sectionKey);
+    notifModal.dataset.section = sectionKey;
+    notifModal.classList.remove("hidden");
+  }
+
+  function closeNotificationModal() {
+    if (!notifModal) return;
+    notifModal.classList.add("hidden");
   }
 
   // ====== LOGIN ======
@@ -501,9 +420,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (target === "comunicazioniPage") {
           showSection(comunicazioniPage);
           renderComunicazioni();
-        } else if (target === "procedurePage") {
-          showSection(procedurePage);
-          initProcedurePage();
         }
         closeSidebarMenu();
       });
@@ -516,10 +432,9 @@ document.addEventListener("DOMContentLoaded", () => {
       app.classList.add("hidden");
       authContainer.classList.remove("hidden");
 
-      // reset login
-      if (loginForm) loginForm.reset();
+      loginForm && loginForm.reset();
       authTabs.forEach((t) => t.classList.remove("active"));
-      if (authTabs[0]) authTabs[0].classList.add("active");
+      authTabs[0].classList.add("active");
       loginRoleLabel.textContent = "Farmacia";
       setRole("farmacia");
 
@@ -566,21 +481,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (openProcedureBtn) {
-    openProcedureBtn.addEventListener("click", () => {
-      showSection(procedurePage);
-      initProcedurePage();
-    });
-  }
-
-  if (backFromProcedureBtn) {
-    backFromProcedureBtn.addEventListener("click", () => {
-      showSection(dashboardSection);
-    });
-  }
-
   // ====== TURNI: POPOLAMENTO ======
-
   function initTurnoOggi() {
     const oggi = turniFarmacie.find((t) => t.tipoRange === "oggi");
     if (!oggi) return;
@@ -593,8 +494,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (turnoAppoggio) turnoAppoggio.textContent = oggi.appoggio;
 
     if (turnoOggiNome) turnoOggiNome.textContent = oggi.principale;
-    if (turnoOggiIndirizzo) turnoOggiIndirizzo.textContent = "Via Esempio 12, Matera";
-    if (turnoOggiTelefono) turnoOggiTelefono.textContent = `Tel: ${oggi.telefono}`;
+    if (turnoOggiIndirizzo)
+      turnoOggiIndirizzo.textContent = "Via Esempio 12, Matera";
+    if (turnoOggiTelefono)
+      turnoOggiTelefono.textContent = `Tel: ${oggi.telefono}`;
     if (turnoOggiOrario) turnoOggiOrario.textContent = oggi.orario;
     if (turnoOggiAppoggioNome) turnoOggiAppoggioNome.textContent = oggi.appoggio;
     if (turnoOggiAppoggioDettagli) {
@@ -607,7 +510,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!turniRowsContainer) return;
 
     const meseFilter = turniMeseSelect ? turniMeseSelect.value : "all";
-    const farmaciaFilter = turniFarmaciaSelect ? turniFarmaciaSelect.value : "all";
+    const farmaciaFilter = turniFarmaciaSelect
+      ? turniFarmaciaSelect.value
+      : "all";
 
     let filtered = turniFarmacie.filter((t) => t.tipoRange === currentTurniView);
 
@@ -674,7 +579,6 @@ document.addEventListener("DOMContentLoaded", () => {
     turniFarmaciaSelect.addEventListener("change", renderTurniTable);
 
   // ====== COMUNICAZIONI: POPOLAMENTO ======
-
   function aggiornaBadgeComunicazioni() {
     if (!badgeTotComunicazioni || !badgeNonLette || !badgeUrgenti) return;
     const tot = comunicazioni.length;
@@ -706,7 +610,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (filtered.length === 0) {
       const empty = document.createElement("div");
       empty.className = "small-text";
-      empty.textContent = "Nessuna comunicazione per i filtri selezionati (demo).";
+      empty.textContent =
+        "Nessuna comunicazione per i filtri selezionati (demo).";
       comunicazioniList.appendChild(empty);
       aggiornaBadgeComunicazioni();
       return;
@@ -805,157 +710,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-    // Click sul pallino della card Assenze → apre popup
-  if (badgeAssenze) {
-    badgeAssenze.addEventListener("click", apriPopupNotificheAssenze);
-  }
+  // ====== NOTIFICHE: EVENTI ======
+  document.querySelectorAll(".notif-badge, .notif-label").forEach((el) => {
+    const section = el.getAttribute("data-section");
+    if (!section) return;
 
-  // Pulsante "Chiudi" nel popup
-  if (notifChiudi) {
-    notifChiudi.addEventListener("click", chiudiPopupNotifiche);
-  }
-
-  // Click fuori dal box per chiudere (overlay)
-  if (notifOverlay) {
-    notifOverlay.addEventListener("click", (e) => {
-      if (e.target === notifOverlay) {
-        chiudiPopupNotifiche();
-      }
+    el.addEventListener("click", () => {
+      openNotificationModal(section);
     });
+  });
+
+  if (notifModalClose) {
+    notifModalClose.addEventListener("click", closeNotificationModal);
   }
 
-  // Segna tutte come viste
-  if (notifSegnaTutte) {
-    notifSegnaTutte.addEventListener("click", () => {
-      notifiche
-        .filter(n => n.sezione === "assenze")
-        .forEach(n => { n.letto = true; });
-
-      aggiornaBadgeAssenze();
-      renderNotificheAssenze();
-    });
-  }
-  
-  // ====== PROCEDURE: LOGICA ======
-
-  function aggiornaBadgeProcedure() {
-    if (!badgeProcTotali || !badgeProcCassa || !badgeProcAggiornate) return;
-
-    const tot = procedureData.length;
-    const cassaCount = procedureData.filter((p) => p.reparto === "cassa").length;
-    const ultimo = procedureData[0] ? procedureData[0].ultimoAggiornamento : "—";
-
-    badgeProcTotali.textContent = `Totali: ${tot}`;
-    badgeProcCassa.textContent = `Cassa/Banco: ${cassaCount}`;
-    badgeProcAggiornate.textContent = `Ultimo aggiornamento: ${ultimo}`;
-  }
-
-  function renderProcedureList() {
-    if (!procedureListContainer) return;
-
-    const term = currentProcedureSearch.trim().toLowerCase();
-
-    let filtered = procedureData.filter((p) => {
-      const matchReparto =
-        currentProcedureReparto === "tutti" || p.reparto === currentProcedureReparto;
-
-      const fullText =
-        (p.titolo + " " + p.testoBreve + " " + p.tags.join(" ")).toLowerCase();
-
-      const matchSearch = term === "" || fullText.includes(term);
-
-      return matchReparto && matchSearch;
-    });
-
-    procedureListContainer.innerHTML = "";
-
-    if (filtered.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "small-text";
-      empty.textContent = "Nessuna procedura trovata per i filtri selezionati.";
-      procedureListContainer.appendChild(empty);
-      return;
+  if (notifModal) {
+    const backdrop = notifModal.querySelector(".notif-modal-backdrop");
+    if (backdrop) {
+      backdrop.addEventListener("click", closeNotificationModal);
     }
-
-    filtered.forEach((p) => {
-      const item = document.createElement("div");
-      item.className = "procedure-item";
-      item.setAttribute("data-id", String(p.id));
-
-      const pillClass = `procedure-reparto-pill ${p.reparto}`;
-
-      item.innerHTML = `
-        <div class="procedure-item-title">${p.titolo}</div>
-        <div class="procedure-item-meta">
-          <span class="${pillClass}">${p.repartoLabel}</span>
-          <span>Ult. agg.: ${p.ultimoAggiornamento}</span>
-        </div>
-      `;
-
-      procedureListContainer.appendChild(item);
-    });
-  }
-
-  function mostraDettaglioProcedura(proc) {
-    if (!procedureDetailTitle || !procedureDetailMeta || !procedureDetailBody) return;
-
-    procedureDetailTitle.textContent = proc.titolo;
-    procedureDetailMeta.textContent = `${proc.repartoLabel} · Ultimo aggiornamento: ${proc.ultimoAggiornamento}`;
-    procedureDetailBody.textContent = proc.testoCompleto;
-  }
-
-  function initProcedurePage() {
-    aggiornaBadgeProcedure();
-
-    // Se è la prima volta che entro, resetto filtri e ricerca
-    currentProcedureReparto = "tutti";
-    currentProcedureSearch = "";
-    if (procedureSearchInput) procedureSearchInput.value = "";
-
-    if (procedureFilterButtons.length > 0) {
-      procedureFilterButtons.forEach((b) => b.classList.remove("active"));
-      // attivo il primo (Tutte)
-      procedureFilterButtons[0].classList.add("active");
-    }
-
-    renderProcedureList();
-
-    if (procedureData[0]) {
-      mostraDettaglioProcedura(procedureData[0]);
-    }
-  }
-
-  if (procedureSearchInput) {
-    procedureSearchInput.addEventListener("input", (e) => {
-      currentProcedureSearch = e.target.value || "";
-      renderProcedureList();
-    });
-  }
-
-  if (procedureFilterButtons.length > 0) {
-    procedureFilterButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        procedureFilterButtons.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        currentProcedureReparto = btn.getAttribute("data-reparto") || "tutti";
-        renderProcedureList();
-      });
-    });
-  }
-
-  if (procedureListContainer) {
-    procedureListContainer.addEventListener("click", (e) => {
-      const item = e.target.closest(".procedure-item");
-      if (!item) return;
-      const id = Number(item.getAttribute("data-id"));
-      const proc = procedureData.find((p) => p.id === id);
-      if (!proc) return;
-      mostraDettaglioProcedura(proc);
-    });
   }
 
   // ====== INIT ======
   initTurnoOggi();
   renderComunicazioni();
-  aggiornaBadgeAssenze();
+
+  // inizializza badge notifiche su tutte le sezioni
+  Object.keys(notificationData).forEach(updateNotificationBadge);
 });
