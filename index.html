@@ -2,252 +2,544 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
+  <title>Portale Farmacia Montesano</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portale Farmacia – Dashboard</title>
   <link rel="stylesheet" href="style.css" />
-</head>
+  <script src="script.js" defer></script>
 
+  <!-- Icone per aggiunta a Home su iPhone/iPad -->
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
+  <link rel="apple-touch-icon" sizes="152x152" href="logo.jpg">
+  <link rel="apple-touch-icon" sizes="120x120" href="logo.jpg">
+  <link rel="apple-touch-icon" href="logo.jpg">
+
+  <!-- Favicon Android / browser -->
+  <link rel="icon" type="image/png" href="logo.jpg">
+</head>
 <body>
 
-<!-- ================== LOGIN ================== -->
-<div id="authContainer" class="auth-container">
-  <div class="auth-card">
-
-    <div class="auth-logo-wrap">
-      <img src="logo.png" class="auth-logo">
-    </div>
-
-    <h1>Accesso</h1>
-    <p class="auth-intro">Seleziona ruolo ed effettua l’accesso.</p>
-
-    <div class="auth-tabs">
-      <button class="auth-tab active" data-role="farmacia">Farmacia</button>
-      <button class="auth-tab" data-role="titolare">Titolare</button>
-      <button class="auth-tab" data-role="dipendente">Dipendente</button>
-    </div>
-
-    <p class="auth-subtitle">Stai accedendo come: <span id="loginRoleLabel">Farmacia</span></p>
-
-    <form id="loginForm" class="auth-form">
-      <div class="form-row">
-        <label>Password</label>
-        <input type="password" required />
+  <!-- ============ LOGIN ============ -->
+  <div id="authContainer" class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo-wrap">
+        <img src="logo.jpg" alt="Farmacia Montesano" class="auth-logo" />
       </div>
-      <button class="btn-primary wide">Entra</button>
-      <p class="login-hint">Accesso demo – qualsiasi password accetta</p>
-    </form>
+      <h1>Portale Farmacia Montesano</h1>
+      <p class="auth-intro">
+        Seleziona il tipo di accesso e inserisci le credenziali.
+      </p>
 
-  </div>
-</div>
-
-<!-- ================== APP ================== -->
-<div id="app" class="app hidden">
-
-  <!-- ===== Sidebar ===== -->
-  <div id="sidebar" class="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo-row">
-        <img src="logo.png" class="sidebar-logo">
-        <span class="sidebar-title">Farmacia Montesano</span>
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-role="farmacia">Farmacia</button>
+        <button class="auth-tab" data-role="titolare">Titolare</button>
+        <button class="auth-tab" data-role="dipendente">Dipendente</button>
       </div>
-      <button id="closeSidebar" class="icon-button">✕</button>
+
+      <p class="auth-subtitle">
+        Accesso come: <span id="loginRoleLabel">Farmacia</span>
+      </p>
+
+      <form id="loginForm" class="auth-form">
+        <div class="form-row">
+          <label for="loginUsername">Username</label>
+          <input id="loginUsername" type="text" placeholder="Inserisci username" />
+        </div>
+        <div class="form-row">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" placeholder="Inserisci password" />
+        </div>
+        <button type="submit" class="btn-primary wide">Entra</button>
+        <p class="login-hint">
+          Demo: per ora puoi inserire qualsiasi username e password.
+        </p>
+      </form>
     </div>
-
-    <ul class="sidebar-list">
-      <li data-nav="dashboard">Dashboard</li>
-      <li class="divider-label">Sezioni</li>
-      <li data-nav="assenzePage">Assenze personale</li>
-      <li data-nav="turniPage">Farmacie di turno</li>
-      <li data-nav="comunicazioniPage">Comunicazioni</li>
-      <li data-nav="procedurePage">Procedure</li>
-      <li data-nav="archivioPage">Archivio File</li>
-
-      <li class="logout" id="logoutBtn">Esci</li>
-    </ul>
   </div>
 
-  <!-- Hamburger -->
-  <button id="hamburger" class="hamburger">☰</button>
+  <!-- ============ APP PRINCIPALE ============ -->
+  <main id="app" class="app hidden">
 
-  <!-- ===== Dashboard ===== -->
-  <section id="dashboard" class="dashboard">
-
-    <div class="dashboard-header">
-      <div class="dashboard-logo-block">
-        <img src="logo.png" class="dash-logo">
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-row">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="sidebar-logo" />
+          <span class="sidebar-title">Portale interno</span>
+        </div>
+        <button id="closeSidebar" class="icon-button" aria-label="Chiudi menu">✕</button>
       </div>
 
-      <div class="dashboard-header-text">
-        <h1>Portale Farmacia</h1>
-        <p class="header-subtitle">Gestione interna</p>
-        <span class="role-pill" id="currentRolePill">Farmacia (accesso generico)</span>
+      <ul class="sidebar-list">
+        <li data-nav="dashboard">Dashboard</li>
+        <li data-nav="assenzePage">Assenze</li>
+        <li data-nav="turniPage">Farmacie di turno</li>
+        <li data-nav="comunicazioniPage">Comunicazioni</li>
+        <li data-nav="procedurePage">Procedure</li>
+        <li class="divider-label">Sezioni dedicate</li>
+        <li data-nav="archivioPage">Archivio file</li>
+        <li id="logoutBtn" class="logout">Logout</li>
+      </ul>
+    </aside>
+
+    <!-- HAMBURGER -->
+    <button id="hamburger" class="hamburger" aria-label="Apri menu">
+      ☰
+    </button>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section id="dashboard" class="dashboard">
+
+      <header class="dashboard-header">
+        <div class="dashboard-logo-block">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="dash-logo" />
+        </div>
+        <div class="dashboard-header-text">
+          <h1>Farmacia Montesano</h1>
+          <p class="header-subtitle">Portale interno</p>
+          <span id="currentRolePill" class="role-pill">Farmacia (accesso generico)</span>
+        </div>
+      </header>
+
+      <div class="dashboard-content">
+        <div class="cards-grid">
+
+          <!-- ASSENZE -->
+          <article class="card card-assenze" data-card="assenze">
+            <div class="card-header">
+              <div class="card-icon">📅</div>
+              <div class="card-title-group">
+                <h2 id="assenzeTitle">Assenze del personale</h2>
+                <span class="chip chip-today">Oggi</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="caption">Demo grafica assenze.</p>
+              <p class="small-text">
+                Vedi calendario, richieste e stato assenze.
+              </p>
+            </div>
+            <div class="card-footer">
+              <button id="openAssenze" class="btn-primary">
+                Vai a Assenze
+              </button>
+            </div>
+          </article>
+
+          <!-- FARMACIA DI TURNO -->
+          <article class="card card-turno" data-card="turni">
+            <div class="card-header">
+              <div class="card-icon">⏰</div>
+              <div class="card-title-group">
+                <h2>Farmacia di turno</h2>
+                <span class="chip chip-turno" id="turnoOrarioChip">00:00 – 24:00</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <p><strong id="turnoNome">Farmacia Montesano</strong></p>
+              <p class="small-text" id="turnoIndirizzo">
+                Via Esempio 12, Matera<br />
+                Tel: 0835 000000
+              </p>
+              <div class="divider"></div>
+              <p class="small-text">
+                <strong>Farmacia di appoggio</strong><br />
+                <span id="turnoAppoggio">
+                  Farmacia Centrale – Via Dante 8, Matera – Tel: 0835 111111
+                </span>
+              </p>
+            </div>
+            <div class="card-footer">
+              <button id="openTurni" class="btn-secondary">
+                Lista farmacie di turno
+              </button>
+            </div>
+          </article>
+
+          <!-- COMUNICAZIONI -->
+          <article class="card card-comunicazioni" data-card="comunicazioni">
+            <div class="card-header">
+              <div class="card-icon">📢</div>
+              <div class="card-title-group">
+                <h2>Comunicazioni</h2>
+              </div>
+            </div>
+            <div class="card-body card-body-list">
+              <div class="list-item">
+                <span class="list-title">Nuova procedura notturni</span>
+                <span class="list-meta">Oggi · Urgente</span>
+              </div>
+              <div class="list-item">
+                <span class="list-title">Verifica armadietto stupefacenti</span>
+                <span class="list-meta">Ieri · Importante</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <button id="openComunicazioni" class="btn-primary">
+                Vai a Comunicazioni
+              </button>
+            </div>
+          </article>
+
+          <!-- PROCEDURE -->
+          <article class="card card-procedure" data-card="procedure">
+            <div class="card-header">
+              <div class="card-icon">🗂️</div>
+              <div class="card-title-group">
+                <h2>Procedure</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Consulta, modifica o inserisci nuove procedure operative interne.
+              </p>
+            </div>
+            <div class="card-footer">
+              <button id="openProcedure" class="btn-secondary">
+                Vai a Procedure
+              </button>
+            </div>
+          </article>
+
+          <!-- LOGISTICA -->
+          <article class="card card-logistica" data-card="logistica">
+            <div class="card-header">
+              <div class="card-icon">📦</div>
+              <div class="card-title-group">
+                <h2>Logistica</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Arrivi, corrieri, espositori e materiali per reparto. (demo)
+              </p>
+            </div>
+            <div class="card-footer">
+              <button class="btn-secondary">
+                In arrivo
+              </button>
+            </div>
+          </article>
+
+          <!-- MAGAZZINIERA -->
+          <article class="card card-magazziniera" data-card="magazzino">
+            <div class="card-header">
+              <div class="card-icon">📋</div>
+              <div class="card-title-group">
+                <h2>Magazziniera</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Controllo scorte, scadenze, arrivi e sistemazione magazzino. (demo)
+              </p>
+            </div>
+            <div class="card-footer">
+              <button class="btn-secondary">
+                In arrivo
+              </button>
+            </div>
+          </article>
+
+          <!-- ARCHIVIO FILE -->
+          <article class="card card-archivio" data-card="archivio">
+            <div class="card-header">
+              <div class="card-icon">🗄️</div>
+              <div class="card-title-group">
+                <h2>Archivio file</h2>
+                <span class="chip chip-archivio">Rapido & intuitivo</span>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Carica, organizza e scarica file in cartelle, come su un PC.
+                Doppio click per aprire, tasto destro o pressione prolungata
+                per più opzioni.
+              </p>
+            </div>
+            <div class="card-footer">
+              <button id="openArchivio" class="btn-primary">
+                Apri Archivio
+              </button>
+            </div>
+          </article>
+
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="dashboard-content">
-      <div class="cards-grid">
-
-        <!-- Card Assenze -->
-        <div class="card card-assenze">
-          <div class="card-header">
-            <div class="card-icon">👥</div>
-            <div class="card-title-group">
-              <h2>Assenze</h2>
-            </div>
-            <div class="card-badge js-card-badge" data-card-key="assenze">
-              <span class="badge-count"></span>
-            </div>
-          </div>
-          <p class="caption">Gestione ferie, permessi, malattia</p>
-          <div class="card-footer">
-            <button id="openAssenze" class="btn-secondary small">Apri</button>
-          </div>
+    <!-- ============ PAGINA ASSENZE ============ -->
+    <section id="assenzePage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromAssenze" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Assenze del personale</h1>
+          <p>Consulta le tue assenze, verifica chi è assente oggi e invia una nuova richiesta.</p>
         </div>
+      </header>
 
-        <!-- Card Turni -->
-        <div class="card card-turno">
-          <div class="card-header">
-            <div class="card-icon">🕒</div>
-            <div class="card-title-group">
-              <h2>Farmacie di turno</h2>
-            </div>
-            <div class="card-badge js-card-badge" data-card-key="turni">
-              <span class="badge-count"></span>
-            </div>
-          </div>
-          <p class="caption">Turno odierno e settimanale</p>
-          <div class="card-footer">
-            <button id="openTurni" class="btn-secondary small">Apri</button>
-          </div>
+      <!-- resto identico a quello che avevi (calendario + tabelle) -->
+      <!-- per brevità non lo ripeto, puoi riusare il tuo markup originale qui,
+           NON influisce sull'archivio file. -->
+      <!-- ... -->
+    </section>
+
+    <!-- ============ PAGINA TURNI ============ -->
+    <section id="turniPage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromTurni" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Farmacie di turno</h1>
+          <p>Consulta le farmacie in turno oggi, nei prossimi giorni e per il mese corrente.</p>
         </div>
+      </header>
 
-        <!-- Card Comunicazioni -->
-        <div class="card card-comunicazioni">
-          <div class="card-header">
-            <div class="card-icon">📢</div>
-            <div class="card-title-group">
-              <h2>Comunicazioni</h2>
-            </div>
-            <div class="card-badge js-card-badge" data-card-key="comunicazioni">
-              <span class="badge-count"></span>
-            </div>
-          </div>
-          <p class="caption">Avvisi interni dello staff</p>
-          <div class="card-footer">
-            <button id="openComunicazioni" class="btn-secondary small">Apri</button>
-          </div>
-        </div>
-
-        <!-- Card Procedure -->
-        <div class="card card-procedure">
-          <div class="card-header">
-            <div class="card-icon">📄</div>
-            <div class="card-title-group">
-              <h2>Procedure</h2>
-            </div>
-            <div class="card-badge js-card-badge" data-card-key="procedure">
-              <span class="badge-count"></span>
-            </div>
-          </div>
-          <p class="caption">Manuali operativi aggiornati</p>
-          <div class="card-footer">
-            <button id="openProcedure" class="btn-secondary small">Apri</button>
-          </div>
-        </div>
-
-        <!-- Card Logistica -->
-        <div class="card card-logistica">
-          <div class="card-header">
-            <div class="card-icon">🚚</div>
-            <div class="card-title-group">
-              <h2>Logistica</h2>
-            </div>
-            <div class="card-badge js-card-badge" data-card-key="logistica">
-              <span class="badge-count"></span>
-            </div>
-          </div>
-          <p class="caption">Movimenti consegne e fornitori</p>
-          <div class="card-footer">
-            <button class="btn-secondary small">Apri</button>
-          </div>
-        </div>
-
-        <!-- Card Magazzino -->
-        <div class="card card-magazziniera">
-          <div class="card-header">
-            <div class="card-icon">📦</div>
-            <div class="card-title-group">
-              <h2>Magazzino</h2>
-            </div>
-            <div class="card-badge js-card-badge" data-card-key="magazzino">
-              <span class="badge-count"></span>
-            </div>
-          </div>
-          <p class="caption">Stoccaggi e scadenze</p>
-          <div class="card-footer">
-            <button class="btn-secondary small">Apri</button>
-          </div>
-        </div>
-
-        <!-- ⭐ NUOVA CARD ARCHIVIO FILE (MACOS STYLE) ⭐ -->
-        <div class="card card-archivio" style="background: linear-gradient(145deg, #5ab4ff, #1e73be);">
-          <div class="card-header">
-            <div class="card-icon">📂</div>
-            <div class="card-title-group">
-              <h2>Archivio File</h2>
-            </div>
-          </div>
-          <p class="caption">Stile MacOS • Cartelle, file, upload</p>
-          <div class="card-footer">
-            <button id="openArchivio" class="btn-secondary small">Apri</button>
-          </div>
-        </div>
-
+      <div class="turni-tabs">
+        <button class="turni-tab active" data-view="oggi">Oggi</button>
+        <button class="turni-tab" data-view="settimana">Settimana</button>
+        <button class="turni-tab" data-view="mese">Mese</button>
       </div>
-    </div>
-  </section>
 
-  <!-- =================== PAGINA: ASSENZE =================== -->
-  <section id="assenzePage" class="page hidden">
-    <!-- (CONTENUTO IDENTICO AL TUO) -->
-  </section>
+      <div class="turni-layout">
+        <article class="card turni-oggi-card">
+          <h2>Turno di oggi</h2>
+          <p class="small-text">Farmacia principale e farmacia di appoggio per la giornata odierna.</p>
 
-  <!-- =================== PAGINA: TURNI =================== -->
-  <section id="turniPage" class="page hidden">
-    <!-- (CONTENUTO IDENTICO AL TUO) -->
-  </section>
+          <div class="turno-main">
+            <h3 id="turnoOggiNome">Farmacia Montesano</h3>
+            <p id="turnoOggiIndirizzo" class="small-text">
+              Via Esempio 12, Matera
+            </p>
+            <p id="turnoOggiTelefono" class="small-text">
+              Tel: 0835 000000
+            </p>
+            <span id="turnoOggiOrario" class="chip chip-turno">00:00 – 24:00</span>
+          </div>
 
-  <!-- =================== PAGINA: COMUNICAZIONI =================== -->
-  <section id="comunicazioniPage" class="page hidden">
-    <!-- (CONTENUTO IDENTICO AL TUO) -->
-  </section>
+          <div class="divider"></div>
 
-  <!-- =================== PAGINA: PROCEDURE =================== -->
-  <section id="procedurePage" class="page hidden">
-    <!-- (CONTENUTO IDENTICO AL TUO) -->
-  </section>
+          <div class="turno-appoggio">
+            <p class="small-text label">Farmacia di appoggio</p>
+            <h3 id="turnoOggiAppoggioNome">Farmacia Centrale</h3>
+            <p id="turnoOggiAppoggioDettagli" class="small-text">
+              Via Dante 8, Matera – Tel: 0835 111111
+            </p>
+          </div>
+        </article>
 
-  <!-- =================== PAGINA: ARCHIVIO FILE =================== -->
-  <section id="archivioPage" class="page hidden">
+        <article class="card turni-table-card">
+          <div class="turni-table-header">
+            <div>
+              <h2>Elenco turni</h2>
+              <p class="small-text">
+                Visualizza i turni in base al periodo selezionato.
+              </p>
+            </div>
+            <div class="turni-filters">
+              <select id="turniMeseSelect">
+                <option value="all">Tutti i mesi</option>
+                <option value="12">Dicembre</option>
+                <option value="1">Gennaio</option>
+                <option value="2">Febbraio</option>
+              </select>
+              <select id="turniFarmaciaSelect">
+                <option value="all">Tutte le farmacie</option>
+                <option value="Farmacia Montesano">Farmacia Montesano</option>
+                <option value="Farmacia Centrale">Farmacia Centrale</option>
+                <option value="Farmacia Madonna delle Grazie">Farmacia Madonna delle Grazie</option>
+              </select>
+            </div>
+          </div>
 
-    <div class="page-header">
-      <div class="page-title-block">
-        <h1>Archivio File</h1>
-        <p>Gestione MacOS – cartelle, file, upload, drag & menu</p>
+          <div class="turni-table">
+            <div class="turni-row header">
+              <span>Data</span>
+              <span>Orario</span>
+              <span>Farmacia principale</span>
+              <span>Farmacia di appoggio</span>
+              <span>Telefono</span>
+              <span>Note</span>
+            </div>
+            <div id="turniRows"></div>
+          </div>
+        </article>
       </div>
-      <button id="backFromArchivio" class="back-button">← Torna alla Dashboard</button>
-    </div>
+    </section>
 
-    <!-- 🔍 Barra Ricerca -->
-    <input type="text" id="archivioSearch" placeholder="Cerca file o cartelle…" class="archivio-search">
+    <!-- ============ PAGINA COMUNICAZIONI ============ -->
+    <section id="comunicazioniPage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromComunicazioni" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Comunicazioni interne</h1>
+          <p>Avvisi, note operative e messaggi tra titolare e dipendenti.</p>
+        </div>
+      </header>
 
-    <!-- 📁 Griglia Cartelle -->
-    <div id="archivioContainer" class="archivio-grid"></div>
+      <div class="comunicazioni-layout">
+        <article class="card comunicazioni-list-card">
+          <div class="comunicazioni-list-header">
+            <h2>Ultime comunicazioni</h2>
+            <p class="small-text">
+              In ordine dalla più recente. Demo statica per ora.
+            </p>
+          </div>
 
-  </section>
+          <div id="comunicazioniList" class="comunicazioni-list"></div>
+        </article>
 
-</div>
+        <article class="card comunicazioni-side-card">
+          <h2>Filtra e nuova comunicazione</h2>
 
-<script src="script.js"></script>
+          <div class="form-row">
+            <label for="filtroCategoria">Filtra per categoria</label>
+            <select id="filtroCategoria">
+              <option value="tutte">Tutte</option>
+              <option value="urgente">Urgente</option>
+              <option value="importante">Importante</option>
+              <option value="informativa">Informativa</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label class="checkbox-inline">
+              <input type="checkbox" id="filtroSoloNonLette" />
+              <span>Mostra solo non lette</span>
+            </label>
+          </div>
+
+          <div class="divider"></div>
+
+          <h3>Invia nuova comunicazione (demo)</h3>
+          <p class="small-text">
+            Questo modulo è dimostrativo. In futuro invierà davvero al server.
+          </p>
+
+          <form id="comunicazioneForm" class="comunicazione-form">
+            <div class="form-row">
+              <label for="comTitolo">Titolo</label>
+              <input type="text" id="comTitolo" placeholder="Es. Aggiornamento procedure notturne" />
+            </div>
+
+            <div class="form-row">
+              <label for="comCategoria">Categoria</label>
+              <select id="comCategoria">
+                <option value="urgente">Urgente</option>
+                <option value="importante">Importante</option>
+                <option value="informativa">Informativa</option>
+              </select>
+            </div>
+
+            <div class="form-row">
+              <label for="comTesto">Testo breve</label>
+              <textarea id="comTesto" rows="3"
+                placeholder="Scrivi qui una breve comunicazione..."></textarea>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Invia comunicazione (demo)</button>
+            </div>
+
+            <p id="comunicazioneFeedback" class="form-feedback hidden">
+              ✅ Comunicazione registrata (demo).
+            </p>
+          </form>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ PAGINA PROCEDURE ============ -->
+    <section id="procedurePage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromProcedure" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Procedure interne</h1>
+          <p>Ricerca veloce e consultazione delle procedure divise per reparto.</p>
+        </div>
+      </header>
+
+      <article class="card">
+        <div class="form-row">
+          <label for="procedureSearch">Cerca tra le procedure</label>
+          <input id="procedureSearch" type="text" placeholder="Es. chiusura cassa, buono SSN, reso fornitore..." />
+        </div>
+
+        <div class="procedure-filters">
+          <button class="proc-filter-btn active" data-reparto="tutti">Tutti</button>
+          <button class="proc-filter-btn" data-reparto="cassa">Cassa / Banco</button>
+          <button class="proc-filter-btn" data-reparto="magazzino">Magazzino</button>
+          <button class="proc-filter-btn" data-reparto="servizi">Servizi</button>
+          <button class="proc-filter-btn" data-reparto="logistica">Logistica</button>
+        </div>
+
+        <div id="procedureList" class="procedure-list"></div>
+      </article>
+
+      <article class="card">
+        <h2>Dettaglio procedura</h2>
+        <p class="small-text">
+          Tocca una procedura dall’elenco per visualizzare qui il dettaglio completo.
+        </p>
+        <div id="procedureDetail" class="procedure-detail">
+          <p class="small-text muted">Nessuna procedura selezionata.</p>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============ PAGINA ARCHIVIO FILE ============ -->
+    <section id="archivioPage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromArchivio" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Archivio file</h1>
+          <p>Archivia documenti in cartelle, con funzioni tipo PC.</p>
+        </div>
+      </header>
+
+      <article class="card archivio-card">
+        <div class="archivio-toolbar">
+          <div class="archivio-path">
+            Percorso: <span id="archivioPath">/root</span>
+          </div>
+          <div class="archivio-actions">
+            <button id="archivioUp" class="btn-secondary small">⬆ Cartella su</button>
+            <button id="archivioNewFolder" class="btn-secondary small">+ Nuova cartella</button>
+            <button id="archivioBtnUpload" class="btn-primary small">⬆ Carica file</button>
+            <input id="archivioUpload" type="file" multiple class="hidden" />
+          </div>
+        </div>
+
+        <p class="small-text long-press-hint">
+          💡 PC: tasto destro per opzioni · Telefono: tieni premuto sul file/cartella.
+        </p>
+
+        <div id="archivioGrid" class="file-grid">
+          <!-- riempito da JS -->
+        </div>
+      </article>
+
+      <!-- MENU TASTO DESTRO -->
+      <div id="archivioContextMenu" class="context-menu hidden">
+        <button id="menuNuova" class="context-menu-item">
+          📁 Nuova cartella
+        </button>
+        <button id="menuRinomina" class="context-menu-item">
+          ✏️ Rinomina
+        </button>
+        <button id="menuCopia" class="context-menu-item">
+          📄 Copia
+        </button>
+        <button id="menuIncolla" class="context-menu-item">
+          📥 Incolla
+        </button>
+        <button id="menuDownload" class="context-menu-item">
+          ⬇️ Scarica file
+        </button>
+        <button id="menuElimina" class="context-menu-item danger">
+          🗑 Elimina
+        </button>
+      </div>
+    </section>
+
+  </main>
 </body>
 </html>
