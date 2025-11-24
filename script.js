@@ -240,7 +240,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const turniPage = document.getElementById("turniPage");
   const comunicazioniPage = document.getElementById("comunicazioniPage");
   const procedurePage = document.getElementById("procedurePage");
+  
+  // Notifiche / badge
+  const badgeAssenze = document.getElementById("badgeAssenze");
+  const labelAssenze = document.getElementById("labelAssenze");
 
+  const notifOverlay = document.getElementById("notificheOverlay");
+  const notifList = document.getElementById("notifList");
+  const notifChiudi = document.getElementById("notifChiudi");
+  const notifSegnaTutte = document.getElementById("notifSegnaTutte");
+  
   // Pulsanti navigazione rapida
   const openAssenzeBtn = document.getElementById("openAssenze");
   const backFromAssenzeBtn = document.getElementById("backFromAssenze");
@@ -308,7 +317,104 @@ document.addEventListener("DOMContentLoaded", () => {
       assenzeTitle.textContent = "Le mie assenze";
     }
   }
+  // ====== NOTIFICHE / BADGE ASSENZE ======
 
+  function getUnreadCount(sezione) {
+    return notifiche.filter(n => n.sezione === sezione && !n.letto).length;
+  }
+
+  function aggiornaBadgeAssenze() {
+    if (!badgeAssenze || !labelAssenze) return;
+
+    const count = getUnreadCount("assenze");
+
+    if (count <= 0) {
+      badgeAssenze.classList.add("hidden");
+      labelAssenze.textContent = "";
+      return;
+    }
+
+    badgeAssenze.classList.remove("hidden");
+    badgeAssenze.textContent = count;
+    labelAssenze.textContent = count === 1 ? "nuovo" : "nuovi";
+  }
+    function apriPopupNotificheAssenze() {
+    if (!notifOverlay || !notifList) return;
+
+    notifOverlay.classList.remove("hidden");
+    document.body.style.overflow = "hidden"; // blocca lo scroll sotto
+
+    renderNotificheAssenze();
+  }
+
+  function chiudiPopupNotifiche() {
+    if (!notifOverlay) return;
+    notifOverlay.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+
+  function renderNotificheAssenze() {
+    if (!notifList) return;
+
+    const lista = notifiche.filter(n => n.sezione === "assenze" && !n.letto);
+
+    notifList.innerHTML = "";
+
+    if (lista.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "small-text";
+      empty.textContent = "Non ci sono nuove notifiche sulle assenze.";
+      notifList.appendChild(empty);
+      return;
+    }
+
+    lista.forEach(n => {
+      const item = document.createElement("div");
+      item.className = "notif-item";
+
+      const header = document.createElement("div");
+      header.className = "notif-item-header";
+
+      const title = document.createElement("div");
+      title.className = "notif-item-title";
+      title.textContent = n.titolo;
+
+      const meta = document.createElement("div");
+      meta.className = "notif-item-meta";
+      meta.textContent = n.data;
+
+      header.appendChild(title);
+      header.appendChild(meta);
+
+      const body = document.createElement("div");
+      body.className = "notif-item-body";
+      body.textContent = n.testo;
+
+      const actionsRow = document.createElement("div");
+      actionsRow.style.marginTop = "6px";
+      actionsRow.style.display = "flex";
+      actionsRow.style.justifyContent = "flex-end";
+
+      const btnVista = document.createElement("button");
+      btnVista.className = "btn-primary small";
+      btnVista.textContent = "Presa visione";
+
+      btnVista.addEventListener("click", () => {
+        n.letto = true;
+        aggiornaBadgeAssenze();
+        renderNotificheAssenze();
+      });
+
+      actionsRow.appendChild(btnVista);
+
+      item.appendChild(header);
+      item.appendChild(body);
+      item.appendChild(actionsRow);
+
+      notifList.appendChild(item);
+    });
+  }
+  
   function showSection(section) {
     if (!section) return;
     // Nasconde tutte le sezioni principali
@@ -820,4 +926,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // ====== INIT ======
   initTurnoOggi();
   renderComunicazioni();
+  aggiornaBadgeAssenze();
 });
