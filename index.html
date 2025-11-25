@@ -1,17 +1,191 @@
-      <form id="loginForm" class="auth-form">
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Portale Farmacia Montesano</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- CSS e JS -->
+  <link rel="stylesheet" href="style.css" />
+  <script src="script.js" defer></script>
+
+  <!-- Icona app -->
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
+  <link rel="icon" type="image/png" href="logo.jpg">
+</head>
+
+<body>
+
+  <!-- ============================
+       SCHERMATA AUTENTICAZIONE
+       (LOGIN + REGISTRAZIONE)
+  ============================= -->
+  <div id="authContainer" class="auth-container">
+    <div class="auth-card">
+
+      <!-- Logo -->
+      <div class="auth-logo-wrap">
+        <img src="logo.jpg" alt="Farmacia Montesano" class="auth-logo" />
+      </div>
+
+      <h1 class="auth-title">Portale Farmacia Montesano</h1>
+      <p class="auth-subtitle-main">
+        Accesso interno per Farmacia, Titolare, Dipendenti e Clienti.
+      </p>
+
+      <!-- TAB ACCEDI / REGISTRATI -->
+      <div class="auth-mode-tabs">
+        <button class="auth-mode-tab active" data-mode="login">Accedi</button>
+        <button class="auth-mode-tab" data-mode="register">Registrati</button>
+      </div>
+
+      <!-- TAB RUOLO -->
+      <div class="auth-role-tabs">
+        <button class="auth-role-tab active" data-role="farmacia">Farmacia</button>
+        <button class="auth-role-tab" data-role="titolare">Titolare</button>
+        <button class="auth-role-tab" data-role="dipendente">Dipendente</button>
+        <button class="auth-role-tab" data-role="cliente">Cliente</button>
+      </div>
+
+      <p class="auth-current-role">
+        Accesso come: <span id="authRoleLabel">Farmacia</span>
+      </p>
+
+      <!-- ===== FORM LOGIN ===== -->
+      <form id="loginForm" class="auth-form auth-form-login">
         <div class="form-row">
-          <label>Username</label>
-          <input id="loginUsername" type="text" placeholder="Inserisci username" />
+          <label for="loginUsername">Username</label>
+          <input
+            id="loginUsername"
+            type="text"
+            placeholder="Inserisci username (o lascia vuoto per accesso demo)"
+          />
         </div>
 
         <div class="form-row">
-          <label>Password</label>
-          <input id="loginPassword" type="password" placeholder="Inserisci password" />
+          <label for="loginPassword">Password</label>
+          <input
+            id="loginPassword"
+            type="password"
+            placeholder="Inserisci password (o lascia vuoto)"
+          />
         </div>
 
         <button type="submit" class="btn-primary wide">Entra</button>
 
         <p class="login-hint">
-          Demo: qualunque username e password funzionano per ora.
+          Puoi entrare anche lasciando i campi vuoti (accesso demo generico).<br />
+          Se vuoi creare un utente vero, passa alla scheda <strong>Registrati</strong>.
         </p>
       </form>
+
+      <!-- ===== FORM REGISTRAZIONE ===== -->
+      <form id="registerForm" class="auth-form auth-form-register hidden">
+        <div class="form-row">
+          <label for="regFullName">Nome e cognome (opzionale)</label>
+          <input
+            id="regFullName"
+            type="text"
+            placeholder="Es. Mario Rossi"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="regRole">Ruolo</label>
+          <select id="regRole">
+            <option value="farmacia">Farmacia (generico)</option>
+            <option value="titolare">Titolare</option>
+            <option value="dipendente">Dipendente</option>
+            <option value="cliente">Cliente</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="regUsername">Username</label>
+          <input
+            id="regUsername"
+            type="text"
+            placeholder="Scegli un username"
+            required
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="regPassword">Password</label>
+          <input
+            id="regPassword"
+            type="password"
+            placeholder="Scegli una password"
+            required
+          />
+        </div>
+
+        <button type="submit" class="btn-primary wide">Registra utente</button>
+
+        <p id="registerFeedback" class="form-feedback hidden"></p>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ============================
+       APP PRINCIPALE (post-login)
+       (per ora solo base, senza card)
+  ============================= -->
+  <main id="app" class="app hidden">
+
+    <!-- SIDEBAR (la riempiremo dopo) -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo-row">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="sidebar-logo" />
+          <span class="sidebar-title">Portale interno</span>
+        </div>
+        <button id="closeSidebar" class="icon-button" aria-label="Chiudi menu">✕</button>
+      </div>
+
+      <ul class="sidebar-list">
+        <li data-nav="dashboard">Dashboard</li>
+        <!-- Qui in seguito aggiungeremo: Assenze, Turni, Comunicazioni, ecc. -->
+        <li id="logoutBtn" class="logout">Logout</li>
+      </ul>
+    </aside>
+
+    <!-- HAMBURGER MOBILE -->
+    <button id="hamburger" class="hamburger" aria-label="Apri menu">
+      ☰
+    </button>
+
+    <!-- DASHBOARD BASE (poi mettiamo le card colorate) -->
+    <section id="dashboard" class="dashboard">
+      <header class="dashboard-header">
+        <div class="dashboard-logo-block">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="dash-logo" />
+        </div>
+
+        <div class="dashboard-header-text">
+          <h1>Farmacia Montesano</h1>
+          <p class="header-subtitle">Portale interno</p>
+          <span id="currentRolePill" class="role-pill">
+            Accesso demo · Farmacia
+          </span>
+          <p class="header-user">
+            Utente: <span id="currentUserLabel">Demo</span>
+          </p>
+        </div>
+      </header>
+
+      <div class="dashboard-content">
+        <p class="welcome-text">
+          Benvenuto nel Portale interno.<br />
+          Qui inseriremo le <strong>card colorate</strong> per:
+          Titolare, Farmacia, Dipendenti e Clienti.<br />
+          Per ora stiamo solo costruendo bene <strong>login</strong> e
+          <strong>registrazione</strong>.
+        </p>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>
