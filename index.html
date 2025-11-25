@@ -2,157 +2,1473 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Portale Farmacia Montesano</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>Farmacia Montesano – Portale Professionale</title>
 
-  <!-- Stili -->
+  <!-- Descrizione per motori di ricerca / anteprima -->
+  <meta
+    name="description"
+    content="Portale Professionale Farmacia Montesano - accesso Titolare, Farmacia, Dipendenti e Clienti."
+  />
+
+  <!-- Collegamento al foglio di stile principale -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- Script -->
-  <script src="script.js" defer></script>
-
-  <!-- Icone -->
-  <link rel="icon" type="image/png" href="logo.jpg" />
-  <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg" />
 </head>
-
 <body>
-  <!-- ========= LOGIN / REGISTRAZIONE ========= -->
-  <div id="authContainer" class="auth-container">
-    <div class="auth-card">
-      <div class="auth-logo-wrap">
-        <!-- Metti il tuo logo qui -->
-        <img src="logo.jpg" alt="Farmacia Montesano" class="auth-logo" />
-      </div>
+  <!--
+    APP WRAPPER PRINCIPALE
+    Tutto il portale vive dentro questo contenitore.
+  -->
+  <div id="app">
 
-      <h1>Portale Farmacia Montesano</h1>
-      <p class="auth-subtitle-main">
-        Accesso interno per Farmacia, Titolare, Dipendenti e Clienti.
-      </p>
-
-      <!-- Tabs Accedi / Registrati -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-panel="loginPanel">Accedi</button>
-        <button class="auth-tab" data-panel="registerPanel">Registrati</button>
-      </div>
-
-      <!-- Selettore ruolo -->
-      <p class="auth-label">Seleziona il tipo di accesso</p>
-      <div class="role-tabs">
-        <button class="role-btn active" data-role="farmacia">Farmacia</button>
-        <button class="role-btn" data-role="titolare">Titolare</button>
-        <button class="role-btn" data-role="dipendente">Dipendente</button>
-        <button class="role-btn" data-role="cliente">Cliente</button>
-      </div>
-      <p class="auth-subtitle">
-        Accesso / Registrazione come: <span id="roleLabel">Farmacia</span>
-      </p>
-
-      <!-- ====== PANNELLO LOGIN ====== -->
-      <div id="loginPanel" class="auth-panel">
-        <form id="loginForm" class="auth-form">
-          <div class="form-row">
-            <label for="loginUsername">Username</label>
-            <input
-              id="loginUsername"
-              type="text"
-              placeholder="Inserisci username (o lascia vuoto per accesso demo)"
-            />
+    <!--
+      TOPBAR / NAVBAR SUPERIORE
+      - Logo + titolo
+      - Nome utente loggato
+      - Ruolo
+      - Pulsante Logout
+      La topbar è nascosta all'inizio e si mostra solo dopo il login.
+    -->
+    <header id="topbar" class="topbar hidden">
+      <div class="topbar-left">
+        <div class="topbar-logo">
+          <!-- Puoi sostituire questo testo con un <img> se vuoi il logo vero -->
+          <span class="topbar-logo-icon">💊</span>
+        </div>
+        <div class="topbar-titles">
+          <div class="topbar-title">
+            Farmacia Montesano – Portale Professionale
           </div>
-
-          <div class="form-row">
-            <label for="loginPassword">Password</label>
-            <input
-              id="loginPassword"
-              type="password"
-              placeholder="Inserisci password (o lascia vuoto)"
-            />
+          <div class="topbar-subtitle">
+            Area interna per Titolare, Farmacia, Dipendenti e Clienti
           </div>
-
-          <button type="submit" class="btn-primary wide">Entra</button>
-
-          <p class="login-hint">
-            Puoi entrare anche lasciando i campi vuoti: verrà creato un accesso
-            demo con il ruolo selezionato. Per utenti reali usa la scheda
-            <strong>Registrati</strong>.
-          </p>
-          <p id="loginError" class="form-error hidden"></p>
-        </form>
-      </div>
-
-      <!-- ====== PANNELLO REGISTRAZIONE ====== -->
-      <div id="registerPanel" class="auth-panel hidden">
-        <form id="registerForm" class="auth-form">
-          <div class="form-row">
-            <label for="registerUsername">Username</label>
-            <input
-              id="registerUsername"
-              type="text"
-              placeholder="Scegli uno username"
-              autocomplete="off"
-            />
-          </div>
-
-          <div class="form-row">
-            <label for="registerPassword">Password</label>
-            <input
-              id="registerPassword"
-              type="password"
-              placeholder="Scegli una password"
-            />
-          </div>
-
-          <button type="submit" class="btn-primary wide">Crea utente</button>
-
-          <p class="login-hint">
-            L'utente verrà registrato come
-            <strong><span id="registerRoleLabel">Farmacia</span></strong>.
-            In futuro il ruolo verrà gestito dal server, ma ora lo usiamo
-            in locale per testare il portale.
-          </p>
-          <p id="registerFeedback" class="form-feedback hidden"></p>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- ========= APP PRINCIPALE (DEMO) ========= -->
-  <main id="app" class="app hidden">
-    <header class="app-header">
-      <div class="app-header-left">
-        <img src="logo.jpg" alt="Farmacia Montesano" class="app-logo" />
-        <div>
-          <h2>Portale interno · Demo</h2>
-          <p id="currentUserLabel" class="app-user"></p>
         </div>
       </div>
-      <div class="app-header-right">
-        <span id="currentRolePill" class="role-pill">Ruolo</span>
-        <button id="logoutBtn" class="btn-secondary small">Logout</button>
+
+      <div class="topbar-right">
+        <div class="topbar-user">
+          <span id="topbarUserName">Ospite</span>
+          <span id="topbarUserRole" class="role-pill-small">Nessun ruolo</span>
+        </div>
+        <button id="btnLogout" class="btn-secondary small">
+          Logout
+        </button>
       </div>
     </header>
 
-    <section class="app-content">
-      <h3>Dashboard demo</h3>
-      <p class="app-text">
-        Sei entrato come <strong><span id="roleDescription"></span></strong>.
-      </p>
-      <p class="app-text">
-        Qui in seguito aggiungeremo le <strong>card colorate</strong> e le
-        funzioni specifiche per:
-      </p>
-      <ul class="app-list">
-        <li>Farmacia (vista generale)</li>
-        <li>Titolare (controllo completo, scadenze, cambio cassa…)</li>
-        <li>Dipendenti / Farmacisti (procedure, turni, assenze…)</li>
-        <li>Clienti (area dedicata, promemoria, documenti…)</li>
-      </ul>
+    <!-- CONTENUTO PRINCIPALE -->
+    <main id="mainContent">
 
-      <p class="app-text">
-        Per provare gli altri ruoli fai <strong>Logout</strong> e rientra:
-        puoi usare accesso demo (campi vuoti) o uno degli utenti registrati.
+      <!--
+        VIEW: SCHERMATA INIZIALE
+        - Titolo portale
+        - Descrizione
+        - Pulsanti "Login" e "Registrati"
+      -->
+      <section id="startView" class="view view-centered">
+        <div class="auth-card">
+          <h1 class="auth-title">
+            Portale Professionale<br />
+            <span>Farmacia Montesano</span>
+          </h1>
+          <p class="auth-intro">
+            Seleziona una delle opzioni per accedere o creare un nuovo account.
+          </p>
+
+          <div class="auth-buttons">
+            <button id="btnGoToLogin" class="btn-primary wide">
+              Accedi
+            </button>
+            <button id="btnGoToRegister" class="btn-secondary wide">
+              Registrati
+            </button>
+          </div>
+
+          <p class="auth-note">
+            Accesso disponibile per <strong>Titolare</strong>, <strong>Farmacia</strong>,
+            <strong>Dipendenti</strong> e <strong>Clienti</strong>.
+          </p>
+        </div>
+      </section>
+            <!--
+        VIEW: LOGIN
+        - Accesso con username/email + password
+        - Nessuna scelta esplicita del ruolo: lo capiamo dai dati salvati
+      -->
+      <section id="loginView" class="view view-centered hidden">
+        <div class="auth-card">
+          <button class="auth-back" data-go-view="startView">
+            ← Indietro
+          </button>
+
+          <h2 class="auth-title-small">Accedi al portale</h2>
+          <p class="auth-intro">
+            Inserisci le credenziali per accedere. Il sistema riconoscerà
+            automaticamente il tuo ruolo (Titolare, Farmacia, Dipendente o Cliente).
+          </p>
+
+          <form id="loginForm" class="auth-form">
+            <div class="form-row">
+              <label for="loginUsername">Email o username</label>
+              <input
+                type="text"
+                id="loginUsername"
+                autocomplete="username"
+                placeholder="es. mario.rossi oppure farmacia"
+                required
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="loginPassword">Password</label>
+              <input
+                type="password"
+                id="loginPassword"
+                autocomplete="current-password"
+                placeholder="Inserisci la password"
+                required
+              />
+            </div>
+
+            <div id="loginError" class="form-error hidden"></div>
+
+            <button type="submit" class="btn-primary wide">
+              Entra
+            </button>
+
+            <p class="auth-switch">
+              Non hai un account dipendente/cliente?
+              <button
+                type="button"
+                class="link-button"
+                data-go-view="registerView"
+              >
+                Registrati
+              </button>
+            </p>
+          </form>
+        </div>
+      </section>
+
+      <!--
+        VIEW: REGISTRAZIONE
+        - Permette di creare SOLO utenti Dipendente o Cliente
+        - Titolare e Farmacia esistono di default (script.js)
+      -->
+      <section id="registerView" class="view view-centered hidden">
+        <div class="auth-card">
+          <button class="auth-back" data-go-view="startView">
+            ← Indietro
+          </button>
+
+          <h2 class="auth-title-small">Crea un nuovo account</h2>
+          <p class="auth-intro">
+            Puoi registrarti come <strong>Dipendente</strong> oppure
+            come <strong>Cliente</strong>. Gli accessi <strong>Titolare</strong> e
+            <strong>Farmacia</strong> sono creati e gestiti direttamente dalla direzione.
+          </p>
+
+          <form id="registerForm" class="auth-form">
+            <div class="form-row">
+              <label for="registerRole">Tipo di account</label>
+              <select id="registerRole" required>
+                <option value="dipendente">Dipendente</option>
+                <option value="cliente">Cliente</option>
+              </select>
+            </div>
+
+            <div class="form-row form-row-inline">
+              <div>
+                <label for="registerNome">Nome</label>
+                <input
+                  type="text"
+                  id="registerNome"
+                  placeholder="Nome"
+                  required
+                />
+              </div>
+              <div>
+                <label for="registerCognome">Cognome</label>
+                <input
+                  type="text"
+                  id="registerCognome"
+                  placeholder="Cognome"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label for="registerUsername">Email / Username</label>
+              <input
+                type="text"
+                id="registerUsername"
+                placeholder="es. nome.cognome o indirizzo email"
+                required
+              />
+            </div>
+
+            <div class="form-row">
+              <label for="registerPassword">Password</label>
+              <input
+                type="password"
+                id="registerPassword"
+                placeholder="Minimo 6 caratteri"
+                required
+              />
+            </div>
+
+            <div id="registerError" class="form-error hidden"></div>
+            <div id="registerSuccess" class="form-success hidden"></div>
+
+            <button type="submit" class="btn-primary wide">
+              Registra account
+            </button>
+
+            <p class="auth-switch">
+              Hai già un account?
+              <button
+                type="button"
+                class="link-button"
+                data-go-view="loginView"
+              >
+                Vai al login
+              </button>
+            </p>
+          </form>
+        </div>
+      </section>
+            <!--
+        =========================================
+        DASHBOARD TITOLARE
+        =========================================
+      -->
+      <section
+        id="dashboardTitolare"
+        class="view view-dashboard hidden"
+        data-role-view="titolare"
+      >
+        <header class="dashboard-header">
+          <div>
+            <h2 class="dashboard-title">Dashboard Titolare</h2>
+            <p class="dashboard-subtitle">
+              Controllo completo su personale, turni, comunicazioni e logistica.
+            </p>
+          </div>
+          <div class="dashboard-badges">
+            <span class="badge role-badge">Titolare</span>
+            <span class="badge badge-accent" id="titolareFarmaciaNameBadge">
+              Farmacia Montesano
+            </span>
+          </div>
+        </header>
+
+        <!-- Griglia principale delle cards (3x3 su desktop) -->
+        <div class="cards-grid">
+          <!-- Card 1: Assenti oggi -->
+          <article
+            class="card card-assenze"
+            data-section-target="titolareAssenzeSection"
+          >
+            <div class="card-icon">👥</div>
+            <h3 class="card-title">Assenti oggi</h3>
+            <p class="card-text">
+              Elenco assenze del personale e gestione ferie/permessi.
+            </p>
+            <button class="card-action">Apri sezione</button>
+          </article>
+
+          <!-- Card 2: Farmacia di turno / appoggio -->
+          <article
+            class="card card-turno"
+            data-section-target="titolareTurniSection"
+          >
+            <div class="card-icon">🌙</div>
+            <h3 class="card-title">Farmacia di turno / appoggio</h3>
+            <p class="card-text">
+              Imposta farmacia di turno e farmacia di appoggio con indirizzo e telefono.
+            </p>
+            <button class="card-action">Gestisci turni</button>
+          </article>
+
+          <!-- Card 3: Comunicazioni -->
+          <article
+            class="card card-comunicazioni"
+            data-section-target="titolareComunicazioniSection"
+          >
+            <div class="card-icon">📢</div>
+            <h3 class="card-title">Comunicazioni interne</h3>
+            <p class="card-text">
+              Bacheca messaggi per tutto il personale in farmacia.
+            </p>
+            <button class="card-action">Apri bacheca</button>
+          </article>
+
+          <!-- Card 4: Procedure -->
+          <article
+            class="card card-procedure"
+            data-section-target="titolareProcedureSection"
+          >
+            <div class="card-icon">📋</div>
+            <h3 class="card-title">Procedure</h3>
+            <p class="card-text">
+              Elenco procedure interne aggiornabili dal Titolare.
+            </p>
+            <button class="card-action">Vai alle procedure</button>
+          </article>
+
+          <!-- Card 5: Arrivi -->
+          <article
+            class="card card-logistica"
+            data-section-target="titolareArriviSection"
+          >
+            <div class="card-icon">📦</div>
+            <h3 class="card-title">Arrivi / consegne</h3>
+            <p class="card-text">
+              Registra arrivi da grossista, espositori e materiale in consegna.
+            </p>
+            <button class="card-action">Segnala arrivo</button>
+          </article>
+
+          <!-- Card 6: Scadenze -->
+          <article
+            class="card card-scadenze"
+            data-section-target="titolareScadenzeSection"
+          >
+            <div class="card-icon">⏰</div>
+            <h3 class="card-title">Scadenze</h3>
+            <p class="card-text">
+              Elenco scadenze prodotti con evidenza di quelle a breve termine.
+            </p>
+            <button class="card-action">Gestisci scadenze</button>
+          </article>
+
+          <!-- Card 7: Scorte -->
+          <article
+            class="card card-scorte"
+            data-section-target="titolareScorteSection"
+          >
+            <div class="card-icon">📊</div>
+            <h3 class="card-title">Scorte interne</h3>
+            <p class="card-text">
+              Gestione scorte di servizio (bicchieri, rotoli, toner, ecc.).
+            </p>
+            <button class="card-action">Gestisci scorte</button>
+          </article>
+
+          <!-- Card 8: Cambio cassa -->
+          <article
+            class="card card-cassa"
+            data-section-target="titolareCassaSection"
+          >
+            <div class="card-icon">💶</div>
+            <h3 class="card-title">Cambio cassa</h3>
+            <p class="card-text">
+              Storico operazioni di cambio cassa e note sui turni.
+            </p>
+            <button class="card-action">Storico cambi</button>
+          </article>
+
+          <!-- Card 9: Archivio file -->
+          <article
+            class="card card-archivio"
+            data-section-target="titolareArchivioSection"
+          >
+            <div class="card-icon">📁</div>
+            <h3 class="card-title">Archivio file</h3>
+            <p class="card-text">
+              Elenco di file e documenti con categorie e link descrittivi.
+            </p>
+            <button class="card-action">Apri archivio</button>
+          </article>
+        </div>
+
+        <!-- Link testuali secondari (Impostazioni, Controlli, ecc.) -->
+        <div class="dashboard-links">
+          <button
+            class="link-button"
+            data-section-target="titolareSettingsSection"
+          >
+            ⚙️ Impostazioni Titolare
+          </button>
+          <button
+            class="link-button"
+            data-section-target="titolareControlliSection"
+          >
+            ✅ Controlli & report
+          </button>
+          <button
+            class="link-button"
+            data-section-target="titolareAltroSection"
+          >
+            ➕ Altro (future funzioni)
+          </button>
+        </div>
+      </section>
+
+      <!--
+        =========================================
+        DASHBOARD FARMACIA / DIPENDENTE
+        =========================================
+      -->
+      <section
+        id="dashboardFarmacia"
+        class="view view-dashboard hidden"
+        data-role-view="farmacia dipendente"
+      >
+        <header class="dashboard-header">
+          <div>
+            <h2 class="dashboard-title">Dashboard Farmacia</h2>
+            <p class="dashboard-subtitle">
+              Strumenti operativi per il lavoro quotidiano in farmacia.
+            </p>
+          </div>
+          <div class="dashboard-badges">
+            <span class="badge role-badge" id="farmaciaRoleBadge">
+              Farmacia
+            </span>
+            <span class="badge badge-accent" id="farmaciaUserBadge">
+              Utente
+            </span>
+          </div>
+        </header>
+
+        <div class="cards-grid">
+          <!-- Card 1: Assenti oggi (solo lettura) -->
+          <article
+            class="card card-assenze"
+            data-section-target="farmaciaAssenzeSection"
+          >
+            <div class="card-icon">👥</div>
+            <h3 class="card-title">Assenti oggi</h3>
+            <p class="card-text">
+              Visualizza chi è assente oggi (ferie, permessi, malattie).
+            </p>
+            <button class="card-action">Vedi elenco</button>
+          </article>
+
+          <!-- Card 2: Farmacia di turno / appoggio (lettura) -->
+          <article
+            class="card card-turno"
+            data-section-target="farmaciaTurniSection"
+          >
+            <div class="card-icon">🌙</div>
+            <h3 class="card-title">Farmacia di turno / appoggio</h3>
+            <p class="card-text">
+              Consulta i dati impostati dal Titolare (turno, appoggio, recapiti).
+            </p>
+            <button class="card-action">Visualizza turni</button>
+          </article>
+
+          <!-- Card 3: Comunicazioni -->
+          <article
+            class="card card-comunicazioni"
+            data-section-target="farmaciaComunicazioniSection"
+          >
+            <div class="card-icon">📢</div>
+            <h3 class="card-title">Comunicazioni interne</h3>
+            <p class="card-text">
+              Leggi messaggi della direzione ed eventuali note dei colleghi.
+            </p>
+            <button class="card-action">Apri bacheca</button>
+          </article>
+
+          <!-- Card 4: Procedure (solo lettura) -->
+          <article
+            class="card card-procedure"
+            data-section-target="farmaciaProcedureSection"
+          >
+            <div class="card-icon">📋</div>
+            <h3 class="card-title">Procedure</h3>
+            <p class="card-text">
+              Consulta le procedure operative aggiornate dal Titolare.
+            </p>
+            <button class="card-action">Vai alle procedure</button>
+          </article>
+
+          <!-- Card 5: Arrivi (segnalazione) -->
+          <article
+            class="card card-logistica"
+            data-section-target="farmaciaArriviSection"
+          >
+            <div class="card-icon">📦</div>
+            <h3 class="card-title">Arrivi / consegne</h3>
+            <p class="card-text">
+              Segnala nuovi arrivi (grossisti, espositori, materiali) e vedi lo storico.
+            </p>
+            <button class="card-action">Segnala arrivo</button>
+          </article>
+
+          <!-- Card 6: Scadenze -->
+          <article
+            class="card card-scadenze"
+            data-section-target="farmaciaScadenzeSection"
+          >
+            <div class="card-icon">⏰</div>
+            <h3 class="card-title">Scadenze</h3>
+            <p class="card-text">
+              Consulta le scadenze, aggiungi prodotti e visualizza lo storico.
+            </p>
+            <button class="card-action">Gestisci scadenze</button>
+          </article>
+
+          <!-- Card 7: Scorte (segnalazione) -->
+          <article
+            class="card card-scorte"
+            data-section-target="farmaciaScorteSection"
+          >
+            <div class="card-icon">📊</div>
+            <h3 class="card-title">Scorte interne</h3>
+            <p class="card-text">
+              Segnala prodotti di servizio in esaurimento (rotoli, bicchieri, ecc.).
+            </p>
+            <button class="card-action">Segnala scorta</button>
+          </article>
+
+          <!-- Card 8: Cambio cassa (segnalazione) -->
+          <article
+            class="card card-cassa"
+            data-section-target="farmaciaCassaSection"
+          >
+            <div class="card-icon">💶</div>
+            <h3 class="card-title">Cambio cassa</h3>
+            <p class="card-text">
+              Registra richieste di cambio cassa e info sui turni.
+            </p>
+            <button class="card-action">Segnala cambio</button>
+          </article>
+
+          <!-- Card 9: Archivio file -->
+          <article
+            class="card card-archivio"
+            data-section-target="farmaciaArchivioSection"
+          >
+            <div class="card-icon">📁</div>
+            <h3 class="card-title">Archivio file</h3>
+            <p class="card-text">
+              Accedi all’archivio documenti condiviso con il Titolare.
+            </p>
+            <button class="card-action">Apri archivio</button>
+          </article>
+        </div>
+      </section>
+
+      <!--
+        =========================================
+        DASHBOARD CLIENTE
+        =========================================
+      -->
+      <section
+        id="dashboardCliente"
+        class="view view-dashboard hidden"
+        data-role-view="cliente"
+      >
+        <header class="dashboard-header">
+          <div>
+            <h2 class="dashboard-title">Area Cliente</h2>
+            <p class="dashboard-subtitle">
+              Eventi, promozioni e informazioni utili della Farmacia Montesano.
+            </p>
+          </div>
+          <div class="dashboard-badges">
+            <span class="badge role-badge">Cliente</span>
+            <span class="badge badge-accent" id="clienteFarmaciaNameBadge">
+              Farmacia Montesano
+            </span>
+          </div>
+        </header>
+
+        <div class="cards-grid cards-grid-cliente">
+          <!-- Card Eventi -->
+          <article
+            class="card card-eventi"
+            data-section-target="clienteEventiSection"
+          >
+            <div class="card-icon">📅</div>
+            <h3 class="card-title">Eventi in farmacia</h3>
+            <p class="card-text">
+              Giornate screening, consulenze, promozioni speciali e altri eventi.
+            </p>
+            <button class="card-action">Vedi tutti gli eventi</button>
+          </article>
+
+          <!-- Card Promozioni -->
+          <article
+            class="card card-promo"
+            data-section-target="clientePromoSection"
+          >
+            <div class="card-icon">💚</div>
+            <h3 class="card-title">Promozioni attive</h3>
+            <p class="card-text">
+              Scopri le offerte del momento su prodotti selezionati.
+            </p>
+            <button class="card-action">Apri promozioni</button>
+          </article>
+
+          <!-- Card Farmacia di turno / appoggio -->
+          <article
+            class="card card-turno"
+            data-section-target="clienteTurniSection"
+          >
+            <div class="card-icon">🌙</div>
+            <h3 class="card-title">Farmacia di turno</h3>
+            <p class="card-text">
+              Informazioni aggiornate sulle farmacie di turno e di appoggio.
+            </p>
+            <button class="card-action">Vedi dettagli</button>
+          </article>
+        </div>
+      </section>
+            <!--
+        =========================================
+        SEZIONI DETTAGLIO – TITOLARE
+        =========================================
+      -->
+
+      <!-- Assenze – Titolare -->
+      <section
+        id="titolareAssenzeSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Assenze del personale</h2>
+            <p>Gestisci ferie, permessi, malattia e assenze varie.</p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Form nuova assenza -->
+          <div class="card section-card">
+            <h3>Aggiungi assenza</h3>
+            <form id="formAssenzaTitolare" class="form">
+              <div class="form-row">
+                <label for="assNome">Nome e cognome</label>
+                <input
+                  id="assNome"
+                  type="text"
+                  required
+                  placeholder="Es. Mario Rossi"
+                />
+              </div>
+              <div class="form-row">
+                <label for="assData">Data</label>
+                <input id="assData" type="date" required />
+              </div>
+              <div class="form-row">
+                <label for="assMotivo">Motivo</label>
+                <select id="assMotivo" required>
+                  <option value="">Seleziona motivo</option>
+                  <option value="ferie">Ferie</option>
+                  <option value="permesso">Permesso</option>
+                  <option value="malattia">Malattia</option>
+                  <option value="altro">Altro</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label for="assNote">Note (facoltative)</label>
+                <textarea
+                  id="assNote"
+                  rows="2"
+                  placeholder="Es. Permesso mezza giornata..."
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva assenza
+              </button>
+              <p class="form-feedback" id="assFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Tabella assenze -->
+          <div class="card section-card">
+            <h3>Assenti registrati</h3>
+            <p class="section-note">
+              I dati sono salvati solo su questo dispositivo (localStorage).
+            </p>
+            <div class="table-wrapper">
+              <table class="table" id="tabellaAssenze">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Data</th>
+                    <th>Motivo</th>
+                    <th>Note</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Righe generate da JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Farmacia di turno / appoggio – Titolare -->
+      <section
+        id="titolareTurniSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Farmacia di turno / appoggio</h2>
+            <p>
+              Imposta i dati che saranno visibili alla Farmacia, ai Dipendenti e
+              ai Clienti.
+            </p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Dati attuali -->
+          <div class="card section-card">
+            <h3>Dati attualmente in vigore</h3>
+            <div class="turno-box">
+              <h4>Farmacia di turno</h4>
+              <p id="turnoFarmaciaNome"></p>
+              <p id="turnoFarmaciaIndirizzo" class="muted"></p>
+              <p id="turnoFarmaciaTelefono" class="muted"></p>
+            </div>
+            <div class="divider"></div>
+            <div class="turno-box">
+              <h4>Farmacia di appoggio</h4>
+              <p id="appoggioFarmaciaNome"></p>
+              <p id="appoggioFarmaciaIndirizzo" class="muted"></p>
+              <p id="appoggioFarmaciaTelefono" class="muted"></p>
+            </div>
+          </div>
+
+          <!-- Form modifica -->
+          <div class="card section-card">
+            <h3>Modifica dati turno / appoggio</h3>
+            <form id="formTurniTitolare" class="form">
+              <h4>Farmacia di turno</h4>
+              <div class="form-row">
+                <label for="turnoNomeInput">Nome farmacia</label>
+                <input id="turnoNomeInput" type="text" required />
+              </div>
+              <div class="form-row">
+                <label for="turnoIndirizzoInput">Indirizzo</label>
+                <input id="turnoIndirizzoInput" type="text" required />
+              </div>
+              <div class="form-row">
+                <label for="turnoTelefonoInput">Telefono</label>
+                <input id="turnoTelefonoInput" type="tel" required />
+              </div>
+
+              <h4>Farmacia di appoggio</h4>
+              <div class="form-row">
+                <label for="appoggioNomeInput">Nome farmacia</label>
+                <input id="appoggioNomeInput" type="text" required />
+              </div>
+              <div class="form-row">
+                <label for="appoggioIndirizzoInput">Indirizzo</label>
+                <input id="appoggioIndirizzoInput" type="text" required />
+              </div>
+              <div class="form-row">
+                <label for="appoggioTelefonoInput">Telefono</label>
+                <input id="appoggioTelefonoInput" type="tel" required />
+              </div>
+
+              <button type="submit" class="btn-primary wide">
+                Salva impostazioni turno
+              </button>
+              <p class="form-feedback" id="turniFeedback"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comunicazioni – Titolare -->
+      <section
+        id="titolareComunicazioniSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Comunicazioni interne</h2>
+            <p>Bacheca messaggi visibile alla Farmacia, ai Dipendenti e al Titolare.</p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Nuova comunicazione -->
+          <div class="card section-card">
+            <h3>Nuova comunicazione</h3>
+            <form id="formComunicazioneTitolare" class="form">
+              <div class="form-row">
+                <label for="comTitolo">Titolo</label>
+                <input
+                  id="comTitolo"
+                  type="text"
+                  required
+                  placeholder="Es. Nuova procedura notturni"
+                />
+              </div>
+              <div class="form-row">
+                <label for="comTesto">Testo</label>
+                <textarea
+                  id="comTesto"
+                  rows="3"
+                  required
+                  placeholder="Scrivi qui il messaggio per la farmacia..."
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Pubblica comunicazione
+              </button>
+              <p class="form-feedback" id="comFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Elenco comunicazioni -->
+          <div class="card section-card">
+            <h3>Storico comunicazioni</h3>
+            <p class="section-note">
+              Le comunicazioni sono salvate in locale e visibili anche a Farmacia / Dipendenti.
+            </p>
+            <div class="com-list" id="comunicazioniList">
+              <!-- Elementi generati da JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Procedure – Titolare -->
+      <section
+        id="titolareProcedureSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Procedure interne</h2>
+            <p>
+              Gestisci procedure operative (cassa, magazzino, servizi, logistica, ecc.).
+            </p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Nuova procedura -->
+          <div class="card section-card">
+            <h3>Nuova procedura</h3>
+            <form id="formProceduraTitolare" class="form">
+              <div class="form-row">
+                <label for="procTitolo">Titolo</label>
+                <input
+                  id="procTitolo"
+                  type="text"
+                  required
+                  placeholder="Es. Chiusura cassa serale"
+                />
+              </div>
+              <div class="form-row">
+                <label for="procCategoria">Categoria</label>
+                <select id="procCategoria" required>
+                  <option value="">Seleziona categoria</option>
+                  <option value="cassa">Cassa / Banco</option>
+                  <option value="magazzino">Magazzino</option>
+                  <option value="servizi">Servizi</option>
+                  <option value="logistica">Logistica</option>
+                  <option value="altro">Altro</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label for="procTesto">Descrizione / Passaggi</label>
+                <textarea
+                  id="procTesto"
+                  rows="4"
+                  required
+                  placeholder="Es. 1) Verifica giacenza contanti.&#10;2) Stampa chiusura fiscale.&#10;3) Conta fondo cassa..."
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva procedura
+              </button>
+              <p class="form-feedback" id="procFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Elenco procedure -->
+          <div class="card section-card">
+            <h3>Elenco procedure</h3>
+            <div class="table-wrapper">
+              <table class="table" id="tabellaProcedure">
+                <thead>
+                  <tr>
+                    <th>Titolo</th>
+                    <th>Categoria</th>
+                    <th>Ultimo aggiornamento</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Righe da JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            <div id="proceduraDettaglio" class="procedura-dettaglio">
+              <!-- Dettaglio procedura selezionata -->
+            </div>
+          </div>
+        </div>
+      </section>
+            <!--
+        =========================================
+        SEZIONI DETTAGLIO – TITOLARE (ALTRE CARDS)
+        =========================================
+      -->
+
+      <!-- Arrivi – Titolare / Farmacia -->
+      <section
+        id="titolareArriviSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Arrivi corrieri / fornitori</h2>
+            <p>Segnala e consulta gli arrivi di colli, espositori e materiali.</p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Nuovo arrivo -->
+          <div class="card section-card">
+            <h3>Segnala nuovo arrivo</h3>
+            <form id="formArrivo" class="form">
+              <div class="form-row">
+                <label for="arrivoData">Data</label>
+                <input id="arrivoData" type="date" required />
+              </div>
+              <div class="form-row">
+                <label for="arrivoFornitore">Fornitore / corriere</label>
+                <input
+                  id="arrivoFornitore"
+                  type="text"
+                  required
+                  placeholder="Es. Unico, Alliance, DHL..."
+                />
+              </div>
+              <div class="form-row">
+                <label for="arrivoDescrizione">Descrizione arrivo</label>
+                <textarea
+                  id="arrivoDescrizione"
+                  rows="3"
+                  required
+                  placeholder="Es. Espositore Caudalie + ordine integratori..."
+                ></textarea>
+              </div>
+              <div class="form-row checkbox-row">
+                <label>
+                  <input id="arrivoUrgente" type="checkbox" />
+                  Segna come arrivo URGENTE
+                </label>
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva arrivo
+              </button>
+              <p class="form-feedback" id="arriviFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Storico arrivi -->
+          <div class="card section-card">
+            <h3>Storico arrivi</h3>
+            <p class="section-note">
+              Dipendenti e Farmacia possono aggiungere arrivi; il Titolare può
+              anche rivederli e, in futuro, con un server, esportarli.
+            </p>
+            <div class="table-wrapper">
+              <table class="table" id="tabellaArrivi">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Fornitore</th>
+                    <th>Descrizione</th>
+                    <th>Urgente</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Righe generate da JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scadenze – Titolare / Farmacia -->
+      <section
+        id="titolareScadenzeSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Scadenze prodotti</h2>
+            <p>
+              Gestisci le scadenze dei prodotti (anche non farmaci). Quelle entro 45
+              giorni si evidenziano in rosso.
+            </p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Nuova scadenza -->
+          <div class="card section-card">
+            <h3>Aggiungi scadenza</h3>
+            <form id="formScadenza" class="form">
+              <div class="form-row">
+                <label for="scadDescrizione">Descrizione prodotto</label>
+                <input
+                  id="scadDescrizione"
+                  type="text"
+                  required
+                  placeholder="Es. Fermenti lattici bambini 10 flaconi"
+                />
+              </div>
+              <div class="form-row">
+                <label for="scadData">Data scadenza</label>
+                <input id="scadData" type="date" required />
+              </div>
+              <div class="form-row">
+                <label for="scadNote">Note</label>
+                <textarea
+                  id="scadNote"
+                  rows="2"
+                  placeholder="Es. Da spostare in vetrina promo..."
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva scadenza
+              </button>
+              <p class="form-feedback" id="scadenzeFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Elenco scadenze -->
+          <div class="card section-card">
+            <h3>Elenco scadenze</h3>
+            <p class="section-note">
+              Le voci in scadenza entro 45 giorni sono evidenziate in rosso.
+            </p>
+            <div class="table-wrapper">
+              <table class="table" id="tabellaScadenze">
+                <thead>
+                  <tr>
+                    <th>Descrizione</th>
+                    <th>Data scadenza</th>
+                    <th>Giorni mancanti</th>
+                    <th>Note</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Righe generate da JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scorte – Titolare / Farmacia -->
+      <section
+        id="titolareScorteSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Scorte interne di servizio</h2>
+            <p>
+              Gestisci scorte di materiali interni (non medicinali): rotoli, bicchieri,
+              carta, toner, ecc.
+            </p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Nuova voce scorta -->
+          <div class="card section-card">
+            <h3>Aggiungi / modifica voce di scorta</h3>
+            <form id="formScorta" class="form">
+              <div class="form-row">
+                <label for="scortaNome">Nome prodotto / servizio</label>
+                <input
+                  id="scortaNome"
+                  type="text"
+                  required
+                  placeholder="Es. Rotoli POS, Bicchieri monouso..."
+                />
+              </div>
+              <div class="form-row">
+                <label for="scortaQuantita">Quantità attuale</label>
+                <input
+                  id="scortaQuantita"
+                  type="number"
+                  min="0"
+                  required
+                  placeholder="Es. 5"
+                />
+              </div>
+              <div class="form-row">
+                <label for="scortaMinimo">Livello minimo consigliato</label>
+                <input
+                  id="scortaMinimo"
+                  type="number"
+                  min="0"
+                  required
+                  placeholder="Es. 3"
+                />
+              </div>
+              <div class="form-row">
+                <label for="scortaNote">Note</label>
+                <textarea
+                  id="scortaNote"
+                  rows="2"
+                  placeholder="Es. Conservati nel magazzino in alto..."
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva scorta
+              </button>
+              <p class="form-feedback" id="scorteFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Elenco scorte -->
+          <div class="card section-card">
+            <h3>Elenco scorte</h3>
+            <p class="section-note">
+              Se la quantità è sotto il livello minimo, la riga viene evidenziata.
+              Dipendenti possono segnalare "Scorta bassa".
+            </p>
+            <div class="table-wrapper">
+              <table class="table" id="tabellaScorte">
+                <thead>
+                  <tr>
+                    <th>Prodotto</th>
+                    <th>Quantità</th>
+                    <th>Minimo</th>
+                    <th>Note</th>
+                    <th>Stato</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Righe da JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cambio cassa – Titolare / Farmacia -->
+      <section
+        id="titolareCambioCassaSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Cambio cassa</h2>
+            <p>
+              Registra le operazioni di cambio cassa (monete, banconote, fondi
+              cassa).
+            </p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Nuova operazione cambio cassa -->
+          <div class="card section-card">
+            <h3>Registra cambio cassa</h3>
+            <form id="formCambioCassa" class="form">
+              <div class="form-row">
+                <label for="cassaData">Data</label>
+                <input id="cassaData" type="date" required />
+              </div>
+              <div class="form-row">
+                <label for="cassaTurno">Turno</label>
+                <input
+                  id="cassaTurno"
+                  type="text"
+                  required
+                  placeholder="Es. Mattina, Pomeriggio, Notte..."
+                />
+              </div>
+              <div class="form-row">
+                <label for="cassaDettagli">Dettagli importi</label>
+                <textarea
+                  id="cassaDettagli"
+                  rows="3"
+                  placeholder="Es. +50€ monete 1€ / +40€ in banconote da 20€..."
+                ></textarea>
+              </div>
+              <div class="form-row">
+                <label for="cassaNote">Note</label>
+                <textarea
+                  id="cassaNote"
+                  rows="2"
+                  placeholder="Es. Richiesta da Banco 1, cambio per turno serale..."
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva operazione cambio cassa
+              </button>
+              <p class="form-feedback" id="cambioCassaFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Storico cambio cassa -->
+          <div class="card section-card">
+            <h3>Storico cambi cassa</h3>
+            <p class="section-note">
+              Dipendenti possono segnalare i cambi; il Titolare vede lo storico
+              completo.
+            </p>
+            <div class="table-wrapper">
+              <table class="table" id="tabellaCambioCassa">
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Turno</th>
+                    <th>Dettagli</th>
+                    <th>Note</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Righe da JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Archivio file – Titolare / Farmacia / Dipendenti -->
+      <section
+        id="titolareArchivioSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Archivio file</h2>
+            <p>
+              Elenco di file virtuali (solo descrizioni) salvati in localStorage:
+              link, note, categorie.
+            </p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Nuovo "file" -->
+          <div class="card section-card">
+            <h3>Aggiungi voce archivio</h3>
+            <form id="formArchivio" class="form">
+              <div class="form-row">
+                <label for="fileNome">Nome file</label>
+                <input
+                  id="fileNome"
+                  type="text"
+                  required
+                  placeholder="Es. Procedura notturni PDF"
+                />
+              </div>
+              <div class="form-row">
+                <label for="fileCategoria">Categoria</label>
+                <input
+                  id="fileCategoria"
+                  type="text"
+                  placeholder="Es. Procedure, Contratti, Scansioni..."
+                />
+              </div>
+              <div class="form-row">
+                <label for="fileLink">Link esterno (facoltativo)</label>
+                <input
+                  id="fileLink"
+                  type="url"
+                  placeholder="Es. https://..."
+                />
+              </div>
+              <div class="form-row">
+                <label for="fileDescrizione">Descrizione</label>
+                <textarea
+                  id="fileDescrizione"
+                  rows="3"
+                  placeholder="Es. File archiviato sul server principale..."
+                ></textarea>
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva voce archivio
+              </button>
+              <p class="form-feedback" id="archivioFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Elenco archivio -->
+          <div class="card section-card">
+            <h3>Elenco archivio</h3>
+            <div class="table-wrapper">
+              <table class="table" id="tabellaArchivio">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>Categoria</th>
+                    <th>Descrizione</th>
+                    <th>Link</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Righe da JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Impostazioni Titolare -->
+      <section
+        id="titolareImpostazioniSection"
+        class="view view-section hidden"
+        data-owner="titolare"
+      >
+        <header class="section-header">
+          <button class="back-button" data-go-dashboard="titolare">
+            ⬅ Torna alla Dashboard Titolare
+          </button>
+          <div>
+            <h2>Impostazioni Titolare</h2>
+            <p>Gestisci credenziali Titolare e dati principali della Farmacia.</p>
+          </div>
+        </header>
+
+        <div class="section-grid">
+          <!-- Credenziali Titolare -->
+          <div class="card section-card">
+            <h3>Credenziali Titolare</h3>
+            <form id="formImpostazioniTitolare" class="form">
+              <div class="form-row">
+                <label for="impUserTitolare">Username Titolare</label>
+                <input
+                  id="impUserTitolare"
+                  type="text"
+                  required
+                  placeholder="Es. titolare"
+                />
+              </div>
+              <div class="form-row">
+                <label for="impPassTitolare">Nuova password</label>
+                <input
+                  id="impPassTitolare"
+                  type="password"
+                  placeholder="Lascia vuoto per non cambiare"
+                />
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva credenziali
+              </button>
+              <p class="form-feedback" id="impTitolareFeedback"></p>
+            </form>
+          </div>
+
+          <!-- Dati Farmacia -->
+          <div class="card section-card">
+            <h3>Dati principali della Farmacia</h3>
+            <form id="formImpostazioniFarmacia" class="form">
+              <div class="form-row">
+                <label for="impNomeFarmacia">Nome farmacia</label>
+                <input
+                  id="impNomeFarmacia"
+                  type="text"
+                  required
+                  placeholder="Es. Farmacia Montesano"
+                />
+              </div>
+              <div class="form-row">
+                <label for="impIndirizzoFarmacia">Indirizzo</label>
+                <input
+                  id="impIndirizzoFarmacia"
+                  type="text"
+                  required
+                  placeholder="Via..., città..."
+                />
+              </div>
+              <div class="form-row">
+                <label for="impTelefonoFarmacia">Telefono</label>
+                <input id="impTelefonoFarmacia" type="tel" required />
+              </div>
+              <button type="submit" class="btn-primary wide">
+                Salva dati farmacia
+              </button>
+              <p class="form-feedback" id="impFarmaciaFeedback"></p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!--
+        =========================================
+        FINE SEZIONI
+        =========================================
+      -->
+    </main>
+
+    <!-- ============================
+         FOOTER SEMPLICE
+    ============================= -->
+    <footer class="main-footer">
+      <p>
+        Farmacia Montesano – Portale Professionale · Demo locale senza server
+        (localStorage)
       </p>
-    </section>
-  </main>
-</body>
+    </footer>
+
+    <!-- Script principale -->
+    <script src="script.js"></script>
+  </body>
 </html>
