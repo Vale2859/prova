@@ -1652,3 +1652,11 @@ button {
     opacity: 0;
   }
 }
+/* ====== RUOLI (VISIBILITÀ ELEMENTI) ====== */
+
+.role-titolare-only,
+.role-farmacia-only,
+.role-dipendente-only,
+.role-cliente-only {
+  display: none;
+}
