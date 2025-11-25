@@ -1,0 +1,1440 @@
+/* ============================================================
+   RESET + BASE
+============================================================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    height: 100%;
+    background: #f5f5f5;
+    font-family: "Inter", sans-serif;
+    color: #333;
+    overflow-x: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+ul, li {
+    list-style: none;
+}
+
+/* ============================================================
+   BOTTONI BASE
+============================================================ */
+.primary-btn {
+    background: #167f93;
+    padding: 12px 18px;
+    color: #fff;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.primary-btn:hover {
+    background: #0f6372;
+}
+
+.secondary-btn {
+    background: #ddd;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    color: #333;
+    cursor: pointer;
+}
+
+.back-btn {
+    background: #eee;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    margin-bottom: 15px;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+/* ============================================================
+   LOGIN PAGE
+============================================================ */
+.auth-container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+}
+
+.auth-card {
+    background: #fff;
+    width: 100%;
+    max-width: 420px;
+    padding: 30px 25px;
+    border-radius: 18px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    text-align: center;
+}
+
+.auth-logo-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.auth-logo {
+    width: 120px;
+    height: auto;
+}
+
+.auth-intro {
+    margin: 10px 0 20px;
+    font-size: 15px;
+    color: #555;
+    line-height: 20px;
+}
+
+.auth-tabs {
+    display: flex;
+    background: #e8e8e8;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.auth-tab.active {
+    background: #167f93;
+    color: #fff;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.login-hint {
+    margin-top: 12px;
+    color: #777;
+    font-size: 14px;
+}
+/* ============================================================
+   APP CONTAINER & LAYOUT
+============================================================ */
+.app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Pagina generica */
+.page {
+    padding: 15px;
+}
+
+.page-section {
+    max-width: 1100px;
+    margin: 0 auto 30px;
+}
+
+/* Titolo pagina */
+.page-title {
+    font-size: 22px;
+    margin-bottom: 18px;
+    font-weight: 700;
+}
+
+/* Testi piccoli / note */
+.small-text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #555;
+}
+
+.small-text.muted {
+    color: #888;
+}
+
+/* Feedback (success / error) */
+.feedback {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.feedback.success {
+    background: #e3f8ea;
+    color: #256b3f;
+}
+
+.feedback.error {
+    background: #fde8e8;
+    color: #b42318;
+}
+
+/* Divider generica */
+.divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 10px 0 15px;
+}
+
+/* ============================================================
+   HEADER SUPERIORE
+============================================================ */
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-logo img {
+    height: 40px;
+    width: auto;
+}
+
+.header-role {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+/* Pillolo ruolo */
+.role-pill {
+    background: #167f93;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Hamburger */
+.hamburger {
+    background: #167f93;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    width: 40px;
+    height: 36px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* ============================================================
+   SIDEBAR
+============================================================ */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -270px;
+    width: 260px;
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.15);
+    z-index: 100;
+    padding: 12px 12px 20px;
+    display: flex;
+    flex-direction: column;
+    transition: left 0.25s ease;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.sidebar-logo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sidebar-logo {
+    height: 32px;
+    width: auto;
+}
+
+.sidebar-title {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.icon-button {
+    border: none;
+    background: #eee;
+    border-radius: 999px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
+/* Lista voci sidebar */
+.sidebar-list {
+    margin-top: 10px;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.sidebar-list li {
+    padding: 10px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+.sidebar-list li:hover {
+    background: #f0f8fa;
+}
+
+.sidebar-list li[data-nav="dashboard"] {
+    font-weight: 600;
+}
+
+/* Etichetta sezione */
+.divider-label {
+    margin-top: 12px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #999;
+}
+
+/* Bottone logout */
+.logout-btn {
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* ============================================================
+   DASHBOARD – HEADER
+============================================================ */
+.dashboard-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+    margin-top: 10px;
+}
+
+.dashboard-logo-block {
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dashboard-logo-block img {
+    height: 60px;
+    width: auto;
+}
+
+.dashboard-header-text h1 {
+    font-size: 22px;
+    margin-bottom: 2px;
+}
+
+.header-subtitle {
+    font-size: 14px;
+    color: #777;
+}
+
+/* Duplicate role pill nella dashboard */
+#currentRolePillDuplicate {
+    margin-top: 6px;
+}
+
+/* ============================================================
+   DASHBOARD – CARDS GRID
+============================================================ */
+.cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+/* su tablet / desktop */
+@media (min-width: 720px) {
+    .cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .cards-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* Card generica */
+.card {
+    position: relative;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 14px 14px 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* Header card */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+.card-title-group h2 {
+    font-size: 17px;
+    margin-bottom: 2px;
+}
+
+/* Chip */
+.chip {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    background: #eef2ff;
+    color: #3730a3;
+}
+
+.chip-today {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.chip-turno {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.card-body {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #555;
+}
+
+/* Colorazioni specifiche delle card (leggero bordo sinistro) */
+.card-assenze {
+    border-left: 4px solid #22c55e;
+}
+.card-turno {
+    border-left: 4px solid #0ea5e9;
+}
+.card-comunicazioni {
+    border-left: 4px solid #f97316;
+}
+.card-procedure {
+    border-left: 4px solid #6366f1;
+}
+.card-archivio {
+    border-left: 4px solid #a855f7;
+}
+
+/* ============================================================
+   PALLINI NOTIFICHE CARD
+============================================================ */
+.card-badge {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 12px;
+    display: none;            /* default: nascosto */
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.card-badge.has-unread {
+    display: flex;
+}
+
+.badge-count {
+    line-height: 1;
+}
+
+/* Etichetta "Nuovo / Nuovi" sotto il pallino */
+.card-badge-label {
+    position: absolute;
+    top: 32px;
+    right: 10px;
+    font-size: 11px;
+    color: #b91c1c;
+    background: #fee2e2;
+    padding: 1px 6px;
+    border-radius: 999px;
+    display: none;
+}
+
+/* bottone piccolo per overlay notifiche */
+.primary-btn.small {
+    padding: 8px 12px;
+    font-size: 13px;
+    width: auto;
+}
+/* ============================================================
+   BOTTONI "TORNA ALLA DASHBOARD"
+============================================================ */
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 14px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid #e0e0e0;
+    background: #f9fafb;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    background: #f3f4f6;
+}
+
+/* ============================================================
+   PAGINA ASSENZE
+============================================================ */
+#assenzePage {
+    /* già centrata come le altre page-section */
+}
+
+.assenze-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 480px;
+    background: #ffffff;
+    padding: 14px;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.assenze-form label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.assenze-input {
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    width: 100%;
+}
+
+.assenze-input:focus {
+    outline: none;
+    border-color: #167f93;
+    box-shadow: 0 0 0 1px rgba(22,127,147,0.25);
+}
+
+.assenze-form textarea.assenze-input {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* feedback assenze */
+#assenzeFeedback {
+    margin-top: 12px;
+}
+
+/* ============================================================
+   PAGINA TURNI
+============================================================ */
+#turniPage {
+    /* stile base ereditato da .page-section */
+}
+
+/* Tabs Oggi / Settimana / Mese */
+.turni-tabs {
+    display: inline-flex;
+    border-radius: 999px;
+    background: #f3f4f6;
+    padding: 4px;
+    margin-bottom: 12px;
+    gap: 4px;
+}
+
+.turni-tab {
+    border: none;
+    background: transparent;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.turni-tab.active {
+    background: #167f93;
+    color: #fff;
+}
+
+/* Filtri (select mese / farmacia) */
+.turni-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.turni-filters select {
+    border: 1px solid #d4d4d4;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+/* Tabella turni (struttura a righe flex) */
+.turni-table {
+    margin-top: 8px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    padding: 8px 8px 4px;
+}
+
+/* Riga singola */
+.turni-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1.3fr 1.5fr 1.5fr 1.2fr 1.4fr;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 4px;
+    font-size: 13px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.turni-row:last-child {
+    border-bottom: none;
+}
+
+/* Adattamento mobile: meno colonne visibili / più altezza */
+@media (max-width: 720px) {
+    .turni-row {
+        grid-template-columns: 1.4fr 1.6fr 1.6fr;
+        grid-template-rows: auto auto;
+        row-gap: 3px;
+    }
+
+    .turni-row span:nth-child(3),
+    .turni-row span:nth-child(4),
+    .turni-row span:nth-child(5),
+    .turni-row span:nth-child(6) {
+        font-size: 12px;
+    }
+
+    .turni-row span:nth-child(3),
+    .turni-row span:nth-child(4),
+    .turni-row span:nth-child(5),
+    .turni-row span:nth-child(6) {
+        grid-column: span 3;
+    }
+}
+
+/* Pill tipo turno (note) */
+.turno-type-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.turno-type-pill.notturno {
+    background: #1e293b;
+    color: #f9fafb;
+}
+
+.turno-type-pill.festivo {
+    background: #f97316;
+    color: #fff7ed;
+}
+
+/* ============================================================
+   PAGINA COMUNICAZIONI – FILTRI & LISTA
+============================================================ */
+#comunicazioniPage {
+    /* page-section come le altre */
+}
+
+/* Filtri alto */
+.com-filters {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.com-filters select {
+    border: 1px solid #d4d4d4;
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+.checkbox-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+/* Lista comunicazioni */
+.com-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+/* Card comunicazione singola */
+.com-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 10px 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Pill categoria (urgente / importante / informativa) */
+.com-pill {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.com-pill.urgente {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.com-pill.importante {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.com-pill.informativa {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+/* Titolo & meta */
+.com-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.com-meta {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+/* Testo */
+.com-text {
+    font-size: 14px;
+    color: #374151;
+}
+
+/* ============================================================
+   FORM NUOVA COMUNICAZIONE
+============================================================ */
+.form-title {
+    font-size: 17px;
+    margin: 16px 0 8px;
+    font-weight: 700;
+}
+
+.com-form {
+    max-width: 520px;
+    background: #ffffff;
+    padding: 12px 14px 14px;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.com-form label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.com-input {
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 7px 10px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.com-input:focus {
+    outline: none;
+    border-color: #167f93;
+    box-shadow: 0 0 0 1px rgba(22,127,147,0.25);
+}
+
+.com-form textarea.com-input {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Badge riepilogo comunicazioni */
+.com-badges {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.com-badge {
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #f3f4f6;
+}
+/* ============================================================
+   PAGINA PROCEDURE
+============================================================ */
+#procedurePage {
+    /* stile base da .page-section */
+}
+
+/* Barra di ricerca */
+.proc-search {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 999px;
+    border: 1px solid #d4d4d4;
+    padding: 7px 12px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-family: inherit;
+}
+
+.proc-search:focus {
+    outline: none;
+    border-color: #167f93;
+    box-shadow: 0 0 0 1px rgba(22,127,147,0.25);
+}
+
+/* Bottoni filtro reparto */
+.proc-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.proc-filter-btn {
+    border-radius: 999px;
+    border: 1px solid #d4d4d4;
+    background: #f9fafb;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.proc-filter-btn.active {
+    background: #167f93;
+    color: #ffffff;
+    border-color: #167f93;
+}
+
+/* Lista procedure a sinistra */
+.proc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+/* Item singolo */
+.proc-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+    cursor: pointer;
+}
+
+.proc-item-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+/* Titolo procedura */
+.proc-item-title {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Meta (reparto + data) */
+.proc-item-meta {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* Tag "Apri" */
+.proc-tag {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4338ca;
+    white-space: nowrap;
+}
+
+/* Dettaglio procedura a destra / in basso */
+.proc-detail {
+    margin-top: 6px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
+    font-size: 14px;
+}
+
+.proc-detail h3 {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.proc-detail p {
+    margin-bottom: 4px;
+}
+
+.proc-detail .divider {
+    height: 1px;
+    background: #e5e7eb;
+    margin: 8px 0 6px;
+}
+
+/* Layout responsive procedure (lista + dettaglio) */
+@media (min-width: 880px) {
+    #procedurePage {
+        display: grid;
+        grid-template-columns: minmax(260px, 320px) minmax(320px, 1fr);
+        grid-auto-rows: auto;
+        column-gap: 16px;
+        align-items: flex-start;
+    }
+
+    #procedurePage > .back-btn {
+        grid-column: 1 / -1;
+    }
+
+    #procedurePage > .page-title {
+        grid-column: 1 / -1;
+    }
+
+    #procedurePage > .proc-search,
+    #procedurePage > .proc-filter-row,
+    #procedureList {
+        grid-column: 1 / 2;
+    }
+
+    #procedureDetail {
+        grid-column: 2 / 3;
+        margin-top: 36px;
+    }
+}
+
+/* ============================================================
+   PAGINA ARCHIVIO FILE
+============================================================ */
+#archivioPage {
+    /* base .page-section */
+}
+
+/* Intestazione percorso */
+.archivio-header {
+    margin-bottom: 6px;
+}
+
+.archivio-path {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #4338ca;
+}
+
+/* Barra comandi sopra i file */
+.archivio-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 12px;
+}
+
+.archivio-btn {
+    border-radius: 999px;
+    border: 1px solid #d4d4d4;
+    background: #f9fafb;
+    padding: 6px 11px;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.archivio-btn:hover {
+    background: #f3f4f6;
+}
+
+.archivio-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* Griglia file & cartelle */
+.archivio-grid {
+    min-height: 120px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    padding: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+}
+
+/* Item singolo (icona + nome) */
+.file-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 6px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.file-item:hover {
+    background: #f5f5f5;
+}
+
+/* Selezionato */
+.file-item.selected {
+    border-color: #167f93;
+    background: #ecfeff;
+    box-shadow: 0 0 0 1px rgba(22,127,147,0.4);
+}
+
+/* Icona file/cartella */
+.file-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+}
+
+/* Varianti icona (solo come classi per eventuali colori futuri) */
+.file-icon.folder {
+    background: #eff6ff;
+}
+
+.file-icon.pdf {
+    background: #fee2e2;
+}
+
+.file-icon.image {
+    background: #fef3c7;
+}
+
+.file-icon.word {
+    background: #e0f2fe;
+}
+
+.file-icon.txt {
+    background: #e5e7eb;
+}
+
+/* Nome file */
+.file-name {
+    font-size: 12px;
+    text-align: center;
+    word-break: break-word;
+}
+
+/* Stato vuoto archivio */
+.archivio-grid .small-text {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Mobile: griglia più larga a 2 colonne minime */
+@media (max-width: 540px) {
+    .archivio-grid {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    }
+}
+
+/* ============================================================
+   MENU CONTESTUALE (TASTO DESTRO ARCHIVIO)
+============================================================ */
+.context-menu {
+    position: fixed;
+    z-index: 9999;
+    min-width: 160px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(15,23,42,0.2);
+    padding: 4px 0;
+    font-size: 13px;
+}
+
+.context-item {
+    padding: 7px 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.context-item:hover {
+    background: #f3f4f6;
+}
+
+/* Nascondi via JS con .hidden (già definita prima) */
+/* ============================================================
+   PAGINA TITOLARE (PAPÀ)
+============================================================ */
+#titolarePage {
+    /* page-section già applicato */
+}
+
+.titolare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.titolare-card {
+    background: #ffffff;
+    padding: 14px;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: transform 0.12s ease;
+}
+
+.titolare-card:hover {
+    transform: translateY(-2px);
+}
+
+.titolare-card-icon {
+    font-size: 26px;
+}
+
+.titolare-card-title {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* ============================================================
+   ADMIN PANEL
+============================================================ */
+#adminPanel {
+    /* base page-section */
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.admin-tab {
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    border: 1px solid #d4d4d4;
+    background: #f9fafb;
+    cursor: pointer;
+}
+
+.admin-tab.active {
+    background: #167f93;
+    color: #ffffff;
+    border-color: #167f93;
+}
+
+/* contenuto admin */
+#adminContent {
+    background: #ffffff;
+    padding: 14px 16px;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.admin-block {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-block:last-child {
+    border-bottom: none;
+}
+
+.admin-block h4 {
+    font-size: 15px;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+
+.admin-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+/* Pulsanti admin */
+.admin-btn {
+    padding: 6px 12px;
+    border-radius: 10px;
+    background: #167f93;
+    color: #ffffff;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+}
+
+.admin-btn.small {
+    padding: 4px 10px;
+}
+
+.admin-btn.danger {
+    background: #b91c1c;
+}
+
+/* ============================================================
+   OVERLAY NOTIFICHE
+============================================================ */
+#notificationOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.notif-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+}
+
+.notif-panel {
+    position: relative;
+    background: #ffffff;
+    width: 100%;
+    max-width: 520px;
+    border-radius: 20px 20px 0 0;
+    padding: 18px 16px 20px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.15);
+    z-index: 10;
+}
+
+.notif-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.notif-intro {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
+
+.notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.notif-item {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.notif-item h3 {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.notif-item p {
+    font-size: 13px;
+}
+
+/* bottone chiudi fondo */
+.notif-close-bottom {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-top: 14px;
+    font-size: 13px;
+    padding: 8px 0;
+    background: #e5e7eb;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+/* ============================================================
+   MODALITÀ PAPÀ (ZOOM & HIGH CONTRAST)
+============================================================ */
+
+/* Zoom testo + elementi */
+.zoom-papa {
+    font-size: 18px !important;
+}
+
+.zoom-papa .card-title,
+.zoom-papa .titolare-card-title,
+.zoom-papa button,
+.zoom-papa input,
+.zoom-papa select {
+    font-size: 18px !important;
+}
+
+/* High contrast */
+.high-contrast {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+.high-contrast * {
+    background: #000 !important;
+    color: #fff !important;
+    border-color: #fff !important;
+}
+
+/* Adatta card & pulsanti */
+.high-contrast .card,
+.high-contrast .titolare-card,
+.high-contrast .admin-btn {
+    box-shadow: none !important;
+    border: 1px solid #fff !important;
+}
+
+/* Overlay notifiche in high contrast */
+.high-contrast #notificationOverlay .notif-panel {
+    background: #000 !important;
+    border: 1px solid #fff;
+}
