@@ -1333,7 +1333,7 @@ ul, li {
     background: rgba(0,0,0,0.45);
 }
 
-.notif-panel {
+.notif-modal {
     position: relative;
     background: #ffffff;
     width: 100%;
