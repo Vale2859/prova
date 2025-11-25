@@ -1,76 +1,72 @@
-// ======================================================
-// PORTALE COMPLETO FARMACIA MONTESANO – SCRIPT COMPLETO
-// Versione: 3.1 (Titolare & Admin attivi)
-// ======================================================
+/* ============================================================
+   PORTALE FARMACIA MONTESANO
+   SCRIPT COMPLETO – PARTE 1/7
+   Ruoli: Titolare · Farmacia · Dipendente · Cliente
+   ============================================================ */
 
-const APP_VERSION = "3.1";
+/* -----------------------------------------------
+   VARIABILI GLOBALI
+------------------------------------------------ */
+let currentRole = "farmacia";
 
-if (!localStorage.getItem("app_version")) {
-    localStorage.setItem("app_version", APP_VERSION);
-} else {
-    const saved = localStorage.getItem("app_version");
-    if (saved !== APP_VERSION) {
-        console.log("Nuova versione disponibile:", APP_VERSION);
+/* Elementi login */
+let authContainer, loginForm, loginRoleLabel;
+
+/* Elementi app */
+let app, sidebar, hamburger, closeSidebar;
+let dashboardSection, assenzePage, turniPage, comunicazioniPage, procedurePage, archivioPage;
+
+/* Dashboard – card */
+let cardAssenze, cardTurno, cardComunicazioni, cardProcedure;
+let cardLogistica, cardMagazziniera, cardCassa, cardArchivio;
+
+/* Sidebar – voci */
+let navAssenze, navTurni, navComunicazioni, navProcedure, navArchivio;
+
+/* Dashboard – elementi specifici */
+let assenzeTitle, openComunicazioniBtn, btnApriPopupComunica;
+let openAssenzeBtn;
+let turnoNome, turnoIndirizzo, turnoAppoggio, turnoOrario;
+
+/* Mini calendario card assenze */
+let miniCalButtons, miniCalInfo;
+
+/* Popup notifiche */
+let notifOverlay, notifClose, notifCloseBottom, notifTitle, notifIntro, notifList;
+
+/* Popup comunicazione rapida */
+let comunicaOverlay, comunicaClose, comunicaPopupForm, comunicaPopupFeedback;
+
+/* Archivio file */
+let archivioGrid, archivioPathLabel, archivioUp, archivioNewFolder;
+let archivioUpload, archivioBtnUpload;
+
+/* Variabili archivio (demo) */
+let archivioPercorso = ["/root"];
+let archivioStruttura = {
+  "/root": {
+    type: "folder",
+    children: {
+      "Documenti": { type: "folder", children: {} },
+      "Promemoria.txt": { type: "txt" },
+      "Fornitori.pdf": { type: "pdf" }
     }
-}
-
-// ======================================================
-// DATI DI BASE (demo)
-// ======================================================
-
-// TABELLA TURNI
-const turniFarmacie = [
-  {
-    data: "2025-12-17",
-    orario: "00:00 – 24:00",
-    principale: "Farmacia Montesano",
-    appoggio: "Farmacia Centrale",
-    telefono: "0835 335921",
-    note: "Turno completo",
-    tipoRange: "oggi",
-    mese: 12
-  },
-  {
-    data: "2025-12-18",
-    orario: "08:00 – 20:00",
-    principale: "Farmacia Centrale",
-    appoggio: "Farmacia Montesano",
-    telefono: "0835 111111",
-    note: "Diurno",
-    tipoRange: "settimana",
-    mese: 12
-  },
-  {
-    data: "2025-12-19",
-    orario: "20:00 – 08:00",
-    principale: "Farmacia Madonna delle Grazie",
-    appoggio: "Farmacia Montesano",
-    telefono: "0835 222222",
-    note: "Notturno",
-    tipoRange: "settimana",
-    mese: 12
-  },
-  {
-    data: "2025-12-24",
-    orario: "00:00 – 24:00",
-    principale: "Farmacia Montesano",
-    appoggio: "Farmacia Centrale",
-    telefono: "0835 000000",
-    note: "Vigilia di Natale",
-    tipoRange: "mese",
-    mese: 12
   }
-];
+};
 
-// COMUNICAZIONI
+/* ------------------------------------------------
+   DATI DEMO – Comunicazioni, Assenze, Arrivi, Scadenze
+--------------------------------------------------- */
+
+/* Comunicazioni DEMO */
 let comunicazioni = [
   {
     id: 1,
     titolo: "Nuova procedura notturni",
     categoria: "urgente",
-    autore: "Titolare",
+    autore: "Direzione",
     data: "Oggi",
-    testo: "Seguire la nuova check-list di chiusura farmacia.",
+    testo: "Aggiornata gestione turni notturni (demo)",
     letta: false
   },
   {
@@ -79,1587 +75,258 @@ let comunicazioni = [
     categoria: "importante",
     autore: "Titolare",
     data: "Ieri",
-    testo: "Controllare giacenze e scadenze entro fine settimana.",
+    testo: "Controllare registro stupefacenti entro fine turno.",
     letta: false
-  },
-  {
-    id: 3,
-    titolo: "Aggiornamento promo vetrina",
-    categoria: "informativa",
-    autore: "Admin",
-    data: "2 giorni fa",
-    testo: "Nuova esposizione prodotti stagionali.",
-    letta: true
   }
 ];
 
-// PROCEDURE
-const procedureData = [
-  {
-    id: "proc1",
-    titolo: "Chiusura cassa serale",
-    reparto: "cassa",
-    aggiornamento: "12/11/2025",
-    testo: "1) Verifica giacenza contanti.\n2) Stampa chiusura fiscale.\n3) Conta fondo cassa."
-  },
-  {
-    id: "proc2",
-    titolo: "Gestione buoni SSN",
-    reparto: "cassa",
-    aggiornamento: "05/10/2025",
-    testo: "Controllare ricetta, inserire dati paziente, allegare scontrino."
-  },
-  {
-    id: "proc3",
-    titolo: "Ricezione merce",
-    reparto: "magazzino",
-    aggiornamento: "22/09/2025",
-    testo: "Controllo colli, verifica scadenze, etichettatura, carico."
+/* Assenze DEMO */
+let assenzeDemo = {
+  oggi: ["Mario Rossi (ferie)"],
+  prossimi: {
+    "17": ["Patrizia – ferie"],
+    "19": ["Cosimo – permesso"],
+    "21": ["Annalisa – ferie"]
   }
-];
-
-// NOTIFICHE CARD
-const notificationConfig = {
-    assenze: {
-        titolo: "Notifiche assenze",
-        descrizioneVuota: "Nessuna nuova assenza.",
-        notifiche: [
-            {
-                id: "ass-1",
-                titolo: "Permesso approvato",
-                testo: "Il permesso del 20/12 è stato approvato.",
-                letto: false
-            }
-        ]
-    },
-    turni: {
-        titolo: "Notifiche turni",
-        descrizioneVuota: "Nessun cambio turno.",
-        notifiche: [
-            {
-                id: "turni-1",
-                titolo: "Cambio turno notturno",
-                testo: "Il turno del 19/12 è stato modificato.",
-                letto: false
-            }
-        ]
-    },
-    comunicazioni: {
-        titolo: "Nuove comunicazioni",
-        descrizioneVuota: "Tutte lette.",
-        notifiche: [
-            {
-                id: "com-1",
-                titolo: "Nuova comunicazione urgente",
-                testo: "Aggiornato regolamento retro-banco.",
-                letto: false
-            }
-        ]
-    },
-    procedure: {
-        titolo: "Aggiornamenti procedure",
-        descrizioneVuota: "Nessuna procedura nuova.",
-        notifiche: [
-            {
-                id: "proc-1",
-                titolo: "Procedura aggiornata",
-                testo: "Aggiornata 'Chiusura cassa serale'.",
-                letto: false
-            }
-        ]
-    },
-    archivio: {
-        titolo: "Notifiche Archivio",
-        descrizioneVuota: "Nessun file nuovo.",
-        notifiche: [
-            {
-                id: "arch-1",
-                titolo: "Nuova cartella creata",
-                testo: "È stata creata la cartella 'Documenti'.",
-                letto: true
-            }
-        ]
-    }
 };
 
-// snapshot per reset notifiche (admin)
-const notificationConfigSnapshot = JSON.parse(JSON.stringify(notificationConfig));
+/* Arrivi DEMO */
+let arriviDemo = [
+  { prodotto: "Aspirina Bayer", ora: "10:40" },
+  { prodotto: "Benagol limone", ora: "09:25" },
+  { prodotto: "Enterogermina 10 fl", ora: "08:55" }
+];
 
-// ======================================================
-// STATO GENERALE
-// ======================================================
-let currentRole = "farmacia";
-let currentTurniView = "oggi";
-let procedureFilter = "tutti";
-let procSearchTerm = "";
-let openNotificationCardKey = null;
+/* Scadenze DEMO */
+let scadenzeDemo = [
+  { prodotto: "Tachipirina 500mg", data: "05/01/2026", urgente: true },
+  { prodotto: "Aspirina 500mg", data: "20/02/2026", urgente: false },
+  { prodotto: "Maalox sospensione", data: "28/03/2026", urgente: false }
+];
 
-// ARCHIVIO FILE – STATO
-let fsRoot = null;
-let currentFolder = null;
-let selectedItem = null;
-let clipboardItem = null;
+/* Scorte DEMO */
+let scorteDemo = [
+  { prodotto: "Rotoli POS", urgente: true },
+  { prodotto: "Bicchierini", urgente: false },
+  { prodotto: "Toner Brother", urgente: true }
+];
 
-// ======================================================
-// STRUTTURA ARCHIVIO
-// ======================================================
-function loadFS() {
-    const saved = localStorage.getItem("fs_montesano_v3");
-    if (saved) {
-        fsRoot = JSON.parse(saved);
-    } else {
-        fsRoot = {
-            name: "root",
-            type: "folder",
-            children: [
-                { type: "folder", name: "Documenti", children: [] },
-                { type: "folder", name: "Foto", children: [] },
-                { type: "folder", name: "Ricette", children: [] },
-                {
-                    type: "file",
-                    name: "Benvenuto.txt",
-                    content: btoa("Benvenuto nell’Archivio della Farmacia Montesano!")
-                }
-            ]
-        };
-        saveFS();
-    }
-    currentFolder = fsRoot;
+/* ------------------------------------------------
+   FUNZIONE DI SELEZIONE RUOLI
+--------------------------------------------------- */
+function setRole(role) {
+  currentRole = role;
+
+  if (loginRoleLabel) {
+    loginRoleLabel.textContent =
+      role === "farmacia" ? "Farmacia" :
+      role === "titolare" ? "Titolare" :
+      role === "dipendente" ? "Dipendente" :
+      "Cliente";
+  }
+
+  applyRoleUI();
 }
 
-function saveFS() {
-    localStorage.setItem("fs_montesano_v3", JSON.stringify(fsRoot));
-}
+/* ------------------------------------------------
+   FUNZIONE MOSTRA SEZIONE
+--------------------------------------------------- */
+function showSection(section) {
+  dashboardSection.classList.add("hidden");
+  assenzePage.classList.add("hidden");
+  turniPage.classList.add("hidden");
+  comunicazioniPage.classList.add("hidden");
+  procedurePage.classList.add("hidden");
+  archivioPage.classList.add("hidden");
 
-// ======================================================
-// DOM READY
-// ======================================================
+  section.classList.remove("hidden");
+}
+/* ============================================================
+   SCRIPT – PARTE 2/7
+   Inizializzazione DOM, login, sidebar, caricamento dashboard
+   ============================================================ */
+
+/* ------------------------------------------------
+   INIT – prende riferimenti DOM dopo load
+--------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-    // RIFERIMENTI BASE
-    const authContainer = document.getElementById("authContainer");
-    const app = document.getElementById("app");
+  /* LOGIN */
+  authContainer = document.getElementById("authContainer");
+  loginForm = document.getElementById("loginForm");
+  loginRoleLabel = document.getElementById("loginRoleLabel");
 
-    const loginForm = document.getElementById("loginForm");
-    const loginRoleLabel = document.getElementById("loginRoleLabel");
-    const authTabs = document.querySelectorAll(".auth-tab");
+  /* APP */
+  app = document.getElementById("app");
+  sidebar = document.getElementById("sidebar");
+  hamburger = document.getElementById("hamburger");
+  closeSidebar = document.getElementById("closeSidebar");
 
-    // sezioni principali
-    const dashboardSection = document.getElementById("dashboard");
-    const assenzePage = document.getElementById("assenzePage");
-    const turniPage = document.getElementById("turniPage");
-    const comunicazioniPage = document.getElementById("comunicazioniPage");
-    const procedurePage = document.getElementById("procedurePage");
-    const archivioPage = document.getElementById("archivioPage");
-    const titolarePage = document.getElementById("titolarePage");
-    const adminPanel = document.getElementById("adminPanel");
+  /* SEZIONI */
+  dashboardSection = document.getElementById("dashboardSection");
+  assenzePage = document.getElementById("assenzePage");
+  turniPage = document.getElementById("turniPage");
+  comunicazioniPage = document.getElementById("comunicazioniPage");
+  procedurePage = document.getElementById("procedurePage");
+  archivioPage = document.getElementById("archivioPage");
 
-    // sidebar
-    const sidebar = document.getElementById("sidebar");
-    const hamburger = document.getElementById("hamburger");
-    const closeSidebarBtn = document.getElementById("closeSidebar");
-    const logoutBtn = document.getElementById("logoutBtn");
+  /* CARD DASHBOARD */
+  cardAssenze = document.getElementById("cardAssenze");
+  cardTurno = document.getElementById("cardTurno");
+  cardComunicazioni = document.getElementById("cardComunicazioni");
+  cardProcedure = document.getElementById("cardProcedure");
+  cardLogistica = document.getElementById("cardLogistica");
+  cardMagazziniera = document.getElementById("cardMagazziniera");
+  cardCassa = document.getElementById("cardCassa");
+  cardArchivio = document.getElementById("cardArchivio");
 
-    // pill ruolo
-    const rolePill = document.getElementById("currentRolePill");
-    const assenzeTitle = document.getElementById("assenzeTitle"); // opzionale, può non esserci
+  /* MINI CALENDAR */
+  miniCalInfo = document.getElementById("miniCalInfo");
+  miniCalButtons = document.querySelectorAll(".mini-cal-day");
 
-    // bottoni da dashboard
-    const openAssenzeBtn = document.getElementById("openAssenze");
-    const openTurniBtn = document.getElementById("openTurni");
-    const openComunicazioniBtn = document.getElementById("openComunicazioni");
-    const openProcedureBtn = document.getElementById("openProcedure");
-    const openArchivioBtn = document.getElementById("openArchivio");
+  /* NOTIFICHE */
+  notifOverlay = document.getElementById("notifOverlay");
+  notifClose = document.getElementById("notifClose");
+  notifCloseBottom = document.getElementById("notifCloseBottom");
+  notifList = document.getElementById("notifList");
+  notifTitle = document.getElementById("notifTitle");
+  notifIntro = document.getElementById("notifIntro");
 
-    // bottoni indietro
-    const backFromAssenzeBtn = document.getElementById("backFromAssenze");
-    const backFromTurniBtn = document.getElementById("backFromTurni");
-    const backFromComunicazioniBtn = document.getElementById("backFromComunicazioni");
-    const backFromProcedureBtn = document.getElementById("backFromProcedure");
-    const backFromArchivioBtn = document.getElementById("backFromArchivio");
-    const backFromTitolareBtn = document.getElementById("backFromTitolare");
-    const backFromAdminBtn = document.getElementById("backFromAdmin");
+  /* POPUP COMUNICA */
+  comunicaOverlay = document.getElementById("comunicaOverlay");
+  comunicaClose = document.getElementById("comunicaClose");
+  comunicaPopupForm = document.getElementById("comunicaForm");
+  comunicaPopupFeedback = document.getElementById("comunicaFeedback");
 
-    // logo dashboard (5 tap admin)
-    const dashLogo = document.querySelector(".dash-logo");
+  /* ARCHIVIO */
+  archivioGrid = document.getElementById("archivioGrid");
+  archivioPathLabel = document.getElementById("archivioPathLabel");
+  archivioUp = document.getElementById("archivioUp");
+  archivioNewFolder = document.getElementById("archivioNewFolder");
+  archivioUpload = document.getElementById("archivioUpload");
+  archivioBtnUpload = document.getElementById("archivioBtnUpload");
 
-    // TURNI
-    const turniTabs = document.querySelectorAll(".turni-tab");
-    const turniRows = document.getElementById("turniRows");
-    const turniMeseSelect = document.getElementById("turniMeseSelect");
-    const turniFarmaciaSelect = document.getElementById("turniFarmaciaSelect");
+  /* SIDEBAR NAV */
+  navAssenze = document.getElementById("navAssenze");
+  navTurni = document.getElementById("navTurni");
+  navComunicazioni = document.getElementById("navComunicazioni");
+  navProcedure = document.getElementById("navProcedure");
+  navArchivio = document.getElementById("navArchivio");
 
-    // COMUNICAZIONI
-    const comunicazioniList = document.getElementById("comunicazioniList");
-    const filtroCategoria = document.getElementById("filtroCategoria");
-    const filtroSoloNonLette = document.getElementById("filtroSoloNonLette");
-    const comunicazioneForm = document.getElementById("comunicazioneForm");
-    const comunicazioneFeedback = document.getElementById("comunicazioneFeedback");
-    const badgeTotComunicazioni = document.getElementById("badgeTotComunicazioni");
-    const badgeNonLette = document.getElementById("badgeNonLette");
-    const badgeUrgenti = document.getElementById("badgeUrgenti");
+  /* EVENTI SIDEBAR */
+  hamburger.addEventListener("click", () => {
+    sidebar.classList.add("open");
+  });
 
-    // ASSENZE
-    const assenzeForm = document.querySelector(".assenze-form");
-    const assenzeFeedback = document.getElementById("assenzeFeedback");
+  closeSidebar.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+  });
 
-    // PROCEDURE
-    const procedureListEl = document.getElementById("procedureList");
-    const procedureDetail = document.getElementById("procedureDetail");
-    const procedureSearch = document.getElementById("procedureSearch");
-    const procedureButtons = document.querySelectorAll(".proc-filter-btn");
+  /* EVENTI NAVIGAZIONE LATERALE */
+  navAssenze.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    loadAssenzePage();
+  });
 
-    // ARCHIVIO
-    const archivioGrid = document.getElementById("archivioGrid");
-    const archivioPath = document.getElementById("archivioPath");
-    const archivioUpload = document.getElementById("archivioUpload");
-    const archivioBtnUpload = document.getElementById("archivioBtnUpload");
-    const archivioUpBtn = document.getElementById("archivioUp");
-    const archivioNewFolderBtn = document.getElementById("archivioNewFolder");
-    const archivioContextMenu = document.getElementById("archivioContextMenu");
+  navTurni.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    loadTurniPage();
+  });
 
-    // NOTIFICHE OVERLAY
-    const notifOverlay = document.getElementById("notificationOverlay");
-    const notifTitle = document.getElementById("notifTitle");
-    const notifIntro = document.getElementById("notifIntro");
-    const notifList = document.getElementById("notifList");
-    const notifClose = document.getElementById("notifClose");
-    const notifCloseBottom = document.getElementById("notifCloseBottom");
+  navComunicazioni.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    loadComunicazioniPage();
+  });
 
-    // TITOLARE & ADMIN
-    const titolareCards = document.querySelectorAll(".titolare-card");
-    const adminTabs = document.querySelectorAll(".admin-tab");
-    const adminContent = document.getElementById("adminContent");
+  navProcedure.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    loadProcedurePage();
+  });
 
-    // ======================================================
-    // FUNZIONI BASE RUOLO + SEZIONI
-    // ======================================================
-    function setRole(role) {
-        currentRole = role;
+  navArchivio.addEventListener("click", () => {
+    sidebar.classList.remove("open");
+    loadArchivioPage();
+  });
 
-        if (rolePill) {
-            if (role === "farmacia") {
-                rolePill.textContent = "Farmacia (accesso generico)";
-            } else if (role === "titolare") {
-                rolePill.textContent = "Titolare";
-            } else if (role === "dipendente") {
-                rolePill.textContent = "Dipendente";
-            } else if (role === "admin") {
-                rolePill.textContent = "ADMIN (pannello segreto)";
-            }
-        }
+  /* LOGIN SUBMIT */
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    handleLogin();
+  });
 
-        if (assenzeTitle) {
-            if (role === "dipendente") {
-                assenzeTitle.textContent = "Le mie assenze";
-            } else {
-                assenzeTitle.textContent = "Assenze del personale";
-            }
-        }
-    }
+  /* PULSANTI POPUP NOTIFICHE */
+  notifClose.addEventListener("click", closeNotifiche);
+  notifCloseBottom.addEventListener("click", closeNotifiche);
 
-    function showSection(section) {
-        const allSections = [
-            dashboardSection,
-            assenzePage,
-            turniPage,
-            comunicazioniPage,
-            procedurePage,
-            archivioPage,
-            titolarePage,
-            adminPanel
-        ];
-        allSections.forEach(sec => {
-            if (sec) sec.classList.add("hidden");
-        });
-        if (section) section.classList.remove("hidden");
-        window.scrollTo({ top: 0, behavior: "instant" });
-    }
+  /* PULSANTI POPUP COMUNICA */
+  comunicaClose.addEventListener("click", closeComunicaPopup);
 
-    // ======================================================
-    // LOGIN
-    // ======================================================
-    if (authTabs && authTabs.length > 0) {
-        authTabs.forEach(tab => {
-            tab.addEventListener("click", () => {
-                authTabs.forEach(t => t.classList.remove("active"));
-                tab.classList.add("active");
-                const role = tab.dataset.role;
-                if (!loginRoleLabel) return;
-                if (role === "farmacia") loginRoleLabel.textContent = "Farmacia";
-                else if (role === "titolare") loginRoleLabel.textContent = "Titolare";
-                else if (role === "dipendente") loginRoleLabel.textContent = "Dipendente";
-            });
-        });
-    }
+  comunicaPopupForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    submitComunicazione();
+  });
 
-    if (loginForm) {
-        loginForm.addEventListener("submit", (e) => {
-            e.preventDefault();
-            const activeTab = document.querySelector(".auth-tab.active");
-            const role = activeTab ? activeTab.dataset.role : "farmacia";
-
-            setRole(role);
-
-            if (authContainer) authContainer.classList.add("hidden");
-            if (app) app.classList.remove("hidden");
-
-            // ✅ se Titolare → vai direttamente nella pagina Titolare
-            if (role === "titolare" && titolarePage) {
-                showSection(titolarePage);
-            } else {
-                // Farmacia / Dipendente → dashboard
-                showSection(dashboardSection);
-            }
-
-            initNotificationBadges();
-
-            if (archivioGrid) {
-                loadFS();
-                renderArchivio();
-            }
-        });
-    }
-
-    // ======================================================
-    // SIDEBAR
-    // ======================================================
-    function openSidebar() {
-        if (sidebar) sidebar.classList.add("open");
-    }
-    function closeSidebar() {
-        if (sidebar) sidebar.classList.remove("open");
-    }
-
-    if (hamburger) hamburger.addEventListener("click", openSidebar);
-    if (closeSidebarBtn) closeSidebarBtn.addEventListener("click", closeSidebar);
-
-    document.addEventListener("click", (e) => {
-        if (
-            sidebar &&
-            sidebar.classList.contains("open") &&
-            !sidebar.contains(e.target) &&
-            e.target !== hamburger
-        ) {
-            closeSidebar();
-        }
-    });
-
-    if (sidebar) {
-        sidebar.querySelectorAll("li[data-nav]").forEach(item => {
-            item.addEventListener("click", () => {
-                const target = item.dataset.nav;
-
-                if (target === "dashboard") {
-                    showSection(dashboardSection);
-                } else if (target === "assenzePage") {
-                    showSection(assenzePage);
-                } else if (target === "turniPage") {
-                    showSection(turniPage);
-                    renderTurniTable();
-                } else if (target === "comunicazioniPage") {
-                    showSection(comunicazioniPage);
-                    renderComunicazioni();
-                } else if (target === "procedurePage") {
-                    showSection(procedurePage);
-                    renderProcedureList();
-                } else if (target === "archivioPage") {
-                    showSection(archivioPage);
-                    if (!fsRoot) loadFS();
-                    renderArchivio();
-                }
-
-                closeSidebar();
-            });
-        });
-    }
-
-    // LOGOUT
-    if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
-            if (app) app.classList.add("hidden");
-            if (authContainer) authContainer.classList.remove("hidden");
-
-            if (loginForm) loginForm.reset();
-            if (authTabs && authTabs.length > 0) {
-                authTabs.forEach(t => t.classList.remove("active"));
-                authTabs[0].classList.add("active");
-            }
-            if (loginRoleLabel) loginRoleLabel.textContent = "Farmacia";
-            setRole("farmacia");
-            showSection(null);
-        });
-    }
-
-    // ======================================================
-    // NAVIGAZIONE BOTTONI DASHBOARD
-    // ======================================================
-    if (openAssenzeBtn) {
-        openAssenzeBtn.addEventListener("click", () => {
-            showSection(assenzePage);
-        });
-    }
-    if (backFromAssenzeBtn) {
-        backFromAssenzeBtn.addEventListener("click", () => {
-            showSection(dashboardSection);
-        });
-    }
-
-    if (openTurniBtn) {
-        openTurniBtn.addEventListener("click", () => {
-            showSection(turniPage);
-            renderTurniTable();
-        });
-    }
-    if (backFromTurniBtn) {
-        backFromTurniBtn.addEventListener("click", () => {
-            showSection(dashboardSection);
-        });
-    }
-
-    if (openComunicazioniBtn) {
-        openComunicazioniBtn.addEventListener("click", () => {
-            showSection(comunicazioniPage);
-            renderComunicazioni();
-        });
-    }
-    if (backFromComunicazioniBtn) {
-        backFromComunicazioniBtn.addEventListener("click", () => {
-            showSection(dashboardSection);
-        });
-    }
-
-    if (openProcedureBtn) {
-        openProcedureBtn.addEventListener("click", () => {
-            showSection(procedurePage);
-            renderProcedureList();
-        });
-    }
-    if (backFromProcedureBtn) {
-        backFromProcedureBtn.addEventListener("click", () => {
-            showSection(dashboardSection);
-        });
-    }
-
-    if (openArchivioBtn) {
-        openArchivioBtn.addEventListener("click", () => {
-            showSection(archivioPage);
-            if (!fsRoot) loadFS();
-            renderArchivio();
-        });
-    }
-    if (backFromArchivioBtn) {
-        backFromArchivioBtn.addEventListener("click", () => {
-            showSection(dashboardSection);
-        });
-    }
-
-    if (backFromTitolareBtn) {
-        backFromTitolareBtn.addEventListener("click", () => {
-            showSection(dashboardSection);
-        });
-    }
-
-    if (backFromAdminBtn) {
-        backFromAdminBtn.addEventListener("click", () => {
-            showSection(dashboardSection);
-        });
-    }
-        // ======================================================
-    // ACCESSO ADMIN SEGRETO – 5 TAP LOGO
-    // ======================================================
-    let adminTapCount = 0;
-    let adminTapTimeout = null;
-
-    function resetAdminTap() {
-        adminTapCount = 0;
-        if (adminTapTimeout) {
-            clearTimeout(adminTapTimeout);
-            adminTapTimeout = null;
-        }
-    }
-
-    function updateAdminNotifUpdate() {
-        const span = document.getElementById("adminNotifUpdate");
-        if (span) {
-            span.textContent = new Date().toLocaleString("it-IT");
-        }
-    }
-
-    function renderAdminTab(tabKey) {
-        if (!adminContent) return;
-        const templateMap = {
-            moduli: "admin-moduli-template",
-            visibilita: "admin-visibilita-template",
-            notifiche: "admin-notifiche-template",
-            impostazioni: "admin-impostazioni-template",
-            manutenzione: "admin-manutenzione-template"
-        };
-        const tmplId = templateMap[tabKey];
-        const tmpl = tmplId ? document.getElementById(tmplId) : null;
-        if (!tmpl) {
-            adminContent.innerHTML = "<p>Tab non disponibile.</p>";
-            return;
-        }
-        adminContent.innerHTML = "";
-        adminContent.appendChild(tmpl.content.cloneNode(true));
-
-        // Hook per tab specifici
-        if (tabKey === "notifiche") {
-            const btnClear = adminContent.querySelector('[data-admin-action="clear-all"]');
-            const btnReset = adminContent.querySelector('[data-admin-action="reset-notifiche"]');
-            const btnRefresh = adminContent.querySelector('[data-admin-action="refresh-ui"]');
-
-            if (btnClear) {
-                btnClear.addEventListener("click", () => {
-                    Object.keys(notificationConfig).forEach(key => {
-                        notificationConfig[key].notifiche.forEach(n => n.letto = true);
-                    });
-                    initNotificationBadges();
-                    updateAdminNotifUpdate();
-                    alert("Tutte le notifiche segnate come lette (demo).");
-                });
-            }
-
-            if (btnReset) {
-                btnReset.addEventListener("click", () => {
-                    Object.keys(notificationConfigSnapshot).forEach(key => {
-                        notificationConfig[key].notifiche =
-                            notificationConfigSnapshot[key].notifiche.map(n => ({ ...n }));
-                    });
-                    initNotificationBadges();
-                    updateAdminNotifUpdate();
-                    alert("Notifiche demo ripristinate.");
-                });
-            }
-
-            if (btnRefresh) {
-                btnRefresh.addEventListener("click", () => {
-                    initNotificationBadges();
-                    updateAdminNotifUpdate();
-                    alert("Interfaccia notifiche aggiornata.");
-                });
-            }
-        }
-
-        if (tabKey === "impostazioni") {
-            const textLargeCb = adminContent.querySelector("#adminTextLarge");
-            const highContrastCb = adminContent.querySelector("#adminHighContrast");
-            const body = document.body;
-
-            if (textLargeCb) {
-                textLargeCb.checked = body.classList.contains("zoom-papa");
-                textLargeCb.addEventListener("change", () => {
-                    body.classList.toggle("zoom-papa", textLargeCb.checked);
-                });
-            }
-
-            if (highContrastCb) {
-                highContrastCb.checked = body.classList.contains("high-contrast");
-                highContrastCb.addEventListener("change", () => {
-                    body.classList.toggle("high-contrast", highContrastCb.checked);
-                });
-            }
-        }
-
-        if (tabKey === "manutenzione") {
-            const btnResetStorage = adminContent.querySelector('[data-admin-action="reset-storage"]');
-            const btnShowLog = adminContent.querySelector('[data-admin-action="show-log"]');
-            const btnReload = adminContent.querySelector('[data-admin-action="reload-app"]');
-
-            if (btnResetStorage) {
-                btnResetStorage.addEventListener("click", () => {
-                    const ok = confirm("Vuoi davvero cancellare tutti i dati (localStorage)?");
-                    if (!ok) return;
-                    localStorage.clear();
-                    alert("Dati cancellati. Ricarico la pagina...");
-                    location.reload();
-                });
-            }
-
-            if (btnShowLog) {
-                btnShowLog.addEventListener("click", () => {
-                    console.log("=== LOG PORTALE MONTESANO ===");
-                    console.log("Versione:", APP_VERSION);
-                    console.log("Ruolo corrente:", currentRole);
-                    console.log("Turni demo:", turniFarmacie);
-                    console.log("Comunicazioni demo:", comunicazioni);
-                    alert("Log mostrato nella console del browser.");
-                });
-            }
-
-            if (btnReload) {
-                btnReload.addEventListener("click", () => {
-                    location.reload();
-                });
-            }
-        }
-    }
-
-    function initAdminPanel() {
-        if (!adminTabs || !adminTabs.length) return;
-        adminTabs.forEach(t => t.classList.remove("active"));
-        const first = adminTabs[0];
-        first.classList.add("active");
-        const key = first.dataset.admin;
-        renderAdminTab(key);
-        const pv = document.getElementById("portalVersion");
-        if (pv) pv.textContent = "v" + APP_VERSION;
-        updateAdminNotifUpdate();
-    }
-
-    function enterAdminMode() {
-        setRole("admin");
-        showSection(adminPanel || dashboardSection);
-        initAdminPanel();
-        alert("Accesso ADMIN attivato (modalità segreta).");
-    }
-
-    if (dashLogo) {
-        dashLogo.addEventListener("click", () => {
-            adminTapCount++;
-            if (adminTapTimeout) clearTimeout(adminTapTimeout);
-            adminTapTimeout = setTimeout(resetAdminTap, 2000);
-
-            if (adminTapCount >= 5) {
-                resetAdminTap();
-                enterAdminMode();
-            }
-        });
-    }
-
-    // tabs admin (click)
-    if (adminTabs && adminTabs.length > 0) {
-        adminTabs.forEach(tab => {
-            tab.addEventListener("click", () => {
-                adminTabs.forEach(t => t.classList.remove("active"));
-                tab.classList.add("active");
-                const key = tab.dataset.admin;
-                renderAdminTab(key);
-            });
-        });
-    }
-
-    // ======================================================
-    // CARD TITOLARE – NAVIGAZIONE
-    // ======================================================
-    if (titolareCards && titolareCards.length > 0) {
-        titolareCards.forEach(card => {
-            card.addEventListener("click", () => {
-                const key = card.dataset.titolare;
-                if (key === "assenze") {
-                    showSection(assenzePage);
-                } else if (key === "notifiche") {
-                    openNotificationPopup("comunicazioni");
-                } else if (key === "messaggi") {
-                    showSection(comunicazioniPage);
-                } else if (key === "procedure") {
-                    showSection(procedurePage);
-                } else if (key === "archivio" || key === "logistica" || key === "promozioni") {
-                    showSection(archivioPage);
-                }
-            });
-        });
-    }
-
-    // ======================================================
-    // INIT INIZIALE
-    // ======================================================
-    initTurnoOggi();
-    renderComunicazioni();
-    renderProcedureList();
-    initNotificationBadges();
-    if (archivioGrid) {
-        loadFS();
-        renderArchivio();
-    }
-
-    console.log("Script Portale Farmacia Montesano v" + APP_VERSION + " caricato.");
 });
-// ======================================================
-// FUNZIONI GENERALI FUORI DAL DOMContentLoaded
-// ======================================================
 
-// ---------- TURNI ----------
-function formatDateIT(iso) {
-    const [y, m, d] = iso.split("-");
-    return `${d}/${m}/${y}`;
+/* ------------------------------------------------
+   LOGIN – Switch tra ruoli demo
+--------------------------------------------------- */
+function handleLogin() {
+  const user = document.getElementById("loginUser").value.trim();
+  const pass = document.getElementById("loginPass").value.trim();
+
+  // RUOLI DEMO
+  if (user === "titolare" && pass === "1234") {
+    currentRole = "titolare";
+  }
+  else if (user === "farmacia" && pass === "1234") {
+    currentRole = "farmacia";
+  }
+  else if (user === "dipendente" && pass === "1234") {
+    currentRole = "dipendente";
+  }
+  else if (user === "cliente" && pass === "1234") {
+    currentRole = "cliente";
+  }
+  else {
+    alert("Credenziali non valide");
+    return;
+  }
+
+  authContainer.classList.add("hidden");
+  app.classList.remove("hidden");
+
+  applyRoleUI();
+  loadDashboard();
 }
 
-function initTurnoOggi() {
-    const oggi = turniFarmacie.find(t => t.tipoRange === "oggi");
-    if (!oggi) return;
+/* ------------------------------------------------
+   RUOLI – Mostra/Nasconde card e pulsanti
+--------------------------------------------------- */
+function applyRoleUI() {
+  document.querySelectorAll(".role-internal-only").forEach(el => {
+    el.classList.toggle("hidden", currentRole === "cliente");
+  });
 
-    const turnoOrarioChip = document.getElementById("turnoOrarioChip");
-    const turnoNome = document.getElementById("turnoNome");
-    const turnoIndirizzo = document.getElementById("turnoIndirizzo");
-    const turnoAppoggio = document.getElementById("turnoAppoggio");
+  document.querySelectorAll(".role-titolare-only").forEach(el => {
+    el.classList.toggle("hidden", currentRole !== "titolare");
+  });
 
-    const turnoOggiNome = document.getElementById("turnoOggiNome");
-    const turnoOggiIndirizzo = document.getElementById("turnoOggiIndirizzo");
-    const turnoOggiTelefono = document.getElementById("turnoOggiTelefono");
-    const turnoOggiOrario = document.getElementById("turnoOggiOrario");
-    const turnoOggiAppoggioNome = document.getElementById("turnoOggiAppoggioNome");
-    const turnoOggiAppoggioDettagli = document.getElementById("turnoOggiAppoggioDettagli");
-
-    if (turnoOrarioChip) turnoOrarioChip.textContent = oggi.orario;
-    if (turnoNome) turnoNome.textContent = oggi.principale;
-    if (turnoIndirizzo) {
-        turnoIndirizzo.innerHTML = `Via Esempio 12, Matera<br />Tel: ${oggi.telefono}`;
-    }
-    if (turnoAppoggio) turnoAppoggio.textContent = oggi.appoggio;
-
-    if (turnoOggiNome) turnoOggiNome.textContent = oggi.principale;
-    if (turnoOggiIndirizzo) turnoOggiIndirizzo.textContent = "Via Esempio 12, Matera";
-    if (turnoOggiTelefono) turnoOggiTelefono.textContent = `Tel: ${oggi.telefono}`;
-    if (turnoOggiOrario) turnoOggiOrario.textContent = oggi.orario;
-    if (turnoOggiAppoggioNome) turnoOggiAppoggioNome.textContent = oggi.appoggio;
-    if (turnoOggiAppoggioDettagli) {
-        turnoOggiAppoggioDettagli.textContent =
-            "Via Dante 8, Matera – Tel: 0835 111111";
-    }
+  document.querySelectorAll(".role-cliente-only").forEach(el => {
+    el.classList.toggle("hidden", currentRole !== "cliente");
+  });
 }
 
-function renderTurniTable() {
-    const turniRows = document.getElementById("turniRows");
-    const turniMeseSelect = document.getElementById("turniMeseSelect");
-    const turniFarmaciaSelect = document.getElementById("turniFarmaciaSelect");
-    if (!turniRows) return;
+/* ------------------------------------------------
+   CARICAMENTO DASHBOARD (dinamico)
+--------------------------------------------------- */
+function loadDashboard() {
+  showSection(dashboardSection);
 
-    const mese = turniMeseSelect ? turniMeseSelect.value : "all";
-    const farmacia = turniFarmaciaSelect ? turniFarmaciaSelect.value : "all";
-
-    let filtered = turniFarmacie.filter(t => t.tipoRange === currentTurniView);
-
-    if (mese !== "all") {
-        filtered = filtered.filter(t => t.mese === Number(mese));
-    }
-    if (farmacia !== "all") {
-        filtered = filtered.filter(t => t.principale === farmacia);
-    }
-
-    turniRows.innerHTML = "";
-
-    if (filtered.length === 0) {
-        const row = document.createElement("div");
-        row.className = "turni-row";
-        row.innerHTML = "<span>Nessun turno per i filtri selezionati.</span>";
-        turniRows.appendChild(row);
-        return;
-    }
-
-    filtered.forEach(t => {
-        const row = document.createElement("div");
-        row.className = "turni-row";
-
-        let noteClass = "normale";
-        const lower = t.note.toLowerCase();
-        if (lower.includes("notturno")) noteClass = "notturno";
-        if (lower.includes("vigilia") || lower.includes("festivo")) noteClass = "festivo";
-
-        row.innerHTML = `
-            <span>${formatDateIT(t.data)}</span>
-            <span>${t.orario}</span>
-            <span>${t.principale}</span>
-            <span>${t.appoggio}</span>
-            <span>${t.telefono}</span>
-            <span><span class="turno-type-pill ${noteClass}">${t.note}</span></span>
-        `;
-        turniRows.appendChild(row);
-    });
+  loadDashboardAssenze();
+  loadDashboardTurno();
+  loadDashboardComunicazioni();
+  loadDashboardArrivi();
+  loadDashboardScadenze();
+  loadDashboardScorte();
+  loadDashboardCambioCassa();
 }
-
-// ---------- COMUNICAZIONI ----------
-function aggiornaBadgeComunicazioni() {
-    const badgeTotComunicazioni = document.getElementById("badgeTotComunicazioni");
-    const badgeNonLette = document.getElementById("badgeNonLette");
-    const badgeUrgenti = document.getElementById("badgeUrgenti");
-
-    if (!badgeTotComunicazioni || !badgeNonLette || !badgeUrgenti) return;
-
-    const tot = comunicazioni.length;
-    const nonLette = comunicazioni.filter(c => !c.letta).length;
-    const urgenti = comunicazioni.filter(c => c.categoria === "urgente").length;
-
-    badgeTotComunicazioni.textContent = `Totali: ${tot}`;
-    badgeNonLette.textContent = `Non lette: ${nonLette}`;
-    badgeUrgenti.textContent = `Urgenti: ${urgenti}`;
-}
-
-function renderComunicazioni() {
-    const comunicazioniList = document.getElementById("comunicazioniList");
-    const filtroCategoria = document.getElementById("filtroCategoria");
-    const filtroSoloNonLette = document.getElementById("filtroSoloNonLette");
-    if (!comunicazioniList) return;
-
-    const cat = filtroCategoria ? filtroCategoria.value : "tutte";
-    const soloNL = filtroSoloNonLette ? filtroSoloNonLette.checked : false;
-
-    let filtered = [...comunicazioni];
-
-    if (cat !== "tutte") {
-        filtered = filtered.filter(c => c.categoria === cat);
-    }
-    if (soloNL) {
-        filtered = filtered.filter(c => !c.letta);
-    }
-
-    comunicazioniList.innerHTML = "";
-
-    if (filtered.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "small-text";
-        empty.textContent = "Nessuna comunicazione per i filtri selezionati (demo).";
-        comunicazioniList.appendChild(empty);
-        aggiornaBadgeComunicazioni();
-        return;
-    }
-
-    filtered.forEach(c => {
-        const card = document.createElement("div");
-        card.className = "com-card";
-
-        const pill = document.createElement("div");
-        pill.className = `com-pill ${c.categoria}`;
-        pill.textContent =
-            c.categoria === "urgente"
-                ? "URGENTE"
-                : c.categoria === "importante"
-                ? "IMPORTANTE"
-                : "INFORMATIVA";
-
-        const title = document.createElement("div");
-        title.className = "com-title";
-        title.textContent = c.titolo;
-
-        const meta = document.createElement("div");
-        meta.className = "com-meta";
-        const stato = c.letta ? "Letta" : "Non letta";
-        meta.textContent = `${c.data} · ${c.autore} · ${stato}`;
-
-        const text = document.createElement("div");
-        text.className = "com-text";
-        text.textContent = c.testo;
-
-        card.appendChild(pill);
-        card.appendChild(title);
-        card.appendChild(meta);
-        card.appendChild(text);
-
-        comunicazioniList.appendChild(card);
-    });
-
-    aggiornaBadgeComunicazioni();
-}
-
-// ---------- ASSENZE FORM ----------
-(function initAssenzeForm() {
-    const assenzeForm = document.querySelector(".assenze-form");
-    const assenzeFeedback = document.getElementById("assenzeFeedback");
-    if (!assenzeForm || !assenzeFeedback) return;
-
-    assenzeForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        assenzeFeedback.classList.remove("hidden");
-        assenzeFeedback.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-})();
-
-// ---------- PROCEDURE ----------
-function renderProcedureList() {
-    const procedureListEl = document.getElementById("procedureList");
-    const procedureDetail = document.getElementById("procedureDetail");
-    if (!procedureListEl) return;
-
-    let filtered = procedureData.filter(p => {
-        const matchCat = (procedureFilter === "tutti" || p.reparto === procedureFilter);
-        const testoRicerca = (p.titolo + " " + p.testo).toLowerCase();
-        const matchSearch = !procSearchTerm || testoRicerca.includes(procSearchTerm);
-        return matchCat && matchSearch;
-    });
-
-    procedureListEl.innerHTML = "";
-
-    if (filtered.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "small-text";
-        empty.textContent = "Nessuna procedura trovata per i filtri impostati (demo).";
-        procedureListEl.appendChild(empty);
-        if (procedureDetail) {
-            procedureDetail.innerHTML =
-                '<p class="small-text muted">Nessuna procedura selezionata.</p>';
-        }
-        return;
-    }
-
-    filtered.forEach(p => {
-        const item = document.createElement("div");
-        item.className = "proc-item";
-        item.dataset.procId = p.id;
-
-        const main = document.createElement("div");
-        main.className = "proc-item-main";
-
-        const title = document.createElement("div");
-        title.className = "proc-item-title";
-        title.textContent = p.titolo;
-
-        const meta = document.createElement("div");
-        meta.className = "proc-item-meta";
-        const repLabel =
-            p.reparto === "cassa"
-                ? "Cassa / Banco"
-                : p.reparto === "magazzino"
-                ? "Magazzino"
-                : p.reparto === "servizi"
-                ? "Servizi"
-                : "Logistica";
-        meta.textContent = `${repLabel} · Agg.: ${p.aggiornamento}`;
-
-        main.appendChild(title);
-        main.appendChild(meta);
-
-        const tag = document.createElement("div");
-        tag.className = "proc-tag";
-        tag.textContent = "Apri";
-
-        item.appendChild(main);
-        item.appendChild(tag);
-
-        item.addEventListener("click", () => {
-            showProcedure(p.id);
-        });
-
-        procedureListEl.appendChild(item);
-    });
-}
-
-function showProcedure(procId) {
-    const procedureDetail = document.getElementById("procedureDetail");
-    if (!procedureDetail) return;
-    const proc = procedureData.find(p => p.id === procId);
-    if (!proc) return;
-
-    const repLabel =
-        proc.reparto === "cassa"
-            ? "Cassa / Banco"
-            : proc.reparto === "magazzino"
-            ? "Magazzino"
-            : proc.reparto === "servizi"
-            ? "Servizi"
-            : "Logistica";
-
-    const paragrafi = proc.testo.split("\n").map((row) => `<p>${row}</p>`).join("");
-
-    procedureDetail.innerHTML = `
-        <h3>${proc.titolo}</h3>
-        <p class="small-text">Reparto: <strong>${repLabel}</strong> · Ultimo aggiornamento: <strong>${proc.aggiornamento}</strong></p>
-        <div class="divider"></div>
-        <div>${paragrafi}</div>
-    `;
-}
-
-(function initProcedureFilters() {
-    const procedureSearch = document.getElementById("procedureSearch");
-    const procedureButtons = document.querySelectorAll(".proc-filter-btn");
-
-    if (procedureSearch) {
-        procedureSearch.addEventListener("input", (e) => {
-            procSearchTerm = e.target.value.trim().toLowerCase();
-            renderProcedureList();
-        });
-    }
-
-    if (procedureButtons && procedureButtons.length > 0) {
-        procedureButtons.forEach(btn => {
-            btn.addEventListener("click", () => {
-                procedureButtons.forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-                procedureFilter = btn.getAttribute("data-reparto") || "tutti";
-                renderProcedureList();
-            });
-        });
-    }
-})();
-
-// ======================================================
-// NOTIFICHE DASHBOARD – PALLINI + POPUP
-// ======================================================
-function getUnreadNotifications(cardKey) {
-    const cfg = notificationConfig[cardKey];
-    if (!cfg) return [];
-    return cfg.notifiche.filter(n => !n.letto);
-}
-
-function updateBadgeForCard(cardKey) {
-    const badge = document.querySelector(`.card-badge[data-card-key="${cardKey}"]`);
-    const label = document.querySelector(`.card-badge-label[data-card-key="${cardKey}"]`);
-    if (!badge) return;
-
-    const unread = getUnreadNotifications(cardKey);
-    const count = unread.length;
-    const countSpan = badge.querySelector(".badge-count");
-
-    if (count > 0) {
-        if (countSpan) countSpan.textContent = String(count);
-        badge.classList.add("has-unread");
-        badge.style.display = "flex";
-        if (label) {
-            label.textContent = count === 1 ? "Nuovo" : "Nuovi";
-            label.style.display = "block";
-        }
-    } else {
-        if (countSpan) countSpan.textContent = "";
-        badge.classList.remove("has-unread");
-        badge.style.display = "none";
-        if (label) {
-            label.textContent = "";
-            label.style.display = "none";
-        }
-    }
-}
-
-function initNotificationBadges() {
-    Object.keys(notificationConfig).forEach(key => {
-        updateBadgeForCard(key);
-    });
-
-    document.querySelectorAll(".js-card-badge").forEach(badge => {
-        const key = badge.getAttribute("data-card-key");
-        badge.addEventListener("click", (e) => {
-            e.stopPropagation();
-            openNotificationPopup(key);
-        });
-    });
-
-    const notifOverlay = document.getElementById("notificationOverlay");
-    const notifClose = document.getElementById("notifClose");
-    const notifCloseBottom = document.getElementById("notifCloseBottom");
-
-    if (notifClose) {
-        notifClose.addEventListener("click", closeNotificationPopup);
-    }
-    if (notifCloseBottom) {
-        notifCloseBottom.addEventListener("click", closeNotificationPopup);
-    }
-    if (notifOverlay) {
-        notifOverlay.addEventListener("click", (e) => {
-            if (e.target === notifOverlay || e.target.classList.contains("notif-backdrop")) {
-                closeNotificationPopup();
-            }
-        });
-    }
-}
-
-function openNotificationPopup(cardKey) {
-    const cfg = notificationConfig[cardKey];
-    const notifOverlay = document.getElementById("notificationOverlay");
-    const notifTitle = document.getElementById("notifTitle");
-    const notifIntro = document.getElementById("notifIntro");
-    const notifList = document.getElementById("notifList");
-    if (!cfg || !notifOverlay || !notifTitle || !notifIntro || !notifList) return;
-
-    openNotificationCardKey = cardKey;
-
-    const unread = getUnreadNotifications(cardKey);
-
-    notifTitle.textContent = cfg.titolo;
-    if (unread.length === 0) {
-        notifIntro.textContent = cfg.descrizioneVuota;
-    } else if (unread.length === 1) {
-        notifIntro.textContent = "Hai 1 nuova notifica.";
-    } else {
-        notifIntro.textContent = `Hai ${unread.length} nuove notifiche.`;
-    }
-
-    notifList.innerHTML = "";
-    if (unread.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "small-text";
-        empty.textContent = cfg.descrizioneVuota;
-        notifList.appendChild(empty);
-    } else {
-        unread.forEach(n => {
-            const item = document.createElement("div");
-            item.className = "notif-item";
-            item.dataset.notifId = n.id;
-
-            const textWrap = document.createElement("div");
-            textWrap.className = "notif-text";
-
-            const h3 = document.createElement("h3");
-            h3.textContent = n.titolo;
-
-            const p = document.createElement("p");
-            p.textContent = n.testo;
-
-            textWrap.appendChild(h3);
-            textWrap.appendChild(p);
-
-            const btn = document.createElement("button");
-            btn.className = "primary-btn small";
-            btn.textContent = "Presa visione";
-            btn.addEventListener("click", () => {
-                markNotificationAsRead(cardKey, n.id);
-            });
-
-            item.appendChild(textWrap);
-            item.appendChild(btn);
-
-            notifList.appendChild(item);
-        });
-    }
-
-    notifOverlay.classList.remove("hidden");
-    notifOverlay.classList.add("active");
-}
-
-function closeNotificationPopup() {
-    const notifOverlay = document.getElementById("notificationOverlay");
-    if (!notifOverlay) return;
-    notifOverlay.classList.add("hidden");
-    notifOverlay.classList.remove("active");
-    openNotificationCardKey = null;
-}
-
-function markNotificationAsRead(cardKey, notifId) {
-    const cfg = notificationConfig[cardKey];
-    if (!cfg) return;
-    const n = cfg.notifiche.find(x => x.id === notifId);
-    if (!n || n.letto) return;
-    n.letto = true;
-
-    if (openNotificationCardKey === cardKey) {
-        openNotificationPopup(cardKey);
-    }
-    updateBadgeForCard(cardKey);
-}
-// ======================================================
-// ARCHIVIO FILE – UTILITY
-// ======================================================
-let lastSelectedEl = null;
-
-function getPathArray(target) {
-    const path = [];
-
-    function helper(node, stack) {
-        if (node === target) {
-            path.push(...stack, node.name);
-            return true;
-        }
-        if (node.type === "folder" && node.children) {
-            for (const child of node.children) {
-                if (helper(child, [...stack, node.name])) return true;
-            }
-        }
-        return false;
-    }
-
-    if (!fsRoot) return [];
-    helper(fsRoot, []);
-    return path;
-}
-
-function ensureUniqueName(base, list) {
-    let name = base;
-    let counter = 1;
-
-    while (list.some(i => i.name === name)) {
-        const parts = base.split(".");
-        if (parts.length > 1) {
-            const ext = parts.pop();
-            name = parts.join(".") + ` (${counter}).` + ext;
-        } else {
-            name = base + ` (${counter})`;
-        }
-        counter++;
-    }
-
-    return name;
-}
-
-function getFileIconClass(item) {
-    if (item.type === "folder") return "folder";
-    const parts = item.name.split(".");
-    if (parts.length < 2) return "";
-    const ext = parts.pop().toLowerCase();
-    if (ext === "pdf") return "pdf";
-    if (["jpg", "jpeg", "png", "gif", "webp", "heic"].includes(ext)) return "image";
-    if (["doc", "docx"].includes(ext)) return "word";
-    if (["txt", "log"].includes(ext)) return "txt";
-    return "";
-}
-
-function clearSelection() {
-    if (lastSelectedEl) lastSelectedEl.classList.remove("selected");
-    lastSelectedEl = null;
-    selectedItem = null;
-}
-
-function renderArchivio() {
-    const archivioGrid = document.getElementById("archivioGrid");
-    const archivioPath = document.getElementById("archivioPath");
-    const archivioUpBtn = document.getElementById("archivioUp");
-    if (!archivioGrid || !archivioPath || !fsRoot || !currentFolder) return;
-
-    // ordina: cartelle prima, poi file
-    currentFolder.children.sort((a, b) => {
-        if (a.type === b.type) return a.name.localeCompare(b.name);
-        return a.type === "folder" ? -1 : 1;
-    });
-
-    // path
-    const pathArr = getPathArray(currentFolder);
-    archivioPath.textContent = "/" + pathArr.join("/");
-
-    // pulsante "su"
-    archivioUpBtn.disabled = (currentFolder === fsRoot);
-
-    // svuota
-    archivioGrid.innerHTML = "";
-
-    if (currentFolder.children.length === 0) {
-        const empty = document.createElement("div");
-        empty.className = "small-text";
-        empty.textContent = "Nessun file in questa cartella.";
-        archivioGrid.appendChild(empty);
-        return;
-    }
-
-    currentFolder.children.forEach(item => {
-        const el = document.createElement("div");
-        el.className = "file-item";
-
-        const icon = document.createElement("div");
-        icon.className = "file-icon " + getFileIconClass(item);
-        icon.textContent = item.type === "folder" ? "📁" : "📄";
-
-        const name = document.createElement("div");
-        name.className = "file-name";
-        name.textContent = item.name;
-
-        el.appendChild(icon);
-        el.appendChild(name);
-        archivioGrid.appendChild(el);
-
-        // CLICK = selezione
-        el.addEventListener("click", (e) => {
-            e.stopPropagation();
-            clearSelection();
-            el.classList.add("selected");
-            lastSelectedEl = el;
-            selectedItem = item;
-            hideArchivioContextMenu();
-        });
-
-        // DOPPIO CLICK = apri cartella (se folder)
-        el.addEventListener("dblclick", (e) => {
-            e.stopPropagation();
-            if (item.type === "folder") {
-                currentFolder = item;
-                renderArchivio();
-            }
-        });
-
-        // TASTO DESTRO = menu contestuale
-        el.addEventListener("contextmenu", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            clearSelection();
-            el.classList.add("selected");
-            lastSelectedEl = el;
-            selectedItem = item;
-            showArchivioContextMenu(e.clientX, e.clientY);
-        });
-
-        // LONG PRESS SU MOBILE
-        let touchTimer = null;
-        el.addEventListener("touchstart", (e) => {
-            touchTimer = setTimeout(() => {
-                const touch = e.touches[0];
-                clearSelection();
-                el.classList.add("selected");
-                lastSelectedEl = el;
-                selectedItem = item;
-                showArchivioContextMenu(touch.clientX, touch.clientY);
-            }, 600);
-        });
-        el.addEventListener("touchend", () => {
-            if (touchTimer) clearTimeout(touchTimer);
-        });
-        el.addEventListener("touchmove", () => {
-            if (touchTimer) clearTimeout(touchTimer);
-        });
-    });
-
-    // click vuoto = deseleziona
-    archivioGrid.addEventListener("click", () => {
-        clearSelection();
-        hideArchivioContextMenu();
-    });
-
-    // pulsante "su"
-    archivioUpBtn.addEventListener("click", () => {
-        if (currentFolder === fsRoot) return;
-        // trova parent
-        function findParent(node, target, parent) {
-            if (node === target) return parent;
-            if (node.type === "folder" && node.children) {
-                for (const child of node.children) {
-                    const r = findParent(child, target, node);
-                    if (r) return r;
-                }
-            }
-            return null;
-        }
-        const parent = findParent(fsRoot, currentFolder, null);
-        if (parent) {
-            currentFolder = parent;
-            renderArchivio();
-        }
-    });
-}
-
-// ======================================================
-// ARCHIVIO – MENU CONTESTUALE
-// ======================================================
-function showArchivioContextMenu(x, y) {
-    const menu = document.getElementById("archivioContextMenu");
-    if (!menu) return;
-    menu.style.left = x + "px";
-    menu.style.top = y + "px";
-    menu.classList.remove("hidden");
-}
-
-function hideArchivioContextMenu() {
-    const menu = document.getElementById("archivioContextMenu");
-    if (!menu) return;
-    menu.classList.add("hidden");
-}
-
-// Azioni di menu
-(function initArchivioMenu() {
-    const menu = document.getElementById("archivioContextMenu");
-    const menuNuova = document.getElementById("menuNuova");
-    const menuRinomina = document.getElementById("menuRinomina");
-    const menuElimina = document.getElementById("menuElimina");
-    const menuCopia = document.getElementById("menuCopia");
-    const menuIncolla = document.getElementById("menuIncolla");
-    const menuDownload = document.getElementById("menuDownload");
-
-    if (!menu) return;
-
-    // click fuori = chiudi menu
-    document.addEventListener("click", (e) => {
-        if (!menu.classList.contains("hidden") && !menu.contains(e.target)) {
-            hideArchivioContextMenu();
-        }
-    });
-
-    // NUOVA CARTELLA
-    if (menuNuova) {
-        menuNuova.addEventListener("click", () => {
-            hideArchivioContextMenu();
-            if (!currentFolder) return;
-
-            const baseName = "Nuova cartella";
-            const unique = ensureUniqueName(baseName, currentFolder.children);
-            currentFolder.children.push({
-                type: "folder",
-                name: unique,
-                children: []
-            });
-            saveFS();
-            renderArchivio();
-        });
-    }
-
-    // RINOMINA
-    if (menuRinomina) {
-        menuRinomina.addEventListener("click", () => {
-            hideArchivioContextMenu();
-            if (!selectedItem || !currentFolder) return;
-            const nuovoNome = prompt("Nuovo nome:", selectedItem.name);
-            if (!nuovoNome) return;
-
-            const siblings = currentFolder.children.filter(i => i !== selectedItem);
-            const unique = ensureUniqueName(nuovoNome.trim(), siblings);
-            selectedItem.name = unique;
-            saveFS();
-            renderArchivio();
-        });
-    }
-
-    // ELIMINA
-    if (menuElimina) {
-        menuElimina.addEventListener("click", () => {
-            hideArchivioContextMenu();
-            if (!selectedItem || !currentFolder) return;
-            const conferma = confirm(`Vuoi eliminare "${selectedItem.name}"?`);
-            if (!conferma) return;
-            currentFolder.children = currentFolder.children.filter(i => i !== selectedItem);
-            selectedItem = null;
-            saveFS();
-            renderArchivio();
-        });
-    }
-
-    // COPIA
-    if (menuCopia) {
-        menuCopia.addEventListener("click", () => {
-            hideArchivioContextMenu();
-            if (!selectedItem) return;
-            // copia profonda per demo
-            clipboardItem = JSON.parse(JSON.stringify(selectedItem));
-            alert(`Copiato: ${clipboardItem.name}`);
-        });
-    }
-
-    // INCOLLA
-    if (menuIncolla) {
-        menuIncolla.addEventListener("click", () => {
-            hideArchivioContextMenu();
-            if (!clipboardItem || !currentFolder) return;
-
-            const cloned = JSON.parse(JSON.stringify(clipboardItem));
-            cloned.name = ensureUniqueName(cloned.name, currentFolder.children);
-            currentFolder.children.push(cloned);
-            saveFS();
-            renderArchivio();
-        });
-    }
-
-    // DOWNLOAD (demo)
-    if (menuDownload) {
-        menuDownload.addEventListener("click", () => {
-            hideArchivioContextMenu();
-            if (!selectedItem || selectedItem.type !== "file") {
-                alert("Seleziona prima un file.");
-                return;
-            }
-            if (!selectedItem.content) {
-                alert("File demo senza contenuto (solo nome).");
-                return;
-            }
-
-            try {
-                const dataUrl = selectedItem.content;
-                const a = document.createElement("a");
-                a.href = dataUrl;
-                a.download = selectedItem.name;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            } catch (err) {
-                console.error(err);
-                alert("Impossibile scaricare il file (demo).");
-            }
-        });
-    }
-})();
-
-// ======================================================
-// ARCHIVIO – BOTTONI BARRA SUPERIORE
-// ======================================================
-(function initArchivioToolbar() {
-    const archivioNewFolderBtn = document.getElementById("archivioNewFolder");
-    const archivioUpload = document.getElementById("archivioUpload");
-    const archivioBtnUpload = document.getElementById("archivioBtnUpload");
-
-    if (!archivioNewFolderBtn && !archivioUpload && !archivioBtnUpload) return;
-
-    // NUOVA CARTELLA (bottone in alto)
-    if (archivioNewFolderBtn) {
-        archivioNewFolderBtn.addEventListener("click", () => {
-            if (!currentFolder) {
-                if (!fsRoot) loadFS();
-                currentFolder = fsRoot;
-            }
-            const baseName = "Nuova cartella";
-            const unique = ensureUniqueName(baseName, currentFolder.children);
-            currentFolder.children.push({
-                type: "folder",
-                name: unique,
-                children: []
-            });
-            saveFS();
-            renderArchivio();
-        });
-    }
-
-    // CLICK SU “CARICA FILE” – apre input nascosto
-    if (archivioBtnUpload && archivioUpload) {
-        archivioBtnUpload.addEventListener("click", () => {
-            archivioUpload.click();
-        });
-
-        archivioUpload.addEventListener("change", (e) => {
-            const files = Array.from(e.target.files || []);
-            if (!files.length) return;
-            if (!currentFolder) {
-                if (!fsRoot) loadFS();
-                currentFolder = fsRoot;
-            }
-
-            files.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    const dataUrl = ev.target.result;
-                    const unique = ensureUniqueName(file.name, currentFolder.children);
-                    currentFolder.children.push({
-                        type: "file",
-                        name: unique,
-                        content: dataUrl,
-                        size: file.size,
-                        mime: file.type || "application/octet-stream"
-                    });
-                    saveFS();
-                    renderArchivio();
-                };
-                // per demo basta DataURL
-                reader.readAsDataURL(file);
-            });
-
-            // reset input
-            e.target.value = "";
-        });
-    }
-})();
-
-// ======================================================
-// HOOK FILTRI COMUNICAZIONI & TURNI
-// ======================================================
-(function initComunicazioniFilters() {
-    const filtroCategoria = document.getElementById("filtroCategoria");
-    const filtroSoloNonLette = document.getElementById("filtroSoloNonLette");
-
-    if (filtroCategoria) {
-        filtroCategoria.addEventListener("change", renderComunicazioni);
-    }
-    if (filtroSoloNonLette) {
-        filtroSoloNonLette.addEventListener("change", renderComunicazioni);
-    }
-})();
-
-(function initTurniFilters() {
-    const turniTabs = document.querySelectorAll(".turni-tab");
-    const turniMeseSelect = document.getElementById("turniMeseSelect");
-    const turniFarmaciaSelect = document.getElementById("turniFarmaciaSelect");
-
-    if (turniTabs && turniTabs.length > 0) {
-        turniTabs.forEach(tab => {
-            tab.addEventListener("click", () => {
-                turniTabs.forEach(t => t.classList.remove("active"));
-                tab.classList.add("active");
-                currentTurniView = tab.dataset.view;
-                renderTurniTable();
-            });
-        });
-    }
-
-    if (turniMeseSelect) {
-        turniMeseSelect.addEventListener("change", renderTurniTable);
-    }
-    if (turniFarmaciaSelect) {
-        turniFarmaciaSelect.addEventListener("change", renderTurniTable);
-    }
-})();
