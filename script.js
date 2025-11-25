@@ -117,18 +117,178 @@ let scorteDemo = [
 function setRole(role) {
   currentRole = role;
 
-  if (loginRoleLabel) {
-    loginRoleLabel.textContent =
-      role === "farmacia" ? "Farmacia" :
-      role === "titolare" ? "Titolare" :
-      role === "dipendente" ? "Dipendente" :
-      "Cliente";
+  // pill in alto nella dashboard
+  if (rolePill) {
+    if (role === "farmacia") {
+      rolePill.textContent = "Farmacia (accesso generico)";
+    } else if (role === "titolare") {
+      rolePill.textContent = "Titolare";
+    } else if (role === "dipendente") {
+      rolePill.textContent = "Dipendente";
+    } else if (role === "cliente") {
+      rolePill.textContent = "Cliente / Utente esterno";
+    } else {
+      rolePill.textContent = role;
+    }
   }
 
-  applyRoleUI();
-}
+  // salvo il ruolo sul body (utile per CSS se serve)
+  if (document.body) {
+    document.body.dataset.role = role;
+  }
 
-/* ------------------------------------------------
+  // titolo pagina assenze
+  if (assenzeTitle) {
+    if (role === "dipendente") {
+      assenzeTitle.textContent = "Le mie assenze";
+    } else if (role === "titolare") {
+      assenzeTitle.textContent = "Assenti di oggi e prossimi giorni";
+    } else {
+      assenzeTitle.textContent = "Assenze del personale";
+    }
+  }
+
+  // --- TESTI CARD ASSENZE (dashboard) ---
+  const assenzeCard = document.querySelector(".card-assenze");
+  if (assenzeCard) {
+    const caption = assenzeCard.querySelector(".caption");
+    const small = assenzeCard.querySelector(".small-text");
+
+    if (role === "titolare") {
+      if (caption) {
+        caption.textContent = "Vedi subito chi è assente oggi e nei prossimi giorni.";
+      }
+      if (small) {
+        small.textContent = "Apri il calendario, tocca un giorno e controlla tutti gli assenti.";
+      }
+      const btnAssenze = document.getElementById("openAssenze");
+      if (btnAssenze) btnAssenze.textContent = "Vedi tutti gli assenti";
+    } else if (role === "dipendente") {
+      if (caption) {
+        caption.textContent = "Le tue ferie, permessi e assenze.";
+      }
+      if (small) {
+        small.textContent = "Richiedi ferie/permessi e guarda lo stato delle tue richieste.";
+      }
+      const btnAssenze = document.getElementById("openAssenze");
+      if (btnAssenze) btnAssenze.textContent = "Le mie assenze";
+    } else {
+      // farmacia / altri
+      if (caption) {
+        caption.textContent = "Panoramica sulle assenze del personale.";
+      }
+      if (small) {
+        small.textContent = "Consulta calendario, richieste e stato assenze.";
+      }
+      const btnAssenze = document.getElementById("openAssenze");
+      if (btnAssenze) btnAssenze.textContent = "Vai a Assenze";
+    }
+  }
+
+  // --- TESTI CARD TURNI (dashboard) ---
+  const turnoCard = document.querySelector(".card-turno");
+  if (turnoCard) {
+    const title = turnoCard.querySelector("h2");
+    const smalls = turnoCard.querySelectorAll(".small-text");
+    if (role === "titolare") {
+      if (title) title.textContent = "Farmacie di turno (oggi)";
+      // il primo small-text è già gestito dai dati demo, lasciamo
+    } else if (role === "cliente") {
+      if (title) title.textContent = "Farmacia di turno per i clienti";
+    } else {
+      if (title) title.textContent = "Farmacia di turno";
+    }
+  }
+
+  // --- CARD LOGISTICA -> ARRIVI / CORRIERI ---
+  const logisticaCard = document.querySelector(".card-logistica");
+  if (logisticaCard) {
+    const title = logisticaCard.querySelector("h2");
+    const bodyText = logisticaCard.querySelector(".small-text");
+    const footerBtn = logisticaCard.querySelector(".card-footer button");
+
+    if (role === "titolare" || role === "farmacia") {
+      if (title) title.textContent = "Arrivi / Corrieri";
+      if (bodyText) {
+        bodyText.textContent =
+          "Segna gli arrivi di corrieri, espositori e materiale. Tieni traccia di cosa è previsto oggi.";
+      }
+      if (footerBtn) {
+        footerBtn.textContent = "Visualizza e segnala arrivo";
+      }
+    } else {
+      // dipendente / cliente: testo più semplice
+      if (title) title.textContent = "Logistica (arrivi)";
+      if (bodyText) {
+        bodyText.textContent = "Consulta gli arrivi previsti (demo).";
+      }
+      if (footerBtn) {
+        footerBtn.textContent = "In arrivo";
+      }
+    }
+  }
+
+  // --- CARD MAGAZZINIERE -> SCADENZE / SCORTE ---
+  const magazzinoCard = document.querySelector(".card-magazziniera");
+  if (magazzinoCard) {
+    const title = magazzinoCard.querySelector("h2");
+    const bodyText = magazzinoCard.querySelector(".small-text");
+    const footerBtn = magazzinoCard.querySelector(".card-footer button");
+
+    if (role === "titolare" || role === "farmacia") {
+      if (title) title.textContent = "Scadenze & Scorte";
+      if (bodyText) {
+        bodyText.textContent =
+          "Visualizza prodotti in scadenza e segnala le scorte critiche (URGENTE).";
+      }
+      if (footerBtn) {
+        footerBtn.textContent = "Visualizza scadenze e scorte";
+      }
+    } else if (role === "dipendente") {
+      if (title) title.textContent = "Magazzino (scorte)";
+      if (bodyText) {
+        bodyText.textContent =
+          "Segnala scorte basse e controlla prodotti in scadenza.";
+      }
+      if (footerBtn) {
+        footerBtn.textContent = "Segna una scorta";
+      }
+    } else {
+      // cliente o altro: card meno dettagliata
+      if (title) title.textContent = "Magazzino";
+      if (bodyText) {
+        bodyText.textContent = "Scorte, scadenze e inventari veloci (demo).";
+      }
+      if (footerBtn) {
+        footerBtn.textContent = "In arrivo";
+      }
+    }
+  }
+
+  // --- CARD COMUNICAZIONI: bottone "Comunica" solo per titolare ---
+  const comunicaExtraBtn = document.getElementById("dashboardComunicaBtn");
+  if (comunicaExtraBtn) {
+    if (role === "titolare") {
+      comunicaExtraBtn.style.display = "inline-flex";
+    } else {
+      comunicaExtraBtn.style.display = "none";
+    }
+  }
+
+  // --- GESTIONE CLASSI DI RUOLO (per futuro) ---
+  document.querySelectorAll(".role-titolare-only").forEach(el => {
+    el.style.display = role === "titolare" ? "" : "none";
+  });
+  document.querySelectorAll(".role-farmacia-only").forEach(el => {
+    el.style.display = role === "farmacia" ? "" : "none";
+  });
+  document.querySelectorAll(".role-dipendente-only").forEach(el => {
+    el.style.display = role === "dipendente" ? "" : "none";
+  });
+  document.querySelectorAll(".role-cliente-only").forEach(el => {
+    el.style.display = role === "cliente" ? "" : "none";
+  });
+}/* ------------------------------------------------
    FUNZIONE MOSTRA SEZIONE
 --------------------------------------------------- */
 function showSection(section) {
