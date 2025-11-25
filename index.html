@@ -7,18 +7,23 @@
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 
-  <!-- Icone (puoi cambiare logo.jpg) -->
+  <!-- Icona app -->
   <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
   <link rel="icon" type="image/png" href="logo.jpg">
 </head>
+
 <body>
 
-  <!-- ============ LOGIN ============ -->
+  <!-- ============================
+       LOGIN (inizio)
+  ============================= -->
   <div id="authContainer" class="auth-container">
     <div class="auth-card">
+
       <div class="auth-logo-wrap">
         <img src="logo.jpg" alt="Farmacia Montesano" class="auth-logo" />
       </div>
+
       <h1>Portale Farmacia Montesano</h1>
       <p class="auth-intro">
         Seleziona il tipo di accesso e inserisci le credenziali.
@@ -37,25 +42,30 @@
 
       <form id="loginForm" class="auth-form">
         <div class="form-row">
-          <label for="loginUsername">Username</label>
+          <label>Username</label>
           <input id="loginUsername" type="text" placeholder="Inserisci username" />
         </div>
+
         <div class="form-row">
-          <label for="loginPassword">Password</label>
+          <label>Password</label>
           <input id="loginPassword" type="password" placeholder="Inserisci password" />
         </div>
+
         <button type="submit" class="btn-primary wide">Entra</button>
+
         <p class="login-hint">
-          Demo: per ora puoi inserire qualsiasi username e password.
+          Demo: qualunque username e password funzionano per ora.
         </p>
       </form>
+
     </div>
   </div>
-
-  <!-- ============ APP PRINCIPALE ============ -->
+    <!-- ============================
+       APP PRINCIPALE
+  ============================= -->
   <main id="app" class="app hidden">
 
-    <!-- SIDEBAR -->
+    <!-- ===== SIDEBAR ===== -->
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo-row">
@@ -67,39 +77,51 @@
 
       <ul class="sidebar-list">
         <li data-nav="dashboard">Dashboard</li>
-        <li data-nav="assenzePage" class="role-internal-only">Assenze</li>
+        <li data-nav="assenzePage">Assenze</li>
         <li data-nav="turniPage">Farmacie di turno</li>
         <li data-nav="comunicazioniPage">Comunicazioni</li>
-        <li data-nav="procedurePage" class="role-internal-only">Procedure</li>
+        <li data-nav="procedurePage">Procedure</li>
+        <li data-nav="arriviPage">Arrivi / Logistica</li>
+        <li data-nav="scortePage">Scorte & Scadenze</li>
+        <li data-nav="cambioCassaPage">Cambio cassa</li>
+
         <li class="divider-label">Strumenti</li>
-        <li data-nav="archivioPage" class="role-internal-only">Archivio file</li>
+        <li data-nav="archivioPage">Archivio file</li>
+
+        <li class="divider-label">Clienti</li>
+        <li data-nav="clientiPage">Area Clienti (demo)</li>
+
         <li id="logoutBtn" class="logout">Logout</li>
       </ul>
     </aside>
 
-    <!-- HAMBURGER -->
+    <!-- ===== HAMBURGER MOBILE ===== -->
     <button id="hamburger" class="hamburger" aria-label="Apri menu">
       ☰
     </button>
 
-    <!-- ============ DASHBOARD ============ -->
+    <!-- ============================
+         DASHBOARD
+    ============================= -->
     <section id="dashboard" class="dashboard">
       <header class="dashboard-header">
         <div class="dashboard-logo-block">
           <img src="logo.jpg" alt="Farmacia Montesano" class="dash-logo" />
         </div>
+
         <div class="dashboard-header-text">
           <h1>Farmacia Montesano</h1>
           <p class="header-subtitle">Portale interno</p>
-          <span id="currentRolePill" class="role-pill">Farmacia – accesso banco/retro</span>
+          <span id="currentRolePill" class="role-pill">
+            Farmacia (accesso generico)
+          </span>
         </div>
       </header>
 
       <div class="dashboard-content">
         <div class="cards-grid">
-
-          <!-- ASSENZE (TITOLARE/FARMACIA/DIPENDENTI) -->
-          <article class="card card-assenze role-internal-only">
+                    <!-- ========== CARD ASSENZE ========== -->
+          <article class="card card-assenze">
             <div class="card-badge js-card-badge" data-card-key="assenze">
               <span class="badge-count"></span>
             </div>
@@ -113,39 +135,45 @@
               </div>
             </div>
 
-            <div class="card-body card-body-assenze">
-              <div class="assenze-oggi-snippet">
-                <p class="caption">Assenti oggi (demo)</p>
-                <ul id="assenzeOggiListCard" class="assenze-list small compact">
-                  <!-- Popolato da JS -->
-                </ul>
-              </div>
+            <div class="card-body">
+              <!-- Assenti di oggi -->
+              <p class="caption">Assenti di oggi (demo):</p>
+              <ul class="assenze-list small" id="assenzeOggiCardList">
+                <li>
+                  <span>Mario Rossi</span>
+                  <span class="tag tag-ferie">Ferie</span>
+                </li>
+              </ul>
 
-              <div class="mini-calendar">
-                <div class="mini-calendar-header">
-                  <span id="miniCalMeseCorrente">Dicembre</span>
+              <!-- Mini calendario demo per Titolare -->
+              <div class="mini-calendar-wrapper">
+                <p class="small-text">Prossimi giorni (demo):</p>
+                <div class="mini-calendar" id="miniCalendarAssenze">
+                  <button class="mini-day" data-day="1">1</button>
+                  <button class="mini-day" data-day="2">2</button>
+                  <button class="mini-day has-assenze" data-day="3">3</button>
+                  <button class="mini-day" data-day="4">4</button>
+                  <button class="mini-day has-assenze" data-day="5">5</button>
+                  <button class="mini-day" data-day="6">6</button>
+                  <button class="mini-day" data-day="7">7</button>
                 </div>
-                <div class="mini-calendar-days">
-                  <button type="button" class="mini-cal-day" data-day="17">17</button>
-                  <button type="button" class="mini-cal-day" data-day="18">18</button>
-                  <button type="button" class="mini-cal-day" data-day="19">19</button>
-                  <button type="button" class="mini-cal-day" data-day="20">20</button>
-                  <button type="button" class="mini-cal-day" data-day="21">21</button>
-                </div>
-                <p id="miniCalInfo" class="mini-calendar-info small-text">
-                  Tocca un giorno per vedere chi è assente (demo).
+                <p class="small-text muted">
+                  Tocca un giorno (blu) per vedere gli assenti (demo).
                 </p>
               </div>
             </div>
 
-            <div class="card-footer card-footer-assenze">
-              <button id="btnVediTuttiAssenti" class="btn-primary">
-                Vedi tutti gli assenti
+            <div class="card-footer card-footer-double">
+              <button id="cardVediAssentiOggi" class="btn-secondary">
+                Vedi tutti gli assenti di oggi
+              </button>
+              <button id="openAssenze" class="btn-primary">
+                Vai alla pagina Assenze
               </button>
             </div>
           </article>
 
-          <!-- FARMACIE DI TURNO (VISIBILE ANCHE AI CLIENTI) -->
+          <!-- ========== CARD FARMACIA DI TURNO ========== -->
           <article class="card card-turno">
             <div class="card-badge js-card-badge" data-card-key="turni">
               <span class="badge-count"></span>
@@ -159,26 +187,33 @@
                 <span class="chip chip-turno" id="turnoOrarioChip">00:00 – 24:00</span>
               </div>
             </div>
+
             <div class="card-body">
-              <p><strong id="turnoNome">Farmacia Montesano</strong></p>
+              <!-- Farmacia principale in alto, grande -->
+              <p class="small-text label">Farmacia principale</p>
+              <p class="turno-main-name" id="turnoNome">Farmacia Montesano</p>
               <p class="small-text" id="turnoIndirizzo">
-                Via Esempio 12, Matera<br />Tel: 0835 000000
+                Via Esempio 12, Matera<br />
+                Tel: 0835 000000
               </p>
+
               <div class="divider"></div>
-              <p class="small-text">
-                <strong>Farmacia di appoggio</strong><br />
-                <span id="turnoAppoggio">
-                  Farmacia Centrale – Via Dante 8, Matera – Tel: 0835 111111
-                </span>
+
+              <!-- Farmacia di appoggio nella seconda metà -->
+              <p class="small-text label">Farmacia di appoggio</p>
+              <p class="small-text" id="turnoAppoggio">
+                Farmacia Centrale – Via Dante 8, Matera – Tel: 0835 111111
               </p>
             </div>
+
             <div class="card-footer">
               <button id="openTurni" class="btn-secondary">
-                Lista farmacie di turno
+                Lista completa turni
               </button>
             </div>
           </article>
-                    <!-- COMUNICAZIONI -->
+
+          <!-- ========== CARD COMUNICAZIONI ========== -->
           <article class="card card-comunicazioni">
             <div class="card-badge js-card-badge" data-card-key="comunicazioni">
               <span class="badge-count"></span>
@@ -191,6 +226,7 @@
                 <h2>Comunicazioni</h2>
               </div>
             </div>
+
             <div class="card-body card-body-list">
               <div class="list-item">
                 <span class="list-title">Nuova procedura notturni</span>
@@ -201,18 +237,19 @@
                 <span class="list-meta">Ieri · Importante</span>
               </div>
             </div>
-            <div class="card-footer card-footer-comunicazioni">
+
+            <div class="card-footer card-footer-double">
+              <button id="btnComunicaPopup" class="btn-secondary">
+                Comunica
+              </button>
               <button id="openComunicazioni" class="btn-primary">
                 Vai a Comunicazioni
-              </button>
-              <button id="btnApriPopupComunica" class="btn-secondary role-titolare-only">
-                Comunica
               </button>
             </div>
           </article>
 
-          <!-- PROCEDURE (INTERNI) -->
-          <article class="card card-procedure role-internal-only">
+          <!-- ========== CARD PROCEDURE ========== -->
+          <article class="card card-procedure">
             <div class="card-badge js-card-badge" data-card-key="procedure">
               <span class="badge-count"></span>
             </div>
@@ -222,13 +259,17 @@
               <div class="card-icon">🗂️</div>
               <div class="card-title-group">
                 <h2>Procedure</h2>
+                <span class="chip">Farmacia & farmacisti</span>
               </div>
             </div>
+
             <div class="card-body">
               <p class="small-text">
-                Procedure della farmacia e dei farmacisti, sempre aggiornate.
+                Accesso rapido alle procedure interne della <strong>Farmacia</strong>
+                e dei <strong>Farmacisti</strong>.
               </p>
             </div>
+
             <div class="card-footer">
               <button id="openProcedure" class="btn-secondary">
                 Vai a Procedure
@@ -236,8 +277,8 @@
             </div>
           </article>
 
-          <!-- ARRIVI / LOGISTICA (INTERNI) -->
-          <article class="card card-logistica role-internal-only">
+          <!-- ========== CARD ARRIVI / LOGISTICA ========== -->
+          <article class="card card-logistica">
             <div class="card-badge js-card-badge" data-card-key="logistica">
               <span class="badge-count"></span>
             </div>
@@ -246,25 +287,30 @@
             <div class="card-header">
               <div class="card-icon">📦</div>
               <div class="card-title-group">
-                <h2>Arrivi & corrieri</h2>
+                <h2>Arrivi / Logistica</h2>
+                <span class="chip">Corrieri & espositori</span>
               </div>
             </div>
+
             <div class="card-body">
               <p class="small-text">
-                Ultimi arrivi registrati (demo):
+                Segnala e visualizza gli <strong>arrivi</strong> di corrieri,
+                espositori e materiale per la farmacia.
               </p>
-              <div id="arriviListCard" class="arrivi-list-card small-text">
-                <!-- Popolato da JS -->
-              </div>
             </div>
-            <div class="card-footer">
-              <button id="btnArriviVisualizza" class="btn-secondary small">Visualizza</button>
-              <button id="btnArriviSegnala" class="btn-primary small">Segnala arrivo</button>
+
+            <div class="card-footer card-footer-double">
+              <button id="btnVediArrivi" class="btn-secondary">
+                Visualizza arrivi
+              </button>
+              <button id="btnSegnalaArrivo" class="btn-primary">
+                Segnala arrivo
+              </button>
             </div>
           </article>
 
-          <!-- SCADENZE & SCORTE (INTERNI) -->
-          <article class="card card-magazziniera role-internal-only">
+          <!-- ========== CARD SCORTE ========== -->
+          <article class="card card-magazziniera">
             <div class="card-badge js-card-badge" data-card-key="magazzino">
               <span class="badge-count"></span>
             </div>
@@ -273,62 +319,90 @@
             <div class="card-header">
               <div class="card-icon">📋</div>
               <div class="card-title-group">
-                <h2>Scadenze & scorte</h2>
+                <h2>Scorte</h2>
+                <span class="chip">Segnala scorta bassa</span>
               </div>
             </div>
+
             <div class="card-body">
-              <p class="small-text"><strong>Prodotti in scadenza (demo)</strong></p>
-              <ul id="scadenzeListCard" class="scadenze-list small">
-                <!-- Popolato da JS -->
-              </ul>
-
-              <div class="divider"></div>
-
-              <p class="small-text"><strong>Prodotti segnati come scorta</strong></p>
-              <ul id="scorteListCard" class="scorte-list small">
-                <!-- Popolato da JS -->
-              </ul>
+              <p class="small-text">
+                Elenco dei prodotti segnalati con <strong>flag di scorta</strong>.
+                La farmacia e i dipendenti vedono le segnalazioni
+                con indicazione <strong>Urgente</strong> quando necessario.
+              </p>
             </div>
+
             <div class="card-footer">
-              <button id="btnScadenzeVisualizza" class="btn-secondary small">
+              <button id="btnVediScorte" class="btn-secondary">
+                Vedi lista scorte
+              </button>
+            </div>
+          </article>
+
+          <!-- ========== CARD SCADENZE ========== -->
+          <article class="card card-scadenze">
+            <div class="card-badge js-card-badge" data-card-key="scadenze">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="scadenze"></div>
+
+            <div class="card-header">
+              <div class="card-icon">⏳</div>
+              <div class="card-title-group">
+                <h2>Scadenze prodotti</h2>
+                <span class="chip">Dal più urgente</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <p class="small-text">
+                Visualizza l’elenco dei prodotti in scadenza,
+                ordinati dal <strong>più urgente</strong> al meno urgente,
+                con possibilità di <strong>cancellare</strong> un prodotto se è stato venduto.
+              </p>
+            </div>
+
+            <div class="card-footer">
+              <button id="btnVediScadenze" class="btn-primary">
                 Visualizza scadenze
               </button>
             </div>
           </article>
 
-          <!-- CAMBIO CASSA (INTERNI) -->
-          <article class="card card-cassa role-internal-only">
+          <!-- ========== CARD CAMBIO CASSA ========== -->
+          <article class="card card-cambio-cassa">
             <div class="card-header">
               <div class="card-icon">💶</div>
               <div class="card-title-group">
                 <h2>Cambio cassa</h2>
-                <span class="chip chip-cassa">Richieste di oggi (demo)</span>
+                <span class="chip">Dettaglio richieste</span>
               </div>
             </div>
+
             <div class="card-body">
               <p class="small-text">
-                Tagli richiesti (esempio):
+                Il <strong>Titolare</strong> visualizza cosa è stato richiesto
+                per il cambio cassa, con dettaglio di <strong>banconote</strong> e
+                <strong>monete</strong>.
               </p>
-              <ul class="cassa-list small-text">
-                <li>💶 50€ × 2</li>
-                <li>💶 20€ × 5</li>
-                <li>💶 10€ × 8</li>
-                <li>💶 5€ × 10</li>
-                <li>🪙 2€ × 20 · 1€ × 30 · 0,50€ × 40</li>
-              </ul>
-              <p class="small-text muted">
-                In futuro qui vedrai le richieste reali del titolare con immagini di banconote e monete.
-              </p>
+              <div class="cambio-cassa-icons">
+                <span>💶 50</span>
+                <span>💶 20</span>
+                <span>💶 10</span>
+                <span>🪙 2</span>
+                <span>🪙 1</span>
+              </div>
             </div>
+
             <div class="card-footer">
-              <button id="btnCassaDettaglio" class="btn-secondary">
-                Visualizza dettaglio
+              <button id="btnVediCambioCassa" class="btn-secondary">
+                Vedi richieste cambio cassa
               </button>
             </div>
           </article>
 
-          <!-- ARCHIVIO FILE (INTERNI) -->
-          <article class="card card-archivio role-internal-only">
+          <!-- ========== CARD ARCHIVIO FILE ========== -->
+          <article class="card card-archivio">
             <div class="card-header">
               <div class="card-icon">🗄️</div>
               <div class="card-title-group">
@@ -336,6 +410,7 @@
                 <span class="chip chip-archivio">Rapido & intuitivo</span>
               </div>
             </div>
+
             <div class="card-body">
               <p class="small-text">
                 Gestisci file e cartelle come su un PC:
@@ -343,6 +418,7 @@
                 per copiare, incollare, rinominare o eliminare.
               </p>
             </div>
+
             <div class="card-footer">
               <button id="openArchivio" class="btn-primary">
                 Apri Archivio
@@ -350,9 +426,33 @@
             </div>
           </article>
 
-        </div>
-      </div>
-    </section>
+          <!-- ========== CARD AREA CLIENTI (DEMO) ========== -->
+          <article class="card card-clienti">
+            <div class="card-header">
+              <div class="card-icon">🧑‍⚕️</div>
+              <div class="card-title-group">
+                <h2>Area Clienti</h2>
+                <span class="chip">Accesso dedicato</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <p class="small-text">
+                Sezione demo per i <strong>Clienti</strong> della farmacia:
+                informazioni, promemoria e documenti personalizzati.
+              </p>
+            </div>
+
+            <div class="card-footer">
+              <button id="openClienti" class="btn-secondary">
+                Vai all’area Clienti
+              </button>
+            </div>
+          </article>
+
+        </div> <!-- /cards-grid -->
+      </div> <!-- /dashboard-content -->
+    </section> <!-- /dashboard -->
         <!-- ============ PAGINA ASSENZE ============ -->
     <section id="assenzePage" class="page hidden">
       <header class="page-header">
@@ -368,6 +468,7 @@
         </div>
       </header>
 
+      <!-- Mini riepilogo in alto -->
       <div class="assenze-top-cards">
         <div class="mini-card">
           <h3>Richieste in attesa</h3>
@@ -422,10 +523,10 @@
           </div>
         </article>
 
-        <!-- Oggi demo -->
+        <!-- Assenti oggi -->
         <article class="card oggi-card">
           <h2>Assenti oggi (demo)</h2>
-          <ul class="assenze-list small">
+          <ul class="assenze-list small" id="assenzeOggiPageList">
             <li>
               <span>Mario Rossi</span>
               <span class="tag tag-ferie">Ferie</span>
@@ -490,7 +591,8 @@
         </p>
       </article>
     </section>
-        <!-- ============ PAGINA TURNI ============ -->
+
+    <!-- ============ PAGINA TURNI ============ -->
     <section id="turniPage" class="page hidden">
       <header class="page-header">
         <button id="backFromTurni" class="back-button">← Dashboard</button>
@@ -570,8 +672,7 @@
         </article>
       </div>
     </section>
-
-    <!-- ============ PAGINA COMUNICAZIONI ============ -->
+        <!-- ============ PAGINA COMUNICAZIONI ============ -->
     <section id="comunicazioniPage" class="page hidden">
       <header class="page-header">
         <button id="backFromComunicazioni" class="back-button">← Dashboard</button>
@@ -595,7 +696,7 @@
           <div id="comunicazioniList" class="comunicazioni-list"></div>
         </article>
 
-        <article class="card comunicazioni-side-card role-internal-only">
+        <article class="card comunicazioni-side-card">
           <h2>Filtri & nuova comunicazione (demo)</h2>
 
           <div class="form-row">
@@ -643,7 +744,8 @@
         </article>
       </div>
     </section>
-        <!-- ============ PAGINA PROCEDURE ============ -->
+
+    <!-- ============ PAGINA PROCEDURE ============ -->
     <section id="procedurePage" class="page hidden">
       <header class="page-header">
         <button id="backFromProcedure" class="back-button">← Dashboard</button>
@@ -680,100 +782,62 @@
         </div>
       </article>
     </section>
-
-    <!-- ============ PAGINA ARCHIVIO FILE ============ -->
+        <!-- ============ PAGINA ARCHIVIO FILE ============ -->
     <section id="archivioPage" class="page hidden">
       <header class="page-header">
         <button id="backFromArchivio" class="back-button">← Dashboard</button>
         <div class="page-title-block">
-          <h1>Archivio file</h1>
-          <p>Cartelle e file stile PC, super semplice.</p>
+          <h1>Archivio File</h1>
+          <p>Organizza file e cartelle come su un PC.</p>
         </div>
       </header>
 
-      <article class="card archivio-card">
-        <div class="archivio-toolbar">
-          <div class="archivio-path">
-            Percorso: <span id="archivioPath">/root</span>
-          </div>
-          <div class="archivio-actions">
-            <button id="archivioUp" class="btn-secondary small">⬆ Cartella su</button>
-            <button id="archivioNewFolder" class="btn-secondary small">+ Nuova cartella</button>
-            <button id="archivioBtnUpload" class="btn-primary small">⬆ Carica file</button>
-            <input id="archivioUpload" type="file" multiple class="hidden" />
-          </div>
-        </div>
+      <div class="archivio-toolbar">
+        <button id="archivioBtnUpload" class="btn-primary">Carica file</button>
+        <button id="archivioNewFolderBtn" class="btn-secondary">Nuova cartella</button>
+        <button id="archivioUpBtn" class="btn-secondary">↑ Su</button>
+        <input id="archivioUpload" type="file" multiple class="hidden" />
+      </div>
 
-        <p class="small-text long-press-hint">
-          💡 PC: tasto destro per opzioni · Telefono: tieni premuto sul file/cartella.
-        </p>
+      <div id="archivioCurrentPath" class="archivio-path">
+        / (root)
+      </div>
 
-        <div id="archivioGrid" class="file-grid">
-          <!-- Popolato da JS -->
-        </div>
-      </article>
+      <div id="archivioGrid" class="archivio-grid">
+        <!-- Lo script riempie qui -->
+      </div>
     </section>
 
-    <!-- MENU TASTO DESTRO ARCHIVIO -->
+    <!-- ====== CONTEXT MENU ARCHIVIO ====== -->
     <div id="archivioContextMenu" class="context-menu hidden">
-      <button id="menuNuova" class="context-menu-item">📁 Nuova cartella</button>
-      <button id="menuRinomina" class="context-menu-item">✏️ Rinomina</button>
-      <button id="menuCopia" class="context-menu-item">📄 Copia</button>
-      <button id="menuIncolla" class="context-menu-item">📥 Incolla</button>
-      <button id="menuDownload" class="context-menu-item">⬇️ Scarica file</button>
-      <button id="menuElimina" class="context-menu-item danger">🗑 Elimina</button>
+      <button id="menuNuova">📁 Nuova cartella</button>
+      <button id="menuRinomina">✏️ Rinomina</button>
+      <button id="menuElimina">🗑️ Elimina</button>
+      <button id="menuCopia">📄 Copia</button>
+      <button id="menuIncolla">📥 Incolla</button>
+      <button id="menuDownload">⬇️ Download</button>
     </div>
 
-    <!-- OVERLAY NOTIFICHE CARD -->
+    <!-- ============ OVERLAY NOTIFICHE ============ -->
     <div id="notificationOverlay" class="notif-overlay hidden">
+
       <div class="notif-backdrop"></div>
-      <div class="notif-modal">
-        <button id="notifClose" class="notif-close" aria-label="Chiudi">✕</button>
-        <h2 id="notifTitle">Notifiche</h2>
-        <p id="notifIntro" class="small-text"></p>
-        <div id="notifList" class="notif-list"></div>
+
+      <div class="notif-popup">
+        <div class="notif-header">
+          <h2 id="notifTitle">Notifiche</h2>
+          <button id="notifClose" class="notif-close">✕</button>
+        </div>
+
+        <div id="notifContent" class="notif-content">
+          <!-- Popolato dallo script -->
+        </div>
+
         <div class="notif-footer">
-          <button id="notifCloseBottom" class="btn-secondary small">Chiudi</button>
+          <button id="notifCloseBottom" class="btn-primary">Chiudi</button>
         </div>
       </div>
     </div>
-
-    <!-- OVERLAY COMUNICA (POPUP TITOLARE) -->
-    <div id="comunicaOverlay" class="notif-overlay hidden">
-      <div class="notif-backdrop"></div>
-      <div class="notif-modal comunica-modal">
-        <button id="comunicaClose" class="notif-close" aria-label="Chiudi">✕</button>
-        <h2>Invia comunicazione rapida</h2>
-        <p class="small-text">
-          Modulo rapido pensato per il titolare / farmacia. La comunicazione verrà aggiunta all’elenco interno (demo).
-        </p>
-        <form id="comunicaPopupForm" class="comunicazione-form">
-          <div class="form-row">
-            <label for="comPopupTitolo">Titolo</label>
-            <input id="comPopupTitolo" type="text" placeholder="Es. Cambio turno di oggi" />
-          </div>
-          <div class="form-row">
-            <label for="comPopupCategoria">Categoria</label>
-            <select id="comPopupCategoria">
-              <option value="urgente">Urgente</option>
-              <option value="importante">Importante</option>
-              <option value="informativa">Informativa</option>
-            </select>
-          </div>
-          <div class="form-row">
-            <label for="comPopupTesto">Testo</label>
-            <textarea id="comPopupTesto" rows="3"></textarea>
-          </div>
-          <div class="form-actions">
-            <button type="submit" class="btn-primary small">Invia (demo)</button>
-          </div>
-          <p id="comunicaPopupFeedback" class="form-feedback hidden">
-            ✅ Comunicazione registrata (demo).
-          </p>
-        </form>
-      </div>
-    </div>
-
-  </main>
+      </main>
 </body>
 </html>
