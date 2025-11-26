@@ -2219,3 +2219,313 @@ button {
     flex-direction: column;
   }
 }
+/* ==========================================================
+   CARD ASSENZE – LAYOUT UNICO
+   ========================================================== */
+
+.single-card-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.card-assenze-hero {
+  display: flex;
+  gap: 32px;
+  padding: 24px 28px;
+  position: relative;
+  align-items: stretch;
+}
+
+.card-assenze-hero .cal-assenze-left,
+.card-assenze-hero .cal-assenze-right {
+  flex: 1;
+  min-width: 0;
+}
+
+.cal-assenze-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cal-assenze-date {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.cal-assenze-title {
+  font-size: 1.6rem;
+  margin: 0;
+}
+
+.cal-assenze-subtitle {
+  margin-top: 16px;
+  font-size: 1.05rem;
+}
+
+.cal-assenze-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+}
+
+.cal-assenze-list li {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.cal-assenze-actions {
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cal-assenze-btn {
+  min-width: 180px;
+}
+
+/* Mini calendario */
+
+.cal-assenze-right {
+  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.35));
+  border-radius: 20px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cal-mini-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.cal-mini-nav {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  cursor: pointer;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+.cal-mini-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.8rem;
+}
+
+.cal-mini-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-mini-header-row span {
+  text-align: center;
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.cal-mini-day {
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 10px;
+  position: relative;
+  cursor: default;
+}
+
+.cal-mini-day.empty {
+  opacity: 0;
+}
+
+.cal-mini-day.has-assenze {
+  cursor: pointer;
+}
+
+.cal-mini-day.has-assenze:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.cal-mini-day-dot {
+  display: block;
+  font-size: 0.55rem;
+  margin-top: 2px;
+  color: #9cff7a;
+}
+
+.cal-mini-day.selected {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.cal-mini-legend {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.cal-mini-info h4 {
+  margin: 8px 0 4px;
+  font-size: 0.95rem;
+}
+
+/* Badge notifiche che pulsa */
+
+.cal-assenze-notif-badge {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: none;
+  background: #3cff7a;
+  color: #000;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(60, 255, 122, 0.8);
+  animation: pulseBadge 1.4s infinite;
+}
+
+.cal-assenze-notif-badge span {
+  transform: translateY(-1px);
+}
+
+@keyframes pulseBadge {
+  0% { transform: scale(1); box-shadow: 0 0 10px rgba(60,255,122,0.8); }
+  50% { transform: scale(1.08); box-shadow: 0 0 14px rgba(60,255,122,1); }
+  100% { transform: scale(1); box-shadow: 0 0 10px rgba(60,255,122,0.8); }
+}
+
+/* Popup notifiche dentro la card */
+
+.notif-popup {
+  position: absolute;
+  top: 52px;
+  right: 16px;
+  z-index: 5;
+}
+
+.notif-popup-inner {
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 16px;
+  padding: 10px 12px 12px;
+  min-width: 230px;
+  max-width: 280px;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+}
+
+.notif-popup-inner h3 {
+  font-size: 0.95rem;
+  margin: 0 0 6px;
+}
+
+#assenzeNotifList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+}
+
+#assenzeNotifList li {
+  margin-bottom: 4px;
+}
+
+.notif-popup .small {
+  font-size: 0.8rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Blocco FARMACIA DI TURNO in alto */
+
+.dashboard-turno-today {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #1fba6c, #25d98b);
+  color: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  max-width: 280px;
+  font-size: 0.8rem;
+}
+
+.turno-today-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.turno-today-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.turno-today-main,
+.turno-today-appoggio {
+  margin: 0 0 4px;
+}
+
+.turno-today-label {
+  opacity: 0.9;
+}
+
+/* Archivio colonne */
+
+.archivio-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.archivio-col h3 {
+  margin-top: 0;
+  margin-bottom: 6px;
+}
+
+.archivio-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.archivio-list li {
+  margin-bottom: 6px;
+}
+
+.btn-inline {
+  display: inline-block;
+  margin-left: 6px;
+  margin-top: 4px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .dashboard-turno-today {
+    margin-left: 0;
+    margin-top: 12px;
+    max-width: 100%;
+  }
+
+  .card-assenze-hero {
+    flex-direction: column;
+  }
+
+  .archivio-columns {
+    grid-template-columns: 1fr;
+  }
+}
