@@ -1091,6 +1091,65 @@ function updateAssenzeLayoutForRole() {
     }
   }
 }
+// Mini calendario assenze in dashboard (demo statica)
+function initMiniCalendarDashboard() {
+  if (!calMiniGrid || !calMiniMonthLabel) return;
+
+  // Titolo del mese
+  calMiniMonthLabel.textContent = "Novembre 2025";
+
+  // HTML del mini calendario (demo)
+  calMiniGrid.innerHTML = `
+    <div class="calendar-row calendar-header-row">
+      <span>L</span><span>M</span><span>M</span><span>G</span><span>V</span><span>S</span><span>D</span>
+    </div>
+    <div class="calendar-row">
+      <span class="empty">.</span>
+      <span class="empty">.</span>
+      <span class="day"><span>1</span></span>
+      <span class="day"><span>2</span></span>
+      <span class="day"><span>3</span></span>
+      <span class="day"><span>4</span></span>
+      <span class="day"><span>5</span></span>
+    </div>
+    <div class="calendar-row">
+      <span class="day"><span>6</span></span>
+      <span class="day"><span>7</span></span>
+      <span class="day"><span>8</span></span>
+      <span class="day"><span>9</span></span>
+      <span class="day"><span>10</span></span>
+      <span class="day"><span>11</span></span>
+      <span class="day"><span>12</span></span>
+    </div>
+    <div class="calendar-row">
+      <span class="day"><span>13</span></span>
+      <span class="day"><span>14</span></span>
+      <span class="day"><span>15</span></span>
+      <span class="day"><span>16</span></span>
+      <span class="day"><span>17</span></span>
+      <span class="day"><span>18</span></span>
+      <span class="day"><span>19</span></span>
+    </div>
+    <div class="calendar-row">
+      <span class="day"><span>20</span></span>
+      <span class="day"><span>21</span></span>
+      <span class="day"><span>22</span></span>
+      <span class="day"><span>23</span></span>
+      <span class="day day-holiday"><span>24</span></span>
+      <span class="day day-holiday"><span>25</span></span>
+      <span class="day day-holiday"><span>26</span></span>
+    </div>
+    <div class="calendar-row">
+      <span class="day"><span>27</span></span>
+      <span class="day"><span>28</span></span>
+      <span class="day"><span>29</span></span>
+      <span class="day"><span>30</span></span>
+      <span class="empty">.</span>
+      <span class="empty">.</span>
+      <span class="empty">.</span>
+    </div>
+  `;
+}
 // ======================================================
 // DOM READY
 // ======================================================
