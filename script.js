@@ -1,5 +1,5 @@
 // ======================================================
-// SCRIPT – LOGIN + CARD ASSENZE + RUOLI
+// PORTALE FARMACIA MONTESANO – SCRIPT COMPLETO
 // ======================================================
 
 // ------- DATI DEMO ASSENZE -------
@@ -10,54 +10,107 @@ const assenzeDemo = [
   { date: "2025-12-05", names: ["Daniela Blu"] }
 ];
 
-// Notifiche diverse per ruolo (demo)
+// ------- DATI DEMO FARMACIA DI TURNO OGGI -------
+const turnoOggi = {
+  principaleNome: "Farmacia Montesano",
+  principaleIndirizzo: "Via Esempio 12, Matera",
+  principaleTel: "0835 000000",
+  appoggioNome: "Farmacia Centrale",
+  appoggioIndirizzo: "Via Dante 8, Matera",
+  appoggioTel: "0835 111111"
+};
+
+// ------- NOTIFICHE PER RUOLO (BASE) -------
 const notifichePerRuolo = {
   farmacia: [
     {
       id: 1,
       text: "Nuova assenza approvata: Mario Rossi (20/12).",
-      read: false
+      read: false,
+      area: "assenze"
     },
     {
       id: 2,
       text: "Nuova assenza approvata: Giulia Bianchi (22/12).",
-      read: false
+      read: false,
+      area: "assenze"
     }
   ],
   titolare: [
     {
       id: 3,
       text: "Nuova richiesta ferie: Cosimo Verdi (28/11).",
-      read: false
+      read: false,
+      area: "assenze"
     },
     {
       id: 4,
       text: "Nuova richiesta permesso: Daniela Blu (05/12).",
-      read: false
+      read: false,
+      area: "assenze"
     }
   ],
   dipendente: [
     {
       id: 5,
       text: "La tua richiesta del 2/12 è stata approvata.",
-      read: false
+      read: false,
+      area: "assenze"
     }
   ]
 };
+
+let nextNotifId = 6;
 
 // ------- STATO GENERALE -------
 let currentRole = "farmacia";
 let currentMonth;
 let currentYear;
 
+// Arrivi / Scadenze / Consumabili
+let arriviState = [];
+let scadenzeState = [];
+let consumabiliState = [];
+
+// Archivio file
+let archivioState = {
+  dipendenti: [],
+  titolare: [],
+  tutti: []
+};
+
+// ------- CHIAVI LOCALSTORAGE -------
+const LS_ARRIVI = "montesano_arrivi";
+const LS_SCADENZE = "montesano_scadenze";
+const LS_CONSUMABILI = "montesano_consumabili";
+const LS_ARCHIVIO = "montesano_archivio";
+
 // ------- RIFERIMENTI DOM -------
 let authContainer, app, loginForm, loginRoleLabel, authTabs;
 let sidebar, hamburger, closeSidebar, logoutBtn, rolePill;
+let dashboardSection, arriviPage, archivioPage;
+
 let listaAssentiOggi, listaAssentiProssimi, calOggiLabel;
 let calMiniGrid, calMiniMonthLabel, calMiniInfo;
 let calPrevMonthBtn, calNextMonthBtn;
 let btnFarmaciaAssenze, btnDipRichiedi, btnDipVedi, btnTitSegna, btnTitVedi;
 let badgeNotifiche, badgeNotificheCount, notifPopup, notifList, notifClose;
+
+// Turno today box
+let turnoTodayMainName, turnoTodayMainAddr, turnoTodayMainTel;
+let turnoTodayAppName, turnoTodayAppAddr, turnoTodayAppTel;
+
+// Arrivi / scadenze / consumabili DOM
+let arriviForm, arriviList, arriviFeedback;
+let cambioCassaForm, cambioCassaFeedback;
+let scadenzeForm, scadenzeList;
+let consumabiliForm, consumabiliList;
+
+// Archivio DOM
+let btnApriArrivi, btnApriArchivio;
+let backFromArrivi, backFromArchivio;
+let archivioForm, archFileNameInput, archDestSelect;
+let archListDip, archListTit, archListTutti;
 
 // ======================================================
 // FUNZIONI DI SUPPORTO
@@ -92,8 +145,8 @@ function setRole(role) {
     btnTitVedi.classList.toggle("hidden", !isTit);
   }
 
-  // Aggiorna badge notifiche per questo ruolo
   renderNotifiche();
+  renderArchivioLists();
 }
 
 function formatDateLabel(dateObj) {
@@ -126,6 +179,19 @@ function getOggiISO() {
   return `${y}-${m}-${d}`;
 }
 
+// Mostra / nasconde le sezioni principali
+function showSection(sectionEl) {
+  if (!sectionEl) return;
+  [dashboardSection, arriviPage, archivioPage].forEach(sec => {
+    if (sec) sec.classList.add("hidden");
+  });
+  sectionEl.classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+
+// ======================================================
+// ASSENZE – LISTE OGGI / PROSSIME
+// ======================================================
 function updateAssentiOggiEProssimi() {
   if (!listaAssentiOggi || !listaAssentiProssimi || !calOggiLabel) return;
 
@@ -184,7 +250,6 @@ function buildMiniCalendar(year, month) {
   calMiniGrid.innerHTML = "";
   calMiniMonthLabel.textContent = formatMonthYearLabel(year, month);
 
-  // Intestazione giorni
   const header = document.createElement("div");
   header.className = "cal-mini-row cal-mini-header-row";
   ["L", "M", "M", "G", "V", "S", "D"].forEach(lettera => {
@@ -196,22 +261,19 @@ function buildMiniCalendar(year, month) {
 
   const first = new Date(year, month, 1);
   let startDay = first.getDay(); // 0=Dom ... 6=Sab
-  // vogliamo Lunedì come primo: 0=>6, 1=>0, ...
-  startDay = (startDay + 6) % 7;
+  startDay = (startDay + 6) % 7; // Lunedì come primo
 
   const numDays = new Date(year, month + 1, 0).getDate();
 
   let currentRow = document.createElement("div");
   currentRow.className = "cal-mini-row";
 
-  // celle vuote prima del giorno 1
   for (let i = 0; i < startDay; i++) {
     const empty = document.createElement("span");
     empty.className = "cal-mini-day empty";
     currentRow.appendChild(empty);
   }
 
-  // giorni del mese
   for (let day = 1; day <= numDays; day++) {
     if (currentRow.children.length === 7) {
       calMiniGrid.appendChild(currentRow);
@@ -244,7 +306,6 @@ function buildMiniCalendar(year, month) {
     currentRow.appendChild(span);
   }
 
-  // celle vuote finali
   while (currentRow.children.length < 7) {
     const empty = document.createElement("span");
     empty.className = "cal-mini-day empty";
@@ -256,7 +317,6 @@ function buildMiniCalendar(year, month) {
 function mostraAssenzeGiorno(dateISO, el) {
   if (!calMiniInfo) return;
 
-  // evidenzia giorno selezionato
   document.querySelectorAll(".cal-mini-day.selected").forEach(d =>
     d.classList.remove("selected")
   );
@@ -295,6 +355,37 @@ function getNotificheCorrenti() {
   return arr;
 }
 
+function updateCardBadgesForCurrentRole() {
+  const list = getNotificheCorrenti();
+  const unread = list.filter(n => !n.read);
+
+  document.querySelectorAll(".card-badge.js-card-badge").forEach(badge => {
+    const key = badge.getAttribute("data-card-key");
+    const countSpan = badge.querySelector(".badge-count");
+    const label = document.querySelector(`.card-badge-label[data-card-key="${key}"]`);
+
+    if (!key || !countSpan) return;
+
+    const count = unread.filter(n => n.area === key).length;
+
+    if (count > 0) {
+      countSpan.textContent = String(count);
+      badge.classList.add("has-unread");
+      if (label) {
+        label.textContent = count === 1 ? "Nuovo" : "Nuovi";
+        label.style.display = "block";
+      }
+    } else {
+      countSpan.textContent = "";
+      badge.classList.remove("has-unread");
+      if (label) {
+        label.textContent = "";
+        label.style.display = "none";
+      }
+    }
+  });
+}
+
 function renderNotifiche() {
   if (!badgeNotifiche || !badgeNotificheCount) return;
 
@@ -304,13 +395,11 @@ function renderNotifiche() {
 
   if (count === 0) {
     badgeNotifiche.classList.add("hidden");
-    return;
+  } else {
+    badgeNotificheCount.textContent = String(count);
+    badgeNotifiche.classList.remove("hidden");
   }
 
-  badgeNotificheCount.textContent = String(count);
-  badgeNotifiche.classList.remove("hidden");
-
-  // riempi popup
   if (!notifList) return;
   notifList.innerHTML = "";
   unread.forEach(n => {
@@ -318,6 +407,8 @@ function renderNotifiche() {
     li.textContent = n.text;
     notifList.appendChild(li);
   });
+
+  updateCardBadgesForCurrentRole();
 }
 
 function openNotifichePopup() {
@@ -329,10 +420,229 @@ function closeNotifichePopup() {
   if (!notifPopup) return;
   notifPopup.classList.add("hidden");
 
-  // segna tutto come letto
   const arr = notifichePerRuolo[currentRole] || [];
   arr.forEach(n => (n.read = true));
   renderNotifiche();
+}
+
+function addNotificaForRoles(roles, text, area) {
+  roles.forEach(role => {
+    if (!notifichePerRuolo[role]) notifichePerRuolo[role] = [];
+    notifichePerRuolo[role].push({
+      id: nextNotifId++,
+      text,
+      read: false,
+      area
+    });
+  });
+  renderNotifiche();
+}
+
+// ======================================================
+// FARMACIA DI TURNO in alto
+// ======================================================
+function renderTurnoToday() {
+  if (
+    !turnoTodayMainName ||
+    !turnoTodayMainAddr ||
+    !turnoTodayMainTel ||
+    !turnoTodayAppName ||
+    !turnoTodayAppAddr ||
+    !turnoTodayAppTel
+  ) {
+    return;
+  }
+
+  turnoTodayMainName.textContent = turnoOggi.principaleNome;
+  turnoTodayMainAddr.textContent = turnoOggi.principaleIndirizzo;
+  turnoTodayMainTel.textContent = `Tel: ${turnoOggi.principaleTel}`;
+  turnoTodayAppName.textContent = turnoOggi.appoggioNome;
+  turnoTodayAppAddr.textContent = turnoOggi.appoggioIndirizzo;
+  turnoTodayAppTel.textContent = `Tel: ${turnoOggi.appoggioTel}`;
+}
+
+// ======================================================
+// ARRIVI / SCADENZE / CONSUMABILI – STORAGE
+// ======================================================
+function loadArrivi() {
+  try {
+    const raw = localStorage.getItem(LS_ARRIVI);
+    arriviState = raw ? JSON.parse(raw) : [];
+  } catch {
+    arriviState = [];
+  }
+}
+
+function saveArrivi() {
+  try {
+    localStorage.setItem(LS_ARRIVI, JSON.stringify(arriviState));
+  } catch {}
+}
+
+function renderArrivi() {
+  if (!arriviList) return;
+  arriviList.innerHTML = "";
+  arriviState.forEach(item => {
+    const li = document.createElement("li");
+    const data = new Date(item.when);
+    li.innerHTML = `<strong>${item.nome}</strong> – ${data.toLocaleString("it-IT")}<br/>${item.nota || ""}`;
+    arriviList.appendChild(li);
+  });
+}
+
+function loadScadenze() {
+  try {
+    const raw = localStorage.getItem(LS_SCADENZE);
+    scadenzeState = raw ? JSON.parse(raw) : [];
+  } catch {
+    scadenzeState = [];
+  }
+}
+
+function saveScadenze() {
+  try {
+    localStorage.setItem(LS_SCADENZE, JSON.stringify(scadenzeState));
+  } catch {}
+}
+
+function renderScadenze() {
+  if (!scadenzeList) return;
+  scadenzeList.innerHTML = "";
+
+  if (scadenzeState.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "Nessuna scadenza registrata.";
+    scadenzeList.appendChild(li);
+    return;
+  }
+
+  scadenzeState.forEach(item => {
+    const li = document.createElement("li");
+    const dt = new Date(item.data);
+    const dataStr = dt.toLocaleDateString("it-IT");
+    li.innerHTML = `
+      <strong>${item.nome}</strong> – ${item.pezzi} pz · scad. ${dataStr}
+      <button class="btn-secondary small btn-inline" data-id="${item.id}">Elimina</button>
+    `;
+    scadenzeList.appendChild(li);
+  });
+
+  scadenzeList.querySelectorAll(".btn-inline").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      scadenzeState = scadenzeState.filter(s => String(s.id) !== String(id));
+      saveScadenze();
+      renderScadenze();
+    });
+  });
+}
+
+function loadConsumabili() {
+  try {
+    const raw = localStorage.getItem(LS_CONSUMABILI);
+    consumabiliState = raw ? JSON.parse(raw) : [];
+  } catch {
+    consumabiliState = [];
+  }
+}
+
+function saveConsumabili() {
+  try {
+    localStorage.setItem(LS_CONSUMABILI, JSON.stringify(consumabiliState));
+  } catch {}
+}
+
+function renderConsumabili() {
+  if (!consumabiliList) return;
+  consumabiliList.innerHTML = "";
+
+  if (consumabiliState.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "Nessun consumabile segnalato.";
+    consumabiliList.appendChild(li);
+    return;
+  }
+
+  consumabiliState.forEach(item => {
+    const li = document.createElement("li");
+    const dataStr = new Date(item.when).toLocaleString("it-IT");
+    li.innerHTML = `
+      <strong>${item.nome}</strong> – ${dataStr}<br/>
+      ${item.nota || ""}<br/>
+      <button class="btn-secondary small btn-inline" data-id="${item.id}">Elimina</button>
+    `;
+    consumabiliList.appendChild(li);
+  });
+
+  consumabiliList.querySelectorAll(".btn-inline").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      consumabiliState = consumabiliState.filter(c => String(c.id) !== String(id));
+      saveConsumabili();
+      renderConsumabili();
+    });
+  });
+}
+
+// ======================================================
+// ARCHIVIO – STORAGE
+// ======================================================
+function loadArchivio() {
+  try {
+    const raw = localStorage.getItem(LS_ARCHIVIO);
+    archivioState = raw
+      ? JSON.parse(raw)
+      : { dipendenti: [], titolare: [], tutti: [] };
+  } catch {
+    archivioState = { dipendenti: [], titolare: [], tutti: [] };
+  }
+}
+
+function saveArchivio() {
+  try {
+    localStorage.setItem(LS_ARCHIVIO, JSON.stringify(archivioState));
+  } catch {}
+}
+
+function renderArchivioLists() {
+  if (!archListDip || !archListTit || !archListTutti) return;
+
+  const makeList = (ul, arr) => {
+    ul.innerHTML = "";
+    if (!arr || arr.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "Nessun file.";
+      ul.appendChild(li);
+      return;
+    }
+    arr.forEach(item => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        ${item.nome}
+        <button class="btn-secondary small btn-inline" data-id="${item.id}" data-folder="${item.folder}">
+          Elimina
+        </button>
+      `;
+      ul.appendChild(li);
+    });
+  };
+
+  makeList(archListDip, archivioState.dipendenti || []);
+  makeList(archListTit, archivioState.titolare || []);
+  makeList(archListTutti, archivioState.tutti || []);
+
+  document.querySelectorAll(".archivio-list .btn-inline").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const folder = btn.getAttribute("data-folder");
+      if (!folder || !archivioState[folder]) return;
+      archivioState[folder] = archivioState[folder].filter(
+        f => String(f.id) !== String(id)
+      );
+      saveArchivio();
+      renderArchivioLists();
+    });
+  });
 }
 
 // ======================================================
@@ -351,6 +661,10 @@ document.addEventListener("DOMContentLoaded", () => {
   closeSidebar = document.getElementById("closeSidebar");
   logoutBtn = document.getElementById("logoutBtn");
   rolePill = document.getElementById("currentRolePill");
+
+  dashboardSection = document.getElementById("dashboard");
+  arriviPage = document.getElementById("arriviPage");
+  archivioPage = document.getElementById("archivioPage");
 
   listaAssentiOggi = document.getElementById("listaAssentiOggi");
   listaAssentiProssimi = document.getElementById("listaAssentiProssimi");
@@ -373,6 +687,41 @@ document.addEventListener("DOMContentLoaded", () => {
   notifPopup = document.getElementById("assenzeNotifPopup");
   notifList = document.getElementById("assenzeNotifList");
   notifClose = document.getElementById("assenzeNotifClose");
+
+  // Turno box
+  turnoTodayMainName = document.getElementById("turnoTodayMainName");
+  turnoTodayMainAddr = document.getElementById("turnoTodayMainAddr");
+  turnoTodayMainTel = document.getElementById("turnoTodayMainTel");
+  turnoTodayAppName = document.getElementById("turnoTodayAppName");
+  turnoTodayAppAddr = document.getElementById("turnoTodayAppAddr");
+  turnoTodayAppTel = document.getElementById("turnoTodayAppTel");
+
+  // Arrivi / scadenze / consumabili
+  arriviForm = document.getElementById("arriviForm");
+  arriviList = document.getElementById("arriviList");
+  arriviFeedback = document.getElementById("arriviFeedback");
+
+  cambioCassaForm = document.getElementById("cambioCassaForm");
+  cambioCassaFeedback = document.getElementById("cambioCassaFeedback");
+
+  scadenzeForm = document.getElementById("scadenzeForm");
+  scadenzeList = document.getElementById("scadenzeList");
+
+  consumabiliForm = document.getElementById("consumabiliForm");
+  consumabiliList = document.getElementById("consumabiliList");
+
+  // Archivio
+  btnApriArrivi = document.getElementById("btnApriArrivi");
+  btnApriArchivio = document.getElementById("btnApriArchivio");
+  backFromArrivi = document.getElementById("backFromArrivi");
+  backFromArchivio = document.getElementById("backFromArchivio");
+
+  archivioForm = document.getElementById("archivioForm");
+  archFileNameInput = document.getElementById("archFileName");
+  archDestSelect = document.getElementById("archDest");
+  archListDip = document.getElementById("archListDip");
+  archListTit = document.getElementById("archListTit");
+  archListTutti = document.getElementById("archListTutti");
 
   // --- ROLE TABS (login) ---
   authTabs.forEach(tab => {
@@ -404,16 +753,28 @@ document.addEventListener("DOMContentLoaded", () => {
       currentMonth = today.getMonth();
       currentYear = today.getFullYear();
 
+      // Carica dati locali
+      loadArrivi();
+      loadScadenze();
+      loadConsumabili();
+      loadArchivio();
+
       setRole(role);
+      renderTurnoToday();
       updateAssentiOggiEProssimi();
       buildMiniCalendar(currentYear, currentMonth);
       mostraAssenzeGiorno(getOggiISO());
 
-      window.scrollTo(0, 0);
+      renderArrivi();
+      renderScadenze();
+      renderConsumabili();
+      renderArchivioLists();
+
+      showSection(dashboardSection);
     });
   }
 
-  // --- SIDEBAR ---
+  // --- SIDEBAR / NAV ---
   if (hamburger) {
     hamburger.addEventListener("click", () => {
       sidebar && sidebar.classList.add("open");
@@ -437,6 +798,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  if (sidebar) {
+    sidebar.querySelectorAll("li[data-nav]").forEach(item => {
+      item.addEventListener("click", () => {
+        const target = item.dataset.nav;
+        if (target === "dashboard") showSection(dashboardSection);
+        if (target === "arriviPage") showSection(arriviPage);
+        if (target === "archivioPage") showSection(archivioPage);
+        sidebar.classList.remove("open");
+      });
+    });
+  }
+
   if (logoutBtn) {
     logoutBtn.addEventListener("click", () => {
       app.classList.add("hidden");
@@ -449,7 +822,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- BOTTONI CARD (demo: solo alert) ---
+  // --- BOTTONI DASHBOARD -> PAGINE ---
+  if (btnApriArrivi && arriviPage) {
+    btnApriArrivi.addEventListener("click", () => {
+      showSection(arriviPage);
+    });
+  }
+
+  if (btnApriArchivio && archivioPage) {
+    btnApriArchivio.addEventListener("click", () => {
+      showSection(archivioPage);
+    });
+  }
+
+  if (backFromArrivi) {
+    backFromArrivi.addEventListener("click", () => {
+      showSection(dashboardSection);
+    });
+  }
+
+  if (backFromArchivio) {
+    backFromArchivio.addEventListener("click", () => {
+      showSection(dashboardSection);
+    });
+  }
+
+  // --- BOTTONI CARD ASSENZE (per ora solo alert demo) ---
   if (btnFarmaciaAssenze) {
     btnFarmaciaAssenze.addEventListener("click", () => {
       alert("Demo: qui in futuro vedrai l’elenco completo di tutti gli assenti.");
@@ -523,5 +921,151 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Non facciamo nulla all’avvio: parte tutto dopo il login
+  // --- FORM ARRIVI ---
+  if (arriviForm && arriviList) {
+    arriviForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const nome = document.getElementById("arrNome").value.trim();
+      const nota = document.getElementById("arrNota").value.trim();
+      if (!nome) {
+        if (arriviFeedback) arriviFeedback.textContent = "Inserisci almeno il nome/descrizione.";
+        return;
+      }
+      arriviState.push({
+        id: Date.now(),
+        nome,
+        nota,
+        when: new Date().toISOString()
+      });
+      saveArrivi();
+      renderArrivi();
+      arriviForm.reset();
+      if (arriviFeedback) arriviFeedback.textContent = "Arrivo registrato (demo).";
+    });
+  }
+
+  // --- FORM CAMBIO CASSA (solo feedback e notifica titolare) ---
+  if (cambioCassaForm) {
+    cambioCassaForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const tagli = document.getElementById("ccTagli").value.trim();
+      const nota = document.getElementById("ccNota").value.trim();
+      if (!tagli) {
+        if (cambioCassaFeedback) cambioCassaFeedback.textContent = "Inserisci i tagli richiesti.";
+        return;
+      }
+      if (cambioCassaFeedback) cambioCassaFeedback.textContent = "Richiesta di cambio cassa registrata (demo).";
+
+      const testo = `Richiesta cambio cassa: ${tagli}${nota ? " (" + nota + ")" : ""}`;
+      addNotificaForRoles(["titolare"], testo, "cambiocassa");
+      cambioCassaForm.reset();
+    });
+  }
+
+  // --- FORM SCADENZE ---
+  if (scadenzeForm) {
+    scadenzeForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const nome = document.getElementById("scadNome").value.trim();
+      const pezzi = parseInt(document.getElementById("scadPezzi").value || "0", 10);
+      const data = document.getElementById("scadData").value;
+
+      if (!nome || !data || !pezzi || pezzi <= 0) {
+        alert("Compila nome prodotto, numero pezzi e data di scadenza.");
+        return;
+      }
+
+      const item = {
+        id: Date.now(),
+        nome,
+        pezzi,
+        data
+      };
+      scadenzeState.push(item);
+      saveScadenze();
+      renderScadenze();
+
+      const oggi = new Date();
+      oggi.setHours(0, 0, 0, 0);
+      const scadDate = new Date(data);
+      scadDate.setHours(0, 0, 0, 0);
+
+      const diffMs = scadDate - oggi;
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffDays >= 0 && diffDays <= 45) {
+        const dataStr = scadDate.toLocaleDateString("it-IT");
+        const testo = `Scadenza vicina: ${nome} (${pezzi} pz) – ${dataStr}`;
+        addNotificaForRoles(["farmacia", "titolare"], testo, "scadenze");
+      }
+
+      scadenzeForm.reset();
+    });
+  }
+
+  // --- FORM CONSUMABILI ---
+  if (consumabiliForm) {
+    consumabiliForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const nome = document.getElementById("consNome").value.trim();
+      const nota = document.getElementById("consNota").value.trim();
+
+      if (!nome) {
+        alert("Inserisci il nome del consumabile.");
+        return;
+      }
+
+      const item = {
+        id: Date.now(),
+        nome,
+        nota,
+        when: new Date().toISOString()
+      };
+      consumabiliState.push(item);
+      saveConsumabili();
+      renderConsumabili();
+
+      const testo = `Segnalato consumabile: ${nome}${nota ? " (" + nota + ")" : ""}`;
+      addNotificaForRoles(["titolare"], testo, "consumabili");
+
+      consumabiliForm.reset();
+    });
+  }
+
+  // --- FORM ARCHIVIO ---
+  if (archivioForm) {
+    archivioForm.addEventListener("submit", e => {
+      e.preventDefault();
+      const nome = archFileNameInput.value.trim();
+      const dest = archDestSelect.value;
+
+      if (!nome) {
+        alert("Inserisci il nome del file.");
+        return;
+      }
+
+      const item = {
+        id: Date.now(),
+        nome,
+        folder: dest
+      };
+
+      if (!archivioState[dest]) archivioState[dest] = [];
+      archivioState[dest].push(item);
+      saveArchivio();
+      renderArchivioLists();
+
+      let roles = [];
+      if (dest === "dipendenti") roles = ["dipendente"];
+      if (dest === "titolare") roles = ["titolare"];
+      if (dest === "tutti") roles = ["farmacia", "dipendente", "titolare"];
+
+      const testo = `Nuovo file "${nome}" in cartella ${dest}.`;
+      addNotificaForRoles(roles, testo, "archivio");
+
+      archivioForm.reset();
+    });
+  }
+
+  // Non facciamo altro all’avvio: tutto parte dopo il login
 });
