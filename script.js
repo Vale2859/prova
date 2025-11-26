@@ -1,8 +1,8 @@
 // ======================================================
-// SCRIPT SEMPLIFICATO – SOLO LOGIN + CARD ASSENZE
+// SCRIPT – LOGIN + CARD ASSENZE + RUOLI
 // ======================================================
 
-// ------- DATI DEMO ASSENZE (puoi cambiarli quando vuoi) -------
+// ------- DATI DEMO ASSENZE -------
 const assenzeDemo = [
   { date: "2025-11-26", names: ["Mario Rossi", "Giulia Bianchi"] },
   { date: "2025-11-28", names: ["Cosimo Verdi"] },
@@ -80,13 +80,13 @@ function setRole(role) {
   if (btnFarmaciaAssenze)
     btnFarmaciaAssenze.classList.toggle("hidden", role !== "farmacia");
 
-  if (btnDipRichiedi) {
+  if (btnDipRichiedi && btnDipVedi) {
     const isDip = role === "dipendente";
     btnDipRichiedi.classList.toggle("hidden", !isDip);
     btnDipVedi.classList.toggle("hidden", !isDip);
   }
 
-  if (btnTitSegna) {
+  if (btnTitSegna && btnTitVedi) {
     const isTit = role === "titolare";
     btnTitSegna.classList.toggle("hidden", !isTit);
     btnTitVedi.classList.toggle("hidden", !isTit);
@@ -149,7 +149,7 @@ function updateAssentiOggiEProssimi() {
     });
   }
 
-  // Assenti prossimamente (dopo oggi, prende i primi 3)
+  // Assenti prossimamente (dopo oggi, primi 3)
   const oggiTime = oggi.getTime();
   const prossimi = assenzeDemo
     .map(a => ({
@@ -175,7 +175,6 @@ function updateAssentiOggiEProssimi() {
     });
   }
 }
-
 // ======================================================
 // MINI CALENDARIO
 // ======================================================
@@ -401,7 +400,6 @@ document.addEventListener("DOMContentLoaded", () => {
       authContainer.classList.add("hidden");
       app.classList.remove("hidden");
 
-      // imposta data calendario al mese corrente
       const today = new Date();
       currentMonth = today.getMonth();
       currentYear = today.getFullYear();
@@ -450,8 +448,6 @@ document.addEventListener("DOMContentLoaded", () => {
       currentRole = "farmacia";
     });
   }
-
-  // --- NAV (abbiamo solo dashboard, quindi niente da gestire) ---
 
   // --- BOTTONI CARD (demo: solo alert) ---
   if (btnFarmaciaAssenze) {
@@ -527,5 +523,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // NON facciamo nulla all’avvio: tutto parte dopo il login
+  // Non facciamo nulla all’avvio: parte tutto dopo il login
 });
