@@ -1472,3 +1472,7 @@ button {
     opacity: 0;
   }
 }
+/* NASCONDE TUTTE LE CARD DELLA DASHBOARD PER TUTTI I RUOLI */
+.cards-grid .card {
+  display: none !important;
+}
