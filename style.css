@@ -701,6 +701,12 @@ body {
 }
 
 .notif-modal h2 {
+  margin: 0 0 4px;
+}
+
+.notif-intro {
+  font-size: 0.8rem;
+  color: var(--text-muted);
   margin: 0 0 8px;
 }
 
