@@ -55,7 +55,7 @@
   <!-- ============ APP PRINCIPALE ============ -->
   <main id="app" class="app hidden">
 
-    <!-- SIDEBAR (teniamo solo Dashboard + Logout) -->
+    <!-- SIDEBAR -->
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo-row">
@@ -76,7 +76,7 @@
       ☰
     </button>
 
-    <!-- ============ DASHBOARD UNICA ============ -->
+    <!-- ============ DASHBOARD ============ -->
     <section id="dashboard" class="dashboard">
       <header class="dashboard-header">
         <div class="dashboard-logo-block">
@@ -169,7 +169,193 @@
               </div>
             </div>
           </article>
-                  </div>
+                    <!-- FARMACIA DI TURNO -->
+          <article class="card card-turno">
+            <div class="card-badge js-card-badge" data-card-key="turni">
+              <span class="badge-count">1</span>
+            </div>
+            <div class="card-badge-label" data-card-key="turni">Nuovo</div>
+
+            <div class="card-header">
+              <div class="card-icon">⏰</div>
+              <div class="card-title-group">
+                <h2>Farmacia di turno</h2>
+                <span class="chip chip-turno">Oggi</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <p class="small-text">
+                <strong>Farmacia Montesano</strong><br />
+                Via Esempio 12, Matera – Tel: 0835 000000
+              </p>
+              <div class="divider"></div>
+              <p class="small-text">
+                <strong>Farmacia di appoggio</strong><br />
+                Farmacia Centrale – Via Dante 8 – Tel: 0835 111111
+              </p>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-secondary">Vedi calendario turni (demo)</button>
+            </div>
+          </article>
+
+          <!-- COMUNICAZIONI -->
+          <article class="card card-comunicazioni">
+            <div class="card-badge js-card-badge" data-card-key="comunicazioni">
+              <span class="badge-count">3</span>
+            </div>
+            <div class="card-badge-label" data-card-key="comunicazioni">Nuove</div>
+
+            <div class="card-header">
+              <div class="card-icon">📢</div>
+              <div class="card-title-group">
+                <h2>Comunicazioni</h2>
+              </div>
+            </div>
+
+            <div class="card-body card-body-list">
+              <div class="list-item">
+                <span class="list-title">Aggiornamento notturni</span>
+                <span class="list-meta">Oggi · Urgente</span>
+              </div>
+              <div class="list-item">
+                <span class="list-title">Verifica armadietto stupefacenti</span>
+                <span class="list-meta">Ieri · Importante</span>
+              </div>
+              <div class="list-item">
+                <span class="list-title">Nuova promo vetrina</span>
+                <span class="list-meta">2 giorni fa · Info</span>
+              </div>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-primary">Apri comunicazioni (demo)</button>
+            </div>
+          </article>
+
+          <!-- PROCEDURE INTERNE -->
+          <article class="card card-procedure">
+            <div class="card-badge js-card-badge" data-card-key="procedure">
+              <span class="badge-count">1</span>
+            </div>
+            <div class="card-badge-label" data-card-key="procedure">Agg.</div>
+
+            <div class="card-header">
+              <div class="card-icon">🗂️</div>
+              <div class="card-title-group">
+                <h2>Procedure interne</h2>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <p class="small-text">
+                Accesso rapido alle procedure: chiusura cassa, resi, servizi CUP, magazzino.
+              </p>
+              <ul class="small-text">
+                <li>Chiusura cassa serale</li>
+                <li>Gestione buoni SSN</li>
+                <li>Ricezione merce da grossista</li>
+              </ul>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-secondary">Apri procedure (demo)</button>
+            </div>
+          </article>
+
+          <!-- ARRIVI / SCADENZE / SCORTE -->
+          <article class="card card-arrivi">
+            <div class="card-badge js-card-badge" data-card-key="arrivi">
+              <span class="badge-count">2</span>
+            </div>
+            <div class="card-badge-label" data-card-key="arrivi">Nuovi</div>
+
+            <div class="card-header">
+              <div class="card-icon">📦</div>
+              <div class="card-title-group">
+                <h2>Arrivi & scorte</h2>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <p class="small-text">
+                Gestisci velocemente arrivi corrieri, scadenze prodotto e scorte di materiale.
+              </p>
+
+              <div class="small-text">
+                <strong>Ultimi arrivi (demo)</strong><br />
+                • Espositore dermocosmesi<br />
+                • Campioni stagionali
+              </div>
+            </div>
+
+            <div class="card-footer card-footer-multi">
+              <button class="btn-primary small">Segnala arrivi (demo)</button>
+              <button class="btn-secondary small">Scadenze (demo)</button>
+              <button class="btn-secondary small">Segnala scorte (demo)</button>
+            </div>
+          </article>
+
+          <!-- CAMBIO CASSA -->
+          <article class="card card-cambiocassa">
+            <div class="card-badge js-card-badge" data-card-key="cambiocassa">
+              <span class="badge-count">1</span>
+            </div>
+            <div class="card-badge-label" data-card-key="cambiocassa">Rich.</div>
+
+            <div class="card-header">
+              <div class="card-icon">💶</div>
+              <div class="card-title-group">
+                <h2>Cambio cassa</h2>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <p class="small-text">
+                Segnala velocemente se servono spiccioli o tagli specifici:
+              </p>
+              <p class="small-text">
+                0,50 € · 1 € · 2 € · 5 € · 10 € · 20 €
+              </p>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-primary">Segnala necessità (demo)</button>
+            </div>
+          </article>
+
+          <!-- ARCHIVIO FILE -->
+          <article class="card card-archivio">
+            <div class="card-badge js-card-badge" data-card-key="archivio">
+              <span class="badge-count">0</span>
+            </div>
+            <div class="card-badge-label" data-card-key="archivio"></div>
+
+            <div class="card-header">
+              <div class="card-icon">🗄️</div>
+              <div class="card-title-group">
+                <h2>Archivio file</h2>
+                <span class="chip chip-archivio">In arrivo</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <p class="small-text">
+                Qui collegheremo in futuro il vero archivio digitale di Farmacia Montesano.
+              </p>
+              <p class="small-text">
+                Cartelle, file, documenti interni, PDF e procedure in un unico posto.
+              </p>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-secondary">Apri archivio (demo)</button>
+            </div>
+          </article>
+
+        </div>
       </div>
     </section>
 
