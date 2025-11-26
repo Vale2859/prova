@@ -1472,7 +1472,13 @@ button {
     opacity: 0;
   }
 }
-/* NASCONDE TUTTE LE CARD DELLA DASHBOARD PER TUTTI I RUOLI */
-.cards-grid .card {
+/* NASCONDE LE VECCHIE CARD DELLA DASHBOARD */
+.cards-grid .card-assenze,
+.cards-grid .card-turno,
+.cards-grid .card-comunicazioni,
+.cards-grid .card-procedure,
+.cards-grid .card-logistica,
+.cards-grid .card-magazziniera,
+.cards-grid .card-archivio {
   display: none !important;
 }
