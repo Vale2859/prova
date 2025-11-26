@@ -1,5 +1,5 @@
 // ============================================================
-// PORTALE FARMACIA MONTESANO – SCRIPT COMPLETO (REVISIONE)
+// PORTALE FARMACIA MONTESANO – SCRIPT COMPLETO
 // ============================================================
 
 // ------------------- STATO GENERALE -------------------------
@@ -13,6 +13,9 @@ let calYear;  // es. 2025
 let arriviData = [];
 let scadenzeData = [];
 let consumabiliData = [];
+let cambioData = [];
+
+let richiesteAssenze = [];
 
 // Notifiche per card e ruolo
 // cardKey: "assenze" | "arrivi" | "scadenze" | "consumabili" | "cambio"
@@ -80,9 +83,11 @@ function loadLocalData() {
     const a = localStorage.getItem("fm_arrivi");
     const s = localStorage.getItem("fm_scadenze");
     const c = localStorage.getItem("fm_consumabili");
+    const k = localStorage.getItem("fm_cambio");
     if (a) arriviData = JSON.parse(a);
     if (s) scadenzeData = JSON.parse(s);
     if (c) consumabiliData = JSON.parse(c);
+    if (k) cambioData = JSON.parse(k);
   } catch (e) {
     console.warn("Errore lettura localStorage", e);
   }
@@ -93,6 +98,7 @@ function saveLocalData() {
     localStorage.setItem("fm_arrivi", JSON.stringify(arriviData));
     localStorage.setItem("fm_scadenze", JSON.stringify(scadenzeData));
     localStorage.setItem("fm_consumabili", JSON.stringify(consumabiliData));
+    localStorage.setItem("fm_cambio", JSON.stringify(cambioData));
   } catch (e) {
     console.warn("Errore salvataggio localStorage", e);
   }
@@ -251,11 +257,13 @@ function closeNotificationOverlay(markAsRead = true) {
 function renderAssentiCard() {
   const today = todayISO();
 
-  const assentiOggi = assenzeDemo.filter(a =>
+  const tutteAssenze = assenzeDemo; // demo + eventuali aggiunte
+
+  const assentiOggi = tutteAssenze.filter(a =>
     isDateInRange(today, a.dal, a.al)
   );
 
-  const prossime = assenzeDemo
+  const prossime = tutteAssenze
     .filter(a => diffInDays(today, a.dal) > 0)
     .sort((a, b) => (a.dal < b.dal ? -1 : 1));
 
@@ -487,6 +495,7 @@ function initCalendarNav() {
     });
   }
 }
+
 // ------------------- FARMACIA DI TURNO BANNER ----------------
 
 function renderTurnoBanner() {
@@ -691,6 +700,166 @@ function renderConsumabiliList() {
     });
 }
 
+function renderCambioList() {
+  const wrapper = document.getElementById("listaCambio");
+  if (!wrapper) return;
+
+  wrapper.innerHTML = "";
+  if (cambioData.length === 0) {
+    wrapper.textContent = "Nessuna segnalazione cambio cassa (demo).";
+    return;
+  }
+
+  const header = document.createElement("div");
+  header.className = "row header";
+  ["Dettaglio", "Urgenza", "Data", "Azioni"].forEach(t => {
+    const span = document.createElement("span");
+    span.textContent = t;
+    header.appendChild(span);
+  });
+  wrapper.appendChild(header);
+
+  cambioData
+    .slice()
+    .sort((a, b) => (a.data > b.data ? -1 : 1))
+    .forEach(item => {
+      const row = document.createElement("div");
+      row.className = "row";
+
+      const span1 = document.createElement("span");
+      span1.textContent = item.dettaglio || "-";
+
+      const span2 = document.createElement("span");
+      span2.textContent = item.urgenza || "-";
+
+      const span3 = document.createElement("span");
+      span3.textContent = item.data.split("-").reverse().join("/");
+
+      const actions = document.createElement("span");
+      actions.className = "actions";
+
+      const btnDel = document.createElement("button");
+      btnDel.className = "btn-secondary";
+      btnDel.style.fontSize = "0.75rem";
+      btnDel.textContent = "Elimina";
+      btnDel.addEventListener("click", () => {
+        cambioData = cambioData.filter(a => a.id !== item.id);
+        saveLocalData();
+        renderCambioList();
+      });
+
+      actions.appendChild(btnDel);
+
+      row.appendChild(span1);
+      row.appendChild(span2);
+      row.appendChild(span3);
+      row.appendChild(actions);
+      wrapper.appendChild(row);
+    });
+}
+
+// ------------------- FORM ASSENZE ---------------------------
+
+function updateAssenzeRoleUI() {
+  const btnRich = document.getElementById("btnRichiediAssenza");
+  const btnSegna = document.getElementById("btnSegnaAssenza");
+  const formTitle = document.getElementById("assenzaFormTitle");
+
+  if (btnRich && btnSegna) {
+    if (currentRole === "dipendente") {
+      btnRich.classList.remove("hidden");
+      btnSegna.classList.add("hidden");
+      if (formTitle) formTitle.textContent = "Richiedi assenza / ritardo";
+    } else if (currentRole === "titolare") {
+      btnRich.classList.add("hidden");
+      btnSegna.classList.remove("hidden");
+      if (formTitle) formTitle.textContent = "Segna assenza / ritardo";
+    } else {
+      btnRich.classList.add("hidden");
+      btnSegna.classList.add("hidden");
+      if (formTitle) formTitle.textContent = "Gestione assenze / ritardi";
+    }
+  }
+}
+
+function initAssenzaForm() {
+  const form = document.getElementById("formRichiestaAssenza");
+  const feedback = document.getElementById("assRichiestaFeedback");
+  if (!form) return;
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const nomeEl = document.getElementById("assNome");
+    const dalEl = document.getElementById("assDal");
+    const alEl = document.getElementById("assAl");
+    const motivoEl = document.getElementById("assMotivo");
+
+    const nome = (nomeEl?.value || "").trim();
+    const dal = dalEl?.value || "";
+    const al = alEl?.value || dal;
+    const motivo = (motivoEl?.value || "").trim();
+
+    if (!nome || !dal) {
+      if (feedback) {
+        feedback.textContent = "Inserisci almeno nome e data di inizio.";
+        feedback.classList.remove("hidden");
+        feedback.style.color = "#ffb3b3";
+      }
+      return;
+    }
+
+    const dalFmt = dal.split("-").reverse().join("/");
+    const alFmt = al.split("-").reverse().join("/");
+
+    if (currentRole === "dipendente") {
+      // Richiesta al titolare
+      richiesteAssenze.push({
+        id: Date.now().toString(),
+        nome,
+        dal,
+        al,
+        motivo,
+        stato: "in_attesa"
+      });
+
+      createNotification(
+        "assenze",
+        ["titolare"],
+        "Nuova richiesta assenza / ritardo",
+        `${nome} dal ${dalFmt} al ${alFmt}${motivo ? " – " + motivo : ""}`
+      );
+    } else if (currentRole === "titolare") {
+      // Titolare segna direttamente l'assenza nel calendario
+      assenzeDemo.push({
+        nome,
+        dal,
+        al,
+        ruolo: "dipendente"
+      });
+
+      createNotification(
+        "assenze",
+        ["farmacia", "dipendente"],
+        "Assenza / ritardo registrato",
+        `${nome} dal ${dalFmt} al ${alFmt}${motivo ? " – " + motivo : ""}`
+      );
+
+      renderAssentiCard();
+      renderCalendar();
+    }
+
+    form.reset();
+    if (feedback) {
+      feedback.textContent =
+        currentRole === "dipendente"
+          ? "Richiesta inviata al titolare (demo)."
+          : "Assenza registrata (demo).";
+      feedback.classList.remove("hidden");
+      feedback.style.color = "#3cf26c";
+    }
+  });
+}
+
 // ------------------- FORM SUBMIT HANDLERS -------------------
 
 function initArriviForm() {
@@ -711,6 +880,7 @@ function initArriviForm() {
     if (!descrizione) {
       if (feedback) {
         feedback.textContent = "Inserisci almeno una descrizione.";
+        feedback.classList.remove("hidden");
         feedback.style.color = "#ffb3b3";
       }
       return;
@@ -735,6 +905,7 @@ function initArriviForm() {
     form.reset();
     if (feedback) {
       feedback.textContent = "Arrivo registrato (demo).";
+      feedback.classList.remove("hidden");
       feedback.style.color = "#3cf26c";
     }
   });
@@ -758,6 +929,7 @@ function initScadenzeForm() {
     if (!nome || !dataScadenza) {
       if (feedback) {
         feedback.textContent = "Inserisci nome prodotto e data di scadenza.";
+        feedback.classList.remove("hidden");
         feedback.style.color = "#ffb3b3";
       }
       return;
@@ -787,6 +959,7 @@ function initScadenzeForm() {
     form.reset();
     if (feedback) {
       feedback.textContent = "Scadenza registrata (demo).";
+      feedback.classList.remove("hidden");
       feedback.style.color = "#3cf26c";
     }
   });
@@ -808,6 +981,7 @@ function initConsumabiliForm() {
     if (!nome) {
       if (feedback) {
         feedback.textContent = "Inserisci il nome del consumabile.";
+        feedback.classList.remove("hidden");
         feedback.style.color = "#ffb3b3";
       }
       return;
@@ -832,6 +1006,7 @@ function initConsumabiliForm() {
     form.reset();
     if (feedback) {
       feedback.textContent = "Segnalazione registrata (demo).";
+      feedback.classList.remove("hidden");
       feedback.style.color = "#3cf26c";
     }
   });
@@ -850,6 +1025,15 @@ function initCambioCassaForm() {
     const dettaglio = (dettaglioEl?.value || "").trim();
     const urgenza = urgenzaEl?.value || "normale";
 
+    cambioData.unshift({
+      id: Date.now().toString(),
+      dettaglio,
+      urgenza,
+      data: todayISO()
+    });
+    saveLocalData();
+    renderCambioList();
+
     createNotification(
       "cambio",
       ["titolare"],
@@ -863,15 +1047,17 @@ function initCambioCassaForm() {
     if (feedback) {
       feedback.textContent =
         "Richiesta cambio cassa inviata (demo – notifica al titolare).";
+      feedback.classList.remove("hidden");
       feedback.style.color = "#3cf26c";
     }
   });
 }
+
 // ------------------- LOGIN / RUOLI ---------------------------
 
-let authContainer,
-  app,
-  loginForm,
+let authContainerEl,
+  appEl,
+  loginFormEl,
   authTabs,
   loginRoleLabel,
   rolePill;
@@ -888,13 +1074,14 @@ function setRole(role) {
         : "Farmacia (accesso generico)";
   }
 
+  updateAssenzeRoleUI();
   updateAllBadges();
 }
 
 function initLogin() {
-  authContainer = document.getElementById("authContainer");
-  app = document.getElementById("app");
-  loginForm = document.getElementById("loginForm");
+  authContainerEl = document.getElementById("authContainer");
+  appEl = document.getElementById("app");
+  loginFormEl = document.getElementById("loginForm");
   authTabs = document.querySelectorAll(".auth-tab");
   loginRoleLabel = document.getElementById("loginRoleLabel");
   rolePill = document.getElementById("currentRolePill");
@@ -917,16 +1104,16 @@ function initLogin() {
     });
   }
 
-  if (loginForm) {
-    loginForm.addEventListener("submit", e => {
+  if (loginFormEl) {
+    loginFormEl.addEventListener("submit", e => {
       e.preventDefault();
       const activeTab = document.querySelector(".auth-tab.active");
       const role = activeTab?.dataset.role || "farmacia";
 
       setRole(role);
 
-      if (authContainer) authContainer.classList.add("hidden");
-      if (app) app.classList.remove("hidden");
+      if (authContainerEl) authContainerEl.classList.add("hidden");
+      if (appEl) appEl.classList.remove("hidden");
 
       showSection("dashboard");
       renderAll();
@@ -938,8 +1125,21 @@ function initLogin() {
 
 function initDashboardButtons() {
   const btnAssenti = document.getElementById("btnVaiTuttiAssenti");
+  const btnRich = document.getElementById("btnRichiediAssenza");
+  const btnSegna = document.getElementById("btnSegnaAssenza");
+
   if (btnAssenti) {
     btnAssenti.addEventListener("click", () => {
+      showSection("assenzePage");
+    });
+  }
+  if (btnRich) {
+    btnRich.addEventListener("click", () => {
+      showSection("assenzePage");
+    });
+  }
+  if (btnSegna) {
+    btnSegna.addEventListener("click", () => {
       showSection("assenzePage");
     });
   }
@@ -1021,6 +1221,7 @@ function renderAll() {
   renderArriviList();
   renderScadenzeList();
   renderConsumabiliList();
+  renderCambioList();
 
   updateAllBadges();
 
@@ -1034,7 +1235,6 @@ function renderAll() {
 // ------------------- NOTIFICHE DEMO INIZIALI -----------------
 
 function initDemoNotifications() {
-  // qualche notifica demo per assenze
   createNotification(
     "assenze",
     ["farmacia", "titolare"],
@@ -1053,6 +1253,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initDashboardButtons();
 
   // form
+  initAssenzaForm();
   initArriviForm();
   initScadenzeForm();
   initConsumabiliForm();
@@ -1065,9 +1266,9 @@ document.addEventListener("DOMContentLoaded", () => {
   initCalendarNav();
 
   // se per qualche motivo partiamo già loggati (es. debug)
-  const appEl = document.getElementById("app");
-  const authEl = document.getElementById("authContainer");
-  if (appEl && !appEl.classList.contains("hidden") && authEl) {
+  const appCheck = document.getElementById("app");
+  const authCheck = document.getElementById("authContainer");
+  if (appCheck && !appCheck.classList.contains("hidden") && authCheck) {
     setRole(currentRole);
     renderAll();
   }
