@@ -1642,3 +1642,110 @@ button {
     margin-top: 0.5rem;
   }
 }
+/* ============================
+   LAYOUT ASSENZE – RUOLO FARMACIA
+   ============================ */
+
+.assenze-farmacia {
+  margin-top: 1.5rem;
+}
+
+.farm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.farm-card {
+  padding: 1.3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Etichette colorate (ASSENTI OGGI, PROSSIME, ecc.) */
+
+.farm-card-header {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.farm-chip {
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.farm-chip-richieste {
+  background: linear-gradient(135deg, #ff8a00, #ffb347);
+}
+
+.farm-chip-oggi {
+  background: linear-gradient(135deg, #19b46b, #32d18b);
+}
+
+.farm-chip-prossime {
+  background: linear-gradient(135deg, #007bff, #56a8ff);
+}
+
+.farm-chip-ritardi {
+  background: linear-gradient(135deg, #a259ff, #c77dff);
+}
+
+/* Contenuti */
+
+.farm-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.center-number {
+  align-items: flex-start;
+}
+
+.farm-big-number {
+  font-size: 2.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Liste */
+
+.farm-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.farm-list li span.farm-name {
+  font-weight: 600;
+}
+
+.farm-list li span.farm-date {
+  opacity: 0.8;
+  font-size: 0.9rem;
+}
+
+/* Testo “nessun dato” */
+
+.farm-empty {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+/* Responsive: su schermi piccoli la griglia va in colonna */
+
+@media (max-width: 900px) {
+  .farm-grid {
+    grid-template-columns: 1fr;
+  }
+}
