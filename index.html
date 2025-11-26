@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Portale Farmacia Montesano</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 
@@ -71,16 +72,15 @@
       </div>
     </header>
 
-    <!-- DASHBOARD -->
+    <!-- ============ DASHBOARD ============ -->
     <section id="dashboard" class="dashboard">
-
       <div class="cards-grid-main">
 
         <!-- ASSENTI OGGI -->
         <article class="card card-assenti">
           <div class="card-top-row">
             <div class="card-top-left">
-              <p id="assenzeOggiDataLabel" class="assenze-data-label">Mer 26 Nov</p>
+              <p id="assenzeOggiDataLabel" class="assenze-data-label">Mar 26 Nov</p>
               <h2 class="card-title">Assenti oggi</h2>
             </div>
             <button class="card-notif-badge" data-card="assenze">
@@ -103,9 +103,17 @@
                 <!-- riempito da JS -->
               </ul>
 
-              <button id="btnVaiTuttiAssenti" class="btn-primary assenti-btn">
-                Vai a tutti gli assenti
-              </button>
+              <div class="assenti-actions">
+                <button id="btnVaiTuttiAssenti" class="btn-primary assenti-btn">
+                  Vai a tutti gli assenti
+                </button>
+                <button id="btnRichiediAssenza" class="btn-secondary assenti-extra-btn hidden">
+                  Richiedi assenza / ritardo
+                </button>
+                <button id="btnSegnaAssenza" class="btn-secondary assenti-extra-btn hidden">
+                  Segna assenza / ritardo
+                </button>
+              </div>
             </div>
 
             <div class="assenti-right">
@@ -209,7 +217,8 @@
 
       </div>
     </section>
-        <!-- ============ PAGINE INTERNE ============ -->
+
+    <!-- ============ PAGINE INTERNE ============ -->
 
     <!-- PAGINA ASSENZE -->
     <section id="assenzePage" class="page hidden">
@@ -217,12 +226,12 @@
         <button class="back-button" data-back="dashboard">← Dashboard</button>
         <div class="page-title-block">
           <h1>Gestione assenze</h1>
-          <p>Richieste, approvazioni e riepilogo.</p>
+          <p>Richieste, segnalazioni e riepilogo.</p>
         </div>
       </header>
 
       <div class="page-content-grid">
-        <!-- Per tutti: elenco assenze oggi e prossime -->
+        <!-- Elenco assenze -->
         <article class="card">
           <h2>Assenze oggi</h2>
           <ul id="pageAssentiOggi" class="assenze-list"></ul>
@@ -230,9 +239,9 @@
           <ul id="pageAssentiProssimi" class="assenze-list"></ul>
         </article>
 
-        <!-- Richiesta assenza (dipendente) -->
-        <article id="boxRichiestaAssenza" class="card hidden">
-          <h2>Richiedi assenza</h2>
+        <!-- Form assenza / ritardo -->
+        <article id="boxRichiestaAssenza" class="card">
+          <h2 id="assenzaFormTitle">Richiedi assenza / ritardo</h2>
           <form id="formRichiestaAssenza" class="simple-form">
             <div class="form-row">
               <label>Nome</label>
@@ -249,20 +258,14 @@
               </div>
             </div>
             <div class="form-row">
-              <label>Motivo</label>
+              <label>Motivo / Note</label>
               <textarea id="assMotivo" rows="2"></textarea>
             </div>
-            <button type="submit" class="btn-primary">Invia richiesta</button>
+            <button type="submit" class="btn-primary">Invia</button>
             <p id="assRichiestaFeedback" class="form-feedback hidden">
-              ✅ Richiesta inviata (demo).
+              ✅ Operazione registrata (demo).
             </p>
           </form>
-        </article>
-
-        <!-- Approvazione assenze (titolare) -->
-        <article id="boxApprovazioneAssenze" class="card hidden">
-          <h2>Richieste da approvare</h2>
-          <div id="listaRichiesteAssenze" class="table-like small"></div>
         </article>
       </div>
     </section>
@@ -384,7 +387,8 @@
         </article>
       </div>
     </section>
-        <!-- PAGINA CAMBIO CASSA -->
+
+    <!-- PAGINA CAMBIO CASSA -->
     <section id="cambioPage" class="page hidden">
       <header class="page-header">
         <button class="back-button" data-back="dashboard">← Dashboard</button>
@@ -394,33 +398,35 @@
         </div>
       </header>
 
-      <article class="card">
-        <h2>Segnala necessità</h2>
-        <form id="formCambio" class="simple-form">
-          <div class="form-row two-cols">
-            <div>
-              <label>Dettaglio richiesta</label>
-              <input type="text" id="cambioDettaglio" placeholder="Es. servono 20 pezzi da 0,50€" />
+      <div class="page-content-grid">
+        <article class="card">
+          <h2>Segnala necessità</h2>
+          <form id="formCambio" class="simple-form">
+            <div class="form-row two-cols">
+              <div>
+                <label>Dettaglio richiesta</label>
+                <input type="text" id="cambioDettaglio" placeholder="Es. servono 20 pezzi da 0,50€" />
+              </div>
+              <div>
+                <label>Urgenza</label>
+                <select id="cambioUrgenza">
+                  <option value="normale">Normale</option>
+                  <option value="alta">Alta</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label>Urgenza</label>
-              <select id="cambioUrgenza">
-                <option value="normale">Normale</option>
-                <option value="alta">Alta</option>
-              </select>
-            </div>
-          </div>
-          <button type="submit" class="btn-primary">Invia segnalazione</button>
-          <p id="cambioFeedback" class="form-feedback hidden">
-            ✅ Segnalazione inviata (demo).
-          </p>
-        </form>
-      </article>
+            <button type="submit" class="btn-primary">Invia segnalazione</button>
+            <p id="cambioFeedback" class="form-feedback hidden">
+              ✅ Segnalazione inviata (demo).
+            </p>
+          </form>
+        </article>
 
-      <article class="card">
-        <h2>Ultime segnalazioni</h2>
-        <div id="listaCambio" class="table-like small"></div>
-      </article>
+        <article class="card">
+          <h2>Ultime segnalazioni</h2>
+          <div id="listaCambio" class="table-like small"></div>
+        </article>
+      </div>
     </section>
 
     <!-- OVERLAY NOTIFICHE GENERALE -->
