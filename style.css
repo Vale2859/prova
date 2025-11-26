@@ -1,308 +1,148 @@
-/* ============================================
-   PORTALE FARMACIA MONTESANO – STYLE.CSS
+/* ============================================================
+   FARMACIA MONTESANO – PORTALE PROFESSIONALE
+   STYLE.CSS – ULTRA PREMIUM THEME
    PARTE 1/7
-   - Reset base
-   - Variabili CSS (tema chiaro)
-   - Layout principale
-   - Tipografia
-   - Pulsanti & input
-   ============================================ */
+   ------------------------------------------------------------
+   In questo file definiamo:
+   - Reset CSS
+   - Variabili globali (colori, spazi, ombre)
+   - Tipografia di base
+   - Layout generale (app-shell, main, sezioni)
+   - Utils riutilizzabili
+   ------------------------------------------------------------ */
 
-/* ============================
-   RESET DI BASE
-   ============================ */
+/* ============= RESET DI BASE E ACCESSIBILITÀ ================= */
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+:root {
+  /* Palette principale chiara, moderna, leggermente “medical” */
+  --bg-body: #f3f5fb;
+  --bg-main: #f7f9ff;
+  --bg-card: #ffffff;
+  --bg-card-alt: #f0f4ff;
+  --bg-soft: #e8edf9;
+  --bg-pill: #e2f3ff;
+
+  --color-text: #1f2933;
+  --color-text-soft: #5f6c80;
+  --color-text-muted: #8a94a8;
+  --color-heading: #111827;
+
+  --accent-primary: #0066ff;
+  --accent-primary-soft: #e0ecff;
+  --accent-primary-deep: #0041b8;
+
+  --accent-success: #10b981;
+  --accent-success-soft: #dcfce7;
+  --accent-success-deep: #047857;
+
+  --accent-warning: #f59e0b;
+  --accent-warning-soft: #fff7e6;
+  --accent-warning-deep: #b45309;
+
+  --accent-danger: #ef4444;
+  --accent-danger-soft: #fee2e2;
+  --accent-danger-deep: #b91c1c;
+
+  --accent-info: #0ea5e9;
+  --accent-info-soft: #e0f5ff;
+  --accent-info-deep: #0369a1;
+
+  --border-subtle: #d9dfef;
+  --border-strong: #c3cbe0;
+
+  --shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --shadow-medium: 0 18px 40px rgba(15, 23, 42, 0.12);
+  --shadow-strong: 0 22px 60px rgba(15, 23, 42, 0.18);
+
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  --nav-height: 64px;
+  --nav-height-mobile: 58px;
+  --sidebar-width: 260px;
+  --content-max-width: 1320px;
+
+  --transition-fast: 0.16s ease-out;
+  --transition-normal: 0.22s ease-out;
+  --transition-slow: 0.3s ease;
+
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont,
+    "SF Pro Text", "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+
+  --z-nav: 50;
+  --z-sidebar: 40;
+  --z-overlay: 60;
+  --z-modal: 70;
+
+  /* Colori per ruoli (accent role-based) */
+  --role-titolare: #6366f1;
+  --role-farmacia: #0ea5e9;
+  --role-dipendente: #10b981;
+  --role-cliente: #f97316;
+}
+
+/* Tema dark opzionale futuro (hook pronto) */
+:root[data-theme="dark"] {
+  --bg-body: #020617;
+  --bg-main: #020617;
+  --bg-card: #020617;
+  --bg-card-alt: #020617;
+  --bg-soft: #020617;
+
+  --color-text: #e5e7eb;
+  --color-text-soft: #a5b4cf;
+  --color-text-muted: #6b7280;
+  --color-heading: #f9fafb;
+
+  --border-subtle: #111827;
+  --border-strong: #1f2937;
+
+  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Reset HTML */
+html,
+body {
   margin: 0;
   padding: 0;
 }
 
-/* Rimuove evidenza blu su mobile */
-* {
-  -webkit-tap-highlight-color: transparent;
+html {
+  scroll-behavior: smooth;
 }
 
-html,
+/* Body principale */
 body {
-  height: 100%;
-}
-
-/* ============================
-   VARIABILI DI TEMA (CHIARO)
-   ============================ */
-
-:root {
-  /* Colori principali */
-  --bg-page: #f5f6fb;
-  --bg-card: #ffffff;
-  --bg-header: #ffffff;
-  --bg-header-accent: #e8f4ff;
-
-  --color-primary: #007bff;
-  --color-primary-dark: #0056c7;
-  --color-primary-soft: #e3f2ff;
-
-  --color-accent-green: #00b894;
-  --color-accent-yellow: #ffb300;
-  --color-accent-pink: #ff4081;
-  --color-accent-purple: #7e57c2;
-
-  /* Testi */
-  --text-main: #222222;
-  --text-muted: #6c757d;
-  --text-soft: #9aa3b2;
-  --text-on-primary: #ffffff;
-
-  /* Bordi & ombre */
-  --border-soft: #e2e6f3;
-  --border-strong: #c5cbe3;
-
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 22px;
-  --radius-pill: 999px;
-
-  --shadow-soft: 0 6px 16px rgba(15, 23, 42, 0.08);
-  --shadow-card: 0 12px 30px rgba(15, 23, 42, 0.09);
-
-  /* Layout */
-  --header-height: 64px;
-  --max-width: 1240px;
-
-  /* Font */
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Segoe UI", sans-serif;
-}
-
-/* ============================
-   BODY & STRUTTURA GENERALE
-   ============================ */
-
-body {
-  min-height: 100vh;
   font-family: var(--font-sans);
-  background: radial-gradient(circle at top left, #eaf3ff 0, #f5f6fb 40%, #edf1fb 100%);
-  color: var(--text-main);
-}
-
-/* Contenitore globale app */
-.app-shell {
+  background: radial-gradient(circle at top left, #f7fbff 0, #eaeef9 35%, #dde3f5 70%, #d3dcf1 100%);
+  color: var(--color-text);
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Contenuto principale (sotto header) */
-.main-content {
-  flex: 1;
-  padding: 16px;
-}
-
-/* Centra il contenuto e limita la larghezza massima */
-.main-inner {
-  max-width: var(--max-width);
-  margin: 0 auto;
-}
-
-/* Nascondi generico (JS) */
+/* Nasconde elementi generici */
 .hidden {
   display: none !important;
 }
 
-/* ============================
-   TIPOGRAFIA
-   ============================ */
-
-h1,
-h2,
-h3,
-h4 {
-  font-weight: 700;
-  color: var(--text-main);
+/* Rimuove highlight blu su mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
-p {
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-/* Testo piccolino */
-.text-small {
-  font-size: 0.85rem;
-}
-
-/* Testo evidenziato */
-.text-strong {
-  font-weight: 600;
-}
-
-/* ============================
-   HEADER PRINCIPALE
-   ============================ */
-
-.main-header {
-  height: var(--header-height);
-  background: var(--bg-header);
-  border-bottom: 1px solid var(--border-soft);
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-.header-inner {
-  width: 100%;
-  max-width: var(--max-width);
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-/* Logo circolare semplice */
-.header-logo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 20%, #ffffff 0, #e3f2ff 45%, #007bff 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-soft);
-  font-size: 22px;
-}
-
-/* Titolo portale */
-.header-title-block {
-  flex: 1;
-}
-
-.header-title {
-  font-size: 1.1rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.header-subtitle {
-  font-size: 0.75rem;
-  margin-top: 2px;
-  color: var(--text-soft);
-}
-
-/* Info utente + logout */
-.header-user-area {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-/* Nome utente loggato */
-.header-user-name {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-/* Pill con ruolo */
-.role-pill {
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 0.75rem;
-  background: var(--color-primary-soft);
-  color: #0b4a8a;
-}
-
-/* ============================
-   PULSANTI (STILE GENERALE)
-   ============================ */
-
-button {
-  font-family: inherit;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-/* Pulsante principale (blu) */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-pill);
-  padding: 10px 18px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-on-primary);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
-  box-shadow: 0 10px 26px rgba(0, 123, 255, 0.45);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 32px rgba(0, 123, 255, 0.55);
-  filter: brightness(1.03);
-}
-
-.btn-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 8px 18px rgba(0, 123, 255, 0.4);
-}
-
-/* Pulsante secondario (bordo grigio) */
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-pill);
-  padding: 9px 16px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-main);
-  background: #ffffff;
-  border: 1px solid var(--border-soft);
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-}
-
-.btn-secondary:hover {
-  background: #f6f7fb;
-  transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.09);
-}
-
-.btn-secondary:active {
-  transform: translateY(0);
-  box-shadow: 0 6px 13px rgba(15, 23, 42, 0.07);
-}
-
-/* Pulsante per azioni pericolose (elimina, reset) */
-.btn-danger {
-  border-radius: var(--radius-pill);
-  padding: 9px 16px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: #e53935;
-  box-shadow: 0 8px 20px rgba(229, 57, 53, 0.4);
-}
-
-/* Versioni full-width */
-.btn-full {
-  width: 100%;
-}
-
-/* ============================
-   LINK
-   ============================ */
-
+/* Link base */
 a {
-  color: var(--color-primary);
+  color: var(--accent-primary);
   text-decoration: none;
 }
 
@@ -310,2136 +150,728 @@ a:hover {
   text-decoration: underline;
 }
 
-/* ============================
-   FORM & INPUT
-   ============================ */
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+/* Titoli generali */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--color-heading);
 }
 
-.form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+/* Paragrafi generali */
+p {
+  margin: 0;
+  color: var(--color-text-soft);
 }
 
-.form-row label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-muted);
+/* Liste */
+ul,
+ol {
+  margin: 0;
+  padding-left: 1.2rem;
 }
 
-input[type="text"],
-input[type="password"],
-input[type="email"],
-input[type="tel"],
-input[type="date"],
-input[type="number"],
-textarea,
-select {
-  border-radius: 999px;
-  border: 1px solid var(--border-soft);
-  padding: 10px 12px;
-  font-size: 0.9rem;
+/* Immagini fluide */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Bottoni base */
+button {
   font-family: inherit;
-  outline: none;
-  background: #ffffff;
-  color: var(--text-main);
-  transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  font-size: 14px;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
-/* Textarea con angoli leggermente meno tondi */
+/* Input base */
+input,
+select,
 textarea {
-  border-radius: var(--radius-md);
-  resize: vertical;
-  min-height: 70px;
+  font-family: inherit;
+  font-size: 14px;
 }
 
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+/* Scrollbar leggero (desktop) */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: var(--text-soft);
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.03);
 }
 
-/* Allinea checkbox + testo */
-.checkbox-row {
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.22);
+  border-radius: 999px;
 }
 
-/* Messaggi feedback form (salvataggio, errori) */
-.form-feedback {
-  font-size: 0.8rem;
-  margin-top: 4px;
-  min-height: 1.1em;
+/* ============================================================
+   LAYOUT GENERALE APP
+   - Wrapper globale
+   - Header / top-bar
+   - Contenuto principale
+   ------------------------------------------------------------ */
+
+/* Wrapper generale applicazione */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.form-feedback.ok {
-  color: #2e7d32;
-}
-
-.form-feedback.error {
-  color: #c62828;
-}
-
-/* ============================
-   FOOTER
-   ============================ */
-
-.main-footer {
-  border-top: 1px solid var(--border-soft);
-  background: rgba(255, 255, 255, 0.9);
-  padding: 10px 16px;
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-soft);
-}
-/* ============================================
-   STYLE.CSS – PARTE 2/7
-   Schermata iniziale, login e registrazione
-   ============================================ */
-
-/* ============================
-   SCHERMATA INIZIALE (WELCOME)
-   ============================ */
-
-.welcome-screen {
-  min-height: calc(100vh - var(--header-height));
+/* Top navigation bar (logo, titolo, utente, logout) */
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  height: var(--nav-height);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
+  background: rgba(247, 249, 255, 0.94);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.08);
 }
 
-.welcome-card {
+/* Contenuto interno topbar */
+.app-topbar-inner {
   width: 100%;
-  max-width: 460px;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.98),
-    rgba(232, 244, 255, 0.98)
-  );
-  border-radius: 26px;
-  padding: 24px 22px 22px;
-  box-shadow: var(--shadow-card);
-  border: 1px solid rgba(226, 230, 243, 0.9);
+  max-width: var(--content-max-width);
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.welcome-logo-wrap {
-  text-align: center;
-  margin-bottom: 16px;
+/* Logo / icona farmacia */
+.app-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.welcome-logo-circle {
-  width: 86px;
-  height: 86px;
-  margin: 0 auto 6px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 20%, #ffffff 0, #e3f2ff 40%, #0d47a1 100%);
+.app-logo-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: radial-gradient(circle at 20% 0, #ffffff 0, #e0f2ff 35%, #b3d4ff 70%, #80aaff 100%);
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 38px;
-  color: #ffffff;
-  box-shadow: 0 16px 35px rgba(13, 71, 161, 0.45);
+  color: #06466e;
+  font-size: 22px;
 }
 
-.welcome-title {
-  font-size: 1.1rem;
+/* Testo logo (titolo + sottotitolo) */
+.app-logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-logo-text-main {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-heading);
+}
+
+.app-logo-text-sub {
+  font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #1b2738;
+  color: var(--color-text-muted);
 }
 
-.welcome-subtitle {
-  font-size: 0.9rem;
-  margin-top: 6px;
-  color: var(--text-muted);
-}
-
-/* Bottoni azione iniziale */
-.welcome-actions {
-  margin-top: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Testo in piccolo sotto i pulsanti */
-.welcome-footnote {
-  margin-top: 12px;
-  font-size: 0.8rem;
-  color: var(--text-soft);
-  text-align: center;
-}
-
-/* ============================
-   CONTAINER AUTENTICAZIONE
-   (LOGIN / REGISTRAZIONE)
-   ============================ */
-
-.auth-wrapper {
-  min-height: calc(100vh - var(--header-height));
+/* Centro: titolo pagina / breadcrumb */
+.app-topbar-center {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 16px;
+  pointer-events: none;
+}
+
+.app-topbar-page-title {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* Destra: utente loggato + logout + menu mobile */
+.app-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+/* Info utente */
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.user-chip-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ecfeff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.user-chip-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-chip-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.user-chip-role {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* Bottone logout */
+.btn-logout {
+  border-radius: var(--radius-pill);
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(239, 68, 68, 0.06);
+  color: var(--accent-danger-deep);
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background var(--transition-fast), transform var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.btn-logout:hover {
+  background: rgba(239, 68, 68, 0.09);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(239, 68, 68, 0.28);
+}
+
+/* Icona burger per mobile (per eventuale sidebar futura) */
+.btn-nav-toggle {
+  display: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.18);
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+/* Contenuto principale (sotto la topbar) */
+.app-main {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 18px 12px 24px;
+}
+
+/* Container centrale */
+.app-main-inner {
+  width: 100%;
+  max-width: var(--content-max-width);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Wrapper per le varie “view” (landing, login, dashboard ecc.) */
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+
+/* ============================================================
+   LANDING / HOME INIZIALE (PRIMA DEL LOGIN)
+   ------------------------------------------------------------ */
+
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 26px;
+  align-items: center;
+  padding: 18px 6px 10px;
+}
+
+.landing-left-title {
+  font-size: 28px;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.landing-left-title span.highlight {
+  background: linear-gradient(120deg, #0ea5e9, #6366f1);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.landing-subtitle {
+  font-size: 14px;
+  color: var(--color-text-soft);
+  margin-bottom: 16px;
+  max-width: 520px;
+}
+
+/* Pulsanti landing */
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.btn-primary {
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #2563eb, #6366f1);
+  color: #f9fafb;
+  box-shadow: 0 16px 35px rgba(37, 99, 235, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    filter var(--transition-fast);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.42);
+  filter: brightness(1.03);
+}
+
+.btn-secondary {
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #ffffff;
+  color: var(--color-text);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  background: #f9fafb;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+}
+
+.btn-soft {
+  border-radius: var(--radius-pill);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--color-text-soft);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+/* Badge piccoli informativi */
+.badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-pill);
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: rgba(22, 163, 74, 0.08);
+  color: #166534;
+}
+
+.badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.32);
+}
+
+/* Colonna destra landing: “preview cards” decorative */
+.landing-preview {
+  position: relative;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Blob sfondo */
+.landing-blob {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 10% 0, rgba(56,189,248,0.2), transparent 55%),
+    radial-gradient(circle at 90% 15%, rgba(129,140,248,0.3), transparent 55%);
+  filter: blur(5px);
+  opacity: 0.9;
+}
+
+/* Piccolo stack di card decorative */
+.landing-card-stack {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1;
+}
+
+.landing-card-mini {
+  border-radius: 18px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #ffffff, #f3f6ff);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.16);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.landing-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 18% 0, #ffffff 0, #e0f2fe 55%, #bfdbfe 100%);
+  color: #1d4ed8;
+  font-size: 18px;
+}
+
+.landing-card-text-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.landing-card-text-sub {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* Piccole etichette shadow “online / sicurezza” */
+.landing-little-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.little-label {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--color-text-muted);
+  border: 1px dashed rgba(148, 163, 184, 0.6);
+}
+
+/* ============================================================
+   AUTH VIEW (LOGIN + REGISTRAZIONE)
+   - Container centrale
+   - Tabs ruoli
+   - Form login/registrazione
+   ------------------------------------------------------------ */
+
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 20px;
 }
 
 .auth-card {
   width: 100%;
-  max-width: 520px;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.98),
-    rgba(230, 239, 255, 0.98)
-  );
-  border-radius: 28px;
-  padding: 22px 22px 24px;
-  box-shadow:
-    0 20px 55px rgba(15, 23, 42, 0.18),
-    0 0 0 1px rgba(222, 230, 248, 0.9);
+  max-width: 480px;
+  background: radial-gradient(circle at top left, #ffffff 0, #f3f6ff 45%, #e5ecff 100%);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-medium);
+  padding: 20px 20px 18px;
+  position: relative;
+  overflow: hidden;
 }
 
-/* Header card login/registrazione */
+/* Decorazioni di sfondo nella auth-card */
+.auth-card::before,
+.auth-card::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(22px);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.auth-card::before {
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(59,130,246,0.35), transparent 70%);
+  top: -60px;
+  right: -40px;
+}
+
+.auth-card::after {
+  width: 190px;
+  height: 190px;
+  background: radial-gradient(circle, rgba(45,212,191,0.35), transparent 70%);
+  bottom: -80px;
+  left: -40px;
+}
+
+/* Intestazione auth card */
 .auth-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 12px;
 }
 
-.auth-title-block h1 {
-  font-size: 1.25rem;
+.auth-title {
+  font-size: 20px;
   margin-bottom: 4px;
 }
 
-.auth-title-block p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+.auth-subtitle {
+  font-size: 13px;
+  color: var(--color-text-soft);
 }
 
-/* Piccolo badge "Demo" o info */
-.auth-badge {
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 0.75rem;
-  background: var(--color-primary-soft);
-  color: #0b4a8a;
-}
-
-/* ============================
-   TAB LOGIN / REGISTRAZIONE
-   ============================ */
-
+/* Tabs Login / Registrazione */
 .auth-tabs {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
-  padding: 4px;
+  padding: 3px;
+  margin-top: 10px;
+  background: rgba(15, 23, 42, 0.04);
   border-radius: var(--radius-pill);
-  background: #edf0fb;
-  gap: 4px;
-  margin-bottom: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
 }
 
-.auth-tab {
-  min-width: 120px;
-  padding: 7px 14px;
+.auth-tab-btn {
   border-radius: var(--radius-pill);
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   border: none;
   background: transparent;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-soft);
-  cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  color: var(--color-text-muted);
+  transition: background var(--transition-normal), box-shadow var(--transition-normal),
+    color var(--transition-normal), transform var(--transition-fast);
 }
 
-.auth-tab.active {
+.auth-tab-btn.active {
   background: #ffffff;
-  color: var(--color-primary-dark);
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
+  color: var(--accent-primary-deep);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.25);
+  transform: translateY(-1px);
 }
 
-/* Sottotitolo sotto le tab */
-.auth-subtitle {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-bottom: 12px;
+/* Contenitore form (login / registrazione) */
+.auth-body {
+  position: relative;
+  z-index: 1;
+  margin-top: 16px;
 }
-
-/* ============================
-   FORM LOGIN
-   ============================ */
 
 .auth-form {
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Riga per selettore ruolo in registrazione */
-.role-select-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Piccolo gruppo di "pill" per scelta rapida */
-.role-pill-group {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.role-pill-option {
-  padding: 5px 10px;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-soft);
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  background: #ffffff;
-  cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-}
-
-.role-pill-option.selected {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
-  color: #0b4a8a;
-}
-
-/* Layout due colonne piccoli campi (nome, cognome) */
-.form-row-inline {
-  display: flex;
-  gap: 8px;
-}
-
-.form-row-inline .form-row {
-  flex: 1;
-}
-
-/* Link testuali piccoli */
-.auth-links {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 4px;
-  font-size: 0.8rem;
-}
-
-/* Mini testo sotto form (es. "demo credenziali") */
-.auth-hint {
-  font-size: 0.8rem;
-  color: var(--text-soft);
-  margin-top: 6px;
-}
-
-/* ============================
-   CARD "RUOLO RAPIDO" (DEBUG)
-   ============================ */
-/* Piccoli bottoni che usi solo tu per entrare
-   al volo come Titolare/Farmacia/Dipendente/Cliente */
-
-.quick-role-bar {
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px dashed rgba(168, 177, 203, 0.9);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.quick-role-label {
-  font-size: 0.75rem;
-  color: var(--text-soft);
-}
-
-.quick-role-btn {
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  border: 1px solid rgba(180, 191, 217, 0.9);
-  background: #ffffff;
-  font-size: 0.75rem;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.quick-role-btn:hover {
-  background: #f5f6ff;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
-}
-
-/* ============================
-   SCHERMATE / SEZIONI PRINCIPALI
-   (dashboard titolare, farmacia, cliente)
-   ============================ */
-
-.section {
   display: none;
 }
 
-.section.active {
+.auth-form.active {
   display: block;
 }
 
-/* Titoli principali delle pagine (dashboard, impostazioni) */
-.page-header {
-  margin-bottom: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.page-title {
-  font-size: 1.35rem;
-}
-
-.page-subtitle {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-}
-
-/* Piccola area per pulsanti in alto a destra */
-.page-header-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-/* ============================================
-   STYLE.CSS – PARTE 3/7
-   Cards dashboard (Titolare/Farmacia/Cliente)
-   ============================================ */
-
-/* ============================
-   CONTENITORE DASHBOARD
-   ============================ */
-
-.dashboard-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 16px;
-  padding-bottom: 40px;
-}
-
-/* Griglia cards:
-   - Desktop: 3 colonne
-   - Tablet: 2 colonne
-   - Mobile: 1 colonna */
-
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(260px, 1fr));
-  gap: 18px;
-}
-
-/* ============================
-   CARD BASE
-   ============================ */
-
-.card {
-  position: relative;
-  border-radius: 18px;
-  background: #ffffff;
-  box-shadow: var(--shadow-card);
-  padding: 16px 16px 14px;
-  border: 1px solid rgba(226, 232, 247, 0.9);
-  display: flex;
-  flex-direction: column;
-  min-height: 120px;
-  cursor: default;
-}
-
-/* Variante "cliccabile" */
-.card-clickable {
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease,
-    border-color 0.12s ease;
-}
-
-.card-clickable:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.16);
-  border-color: rgba(158, 177, 242, 0.9);
-}
-
-/* Header card */
-.card-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-/* Icona card (emoji o SVG) */
-.card-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: #f4f6ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-}
-
-/* Titolo + eventuale sottotitolo card */
-.card-title-block {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.card-title {
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.card-subtitle {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-/* Piccoli chip sotto al titolo (es. "Oggi", "Solo lettura") */
-.card-chip-row {
-  margin-top: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.card-chip {
-  padding: 3px 8px;
-  font-size: 0.7rem;
-  border-radius: 999px;
-  background: #edf0fb;
-  color: #334155;
-}
-
-/* ============================
-   BODY & FOOTER CARD
-   ============================ */
-
-.card-body {
-  font-size: 0.85rem;
-  color: var(--text-main);
-  margin-bottom: 10px;
-  line-height: 1.4;
-}
-
-.card-body p {
-  margin-bottom: 4px;
-}
-
-.card-body .muted {
-  color: var(--text-soft);
-}
-
-/* Piccole liste dentro le card (es. ultimi 3 elementi) */
-.card-mini-list {
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.card-mini-item {
-  font-size: 0.8rem;
-  padding: 4px 6px;
-  border-radius: 8px;
-  background: #f7f8fe;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card-mini-item span {
-  display: inline-block;
-}
-
-/* Footer card con pulsante */
-.card-footer {
-  margin-top: auto;
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* Pulsantino nel footer tipo "Apri" */
-.card-footer .btn-outline {
-  border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.8);
-  background: #ffffff;
-  padding: 6px 12px;
-  font-size: 0.8rem;
-  color: #334155;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
-}
-
-.card-footer .btn-outline:hover {
-  background: #f8fafc;
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
-}
-
-/* ============================
-   CARD COLORATE PER SEZIONE
-   (solo piccolo accento in alto)
-   ============================ */
-
-.card-assenti {
-  border-top: 3px solid #22c55e;
-}
-
-.card-turno {
-  border-top: 3px solid #3b82f6;
-}
-
-.card-comunicazioni {
-  border-top: 3px solid #ec4899;
-}
-
-.card-procedure {
-  border-top: 3px solid #14b8a6;
-}
-
-.card-arrivi {
-  border-top: 3px solid #f97316;
-}
-
-.card-scadenze {
-  border-top: 3px solid #facc15;
-}
-
-.card-scorte {
-  border-top: 3px solid #a855f7;
-}
-
-.card-cassa {
-  border-top: 3px solid #0ea5e9;
-}
-
-.card-archivio {
-  border-top: 3px solid #6366f1;
-}
-
-/* Icona card con sfondi diversi */
-.card-assenti .card-icon {
-  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-}
-.card-turno .card-icon {
-  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
-}
-.card-comunicazioni .card-icon {
-  background: linear-gradient(135deg, #fce7f3, #f9a8d4);
-}
-.card-procedure .card-icon {
-  background: linear-gradient(135deg, #ccfbf1, #99f6e4);
-}
-.card-arrivi .card-icon {
-  background: linear-gradient(135deg, #ffedd5, #fed7aa);
-}
-.card-scadenze .card-icon {
-  background: linear-gradient(135deg, #fef9c3, #fef3c7);
-}
-.card-scorte .card-icon {
-  background: linear-gradient(135deg, #ede9fe, #ddd6fe);
-}
-.card-cassa .card-icon {
-  background: linear-gradient(135deg, #e0f2fe, #bae6fd);
-}
-.card-archivio .card-icon {
-  background: linear-gradient(135deg, #e5e7eb, #e0f2fe);
-}
-
-/* ============================
-   BADGE PICCOLE NOTIFICHE
-   (es. numerino rosso sulla card)
-   ============================ */
-
-.card-badge {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 30% 20%, #fee2e2 0, #ef4444 40%, #b91c1c 100%);
-  color: #ffffff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 0 3px #ffffff;
-}
-
-/* ============================
-   CARDS SPECIFICHE CLIENTE
-   (Eventi, Promozioni, Turno)
-   ============================ */
-
-.card-clienti-eventi .card-icon {
-  background: linear-gradient(135deg, #e0f2fe, #bfdbfe);
-}
-
-.card-clienti-promozioni .card-icon {
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-}
-
-.card-clienti-turno .card-icon {
-  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
-}
-
-/* Contenuto eventi (lista semplice) */
-.eventi-list {
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.evento-item {
-  font-size: 0.8rem;
-  padding: 4px 6px;
-  border-radius: 8px;
-  background: #f8fafc;
-}
-
-/* Promozioni – contenitore slider orizzontale */
-.promozioni-slider {
-  margin-top: 6px;
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-}
-
-.promo-card {
-  min-width: 150px;
-  max-width: 180px;
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
-  padding: 6px 8px;
-  flex-shrink: 0;
-}
-
-.promo-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.promo-price {
-  font-size: 0.9rem;
-  color: #16a34a;
-  font-weight: 700;
-}
-
-/* Piccolo box colorato come "immagine promo" */
-.promo-image {
-  height: 60px;
-  border-radius: 10px;
-  margin-bottom: 4px;
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  color: #7f1d1d;
-}
-
-/* Turno / appoggio testo */
-.turno-info {
-  font-size: 0.85rem;
-  line-height: 1.4;
-}
-
-.turno-info strong {
-  color: var(--color-primary-dark);
-}
-/* ============================================
-   STYLE.CSS – PARTE 4/7
-   Sezioni interne, tabelle, form, impostazioni
-   ============================================ */
-
-/* ============================
-   SEZIONI INTERNE (ASSENTI,
-   ARRIVI, SCADENZE, ECC.)
-   ============================ */
-
-.section-wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 16px;
-  padding-bottom: 40px;
-}
-
-.section-card {
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: var(--shadow-card);
-  padding: 16px 16px 18px;
-  border: 1px solid rgba(226, 232, 247, 0.9);
-}
-
-/* Header sezione (titolo + descrizione breve) */
-.section-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.section-title-block {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.section-title {
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.section-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-/* Piccoli badge riassuntivi (es. "Tot: 5" ecc.) */
-.section-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.section-badge {
-  border-radius: 999px;
-  padding: 4px 9px;
-  font-size: 0.75rem;
-  background: #e5e7eb;
-  color: #374151;
-}
-
-.section-badge-ok {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.section-badge-warn {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.section-badge-danger {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-/* Divider leggero interno alle sezioni */
-.section-divider {
-  height: 1px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  margin: 10px 0 14px;
-}
-
-/* ============================
-   TABELLE DATI
-   (Assenti, Arrivi, Scadenze,
-   Scorte, Cambio cassa, ecc.)
-   ============================ */
-
-.table-wrapper {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-
-/* Tabella principale */
-.ft-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-  min-width: 620px; /* scrollabile su schermi stretti */
-}
-
-.ft-table thead {
-  background: #e5edff;
-}
-
-.ft-table thead th {
-  text-align: left;
-  padding: 8px 10px;
-  font-weight: 600;
-  color: #1f2933;
-  border-bottom: 1px solid #d4ddf7;
-}
-
-.ft-table tbody tr {
-  background: #ffffff;
-}
-
-.ft-table tbody tr:nth-child(2n) {
-  background: #f9fafb;
-}
-
-.ft-table tbody td {
-  padding: 7px 10px;
-  border-bottom: 1px solid #e5e7eb;
-  color: #374151;
-}
-
-/* Piccole pillole dentro cella (es. stato, ruolo) */
-.cell-pill {
-  display: inline-block;
-  padding: 3px 7px;
-  font-size: 0.75rem;
-  border-radius: 999px;
-  background: #e5e7eb;
-  color: #374151;
-}
-
-.cell-pill-ok {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.cell-pill-warn {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.cell-pill-danger {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-/* Riga "vuota" quando non ci sono dati */
-.ft-table-empty {
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--text-soft);
-}
-
-/* ============================
-   FORM INTERNI
-   (aggiungi assente, arrivo,
-   scadenza, scorta, ecc.)
-   ============================ */
-
-.form-inline-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.form-inline-grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
+/* Campi form */
 .form-row {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  margin-bottom: 10px;
 }
 
-.form-row label {
-  font-size: 0.78rem;
+.form-label {
+  font-size: 12px;
   font-weight: 600;
-  color: #4b5563;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
 }
 
-.form-row input,
-.form-row select,
-.form-row textarea {
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  padding: 7px 9px;
-  font-size: 0.85rem;
-  font-family: inherit;
-  outline: none;
+.form-input,
+.form-select,
+.form-textarea {
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  padding: 9px 12px;
+  font-size: 14px;
   background: #ffffff;
-  transition: border-color 0.12s ease, box-shadow 0.12s ease,
-    background 0.12s ease;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast),
+    background var(--transition-fast);
 }
 
-/* Autofill iOS fix */
-.form-row input:-webkit-autofill {
-  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
-}
-
-/* Focus */
-.form-row input:focus,
-.form-row select:focus,
-.form-row textarea:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.28);
-  background: #f9fafb;
-}
-
-/* Textarea */
-.form-row textarea {
+/* Variante “box” per textarea */
+.form-textarea {
+  border-radius: var(--radius-md);
+  min-height: 66px;
   resize: vertical;
-  min-height: 60px;
 }
 
-/* Piccola descrizione sotto campo */
+/* Stato focus */
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: rgba(59, 130, 246, 0.75);
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.25), 0 0 0 4px rgba(191, 219, 254, 0.7);
+}
+
+/* Piccole note sotto i campi */
 .form-hint {
-  font-size: 0.75rem;
-  color: var(--text-soft);
+  font-size: 11px;
+  color: var(--color-text-muted);
 }
 
-/* Azioni form (bottoni) */
-.form-actions {
-  margin-top: 8px;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* Pulsante primario interno form */
-.btn-form-primary {
-  border-radius: 999px;
-  border: none;
-  padding: 7px 15px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, #4f46e5, #6366f1);
-  color: #ffffff;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.32);
-  transition: transform 0.12s ease, box-shadow 0.12s ease,
-    filter 0.12s ease;
-}
-
-.btn-form-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 26px rgba(79, 70, 229, 0.42);
-  filter: brightness(1.02);
-}
-
-/* Pulsante secondario (es. reset) */
-.btn-form-secondary {
-  border-radius: 999px;
-  border: 1px solid #cbd5f5;
-  padding: 7px 15px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  background: #f9fafb;
-  color: #4b5563;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  transition: background 0.12s ease, border-color 0.12s ease;
-}
-
-.btn-form-secondary:hover {
-  background: #e5e7eb;
-  border-color: #9ca3af;
-}
-
-/* Messaggi di feedback sotto il form */
-.form-feedback {
-  margin-top: 6px;
-  font-size: 0.8rem;
-}
-
-.form-feedback-ok {
-  color: #16a34a;
-}
-
-.form-feedback-error {
-  color: #b91c1c;
-}
-
-/* ============================
-   IMPOSTAZIONI TITOLARE
-   (Dati farmacia, account,
-   tema colore)
-   ============================ */
-
-.settings-grid {
+/* Riga orizzontale campi a 2 colonne (es. nome/cognome) */
+.form-row-two {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
-.settings-card {
-  background: #f9fafb;
-  border-radius: 16px;
-  padding: 12px 12px 14px;
-  border: 1px solid #e5e7eb;
+/* Pulsante submit form */
+.auth-submit-row {
+  margin-top: 12px;
 }
 
-.settings-card-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 4px;
+/* Messaggi errore/successo login/registrazione */
+.form-message {
+  margin-top: 8px;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.settings-card-subtitle {
-  font-size: 0.8rem;
-  color: var(--text-soft);
+.form-message.error {
+  background: var(--accent-danger-soft);
+  color: var(--accent-danger-deep);
+  border: 1px solid rgba(248, 113, 113, 0.55);
+}
+
+.form-message.success {
+  background: var(--accent-success-soft);
+  color: var(--accent-success-deep);
+  border: 1px solid rgba(52, 211, 153, 0.6);
+}
+
+/* Link piccolo sotto i form */
+.auth-footer-note {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+/* Selettore ruolo in registrazione (Dipendente / Cliente) */
+.role-selector {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  background: rgba(15, 23, 42, 0.02);
+  margin-bottom: 6px;
+}
+
+.role-pill-btn {
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: none;
+}
+
+.role-pill-btn.active {
+  background: #ffffff;
+  color: var(--accent-success-deep);
+  box-shadow: 0 12px 26px rgba(16, 185, 129, 0.28);
+}
+
+/* Piccolo riassunto ruolo scelto */
+.role-summary {
+  font-size: 12px;
+  color: var(--color-text-soft);
   margin-bottom: 8px;
 }
 
-/* Piccola palette tema (pallini colore) */
-.theme-swatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 4px;
-}
+/* Fine PARTE 1/7 */
 
-.theme-swatch {
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  border: 2px solid transparent;
-  cursor: pointer;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.28);
-}
-
-.theme-swatch-selected {
-  border-color: #111827;
-}
-
-/* ============================
-   ARCHIVIO FILE – BASE
-   (lista semplice: nome,
-   categoria, link/descrizione)
-   ============================ */
-
-.archivio-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-/* “Riga” archivio */
-.archivio-item {
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 1.4fr auto;
-  gap: 8px;
-  align-items: center;
-  font-size: 0.85rem;
-}
-
-.archivio-name {
-  font-weight: 600;
-  color: #111827;
-}
-
-.archivio-category {
-  font-size: 0.8rem;
-  color: #4b5563;
-}
-
-.archivio-link {
-  font-size: 0.8rem;
-  color: #1d4ed8;
-  text-decoration: underline;
-  cursor: pointer;
-  word-break: break-all;
-}
-
-/* Pulsanti azione su riga archivio */
-.archivio-actions {
-  display: flex;
-  gap: 4px;
-}
-
-.archivio-actions button {
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  font-size: 0.75rem;
-  padding: 4px 7px;
-  cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease;
-}
-
-.archivio-actions button:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
-}
-
-/* Stato vuoto archivio */
-.archivio-empty {
-  font-size: 0.8rem;
-  color: var(--text-soft);
-  padding: 6px 2px;
-}
-/* ============================================
-   STYLE.CSS – PARTE 5/7
-   Archivio avanzato + badge ruoli
-   ============================================ */
-
-/* ============================
-   ARCHIVIO FILE – VISTA CARDS
-   (opzionale, per look più “server”)
-   ============================ */
-
-.archivio-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 10px;
-}
-
-/* Card singolo “file” archivio */
-.archivio-card-item {
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
-  border: 1px solid #e5e7eb;
-  padding: 10px 11px 11px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 0.85rem;
-}
-
-.archivio-card-header {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.archivio-card-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 12px;
-  background: #eff6ff;
-  color: #1d4ed8;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
-.archivio-card-title {
-  flex: 1;
-  font-weight: 600;
-  color: #111827;
-  font-size: 0.9rem;
-}
-
-/* Piccola “pillola” categoria in alto a destra */
-.archivio-card-category-pill {
-  border-radius: 999px;
-  padding: 2px 7px;
-  font-size: 0.7rem;
-  background: #eef2ff;
-  color: #3730a3;
-}
-
-/* Corpo card archivio */
-.archivio-card-body {
-  font-size: 0.8rem;
-  color: #4b5563;
-}
-
-/* Link file / descrizione */
-.archivio-card-link {
-  margin-top: 4px;
-  font-size: 0.78rem;
-  color: #1d4ed8;
-  text-decoration: underline;
-  word-break: break-all;
-}
-
-/* Footer con pulsanti azione */
-.archivio-card-footer {
-  margin-top: 4px;
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.archivio-card-footer button {
-  border-radius: 999px;
-  border: 1px solid #d1d5db;
-  background: #f9fafb;
-  font-size: 0.75rem;
-  padding: 4px 9px;
-  cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease;
-}
-
-.archivio-card-footer button:hover {
-  background: #e5e7eb;
-  border-color: #9ca3af;
-}
-
-/* ============================
-   BADGE RUOLO / LABEL PREMIUM
-   (es. “Titolare”, “Dipendente”,
-   “Cliente”, “Solo lettura”)
-   ============================ */
-
-.role-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 0.74rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  background: #e5e7eb;
-  color: #374151;
-}
-
-/* Iconcina rotonda a sinistra della label ruolo */
-.role-label-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-}
-
-/* Varianti per ruolo */
-.role-label-titolare {
-  background: #eef2ff;
-  color: #312e81;
-}
-
-.role-label-titolare .role-label-dot {
-  background: #4f46e5;
-}
-
-.role-label-farmacia {
-  background: #ecfdf3;
-  color: #14532d;
-}
-
-.role-label-farmacia .role-label-dot {
-  background: #22c55e;
-}
-
-.role-label-dipendente {
-  background: #eff6ff;
-  color: #1e40af;
-}
-
-.role-label-dipendente .role-label-dot {
-  background: #3b82f6;
-}
-
-.role-label-cliente {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.role-label-cliente .role-label-dot {
-  background: #fbbf24;
-}
-
-/* =======================================
-   PICCOLI TAG DI PERMESSO / STATO
-   (es. “Solo lettura”, “Può modificare”)
-   ======================================= */
-
-.perm-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 999px;
-  padding: 3px 7px;
-  font-size: 0.74rem;
-  background: #f3f4f6;
-  color: #4b5563;
-}
-
-.perm-tag-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-}
-
-/* Solo lettura */
-.perm-readonly {
-  background: #eff6ff;
-  color: #1d4ed8;
-}
-
-.perm-readonly .perm-tag-dot {
-  background: #3b82f6;
-}
-
-/* Può inserire / segnalare (es. Arrivi, Scorte) */
-.perm-can-insert {
-  background: #ecfdf3;
-  color: #15803d;
-}
-
-.perm-can-insert .perm-tag-dot {
-  background: #22c55e;
-}
-
-/* Può modificare dati “sensibili” (solo Titolare) */
-.perm-can-edit-strong {
-  background: #fef2f2;
-  color: #b91c1c;
-}
-
-.perm-can-edit-strong .perm-tag-dot {
-  background: #ef4444;
-}
-
-/* ============================
-   CHIP / TAG GENERICI
-   (riutilizzabili ovunque)
-   ============================ */
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 9px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  background: #f3f4f6;
-  color: #374151;
-  gap: 5px;
-}
-
-.chip-icon {
-  font-size: 0.9rem;
-}
-
-/* Varianti colore chip */
-.chip-primary {
-  background: #eef2ff;
-  color: #3730a3;
-}
-
-.chip-success {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.chip-warning {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.chip-danger {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-/* Piccole label sopra un campo o una sezione */
-.label-soft {
-  display: inline-block;
-  font-size: 0.75rem;
-  color: var(--text-soft);
-  margin-bottom: 4px;
-}
-/* ============================================
-   STYLE.CSS – PARTE 6/7
-   Responsive avanzato + rifiniture
-   ============================================ */
-
-/* ============================
-   BREAKPOINT GRANDI SCHERMI
-   (monitor larghi > 1400px)
-   ============================ */
-
-@media (min-width: 1400px) {
-  .app-shell {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .dashboard {
-    padding-left: 32px;
-    padding-right: 32px;
-  }
-
-  .page {
-    padding-left: 32px;
-    padding-right: 32px;
-  }
-
-  .cards-grid {
-    gap: 20px;
-  }
-
-  .card {
-    border-radius: 20px;
-  }
-}
-
-/* ============================
-   BREAKPOINT DESKTOP STANDARD
-   (tra 1024px e 1399px)
-   ============================ */
-
-@media (max-width: 1399px) and (min-width: 1024px) {
-  .cards-grid {
-    grid-template-columns: repeat(3, minmax(260px, 1fr));
-  }
-
-  .archivio-cards-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-/* ============================
-   BREAKPOINT TABLET ORIZZONTALE
-   (~ 900 – 1023px)
-   ============================ */
-
-@media (max-width: 1023px) and (min-width: 900px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(260px, 1fr));
-  }
-
-  .archivio-cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .app-shell {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .page {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
-
-  .dashboard {
-    padding-left: 14px;
-    padding-right: 14px;
-  }
-}
-
-/* ============================
-   BREAKPOINT TABLET VERTICALE /
-   TELEFONO GRANDE (768 – 899px)
-   ============================ */
-
-@media (max-width: 899px) and (min-width: 768px) {
-  .header-inner {
-    padding: 0 12px;
-  }
-
-  .header-title {
-    font-size: 1rem;
-  }
-
-  .header-subtitle {
-    font-size: 0.78rem;
-  }
-
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .card {
-    padding: 14px 13px 13px;
-  }
-
-  .card-title {
-    font-size: 1rem;
-  }
-
-  .card-subtitle {
-    font-size: 0.78rem;
-  }
-
-  .page {
-    padding-top: 70px;
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .section-title {
-    font-size: 1rem;
-  }
-
-  .section-subtitle {
-    font-size: 0.8rem;
-  }
-
-  .archivio-cards-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* ============================
-   BREAKPOINT TELEFONO
-   (fino a 767px)
-   ============================ */
-
-@media (max-width: 767px) {
-  /* Layout base */
-  .app-shell {
-    padding: 0 10px 20px;
-  }
-
-  .dashboard {
-    padding: 72px 4px 20px;
-  }
-
-  .page {
-    padding: 72px 4px 20px;
-  }
-
-  /* Header app (barra in alto) */
-  .app-header {
-    height: 56px;
-  }
-
-  .header-inner {
-    padding: 0 10px;
-  }
-
-  .header-title {
-    font-size: 0.95rem;
-  }
-
-  .header-subtitle {
-    display: none; /* troppo piccola sugli schermi piccoli, la togliamo */
-  }
-
-  .header-user {
-    gap: 6px;
-  }
-
-  .header-username {
-    display: none; /* mostriamo solo avatar e icona */
-  }
-
-  .header-avatar {
-    width: 32px;
-    height: 32px;
-  }
-
-  .header-menu-btn {
-    padding: 5px;
-  }
-
-  /* Navigazione mobile */
-  .app-nav {
-    top: 56px;
-    width: 100%;
-    border-radius: 0 0 18px 18px;
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.25);
-  }
-
-  .nav-list {
-    padding-block: 8px 10px;
-  }
-
-  /* Griglia cards: 1 colonna piena */
-  .cards-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 14px;
-  }
-
-  .card {
-    border-radius: 18px;
-    padding: 14px 12px 12px;
-  }
-
-  .card-header {
-    margin-bottom: 8px;
-  }
-
-  .card-icon {
-    width: 38px;
-    height: 38px;
-    font-size: 1.05rem;
-  }
-
-  .card-title {
-    font-size: 0.95rem;
-  }
-
-  .card-subtitle {
-    font-size: 0.78rem;
-  }
-
-  .card-body {
-    font-size: 0.82rem;
-  }
-
-  .card-footer {
-    margin-top: 8px;
-  }
-
-  .card-footer .btn-sm {
-    width: 100%;
-    justify-content: center;
-  }
-
-  /* Tabelle: rendiamo il testo un po’ più grande e scroll orizz. */
-  table {
-    font-size: 0.78rem;
-  }
-
-  .table-wrapper {
-    margin-inline: -4px;
-  }
-
-  /* Form: input full-width e più comodi da tappare */
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
-
-  .form-row label {
-    font-size: 0.8rem;
-  }
-
-  .form-row input,
-  .form-row select,
-  .form-row textarea {
-    font-size: 0.85rem;
-    padding: 9px 11px;
-  }
-
-  /* Bottoni */
-  .btn,
-  .btn-primary,
-  .btn-secondary,
-  .btn-outline {
-    font-size: 0.82rem;
-    padding: 9px 12px;
-  }
-
-  .btn-icon {
-    padding: 7px;
-    border-radius: 999px;
-  }
-
-  /* Sezioni specifiche con layout 2 colonne → 1 colonna */
-  .two-column-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .two-column-layout .column {
-    width: 100%;
-  }
-
-  /* Archivio cards: 1 colonna su mobile */
-  .archivio-cards-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* Mini riassunti in alto nelle pagine (summary-pill) */
-  .summary-pill {
-    font-size: 0.75rem;
-    padding: 5px 9px;
-  }
-
-  .summary-row {
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-}
-
-/* ============================
-   BREAKPOINT TELEFONO PICCOLO
-   (< 360px)
-   ============================ */
-
-@media (max-width: 359px) {
-  .header-inner {
-    padding: 0 6px;
-  }
-
-  .app-shell {
-    padding: 0 6px 16px;
-  }
-
-  .card {
-    padding-inline: 10px;
-  }
-
-  .btn,
-  .btn-primary,
-  .btn-secondary,
-  .btn-outline {
-    padding: 8px 10px;
-    font-size: 0.8rem;
-  }
-
-  .table-wrapper {
-    margin-inline: -6px;
-  }
-
-  .section-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-  }
-
-  .section-actions {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-}
-/* ============================================
-   STYLE.CSS – PARTE 7/7
-   Utility, helper class, stati
-   ============================================ */
-
-/* ============================
-   UTILITY DI VISIBILITÀ
-   ============================ */
-
-/* Nascondi un elemento (display none) */
-.hidden {
-  display: none !important;
-}
-
-/* Solo visibile agli screen reader (accessibilità) */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* Mostra elemento come blocco (forzato) */
-.show-block {
-  display: block !important;
-}
-
-/* ============================
-   UTILITY DI LAYOUT
-   ============================ */
-
-.mt-0 { margin-top: 0 !important; }
-.mt-4 { margin-top: 4px !important; }
-.mt-8 { margin-top: 8px !important; }
-.mt-12 { margin-top: 12px !important; }
-.mt-16 { margin-top: 16px !important; }
-
-.mb-0 { margin-bottom: 0 !important; }
-.mb-4 { margin-bottom: 4px !important; }
-.mb-8 { margin-bottom: 8px !important; }
-.mb-12 { margin-bottom: 12px !important; }
-.mb-16 { margin-bottom: 16px !important; }
-
-.pt-8 { padding-top: 8px !important; }
-.pt-12 { padding-top: 12px !important; }
-.pt-16 { padding-top: 16px !important; }
-
-.pb-8 { padding-bottom: 8px !important; }
-.pb-12 { padding-bottom: 12px !important; }
-.pb-16 { padding-bottom: 16px !important; }
-
-.text-right { text-align: right !important; }
-.text-center { text-align: center !important; }
-.text-left { text-align: left !important; }
-
-/* Wrapper per righe di bottoni / azioni */
-.actions-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.actions-row.right {
-  justify-content: flex-end;
-}
-
-/* ============================
-   TESTI & BADGE DI STATO
-   ============================ */
-
-.text-muted {
-  color: var(--text-muted);
-}
-
-.text-success {
-  color: var(--success);
-}
-
-.text-danger {
-  color: var(--danger);
-}
-
-.text-warning {
-  color: var(--warning);
-}
-
-.text-info {
-  color: var(--info);
-}
-
-/* Badge piccoli per evidenziare uno stato */
-.badge-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  background-color: var(--bg-elevated);
-  color: var(--text-muted);
-}
-
-.badge-status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background-color: var(--text-muted);
-}
-
-/* Varianti colore per badge di stato */
-.badge-status.success {
-  background: rgba(22, 163, 74, 0.09);
-  color: #15803d;
-}
-
-.badge-status.success .badge-status-dot {
-  background-color: #22c55e;
-}
-
-.badge-status.warning {
-  background: rgba(234, 179, 8, 0.10);
-  color: #b45309;
-}
-
-.badge-status.warning .badge-status-dot {
-  background-color: #facc15;
-}
-
-.badge-status.danger {
-  background: rgba(239, 68, 68, 0.10);
-  color: #b91c1c;
-}
-
-.badge-status.danger .badge-status-dot {
-  background-color: #ef4444;
-}
-
-.badge-status.info {
-  background: rgba(59, 130, 246, 0.10);
-  color: #1d4ed8;
-}
-
-.badge-status.info .badge-status-dot {
-  background-color: #3b82f6;
-}
-
-/* ============================
-   AVVISI / ALERT
-   ============================ */
-
-.alert {
-  border-radius: 12px;
-  padding: 10px 12px;
-  font-size: 0.85rem;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  background-color: var(--bg-elevated);
-  color: var(--text-main);
-}
-
-.alert-icon {
-  font-size: 1rem;
-  line-height: 1;
-  margin-top: 2px;
-}
-
-.alert-success {
-  border: 1px solid rgba(34, 197, 94, 0.4);
-  background: rgba(22, 163, 74, 0.04);
-}
-
-.alert-success .alert-icon {
-  color: #16a34a;
-}
-
-.alert-danger {
-  border: 1px solid rgba(248, 113, 113, 0.5);
-  background: rgba(248, 113, 113, 0.05);
-}
-
-.alert-danger .alert-icon {
-  color: #ef4444;
-}
-
-.alert-warning {
-  border: 1px solid rgba(245, 158, 11, 0.6);
-  background: rgba(245, 158, 11, 0.06);
-}
-
-.alert-warning .alert-icon {
-  color: #f59e0b;
-}
-
-.alert-info {
-  border: 1px solid rgba(59, 130, 246, 0.55);
-  background: rgba(59, 130, 246, 0.05);
-}
-
-.alert-info .alert-icon {
-  color: #3b82f6;
-}
-
-/* ============================
-   CHIP PICCOLE (per info rapide)
-   ============================ */
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  background-color: var(--bg-elevated);
-  color: var(--text-muted);
-}
-
-.chip-icon {
-  font-size: 0.9rem;
-}
-
-/* Varianti colore chip */
-.chip-success {
-  background: rgba(22, 163, 74, 0.06);
-  color: #16a34a;
-}
-
-.chip-warning {
-  background: rgba(245, 158, 11, 0.06);
-  color: #f59e0b;
-}
-
-.chip-danger {
-  background: rgba(239, 68, 68, 0.06);
-  color: #ef4444;
-}
-
-.chip-info {
-  background: rgba(59, 130, 246, 0.06);
-  color: #3b82f6;
-}
-
-/* ============================
-   TAG RUOLO (header utente)
-   ============================ */
-
-.role-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 7px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background-color: rgba(15, 23, 42, 0.04);
-  color: var(--text-muted);
-}
-
-.role-tag .role-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background-color: var(--accent);
-}
-
-.role-tag.titolare {
-  background-color: rgba(59, 130, 246, 0.07);
-  color: #1d4ed8;
-}
-
-.role-tag.titolare .role-dot {
-  background-color: #3b82f6;
-}
-
-.role-tag.farmacia {
-  background-color: rgba(16, 185, 129, 0.08);
-  color: #047857;
-}
-
-.role-tag.farmacia .role-dot {
-  background-color: #10b981;
-}
-
-.role-tag.dipendente {
-  background-color: rgba(107, 114, 128, 0.08);
-  color: #374151;
-}
-
-.role-tag.dipendente .role-dot {
-  background-color: #6b7280;
-}
-
-.role-tag.cliente {
-  background-color: rgba(249, 115, 22, 0.08);
-  color: #c2410c;
-}
-
-.role-tag.cliente .role-dot {
-  background-color: #f97316;
-}
-
-/* ============================
-   FINE STYLE.CSS
-   ============================ */
