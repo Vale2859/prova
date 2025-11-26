@@ -335,7 +335,59 @@
           <span class="badge badge-month">Mese</span>
         </div>
       </header>
+           <!-- LAYOUT SPECIALE ASSENZE PER RUOLO "FARMACIA" -->
+      <div id="assenzeFarmaciaCards" class="assenze-farmacia hidden">
+        <div class="farm-grid">
 
+          <!-- 1) RICHIESTE IN ATTESA -->
+          <article class="card farm-card farm-card-richieste">
+            <div class="farm-card-header">
+              <span class="farm-chip farm-chip-richieste">RICHIESTE IN ATTESA</span>
+            </div>
+            <div class="farm-card-body center-number">
+              <span id="farmRichiesteInAttesaNumero" class="farm-big-number">0</span>
+              <p class="small-text">Permessi / ferie in attesa di approvazione.</p>
+            </div>
+          </article>
+
+          <!-- 2) ASSENTI OGGI -->
+          <article class="card farm-card farm-card-oggi">
+            <div class="farm-card-header">
+              <span class="farm-chip farm-chip-oggi">ASSENTI OGGI</span>
+            </div>
+            <div class="farm-card-body">
+              <ul id="farmAssentiOggiList" class="farm-list">
+                <!-- riempito da JS -->
+              </ul>
+            </div>
+          </article>
+
+          <!-- 3) PROSSIME ASSENZE APPROVATE -->
+          <article class="card farm-card farm-card-prossime">
+            <div class="farm-card-header">
+              <span class="farm-chip farm-chip-prossime">ASSENTI PROSSIMAMENTE</span>
+            </div>
+            <div class="farm-card-body">
+              <ul id="farmProssimeAssenzeList" class="farm-list">
+                <!-- riempito da JS -->
+              </ul>
+            </div>
+          </article>
+
+          <!-- 4) RITARDI / USCITE -->
+          <article class="card farm-card farm-card-ritardi">
+            <div class="farm-card-header">
+              <span class="farm-chip farm-chip-ritardi">RITARDI / USCITE</span>
+            </div>
+            <div class="farm-card-body">
+              <ul id="farmRitardiUsciteList" class="farm-list">
+                <!-- riempito da JS -->
+              </ul>
+            </div>
+          </article>
+
+        </div>
+      </div>
       <div class="assenze-top-cards">
         <div class="mini-card">
           <h3>Richieste in attesa</h3>
