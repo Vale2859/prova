@@ -1485,4 +1485,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initNotificationBadges();
   loadFS();
   renderArchivio();
+  renderCalendarioAssenzeDashboard();
 });
