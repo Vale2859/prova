@@ -4,11 +4,10 @@
   <meta charset="UTF-8" />
   <title>Portale Farmacia Montesano</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <link rel="stylesheet" href="style.css" />
   <script src="script.js" defer></script>
 
-  <!-- Icone -->
+  <!-- Icone (puoi cambiare logo.jpg) -->
   <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
   <link rel="icon" type="image/png" href="logo.jpg">
 </head>
@@ -67,11 +66,14 @@
 
       <ul class="sidebar-list">
         <li data-nav="dashboard">Dashboard</li>
-        <!-- Link diretti alle pagine separate -->
-        <li><a href="arrivi.html">Arrivi</a></li>
-        <li><a href="scadenze.html">Scadenze</a></li>
-        <li><a href="consumabili.html">Consumabili</a></li>
+        <li data-nav="assenzePage">Assenze</li>
+        <li data-nav="turniPage">Farmacie di turno</li>
+        <li data-nav="comunicazioniPage">Comunicazioni</li>
+        <li data-nav="procedurePage">Procedure</li>
         <li data-nav="archivioPage">Archivio file</li>
+        <li data-nav="arriviPage">Arrivi</li>
+        <li data-nav="scadenzePage">Scadenze</li>
+        <li data-nav="consumabiliPage">Consumabili</li>
         <li id="logoutBtn" class="logout">Logout</li>
       </ul>
     </aside>
@@ -92,112 +94,77 @@
           <p class="header-subtitle">Portale interno</p>
           <span id="currentRolePill" class="role-pill">Farmacia (accesso generico)</span>
         </div>
+
+        <!-- Banner Farmacia di turno sempre visibile -->
+        <div class="turno-banner" id="turnoBanner">
+          <div class="turno-banner-main">
+            <h2>Farmacia di turno oggi</h2>
+            <p id="turnoBannerNome">Farmacia Montesano</p>
+            <p id="turnoBannerIndirizzo">Via Esempio 12, Matera</p>
+            <p id="turnoBannerTelefono">Tel: 0835 000000</p>
+          </div>
+          <div class="turno-banner-side">
+            <h3>Farmacia di appoggio</h3>
+            <p id="turnoBannerAppoggioNome">Farmacia Centrale</p>
+            <p id="turnoBannerAppoggioDettagli">Via Dante 8, Matera – Tel: 0835 111111</p>
+          </div>
+        </div>
       </header>
 
       <div class="dashboard-content">
+        <div class="cards-grid">
 
-        <!-- 1) BANNER LARGO FARMACIA DI TURNO OGGI -->
-        <div class="dashboard-turno-today" id="turnoTodayBox">
-          <div class="turno-today-icon">⏰</div>
-          <div class="turno-today-text">
-            <p class="turno-today-title">Farmacia di turno oggi</p>
-            <p class="turno-today-main">
-              <strong id="turnoTodayMainName">Farmacia Montesano</strong><br />
-              <span id="turnoTodayMainAddr">Via Esempio 12, Matera</span><br />
-              <span id="turnoTodayMainTel">Tel: 0835 000000</span>
-            </p>
-            <p class="turno-today-appoggio">
-              <span class="turno-today-label">Farmacia di appoggio:</span><br />
-              <strong id="turnoTodayAppName">Farmacia Centrale</strong><br />
-              <span id="turnoTodayAppAddr">Via Dante 8, Matera</span><br />
-              <span id="turnoTodayAppTel">Tel: 0835 111111</span>
-            </p>
-          </div>
-        </div>
-
-        <!-- GRIGLIA CARDS -->
-        <div class="cards-grid dashboard-grid">
-
-          <!-- 2+3) CARD ASSENTI OGGI + ASSENTI PROSSIMAMENTE + CALENDARIO -->
-          <article class="card card-assenze-hero">
-
-            <!-- Badge notifiche assenze che pulsa -->
-            <button class="cal-assenze-notif-badge hidden" id="assenzeNotifBadge">
-              <span id="assenzeNotifCount">0</span>
-            </button>
-
-            <!-- Popup notifiche -->
-            <div id="assenzeNotifPopup" class="notif-popup hidden">
-              <div class="notif-popup-inner">
-                <h3>Notifiche</h3>
-                <ul id="assenzeNotifList"></ul>
-                <button id="assenzeNotifClose" class="btn-secondary small">
-                  Chiudi
-                </button>
-              </div>
+          <!-- CARD ASSENTI + CALENDARIO -->
+          <article class="card card-assenze-dashboard">
+            <div class="card-badge js-card-badge" data-card-key="assenze">
+              <span class="badge-count"></span>
             </div>
+            <div class="card-badge-label" data-card-key="assenze"></div>
 
-            <!-- LATO SINISTRO: OGGI + PROSSIMI -->
-            <div class="cal-assenze-left">
-              <p class="cal-assenze-date" id="calOggiLabel">Mer 26 Nov</p>
+            <div class="assenze-dashboard-inner">
+              <div class="cal-assenze-left">
+                <p class="cal-assenze-date" id="calAssenzeOggiLabel">Mer 26 Nov</p>
+                <h2 class="cal-assenze-title">Assenti oggi</h2>
 
-              <h2 class="cal-assenze-title">Assenti oggi</h2>
-              <ul class="cal-assenze-list" id="listaAssentiOggi">
-                <!-- Riempito da JS -->
-              </ul>
+                <ul class="assenze-today-list" id="assenzeOggiList">
+                  <!-- riempito da JS -->
+                  <li>Mario Rossi</li>
+                  <li>Giulia Bianchi</li>
+                </ul>
 
-              <h3 class="cal-assenze-subtitle ass-prox">Assenti prossimamente</h3>
-              <ul class="cal-assenze-list" id="listaAssentiProssimi">
-                <!-- Riempito da JS: Nome – dal … al … -->
-              </ul>
+                <h3 class="cal-assenze-subtitle">Assenti prossimamente</h3>
+                <ul class="assenze-next-list" id="assenzeProssimeList">
+                  <!-- riempito da JS -->
+                  <li><strong>Ven 28 Nov</strong> – Cosimo Verdi</li>
+                  <li><strong>Mar 2 Dic</strong> – Annalisa Neri</li>
+                  <li><strong>Ven 5 Dic</strong> – Daniela Blu</li>
+                </ul>
 
-              <!-- Bottoni diversi per ruolo -->
-              <div class="cal-assenze-actions">
-                <!-- FARMACIA -->
-                <button class="btn-primary cal-assenze-btn hidden" id="btnFarmaciaAssenze">
+                <button class="btn-primary cal-assenze-btn" id="btnVaiTuttiAssenti">
                   Vai a tutti gli assenti
                 </button>
-
-                <!-- DIPENDENTE -->
-                <button class="btn-primary cal-assenze-btn hidden" id="btnDipRichiedi">
-                  Richiedi assenza
-                </button>
-                <button class="btn-secondary cal-assenze-btn hidden" id="btnDipVedi">
-                  Vedi tutte le assenze
-                </button>
-
-                <!-- TITOLARE -->
-                <button class="btn-primary cal-assenze-btn hidden" id="btnTitSegna">
-                  Segna assenza
-                </button>
-                <button class="btn-secondary cal-assenze-btn hidden" id="btnTitVedi">
-                  Visualizza tutte le assenze
-                </button>
-              </div>
-            </div>
-
-            <!-- LATO DESTRO: MINI CALENDARIO LARGO -->
-            <div class="cal-assenze-right">
-              <div class="cal-mini-header">
-                <button class="cal-mini-nav" id="calPrevMonth">‹</button>
-                <span id="calMiniMonthLabel">Novembre 2025</span>
-                <button class="cal-mini-nav" id="calNextMonth">›</button>
               </div>
 
-              <div class="cal-mini-grid" id="calMiniGrid">
-                <!-- Mini calendario riempito da JS -->
-              </div>
-
-              <div class="cal-mini-legend">
-                <p>● giorno con almeno un assente</p>
-              </div>
-
-              <div class="cal-mini-info" id="calMiniInfo">
-                <!-- Qui JS mostra gli assenti del giorno cliccato -->
+              <div class="cal-assenze-right">
+                <div class="cal-mini-header">
+                  <button class="cal-mini-nav" id="calMiniPrevMonth" aria-label="Mese precedente">‹</button>
+                  <span id="calMiniMonthLabel">Novembre 2025</span>
+                  <button class="cal-mini-nav" id="calMiniNextMonth" aria-label="Mese successivo">›</button>
+                </div>
+                <div class="cal-mini-weekdays">
+                  <span>L</span><span>M</span><span>M</span><span>G</span><span>V</span><span>S</span><span>D</span>
+                </div>
+                <div class="cal-mini-grid" id="calMiniGrid">
+                  <!-- mini calendario riempito da JS -->
+                </div>
+                <div class="cal-mini-legend">
+                  <p>● giorno con almeno un assente</p>
+                </div>
               </div>
             </div>
           </article>
-                    <!-- 4) ARRIVI – CARD BLU -->
+
+          <!-- CARD ARRIVI -->
           <article class="card card-arrivi">
             <div class="card-badge js-card-badge" data-card-key="arrivi">
               <span class="badge-count"></span>
@@ -208,21 +175,20 @@
               <div class="card-icon">📦</div>
               <div class="card-title-group">
                 <h2>Arrivi</h2>
+                <p class="card-subtext">Segnala arrivi di corrieri, espositori e materiale.</p>
               </div>
             </div>
             <div class="card-body">
               <p class="small-text">
-                Segnala arrivi di corrieri, espositori e materiale.
+                Usa questa sezione per registrare velocemente arrivi importanti (demo).
               </p>
             </div>
             <div class="card-footer">
-              <button class="btn-primary small" id="btnCardArrivi">
-                Vai alla sezione
-              </button>
+              <button id="openArrivi" class="btn-primary">Vai alla sezione</button>
             </div>
           </article>
 
-          <!-- 5) SCADENZE – CARD GIALLA -->
+          <!-- CARD SCADENZE -->
           <article class="card card-scadenze">
             <div class="card-badge js-card-badge" data-card-key="scadenze">
               <span class="badge-count"></span>
@@ -230,24 +196,23 @@
             <div class="card-badge-label" data-card-key="scadenze"></div>
 
             <div class="card-header">
-              <div class="card-icon">⌛</div>
+              <div class="card-icon">⏳</div>
               <div class="card-title-group">
                 <h2>Scadenze</h2>
+                <p class="card-subtext">Prodotti in scadenza (meno di 45 giorni).</p>
               </div>
             </div>
             <div class="card-body">
               <p class="small-text">
-                Prodotti in scadenza: segnala nome, pezzi e data.
+                Segnala prodotti in scadenza e tieni tutto sotto controllo (demo).
               </p>
             </div>
             <div class="card-footer">
-              <button class="btn-primary small" id="btnCardScadenze">
-                Vai alla sezione
-              </button>
+              <button id="openScadenze" class="btn-primary">Vai alla sezione</button>
             </div>
           </article>
 
-          <!-- 6) CONSUMABILI – CARD ARANCIONE -->
+          <!-- CARD CONSUMABILI -->
           <article class="card card-consumabili">
             <div class="card-badge js-card-badge" data-card-key="consumabili">
               <span class="badge-count"></span>
@@ -255,24 +220,23 @@
             <div class="card-badge-label" data-card-key="consumabili"></div>
 
             <div class="card-header">
-              <div class="card-icon">☕</div>
+              <div class="card-icon">🧻</div>
               <div class="card-title-group">
                 <h2>Consumabili</h2>
+                <p class="card-subtext">Caffè, zucchero, carta igienica, rotoli POS, toner…</p>
               </div>
             </div>
             <div class="card-body">
               <p class="small-text">
-                Caffè, zucchero, carta igienica, rotoli POS, toner...
+                Segnala i consumabili da rifornire: la notifica arriva al titolare (demo).
               </p>
             </div>
             <div class="card-footer">
-              <button class="btn-primary small" id="btnCardConsumabili">
-                Vai alla sezione
-              </button>
+              <button id="openConsumabili" class="btn-primary">Vai alla sezione</button>
             </div>
           </article>
 
-          <!-- 7) CAMBIO CASSA (INVARIATA) -->
+          <!-- CARD CAMBIO CASSA (CON MODULO SEGNALA NECESSITÀ) -->
           <article class="card card-cambiocassa">
             <div class="card-badge js-card-badge" data-card-key="cambiocassa">
               <span class="badge-count"></span>
@@ -283,24 +247,59 @@
               <div class="card-icon">💶</div>
               <div class="card-title-group">
                 <h2>Cambio cassa</h2>
+                <p class="card-subtext">Segnala velocemente se servono spiccioli o banconote.</p>
               </div>
             </div>
 
             <div class="card-body">
-              <p class="small-text">
-                Segnala velocemente se servono spiccioli o tagli specifici:
-              </p>
-              <p class="small-text">
-                0,50 € · 1 € · 2 € · 5 € · 10 € · 20 €
-              </p>
-            </div>
+              <form id="cambioCassaForm" class="cambiocassa-form">
+                <p class="small-text">
+                  Seleziona cosa ti serve (demo). La richiesta verrà segnalata al titolare.
+                </p>
+                <div class="cambiocassa-grid">
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="tagli" value="0.50" />
+                    <span>Monete da 0,50 €</span>
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="tagli" value="1" />
+                    <span>Monete da 1 €</span>
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="tagli" value="2" />
+                    <span>Monete da 2 €</span>
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="tagli" value="5" />
+                    <span>Banconote da 5 €</span>
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="tagli" value="10" />
+                    <span>Banconote da 10 €</span>
+                  </label>
+                  <label class="checkbox-inline">
+                    <input type="checkbox" name="tagli" value="20" />
+                    <span>Banconote da 20 €</span>
+                  </label>
+                </div>
 
-            <div class="card-footer">
-              <button class="btn-primary">Segnala necessità (demo)</button>
+                <div class="form-row">
+                  <label for="cambioNote">Nota (opzionale)</label>
+                  <textarea id="cambioNote" rows="2" placeholder="Es. servono 50€ in monete piccole…"></textarea>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn-primary">Segnala necessità (demo)</button>
+                </div>
+
+                <p id="cambioCassaFeedback" class="form-feedback hidden">
+                  ✅ Richiesta inviata (demo). In futuro sarà notificata al titolare.
+                </p>
+              </form>
             </div>
           </article>
 
-          <!-- 8) ARCHIVIO FILE -->
+          <!-- CARD ARCHIVIO FILE -->
           <article class="card card-archivio">
             <div class="card-badge js-card-badge" data-card-key="archivio">
               <span class="badge-count"></span>
@@ -311,23 +310,24 @@
               <div class="card-icon">🗄️</div>
               <div class="card-title-group">
                 <h2>Archivio file</h2>
-                <span class="chip chip-archivio">Condiviso</span>
+                <span class="chip chip-archivio">Rapido & intuitivo</span>
               </div>
             </div>
-
             <div class="card-body">
               <p class="small-text">
-                Gestisci file interni e scegli i destinatari:
-                Dipendenti, Titolare o Tutti.
+                Gestisci file e cartelle come su un PC:
+                doppio click per aprire, tasto destro o pressione lunga
+                per copiare, incollare, rinominare o eliminare.
               </p>
             </div>
-
             <div class="card-footer">
-              <button class="btn-secondary" id="btnApriArchivio">Apri archivio</button>
+              <button id="openArchivio" class="btn-primary">
+                Apri Archivio
+              </button>
             </div>
           </article>
 
-          <!-- 9) COMUNICAZIONI -->
+          <!-- CARD COMUNICAZIONI -->
           <article class="card card-comunicazioni">
             <div class="card-badge js-card-badge" data-card-key="comunicazioni">
               <span class="badge-count"></span>
@@ -340,28 +340,24 @@
                 <h2>Comunicazioni</h2>
               </div>
             </div>
-
             <div class="card-body card-body-list">
               <div class="list-item">
-                <span class="list-title">Aggiornamento notturni</span>
+                <span class="list-title">Nuova procedura notturni</span>
                 <span class="list-meta">Oggi · Urgente</span>
               </div>
               <div class="list-item">
                 <span class="list-title">Verifica armadietto stupefacenti</span>
                 <span class="list-meta">Ieri · Importante</span>
               </div>
-              <div class="list-item">
-                <span class="list-title">Nuova promo vetrina</span>
-                <span class="list-meta">2 giorni fa · Info</span>
-              </div>
             </div>
-
             <div class="card-footer">
-              <button class="btn-primary">Apri comunicazioni (demo)</button>
+              <button id="openComunicazioni" class="btn-primary">
+                Vai a Comunicazioni
+              </button>
             </div>
           </article>
 
-          <!-- 10) PROCEDURE INTERNE -->
+          <!-- CARD PROCEDURE -->
           <article class="card card-procedure">
             <div class="card-badge js-card-badge" data-card-key="procedure">
               <span class="badge-count"></span>
@@ -374,25 +370,348 @@
                 <h2>Procedure interne</h2>
               </div>
             </div>
-
             <div class="card-body">
               <p class="small-text">
-                Accesso rapido alle procedure: chiusura cassa, resi, servizi CUP, magazzino.
+                Consulta rapidamente le procedure interne della farmacia.
               </p>
-              <ul class="small-text">
-                <li>Chiusura cassa serale</li>
-                <li>Gestione buoni SSN</li>
-                <li>Ricezione merce da grossista</li>
-              </ul>
             </div>
-
             <div class="card-footer">
-              <button class="btn-secondary">Apri procedure (demo)</button>
+              <button id="openProcedure" class="btn-secondary">
+                Vai a Procedure
+              </button>
             </div>
           </article>
 
-        </div> <!-- /cards-grid -->
-      </div> <!-- /dashboard-content -->
+        </div>
+      </div>
+    </section>
+        <!-- ============ PAGINA ASSENZE ============ -->
+    <section id="assenzePage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromAssenze" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Assenze del personale</h1>
+          <p>Calendario, assenti di oggi e richieste di ferie/permessi (demo).</p>
+        </div>
+        <div class="summary-badges">
+          <span class="badge badge-today">Oggi</span>
+          <span class="badge badge-week">Settimana</span>
+          <span class="badge badge-month">Mese</span>
+        </div>
+      </header>
+
+      <div class="assenze-top-cards">
+        <div class="mini-card">
+          <h3>Richieste in attesa</h3>
+          <p class="big-number">2</p>
+          <p class="small-text">Permessi/ferie da approvare.</p>
+        </div>
+        <div class="mini-card">
+          <h3>Assenti oggi</h3>
+          <p class="big-number">1</p>
+          <p class="small-text">Demo statica.</p>
+        </div>
+        <div class="mini-card">
+          <h3>Ferie mese</h3>
+          <p class="big-number">4</p>
+          <p class="small-text">Totale giornate ferie richieste.</p>
+        </div>
+      </div>
+
+      <div class="assenze-layout">
+        <!-- Calendario DEMO -->
+        <article class="card calendar-card">
+          <div class="calendar-header">
+            <h2>Calendario assenze (demo)</h2>
+            <div class="calendar-controls">
+              <select>
+                <option>Dicembre 2025</option>
+                <option>Gennaio 2026</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="calendar-grid">
+            <div class="calendar-row calendar-header-row">
+              <span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span>
+            </div>
+            <!-- Riga esempio -->
+            <div class="calendar-row">
+              <span class="empty">.</span>
+              <span class="empty">.</span>
+              <span class="day"><span>1</span></span>
+              <span class="day"><span>2</span></span>
+              <span class="day day-holiday"><span>3</span></span>
+              <span class="day"><span>4</span></span>
+              <span class="day"><span>5</span></span>
+            </div>
+          </div>
+
+          <div class="calendar-legend">
+            <span><span class="legend-dot ferie"></span>Ferie</span>
+            <span><span class="legend-dot permesso"></span>Permesso</span>
+            <span><span class="legend-dot oggi"></span>Oggi</span>
+          </div>
+        </article>
+
+        <!-- Oggi demo -->
+        <article class="card oggi-card">
+          <h2>Assenti oggi (demo)</h2>
+          <ul class="assenze-list small">
+            <li>
+              <span>Mario Rossi</span>
+              <span class="tag tag-ferie">Ferie</span>
+            </li>
+          </ul>
+        </article>
+      </div>
+
+      <!-- Richieste assenza demo -->
+      <article class="card requests-card">
+        <h2>Richieste di assenza (demo)</h2>
+        <div class="requests-table">
+          <div class="requests-row header">
+            <span>Nome</span>
+            <span>Dal</span>
+            <span>Al</span>
+            <span>Tipo</span>
+            <span>Stato</span>
+          </div>
+          <div class="requests-row">
+            <span>Mario Rossi</span>
+            <span>20/12</span>
+            <span>22/12</span>
+            <span>Ferie</span>
+            <span><span class="status status-pending">In attesa</span></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Form assenza demo -->
+      <article class="card form-card">
+        <h2>Invia richiesta di assenza (demo)</h2>
+        <form class="assenze-form">
+          <div class="form-row two-cols">
+            <div class="form-row">
+              <label>Dal</label>
+              <input type="date" />
+            </div>
+            <div class="form-row">
+              <label>Al</label>
+              <input type="date" />
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Tipo</label>
+            <select>
+              <option>Ferie</option>
+              <option>Permesso</option>
+              <option>Malattia</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Note</label>
+            <textarea rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Invia richiesta (demo)</button>
+          </div>
+        </form>
+        <p id="assenzeFeedback" class="form-feedback hidden">
+          ✅ Richiesta inviata (demo). In futuro verrà salvata sul server.
+        </p>
+      </article>
+    </section>
+
+    <!-- ============ PAGINA TURNI ============ -->
+    <section id="turniPage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromTurni" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Farmacie di turno</h1>
+          <p>Oggi, prossimi giorni e mese (demo dati).</p>
+        </div>
+      </header>
+
+      <div class="turni-tabs">
+        <button class="turni-tab active" data-view="oggi">Oggi</button>
+        <button class="turni-tab" data-view="settimana">Settimana</button>
+        <button class="turni-tab" data-view="mese">Mese</button>
+      </div>
+
+      <div class="turni-layout">
+        <article class="card turni-oggi-card">
+          <h2>Turno di oggi</h2>
+          <p class="small-text">Farmacia principale e farmacia di appoggio.</p>
+
+          <div class="turno-main">
+            <h3 id="turnoOggiNome">Farmacia Montesano</h3>
+            <p id="turnoOggiIndirizzo" class="small-text">
+              Via Esempio 12, Matera
+            </p>
+            <p id="turnoOggiTelefono" class="small-text">
+              Tel: 0835 000000
+            </p>
+            <span id="turnoOggiOrario" class="chip chip-turno">00:00 – 24:00</span>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="turno-appoggio">
+            <p class="small-text label">Farmacia di appoggio</p>
+            <h3 id="turnoOggiAppoggioNome">Farmacia Centrale</h3>
+            <p id="turnoOggiAppoggioDettagli" class="small-text">
+              Via Dante 8, Matera – Tel: 0835 111111
+            </p>
+          </div>
+        </article>
+
+        <article class="card turni-table-card">
+          <div class="turni-table-header">
+            <div>
+              <h2>Elenco turni</h2>
+              <p class="small-text">
+                Filtra per mese e farmacia.
+              </p>
+            </div>
+            <div class="turni-filters">
+              <select id="turniMeseSelect">
+                <option value="all">Tutti i mesi</option>
+                <option value="12">Dicembre</option>
+                <option value="1">Gennaio</option>
+              </select>
+              <select id="turniFarmaciaSelect">
+                <option value="all">Tutte le farmacie</option>
+                <option value="Farmacia Montesano">Farmacia Montesano</option>
+                <option value="Farmacia Centrale">Farmacia Centrale</option>
+                <option value="Farmacia Madonna delle Grazie">Farmacia Madonna delle Grazie</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="turni-table">
+            <div class="turni-row header">
+              <span>Data</span>
+              <span>Orario</span>
+              <span>Farmacia principale</span>
+              <span>Farmacia di appoggio</span>
+              <span>Telefono</span>
+              <span>Note</span>
+            </div>
+            <div id="turniRows"></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ PAGINA COMUNICAZIONI ============ -->
+    <section id="comunicazioniPage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromComunicazioni" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Comunicazioni interne</h1>
+          <p>Avvisi, note e messaggi (demo).</p>
+        </div>
+        <div class="summary-badges">
+          <span id="badgeTotComunicazioni" class="badge badge-week">Totali: 0</span>
+          <span id="badgeNonLette" class="badge badge-pending">Non lette: 0</span>
+          <span id="badgeUrgenti" class="badge badge-pending">Urgenti: 0</span>
+        </div>
+      </header>
+
+      <div class="comunicazioni-layout">
+        <article class="card comunicazioni-list-card">
+          <h2>Ultime comunicazioni</h2>
+          <p class="small-text">
+            Ordinato dalla più recente (demo).
+          </p>
+          <div id="comunicazioniList" class="comunicazioni-list"></div>
+        </article>
+
+        <article class="card comunicazioni-side-card">
+          <h2>Filtri & nuova comunicazione (demo)</h2>
+
+          <div class="form-row">
+            <label for="filtroCategoria">Categoria</label>
+            <select id="filtroCategoria">
+              <option value="tutte">Tutte</option>
+              <option value="urgente">Urgente</option>
+              <option value="importante">Importante</option>
+              <option value="informativa">Informativa</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label class="checkbox-inline">
+              <input type="checkbox" id="filtroSoloNonLette" />
+              <span>Mostra solo non lette</span>
+            </label>
+          </div>
+
+          <div class="divider"></div>
+
+          <form id="comunicazioneForm" class="comunicazione-form">
+            <div class="form-row">
+              <label for="comTitolo">Titolo</label>
+              <input id="comTitolo" type="text" placeholder="Es. Aggiornamento notturni" />
+            </div>
+            <div class="form-row">
+              <label for="comCategoria">Categoria</label>
+              <select id="comCategoria">
+                <option value="urgente">Urgente</option>
+                <option value="importante">Importante</option>
+                <option value="informativa">Informativa</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="comTesto">Testo</label>
+              <textarea id="comTesto" rows="3"></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary">Invia comunicazione (demo)</button>
+            </div>
+            <p id="comunicazioneFeedback" class="form-feedback hidden">
+              ✅ Comunicazione registrata (demo).
+            </p>
+          </form>
+        </article>
+      </div>
+    </section>
+        <!-- ============ PAGINA PROCEDURE ============ -->
+    <section id="procedurePage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromProcedure" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Procedure interne</h1>
+          <p>Ricerca veloce per reparto.</p>
+        </div>
+      </header>
+
+      <article class="card">
+        <div class="form-row">
+          <label for="procedureSearch">Cerca</label>
+          <input id="procedureSearch" type="text" placeholder="Es. chiusura cassa, buoni SSN..." />
+        </div>
+
+        <div class="procedure-filters">
+          <button class="proc-filter-btn active" data-reparto="tutti">Tutti</button>
+          <button class="proc-filter-btn" data-reparto="cassa">Cassa / Banco</button>
+          <button class="proc-filter-btn" data-reparto="magazzino">Magazzino</button>
+          <button class="proc-filter-btn" data-reparto="servizi">Servizi</button>
+          <button class="proc-filter-btn" data-reparto="logistica">Logistica</button>
+        </div>
+
+        <div id="procedureList" class="procedure-list"></div>
+      </article>
+
+      <article class="card">
+        <h2>Dettaglio procedura</h2>
+        <p class="small-text">
+          Tocca una procedura per vedere qui i dettagli.
+        </p>
+        <div id="procedureDetail" class="procedure-detail">
+          <p class="small-text muted">Nessuna procedura selezionata.</p>
+        </div>
+      </article>
     </section>
 
     <!-- ============ PAGINA ARCHIVIO FILE ============ -->
@@ -401,57 +720,188 @@
         <button id="backFromArchivio" class="back-button">← Dashboard</button>
         <div class="page-title-block">
           <h1>Archivio file</h1>
-          <p>Carica file e scegli a chi inviare la notifica.</p>
+          <p>Cartelle e file stile PC, super semplice.</p>
+        </div>
+      </header>
+
+      <article class="card archivio-card">
+        <div class="archivio-toolbar">
+          <div class="archivio-path">
+            Percorso: <span id="archivioPath">/root</span>
+          </div>
+          <div class="archivio-actions">
+            <button id="archivioUp" class="btn-secondary small">⬆ Cartella su</button>
+            <button id="archivioNewFolder" class="btn-secondary small">+ Nuova cartella</button>
+            <button id="archivioBtnUpload" class="btn-primary small">⬆ Carica file</button>
+            <input id="archivioUpload" type="file" multiple class="hidden" />
+          </div>
+        </div>
+
+        <p class="small-text long-press-hint">
+          💡 PC: tasto destro per opzioni · Telefono: tieni premuto sul file/cartella.
+        </p>
+
+        <div id="archivioGrid" class="file-grid">
+          <!-- Popolato da JS -->
+        </div>
+      </article>
+    </section>
+
+    <!-- ============ PAGINA ARRIVI ============ -->
+    <section id="arriviPage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromArrivi" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Arrivi</h1>
+          <p>Segnala arrivi di corrieri, espositori e materiale (demo).</p>
         </div>
       </header>
 
       <article class="card">
-        <h2>Nuovo file</h2>
-        <p class="small-text">
-          Scegli il nome del file e la cartella di destinazione:
-          <strong>Dipendenti</strong>, <strong>Titolare</strong> o <strong>Tutti</strong>.
-        </p>
-
-        <form id="archivioForm" class="simple-form">
+        <h2>Segnala arrivo</h2>
+        <form id="arriviForm" class="arrivi-form">
           <div class="form-row">
-            <label for="archFileName">Nome file</label>
-            <input id="archFileName" type="text" placeholder="Es. Turni_dicembre.pdf" />
+            <label for="arrivoData">Data arrivo</label>
+            <input id="arrivoData" type="date" />
           </div>
           <div class="form-row">
-            <label for="archDest">Destinatari</label>
-            <select id="archDest">
-              <option value="dipendenti">Dipendenti</option>
-              <option value="titolare">Titolare</option>
-              <option value="tutti">Tutti</option>
-            </select>
+            <label for="arrivoChi">Chi / Corriere</label>
+            <input id="arrivoChi" type="text" placeholder="Es. GLS, Bartolini, informatore..." />
           </div>
-          <button type="submit" class="btn-primary small">Aggiungi file</button>
+          <div class="form-row">
+            <label for="arrivoCosa">Cosa</label>
+            <input id="arrivoCosa" type="text" placeholder="Es. espositore dermocosmesi, ordine magazzino..." />
+          </div>
+          <div class="form-row">
+            <label for="arrivoNote">Note (opzionale)</label>
+            <textarea id="arrivoNote" rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Salva arrivo (demo)</button>
+          </div>
         </form>
+        <p id="arriviFeedback" class="form-feedback hidden">
+          ✅ Arrivo registrato (demo). In futuro sarà salvato e notificato.
+        </p>
       </article>
 
       <article class="card">
-        <h2>Cartelle archivio</h2>
-        <p class="small-text">
-          Le cartelle principali non possono essere eliminate. Puoi solo aggiungere
-          o rimuovere i file al loro interno.
-        </p>
+        <h2>Ultimi arrivi (demo)</h2>
+        <ul id="arriviList" class="simple-list">
+          <!-- riempito da JS in demo -->
+        </ul>
+      </article>
+    </section>
 
-        <div class="archivio-columns">
-          <div class="archivio-col">
-            <h3>Dipendenti</h3>
-            <ul id="archListDip" class="small-text archivio-list"></ul>
+    <!-- ============ PAGINA SCADENZE ============ -->
+    <section id="scadenzePage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromScadenze" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Scadenze</h1>
+          <p>Prodotti in scadenza (meno di 45 giorni) – demo locale.</p>
+        </div>
+      </header>
+
+      <article class="card">
+        <h2>Segnala scadenza</h2>
+        <form id="scadenzeForm" class="scadenze-form">
+          <div class="form-row">
+            <label for="scadProdotto">Nome prodotto</label>
+            <input id="scadProdotto" type="text" placeholder="Es. Amoxicillina 500mg 12cpr" />
           </div>
-          <div class="archivio-col">
-            <h3>Titolare</h3>
-            <ul id="archListTit" class="small-text archivio-list"></ul>
+          <div class="form-row">
+            <label for="scadPezzi">Numero pezzi</label>
+            <input id="scadPezzi" type="number" min="1" step="1" />
           </div>
-          <div class="archivio-col">
-            <h3>Tutti</h3>
-            <ul id="archListTutti" class="small-text archivio-list"></ul>
+          <div class="form-row">
+            <label for="scadData">Data di scadenza</label>
+            <input id="scadData" type="date" />
           </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Aggiungi scadenza (demo)</button>
+          </div>
+        </form>
+        <p id="scadenzeFeedback" class="form-feedback hidden">
+          ✅ Scadenza registrata (demo). Se inferiore a 45 giorni comparirà come notifica.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Elenco scadenze (demo)</h2>
+        <div class="scadenze-table">
+          <div class="scadenze-row header">
+            <span>Prodotto</span>
+            <span>Pezzi</span>
+            <span>Scadenza</span>
+            <span>Azioni</span>
+          </div>
+          <div id="scadenzeRows"></div>
         </div>
       </article>
     </section>
+
+    <!-- ============ PAGINA CONSUMABILI ============ -->
+    <section id="consumabiliPage" class="page hidden">
+      <header class="page-header">
+        <button id="backFromConsumabili" class="back-button">← Dashboard</button>
+        <div class="page-title-block">
+          <h1>Consumabili</h1>
+          <p>Segnala consumabili (caffè, zucchero, carta igienica, rotoli, toner…)</p>
+        </div>
+      </header>
+
+      <article class="card">
+        <h2>Segnala consumabili</h2>
+        <form id="consumabiliForm" class="consumabili-form">
+          <div class="form-row">
+            <label for="consNome">Nome consumabile</label>
+            <input id="consNome" type="text" placeholder="Es. Carta igienica, caffè, rotolo POS..." />
+          </div>
+          <div class="form-row">
+            <label for="consNota">Nota (opzionale)</label>
+            <textarea id="consNota" rows="3"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-primary">Aggiungi consumabile (demo)</button>
+          </div>
+        </form>
+        <p id="consumabiliFeedback" class="form-feedback hidden">
+          ✅ Segnalazione registrata (demo). La notifica viene inviata al titolare.
+        </p>
+      </article>
+
+      <article class="card">
+        <h2>Elenco consumabili (demo)</h2>
+        <ul id="consumabiliList" class="simple-list">
+          <!-- riempito da JS in demo -->
+        </ul>
+      </article>
+    </section>
+
+    <!-- MENU TASTO DESTRO ARCHIVIO -->
+    <div id="archivioContextMenu" class="context-menu hidden">
+      <button id="menuNuova" class="context-menu-item">📁 Nuova cartella</button>
+      <button id="menuRinomina" class="context-menu-item">✏️ Rinomina</button>
+      <button id="menuCopia" class="context-menu-item">📄 Copia</button>
+      <button id="menuIncolla" class="context-menu-item">📥 Incolla</button>
+      <button id="menuDownload" class="context-menu-item">⬇️ Scarica file</button>
+      <button id="menuElimina" class="context-menu-item danger">🗑 Elimina</button>
+    </div>
+
+    <!-- OVERLAY NOTIFICHE CARD -->
+    <div id="notificationOverlay" class="notif-overlay hidden">
+      <div class="notif-backdrop"></div>
+      <div class="notif-modal">
+        <button id="notifClose" class="notif-close" aria-label="Chiudi">✕</button>
+        <h2 id="notifTitle">Notifiche</h2>
+        <p id="notifIntro" class="small-text"></p>
+        <div id="notifList" class="notif-list"></div>
+        <div class="notif-footer">
+          <button id="notifCloseBottom" class="btn-secondary small">Chiudi</button>
+        </div>
+      </div>
+    </div>
 
   </main>
 </body>
