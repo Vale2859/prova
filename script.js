@@ -1196,7 +1196,8 @@ document.addEventListener("DOMContentLoaded", () => {
   notifCloseBottom = document.getElementById("notifCloseBottom");
 
   btnVaiTuttiAssenti = document.getElementById("btnVaiTuttiAssenti");
-
+    calMiniGrid = document.getElementById("calMiniGrid");
+  calMiniMonthLabel = document.getElementById("calMiniMonthLabel");
   // ====== LOGIN ======
   authTabs.forEach(tab => {
     tab.addEventListener("click", () => {
