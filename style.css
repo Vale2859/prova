@@ -1,10 +1,8 @@
 /* ============================================================
    PORTALE FARMACIA MONTESANO – STYLE.CSS
-   (PARTE 1/3)
    ============================================================ */
 
 /* RESET DI BASE */
-
 *,
 *::before,
 *::after {
@@ -37,7 +35,6 @@ body {
   --radius-pill: 999px;
 
   --notif-red: #ff395f;
-  --notif-pulse: #ff879e;
   --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 }
 
@@ -386,6 +383,7 @@ body {
 .card-cambio {
   background: radial-gradient(circle at top left, #18d18b 0, #07945a 40%, #045334 100%);
 }
+
 /* ============================================================
    CARD NOTIFICHE (PALLINO PULSANTE)
    ============================================================ */
@@ -480,9 +478,21 @@ body {
   font-size: 0.9rem;
 }
 
-.assenti-btn {
+.assenti-actions {
   margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.assenti-btn {
   align-self: flex-start;
+}
+
+.assenti-extra-btn {
+  font-size: 0.8rem;
+  padding-inline: 16px;
 }
 
 .cal-mini-header {
@@ -752,6 +762,7 @@ body {
   justify-content: flex-end;
   gap: 8px;
 }
+
 /* ============================================================
    RESPONSIVE
    ============================================================ */
