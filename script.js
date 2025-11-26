@@ -1218,7 +1218,7 @@ document.addEventListener("DOMContentLoaded", () => {
   notifList = document.getElementById("notifList");
   notifClose = document.getElementById("notifClose");
   notifCloseBottom = document.getElementById("notifCloseBottom");
-
+  btnVaiTuttiAssenti = document.getElementById("btnVaiTuttiAssenti");
   // ====== LOGIN ======
   authTabs.forEach(tab => {
     tab.addEventListener("click", () => {
