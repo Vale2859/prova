@@ -96,7 +96,42 @@
 
       <div class="dashboard-content">
         <div class="cards-grid">
+          <!-- CARD CALENDARIO ASSENZE (TITOLARE) -->
+          <article class="card card-calendario-assenze">
+            <div class="cal-assenze-left">
+              <div class="cal-assenze-today-block">
+                <div class="cal-assenze-date" id="calAssenzeTodayDate">—</div>
+                <h2 class="cal-assenze-title">Assenti oggi</h2>
+                <ul class="cal-assenze-list" id="calAssenzeTodayList">
+                  <!-- riempito da JS -->
+                </ul>
+              </div>
 
+              <div class="cal-assenze-next-block">
+                <h3 class="cal-assenze-subtitle">Assenti prossimamente</h3>
+                <ul class="cal-assenze-next-list" id="calAssenzeNextList">
+                  <!-- riempito da JS -->
+                </ul>
+              </div>
+
+              <button class="btn-primary cal-assenze-btn" id="btnVaiTuttiAssenti">
+                Vai a tutti gli assenti
+              </button>
+            </div>
+
+            <div class="cal-assenze-right">
+              <div class="cal-mini-header">
+                <span id="calMiniMonthLabel">Mese 2025</span>
+              </div>
+              <div class="cal-mini-grid" id="calMiniGrid">
+                <!-- mini calendario riempito da JS -->
+              </div>
+              <p class="cal-mini-legend">
+                ● giorno con almeno un assente
+              </p>
+            </div>
+          </article>
+          
           <!-- ASSENZE -->
           <article class="card card-assenze">
             <div class="card-badge js-card-badge" data-card-key="assenze">
