@@ -1,2965 +1,1392 @@
-// ======================================================
-// FARMACIA MONTESANO – PORTALE PROFESSIONALE
-// SCRIPT.JS – PARTE 1/7
-// ------------------------------------------------------
-// In questo file gestiamo tutta la logica del portale:
-// - utenti e ruoli (titolare, farmacia, dipendente, cliente)
-// - autenticazione e sessione "finta" via localStorage
-// - caricamento dashboard corrette in base al ruolo
-// - gestione dei dati (assenze, arrivi, scorte, ecc.) sempre in localStorage
-// ======================================================
-
-/* =====================================================
-   COSTANTI GLOBALI / CHIAVI DI LOCALSTORAGE
-   ===================================================== */
-
-// Chiavi centralizzate per non sbagliare mai a scriverle
-const LS_KEYS = {
-  USERS: "fm_users",             // Lista utenti registrati (tutti i ruoli)
-  SETTINGS: "fm_settings",       // Impostazioni varie (es. dati farmacia, tema)
-  DATA: "fm_data",               // Dati operativi (assenze, scorte, arrivi, ecc.)
-  SESSION: "fm_session"          // Utente attualmente loggato
-};
-
-// Ruoli supportati dal portale
-const ROLES = {
-  TITOLARE: "titolare",
-  FARMACIA: "farmacia",
-  DIPENDENTE: "dipendente",
-  CLIENTE: "cliente"
-};
-
-// Piccolo helper per sapere se siamo in "modalità debug" (utile se vuoi loggare)
-const DEBUG = true;
-
-/* =====================================================
-   FUNZIONI DI UTILITÀ GENERALI
-   ===================================================== */
-
-/**
- * Log condizionale: se DEBUG è true, mostra nel console.log il messaggio.
- * Così puoi spegnere tutti i log mettendo DEBUG = false.
- */
-function logDebug(...args) {
-  if (DEBUG) {
-    console.log("[FM DEBUG]", ...args);
-  }
-}
-
-/**
- * Legge un valore dal localStorage e lo converte da JSON.
- * Se non esiste, restituisce il valore di default passato.
- */
-function loadFromStorage(key, defaultValue) {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return defaultValue;
-    return JSON.parse(raw);
-  } catch (err) {
-    console.error("Errore lettura localStorage per key:", key, err);
-    return defaultValue;
-  }
-}
-
-/**
- * Salva un valore in localStorage convertendolo in JSON.
- */
-function saveToStorage(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (err) {
-    console.error("Errore salvataggio localStorage per key:", key, err);
-  }
-}
-
-/**
- * Genera un ID semplice (non sicuro, ma perfetto per il front-end locale).
- */
-function generateId(prefix = "id") {
-  const now = Date.now().toString(36);
-  const rand = Math.random().toString(36).substring(2, 8);
-  return `${prefix}_${now}_${rand}`;
-}
-
-/* =====================================================
-   GESTIONE UTENTI · STRUTTURA DATI
-   ===================================================== */
-
-/**
- * Struttura di un utente tipo:
- * {
- *   id: "user_...",
- *   role: "titolare" | "farmacia" | "dipendente" | "cliente",
- *   nome: "Mario",
- *   cognome: "Rossi",
- *   username: "mario.rossi" (o email),
- *   password: "hash o testo semplice (per ora semplice)",
- *   createdAt: "ISO date string"
- * }
- */
-
-/**
- * Restituisce l'array di tutti gli utenti dal localStorage.
- */
-function getAllUsers() {
-  const users = loadFromStorage(LS_KEYS.USERS, []);
-  return Array.isArray(users) ? users : [];
-}
-
-/**
- * Salva l'array di utenti in localStorage.
- */
-function saveAllUsers(users) {
-  if (!Array.isArray(users)) return;
-  saveToStorage(LS_KEYS.USERS, users);
-}
-
-/**
- * Trova un utente in base allo username (o email).
- */
-function findUserByUsername(username) {
-  const users = getAllUsers();
-  return users.find(u => u.username.toLowerCase() === username.toLowerCase()) || null;
-}
-
-/**
- * Aggiunge un nuovo utente se lo username non è già esistente.
- * Ritorna { ok: true, user } oppure { ok: false, error }
- */
-function registerUser({ role, nome, cognome, username, password }) {
-  const trimmedUsername = (username || "").trim();
-  if (!trimmedUsername || !password) {
-    return { ok: false, error: "Username e password sono obbligatori." };
-  }
-
-  const existing = findUserByUsername(trimmedUsername);
-  if (existing) {
-    return { ok: false, error: "Esiste già un utente con questo username." };
-  }
-
-  const users = getAllUsers();
-  const newUser = {
-    id: generateId("user"),
-    role,
-    nome: (nome || "").trim(),
-    cognome: (cognome || "").trim(),
-    username: trimmedUsername,
-    password: password, // In futuro potresti sostituire con hash, qui va bene così.
-    createdAt: new Date().toISOString()
-  };
-
-  users.push(newUser);
-  saveAllUsers(users);
-
-  return { ok: true, user: newUser };
-}
-
-/**
- * Controlla username + password e ritorna l'utente se valido.
- */
-function authenticate(username, password) {
-  const user = findUserByUsername(username || "");
-  if (!user) {
-    return { ok: false, error: "Utente non trovato." };
-  }
-  if (user.password !== password) {
-    return { ok: false, error: "Password errata." };
-  }
-  return { ok: true, user };
-}
-
-/* =====================================================
-   UTENTI DI DEFAULT: TITOLARE + FARMACIA
-   ===================================================== */
-
-/**
- * Inizializza gli utenti di default, se non esistono ancora:
- * - titolare / password: titolare123
- * - farmacia / password: farmacia123
- *
- * Questi NON passano dalla schermata di registrazione, sono pre-creati
- * e in futuro potrai far cambiare le password dalle impostazioni.
- */
-function ensureDefaultUsers() {
-  let users = getAllUsers();
-  let changed = false;
-
-  // Titolare di default
-  if (!users.some(u => u.role === ROLES.TITOLARE)) {
-    const titolareUser = {
-      id: generateId("user"),
-      role: ROLES.TITOLARE,
-      nome: "Titolare",
-      cognome: "Montesano",
-      username: "titolare",      // login: titolare / titolare123
-      password: "titolare123",
-      createdAt: new Date().toISOString()
-    };
-    users.push(titolareUser);
-    changed = true;
-    logDebug("Creato utente di default Titolare");
-  }
-
-  // Farmacia di default (postazione banco)
-  if (!users.some(u => u.role === ROLES.FARMACIA)) {
-    const farmaciaUser = {
-      id: generateId("user"),
-      role: ROLES.FARMACIA,
-      nome: "Farmacia",
-      cognome: "Montesano",
-      username: "farmacia",      // login: farmacia / farmacia123
-      password: "farmacia123",
-      createdAt: new Date().toISOString()
-    };
-    users.push(farmaciaUser);
-    changed = true;
-    logDebug("Creato utente di default Farmacia");
-  }
-
-  if (changed) {
-    saveAllUsers(users);
-  }
-}
-
-/* =====================================================
-   IMPOSTAZIONI DI DEFAULT (FARMACIA, TEMA, ECC.)
-   ===================================================== */
-
-/**
- * Restituisce le impostazioni correnti (fm_settings).
- * Se non esistono, crea valori di default.
- */
-function getSettings() {
-  let settings = loadFromStorage(LS_KEYS.SETTINGS, null);
-  if (!settings) {
-    settings = {
-      farmaciaNome: "Farmacia Montesano",
-      farmaciaIndirizzo: "Via Esempio 123, 75100 Matera (MT)",
-      farmaciaTelefono: "0835 000000",
-      // Tema base: "light-premium" – in futuro potrai cambiare colori dinamicamente
-      theme: "light-premium",
-      // Config card cliente: eventi e promo possono usare queste impostazioni base
-      cliente: {
-        mostraEventi: true,
-        mostraPromozioni: true
-      }
-    };
-    saveToStorage(LS_KEYS.SETTINGS, settings);
-  }
-  return settings;
-}
-
-/**
- * Salva nuove impostazioni.
- */
-function saveSettings(newSettings) {
-  const current = getSettings();
-  const merged = { ...current, ...newSettings };
-  saveToStorage(LS_KEYS.SETTINGS, merged);
-}
-
-/* =====================================================
-   STRUTTURA DATI OPERATIVI (ASSENZE, ARRIVI, ECC.)
-   ===================================================== */
-
-/**
- * Restituisce la struttura completa dei dati "operativi".
- * Se non esiste, la inizializza con array vuoti.
- */
-function getDataStore() {
-  let data = loadFromStorage(LS_KEYS.DATA, null);
-  if (!data) {
-    data = {
-      assenze: [],        // {id, nome, data, motivo}
-      turni: {
-        farmaciaTurno: "Farmacia Montesano – Via Esempio 123 – Tel: 0835 000000",
-        farmaciaAppoggio: "Farmacia Centrale – Via Roma 10 – Tel: 0835 111111"
-      },
-      comunicazioni: [],  // {id, titolo, testo, autore, dataISO}
-      procedure: [],      // {id, titolo, descrizione}
-      arrivi: [],         // {id, data, fornitore, descrizione}
-      scadenze: [],       // {id, descrizione, dataScadenza, note}
-      scorte: [],         // {id, nome, quantita, minimo, note, bassa}
-      cambioCassa: [],    // {id, data, turno, importi, note}
-      eventiCliente: [],  // {id, titolo, data, descrizione}
-      promoCliente: []    // {id, titolo, prezzo, descrizione, coloreBox, evidenza}
-    };
-    saveToStorage(LS_KEYS.DATA, data);
-  }
-  return data;
-}
-
-/**
- * Salva l'intero data store nel localStorage.
- */
-function saveDataStore(data) {
-  saveToStorage(LS_KEYS.DATA, data);
-}
-
-/* =====================================================
-   SESSIONE UTENTE (LOGIN / LOGOUT)
-   ===================================================== */
-
-/**
- * Imposta la sessione con un utente loggato.
- */
-function setSessionUser(user) {
-  const session = {
-    userId: user.id,
-    loggedAt: new Date().toISOString()
-  };
-  saveToStorage(LS_KEYS.SESSION, session);
-}
-
-/**
- * Recupera l'utente attualmente in sessione (se esiste).
- */
-function getSessionUser() {
-  const session = loadFromStorage(LS_KEYS.SESSION, null);
-  if (!session || !session.userId) return null;
-
-  const users = getAllUsers();
-  const user = users.find(u => u.id === session.userId) || null;
-  return user;
-}
-
-/**
- * Cancella la sessione attuale (logout).
- */
-function clearSession() {
-  try {
-    localStorage.removeItem(LS_KEYS.SESSION);
-  } catch (err) {
-    console.error("Errore durante il logout:", err);
-  }
-}
-
-/* =====================================================
-   GESTIONE VISTE / NAVIGAZIONE BASE
-   ===================================================== */
-
-// Riferimenti principali agli elementi del DOM (verranno riempiti su DOMContentLoaded)
-let appShell = null;
-let viewLanding = null;
-let viewAuth = null;
-let viewDashboardTitolare = null;
-let viewDashboardFarmacia = null;
-let viewDashboardCliente = null;
-
-// Header / Nav
-let navUserName = null;
-let navUserRole = null;
-let btnLogout = null;
-
-// Form login / registrazione
-let loginForm = null;
-let loginErrorBox = null;
-
-let registerForm = null;
-let registerRoleSelect = null;
-let registerErrorBox = null;
-
-/**
- * Nasconde tutte le "view" principali e mostra solo quella passata.
- * Le view sono sezioni del tipo:
- *   <section class="app-view" id="view-...">...</section>
- */
-function showView(viewElement) {
-  const allViews = document.querySelectorAll(".app-view");
-  allViews.forEach(v => v.classList.add("hidden"));
-  if (viewElement) {
-    viewElement.classList.remove("hidden");
-  }
-}
-
-/**
- * Aggiorna il testo della barra in alto con nome utente e ruolo.
- */
-function updateNavUserInfo(user) {
-  if (!navUserName || !navUserRole) return;
-
-  if (!user) {
-    navUserName.textContent = "";
-    navUserRole.textContent = "";
-    return;
-  }
-
-  const fullName = [user.nome, user.cognome].filter(Boolean).join(" ") || user.username;
-  navUserName.textContent = fullName;
-
-  let roleLabel = "";
-  switch (user.role) {
-    case ROLES.TITOLARE:
-      roleLabel = "Titolare";
-      break;
-    case ROLES.FARMACIA:
-      roleLabel = "Farmacia (postazione banco)";
-      break;
-    case ROLES.DIPENDENTE:
-      roleLabel = "Dipendente";
-      break;
-    case ROLES.CLIENTE:
-      roleLabel = "Cliente";
-      break;
-    default:
-      roleLabel = "Utente";
-  }
-  navUserRole.textContent = roleLabel;
-}
-
-/**
- * Mostra la dashboard corretta in base al ruolo dell'utente.
- */
-function goToDashboardForRole(user) {
-  if (!user) return;
-
-  // Mostro il guscio dell'app (nav + main)
-  if (appShell) {
-    appShell.classList.remove("hidden");
-  }
-
-  // Nascondo eventuale view auth
-  if (viewAuth) {
-    viewAuth.classList.add("hidden");
-  }
-  if (viewLanding) {
-    viewLanding.classList.add("hidden");
-  }
-
-  // Aggiorno la navbar
-  updateNavUserInfo(user);
-
-  // Mostro la dashboard corretta
-  if (user.role === ROLES.TITOLARE) {
-    showView(viewDashboardTitolare);
-    // Funzione specifica che in futuro popolerà la dashboard titolare
-    if (typeof renderDashboardTitolare === "function") {
-      renderDashboardTitolare(user);
-    }
-  } else if (user.role === ROLES.FARMACIA || user.role === ROLES.DIPENDENTE) {
-    showView(viewDashboardFarmacia);
-    if (typeof renderDashboardFarmacia === "function") {
-      renderDashboardFarmacia(user);
-    }
-  } else if (user.role === ROLES.CLIENTE) {
-    showView(viewDashboardCliente);
-    if (typeof renderDashboardCliente === "function") {
-      renderDashboardCliente(user);
-    }
-  } else {
-    // Ruolo non previsto -> fallback
-    showView(viewDashboardFarmacia);
-  }
-}
-
-/* =====================================================
-   INIZIALIZZAZIONE DELL'APP (DOM READY)
-   ===================================================== */
+/* ============================================================
+   FARMACIA MONTESANO – PORTALE PROFESSIONALE
+   SCRIPT.JS – LOGICA FRONTEND (LOCALSTORAGE DEMO)
+   ------------------------------------------------------------
+   Gestisce:
+   - Navigazione view (landing, auth, dashboard ruoli)
+   - Login / registrazione utenti
+   - Role selector (Dipendente / Cliente)
+   - Topbar utente + logout
+   - Assenti, Arrivi, Scadenze, Scorte, Cambio cassa, Archivio
+   - Comunicazioni, Procedure (demo)
+   - Toast, loading bar, overlay base
+   ------------------------------------------------------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
-  logDebug("Inizializzazione Portale Professionale – script.js PARTE 1/7");
+  /* ----------------------------------------------------------
+     UTILITY BASE
+     ---------------------------------------------------------- */
+  const qs = (sel, ctx = document) => ctx.querySelector(sel);
+  const qsa = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
 
-  // 1) Garantisco che esistano Titolare e Farmacia di default
-  ensureDefaultUsers();
-  getSettings();   // inizializza impostazioni base
-  getDataStore();  // inizializza struttura dati operativi
+  const LS_KEYS = {
+    USERS: "fm_users",
+    CURRENT_USER: "fm_current_user",
+    ASSENTI: "fm_assenti",
+    ARRIVI: "fm_arrivi",
+    SCADENZE: "fm_scadenze",
+    SCORTE: "fm_scorte",
+    CASSA: "fm_cassa",
+    ARCHIVIO: "fm_archivio",
+    COMUNICAZIONI: "fm_comunicazioni",
+    PROCEDURE: "fm_procedure",
+  };
 
-  // 2) Recupero riferimenti DOM principali
-  appShell = document.getElementById("appShell");
-  viewLanding = document.getElementById("view-landing");
-  viewAuth = document.getElementById("view-auth");
-  viewDashboardTitolare = document.getElementById("view-dashboard-titolare");
-  viewDashboardFarmacia = document.getElementById("view-dashboard-farmacia");
-  viewDashboardCliente = document.getElementById("view-dashboard-cliente");
+  const ROLE_LABELS = {
+    titolare: "Titolare",
+    farmacia: "Farmacia",
+    dipendente: "Dipendente",
+    cliente: "Cliente",
+  };
 
-  navUserName = document.getElementById("navUserName");
-  navUserRole = document.getElementById("navUserRole");
-  btnLogout = document.getElementById("btnLogout");
+  /* ----------------------------------------------------------
+     TOAST / LOADING BAR
+     ---------------------------------------------------------- */
 
-  loginForm = document.getElementById("loginForm");
-  loginErrorBox = document.getElementById("loginErrorBox");
+  function ensureToastContainer() {
+    let c = qs(".toast-container");
+    if (!c) {
+      c = document.createElement("div");
+      c.className = "toast-container";
+      document.body.appendChild(c);
+    }
+    return c;
+  }
 
-  registerForm = document.getElementById("registerForm");
-  registerRoleSelect = document.getElementById("registerRole");
-  registerErrorBox = document.getElementById("registerErrorBox");
+  function showToast(type = "info", message = "") {
+    const container = ensureToastContainer();
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${type}`;
 
-  // 3) Se esiste una sessione attiva, mando subito l'utente nella sua dashboard
-  const sessionUser = getSessionUser();
-  if (sessionUser) {
-    if (viewAuth) viewAuth.classList.add("hidden");
-    if (viewLanding) viewLanding.classList.add("hidden");
-    if (appShell) appShell.classList.remove("hidden");
-    goToDashboardForRole(sessionUser);
-  } else {
-    // Nessun utente loggato: mostro schermata iniziale / auth
-    if (appShell) appShell.classList.add("hidden");
-    if (viewAuth) viewAuth.classList.remove("hidden");
-    if (viewLanding) {
-      // se hai una landing separata la mostri, altrimenti ignora
-      viewLanding.classList.remove("hidden");
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "toast-icon";
+    iconSpan.textContent =
+      type === "success" ? "✅" : type === "error" ? "⚠️" : "ℹ️";
+
+    const textDiv = document.createElement("div");
+    textDiv.className = "toast-text";
+    textDiv.textContent = message;
+
+    const closeBtn = document.createElement("button");
+    closeBtn.className = "toast-close";
+    closeBtn.textContent = "Chiudi";
+    closeBtn.addEventListener("click", () => {
+      toast.remove();
+    });
+
+    toast.appendChild(iconSpan);
+    toast.appendChild(textDiv);
+    toast.appendChild(closeBtn);
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 4500);
+  }
+
+  // Loading bar
+  let loadingBar = qs(".loading-bar");
+  if (!loadingBar) {
+    loadingBar = document.createElement("div");
+    loadingBar.className = "loading-bar";
+    document.body.appendChild(loadingBar);
+  }
+
+  function startLoading() {
+    loadingBar.classList.add("visible");
+    loadingBar.classList.remove("complete");
+  }
+
+  function endLoading() {
+    loadingBar.classList.add("complete");
+    setTimeout(() => {
+      loadingBar.classList.remove("visible");
+      loadingBar.classList.remove("complete");
+    }, 220);
+  }
+
+  /* ----------------------------------------------------------
+     LOCALSTORAGE HELPERS
+     ---------------------------------------------------------- */
+
+  function lsGet(key, fallback) {
+    try {
+      const val = localStorage.getItem(key);
+      if (!val) return fallback;
+      return JSON.parse(val);
+    } catch {
+      return fallback;
     }
   }
 
-  // 4) Listener Logout
+  function lsSet(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (err) {
+      console.error("localStorage set error", err);
+      showToast("error", "Errore nel salvataggio locale.");
+    }
+  }
+
+  /* ----------------------------------------------------------
+     VIEW MANAGER
+     ---------------------------------------------------------- */
+
+  const views = qsa(".view");
+  const appPageTitleEl = qs("#appPageTitle");
+
+  function showView(viewId, pageTitle) {
+    views.forEach((v) => v.classList.remove("active"));
+    const target = qs(`#${viewId}`);
+    if (target) {
+      target.classList.add("active");
+    }
+    if (appPageTitleEl && pageTitle) {
+      appPageTitleEl.textContent = pageTitle;
+    }
+  }
+
+  /* ----------------------------------------------------------
+     TOPBAR USER CHIP + LOGOUT
+     ---------------------------------------------------------- */
+
+  const userChipNameEl = qs("#userChipName");
+  const userChipRoleEl = qs("#userChipRole");
+  const userChipAvatarEl = qs("#userChipAvatar");
+  const btnLogout = qs("#btnLogout");
+
+  function updateTopbarUser(user) {
+    if (!user) {
+      if (userChipNameEl) userChipNameEl.textContent = "";
+      if (userChipRoleEl) userChipRoleEl.textContent = "";
+      if (userChipAvatarEl) userChipAvatarEl.textContent = "";
+      return;
+    }
+    const initials = (user.nome?.[0] || "?") + (user.cognome?.[0] || "");
+    if (userChipNameEl)
+      userChipNameEl.textContent = `${user.nome || ""} ${user.cognome || ""}`;
+    if (userChipRoleEl)
+      userChipRoleEl.textContent = ROLE_LABELS[user.ruolo] || "Utente";
+    if (userChipAvatarEl) userChipAvatarEl.textContent = initials.toUpperCase();
+  }
+
   if (btnLogout) {
     btnLogout.addEventListener("click", () => {
-      clearSession();
-      updateNavUserInfo(null);
-      if (appShell) appShell.classList.add("hidden");
-      if (viewAuth) viewAuth.classList.remove("hidden");
-      if (viewLanding) viewLanding.classList.remove("hidden");
-      showView(viewAuth);
+      lsSet(LS_KEYS.CURRENT_USER, null);
+      showToast("info", "Disconnessione effettuata.");
+      showView("view-landing", "Portale Professionale");
+      updateTopbarUser(null);
     });
   }
 
-  // Gli handler di login/registrazione, e tutte le logiche
-  // specifiche delle pagine (assenze, arrivi, ecc.)
-  // li aggiungiamo nelle PARTI successive di script.js.
-});
+  /* ----------------------------------------------------------
+     AUTH: TABS LOGIN / REGISTRAZIONE
+     ---------------------------------------------------------- */
 
-// ======================================================
-// SCRIPT.JS – PARTE 2/7
-// Autenticazione: login, registrazione, switch viste
-// ======================================================
+  const authTabButtons = qsa(".auth-tab-btn");
+  const authForms = qsa(".auth-form");
 
-/* =====================================================
-   GESTIONE MODALITÀ LOGIN / REGISTRAZIONE
-   ===================================================== */
-
-// Riferimenti specifici per la vista auth (login/registrazione)
-let authTabs = null;
-let authTabLogin = null;
-let authTabRegister = null;
-let authBoxLogin = null;
-let authBoxRegister = null;
-
-// Pulsanti sulla landing iniziale (se presenti)
-let btnLandingLogin = null;
-let btnLandingRegister = null;
-
-/**
- * Mostra la sezione LOGIN o REGISTRAZIONE nella view auth.
- * mode può essere "login" oppure "register".
- */
-function showAuthMode(mode) {
-  if (!authBoxLogin || !authBoxRegister) return;
-
-  if (mode === "login") {
-    authBoxLogin.classList.remove("hidden");
-    authBoxRegister.classList.add("hidden");
-
-    if (authTabLogin) authTabLogin.classList.add("active");
-    if (authTabRegister) authTabRegister.classList.remove("active");
-  } else {
-    authBoxLogin.classList.add("hidden");
-    authBoxRegister.classList.remove("hidden");
-
-    if (authTabLogin) authTabLogin.classList.remove("active");
-    if (authTabRegister) authTabRegister.classList.add("active");
-  }
-
-  // Pulisco eventuali messaggi di errore quando cambio scheda
-  if (loginErrorBox) {
-    loginErrorBox.textContent = "";
-    loginErrorBox.classList.add("hidden");
-  }
-  if (registerErrorBox) {
-    registerErrorBox.textContent = "";
-    registerErrorBox.classList.add("hidden");
-  }
-}
-
-/**
- * Inizializza tutti i riferimenti auth e i listener
- * (viene richiamata in DOMContentLoaded – parte 1).
- */
-function initAuthArea() {
-  authTabs = document.querySelectorAll(".auth-tab");
-  authTabLogin = document.getElementById("authTabLogin");
-  authTabRegister = document.getElementById("authTabRegister");
-  authBoxLogin = document.getElementById("authLoginBox");
-  authBoxRegister = document.getElementById("authRegisterBox");
-
-  btnLandingLogin = document.getElementById("btnLandingLogin");
-  btnLandingRegister = document.getElementById("btnLandingRegister");
-
-  // Click sui tab "Login" / "Registrati" nella schermata auth
-  if (authTabLogin) {
-    authTabLogin.addEventListener("click", () => {
-      showAuthMode("login");
+  function setActiveAuthTab(tabName) {
+    authTabButtons.forEach((btn) => {
+      const target = btn.getAttribute("data-auth-tab");
+      btn.classList.toggle("active", target === tabName);
     });
-  }
-  if (authTabRegister) {
-    authTabRegister.addEventListener("click", () => {
-      showAuthMode("register");
+    authForms.forEach((form) => {
+      const target = form.getAttribute("data-auth-tab");
+      form.classList.toggle("active", target === tabName);
     });
   }
 
-  // Pulsanti sulla landing (prima schermata) – se li hai nel tuo HTML
-  if (btnLandingLogin) {
-    btnLandingLogin.addEventListener("click", () => {
-      if (viewAuth) viewAuth.classList.remove("hidden");
-      showAuthMode("login");
-      if (viewLanding) viewLanding.classList.add("hidden");
+  authTabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.getAttribute("data-auth-tab");
+      if (!tab) return;
+      setActiveAuthTab(tab);
     });
-  }
-  if (btnLandingRegister) {
-    btnLandingRegister.addEventListener("click", () => {
-      if (viewAuth) viewAuth.classList.remove("hidden");
-      showAuthMode("register");
-      if (viewLanding) viewLanding.classList.add("hidden");
-    });
-  }
-
-  // Di default mostro la modalità "login"
-  showAuthMode("login");
-
-  // Inizializzo i listener di login/registrazione
-  initLoginForm();
-  initRegisterForm();
-}
-
-/* =====================================================
-   LOGIN
-   ===================================================== */
-
-/**
- * Inizializza il form di login:
- * - legge username + password
- * - chiama authenticate()
- * - in caso di successo salva sessione e apre dashboard corretta
- */
-function initLoginForm() {
-  if (!loginForm) return;
-
-  loginForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (loginErrorBox) {
-      loginErrorBox.textContent = "";
-      loginErrorBox.classList.add("hidden");
-    }
-
-    const inputUsername = loginForm.querySelector("input[name='loginUsername']");
-    const inputPassword = loginForm.querySelector("input[name='loginPassword']");
-
-    const username = inputUsername ? inputUsername.value.trim() : "";
-    const password = inputPassword ? inputPassword.value : "";
-
-    if (!username || !password) {
-      if (loginErrorBox) {
-        loginErrorBox.textContent = "Inserisci username e password.";
-        loginErrorBox.classList.remove("hidden");
-      }
-      return;
-    }
-
-    const result = authenticate(username, password);
-    if (!result.ok) {
-      if (loginErrorBox) {
-        loginErrorBox.textContent = result.error || "Credenziali non valide.";
-        loginErrorBox.classList.remove("hidden");
-      }
-      return;
-    }
-
-    const user = result.user;
-    setSessionUser(user);
-    updateNavUserInfo(user);
-
-    // Mostro il guscio app e vado alla dashboard giusta
-    if (appShell) appShell.classList.remove("hidden");
-    if (viewAuth) viewAuth.classList.add("hidden");
-    if (viewLanding) viewLanding.classList.add("hidden");
-
-    goToDashboardForRole(user);
-
-    // resetto i campi del form
-    loginForm.reset();
   });
-}
 
-/* =====================================================
-   REGISTRAZIONE (DIPENDENTE / CLIENTE)
-   ===================================================== */
+  /* Pulsanti landing → auth */
+  const btnVaiAlLogin = qs("#btnVaiAlLogin");
+  const btnVaiAllaRegistrazione = qs("#btnVaiAllaRegistrazione");
 
-/**
- * Inizializza il form di registrazione:
- * - consente di creare UTENTI di tipo DIPENDENTE o CLIENTE
- * - Titolare e Farmacia NON passano mai da qui (sono creati in ensureDefaultUsers)
- */
-function initRegisterForm() {
-  if (!registerForm) return;
-
-  registerForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (registerErrorBox) {
-      registerErrorBox.textContent = "";
-      registerErrorBox.classList.add("hidden");
-    }
-
-    const roleSelect = registerRoleSelect;
-    const nomeInput = registerForm.querySelector("input[name='regNome']");
-    const cognomeInput = registerForm.querySelector("input[name='regCognome']");
-    const usernameInput = registerForm.querySelector("input[name='regUsername']");
-    const passwordInput = registerForm.querySelector("input[name='regPassword']");
-
-    const selectedRole = roleSelect ? roleSelect.value : ROLES.CLIENTE;
-    const nome = nomeInput ? nomeInput.value.trim() : "";
-    const cognome = cognomeInput ? cognomeInput.value.trim() : "";
-    const username = usernameInput ? usernameInput.value.trim() : "";
-    const password = passwordInput ? passwordInput.value : "";
-
-    // Regola: da questa schermata si possono creare SOLO Dipendente o Cliente
-    if (![ROLES.DIPENDENTE, ROLES.CLIENTE].includes(selectedRole)) {
-      if (registerErrorBox) {
-        registerErrorBox.textContent = "Puoi registrare solo Dipendenti o Clienti.";
-        registerErrorBox.classList.remove("hidden");
-      }
-      return;
-    }
-
-    if (!nome || !cognome || !username || !password) {
-      if (registerErrorBox) {
-        registerErrorBox.textContent = "Compila tutti i campi richiesti.";
-        registerErrorBox.classList.remove("hidden");
-      }
-      return;
-    }
-
-    const result = registerUser({
-      role: selectedRole,
-      nome,
-      cognome,
-      username,
-      password
+  if (btnVaiAlLogin) {
+    btnVaiAlLogin.addEventListener("click", () => {
+      showView("view-auth", "Accedi al Portale");
+      setActiveAuthTab("login");
     });
+  }
+  if (btnVaiAllaRegistrazione) {
+    btnVaiAllaRegistrazione.addEventListener("click", () => {
+      showView("view-auth", "Registrati al Portale");
+      setActiveAuthTab("register");
+    });
+  }
 
-    if (!result.ok) {
-      if (registerErrorBox) {
-        registerErrorBox.textContent = result.error || "Errore in registrazione.";
-        registerErrorBox.classList.remove("hidden");
-      }
-      return;
+  /* ----------------------------------------------------------
+     AUTH: ROLE SELECTOR (DIPENDENTE / CLIENTE) IN REGISTRAZIONE
+     ---------------------------------------------------------- */
+
+  const roleSelectorBtns = qsa(".role-pill-btn");
+  const regRuoloHiddenInput = qs("#regRuoloHidden");
+
+  function updateRoleSelector(role) {
+    roleSelectorBtns.forEach((btn) => {
+      const r = btn.getAttribute("data-role");
+      btn.classList.toggle("active", r === role);
+    });
+    if (regRuoloHiddenInput) regRuoloHiddenInput.value = role;
+    const summary = qs("#roleSummary");
+    if (summary) {
+      summary.textContent =
+        role === "dipendente"
+          ? "Accesso dedicato al personale della Farmacia Montesano."
+          : "Accesso dedicato ai clienti per promozioni, eventi e turni.";
     }
+  }
 
-    // Registrazione andata a buon fine: facoltativamente effettuiamo login diretto
-    const newUser = result.user;
-    setSessionUser(newUser);
-    updateNavUserInfo(newUser);
-
-    if (appShell) appShell.classList.remove("hidden");
-    if (viewAuth) viewAuth.classList.add("hidden");
-    if (viewLanding) viewLanding.classList.add("hidden");
-
-    goToDashboardForRole(newUser);
-
-    // Reset del form dopo la registrazione
-    registerForm.reset();
-
-    // Dopo la registrazione potremmo anche mostrare un messaggio toast (TODO)
-    logDebug("Nuovo utente registrato:", newUser);
+  roleSelectorBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const role = btn.getAttribute("data-role");
+      if (!role) return;
+      updateRoleSelector(role);
+    });
   });
-}
 
-/* =====================================================
-   AGGANCIO INIT AUTH DOPO DOMCONTENTLOADED
-   ===================================================== */
-
-// Estendo il listener già definito nella PARTE 1
-document.addEventListener("DOMContentLoaded", () => {
-  // Nel listener precedente (parte 1) abbiamo già fatto:
-  // - ensureDefaultUsers()
-  // - getSettings()
-  // - getDataStore()
-  // - recupero sessione
-  // Qui ci assicuriamo solo di inizializzare la parte AUTH
-  initAuthArea();
-});
-
-// ======================================================
-// SCRIPT.JS – PARTE 3/7
-// Gestione view principali + dashboard per ruolo
-// ======================================================
-
-/* =====================================================
-   RIFERIMENTI A SEZIONI / VISTE PRINCIPALI
-   ===================================================== */
-
-// Ogni "vista" (dashboard o pagina interna) avrà in HTML
-// una sezione <section> con class="app-view" e un id unico.
-// Qui memorizziamo i riferimenti principali:
-
-let viewOwnerDashboard = null;     // Dashboard Titolare
-let viewPharmacyDashboard = null;  // Dashboard Farmacia/Dipendenti
-let viewClientDashboard = null;    // Dashboard Cliente
-
-// In futuro: viste di dettaglio titolare (assenze, turni, ecc.)
-let viewOwnerAssenze = null;
-let viewOwnerTurni = null;
-let viewOwnerComunicazioni = null;
-let viewOwnerProcedure = null;
-let viewOwnerArrivi = null;
-let viewOwnerScadenze = null;
-let viewOwnerScorte = null;
-let viewOwnerCambioCassa = null;
-let viewOwnerArchivio = null;
-
-// Viste simili per farmacia/dipendenti (possono riutilizzare alcune del titolare
-// oppure avere sezioni dedicate se preferisci separarle)
-let viewPharmacyAssenze = null;
-let viewPharmacyTurni = null;
-let viewPharmacyComunicazioni = null;
-let viewPharmacyProcedure = null;
-let viewPharmacyArrivi = null;
-let viewPharmacyScadenze = null;
-let viewPharmacyScorte = null;
-let viewPharmacyCambioCassa = null;
-let viewPharmacyArchivio = null;
-
-// Viste dedicate al cliente (sezioni semplici)
-let viewClientEventi = null;
-let viewClientPromozioni = null;
-let viewClientTurni = null;
-
-/**
- * Inizializza i riferimenti alle view principali.
- * Viene chiamata dopo DOMContentLoaded, quando l'HTML è pronto.
- */
-function initMainViews() {
-  // Dashboard principali
-  viewOwnerDashboard = document.getElementById("viewOwnerDashboard");
-  viewPharmacyDashboard = document.getElementById("viewPharmacyDashboard");
-  viewClientDashboard = document.getElementById("viewClientDashboard");
-
-  // Sezioni titolare (dettaglio cards)
-  viewOwnerAssenze = document.getElementById("viewOwnerAssenze");
-  viewOwnerTurni = document.getElementById("viewOwnerTurni");
-  viewOwnerComunicazioni = document.getElementById("viewOwnerComunicazioni");
-  viewOwnerProcedure = document.getElementById("viewOwnerProcedure");
-  viewOwnerArrivi = document.getElementById("viewOwnerArrivi");
-  viewOwnerScadenze = document.getElementById("viewOwnerScadenze");
-  viewOwnerScorte = document.getElementById("viewOwnerScorte");
-  viewOwnerCambioCassa = document.getElementById("viewOwnerCambioCassa");
-  viewOwnerArchivio = document.getElementById("viewOwnerArchivio");
-
-  // Sezioni farmacia/dipendente
-  viewPharmacyAssenze = document.getElementById("viewPharmacyAssenze");
-  viewPharmacyTurni = document.getElementById("viewPharmacyTurni");
-  viewPharmacyComunicazioni = document.getElementById("viewPharmacyComunicazioni");
-  viewPharmacyProcedure = document.getElementById("viewPharmacyProcedure");
-  viewPharmacyArrivi = document.getElementById("viewPharmacyArrivi");
-  viewPharmacyScadenze = document.getElementById("viewPharmacyScadenze");
-  viewPharmacyScorte = document.getElementById("viewPharmacyScorte");
-  viewPharmacyCambioCassa = document.getElementById("viewPharmacyCambioCassa");
-  viewPharmacyArchivio = document.getElementById("viewPharmacyArchivio");
-
-  // Sezioni cliente
-  viewClientEventi = document.getElementById("viewClientEventi");
-  viewClientPromozioni = document.getElementById("viewClientPromozioni");
-  viewClientTurni = document.getElementById("viewClientTurni");
-}
-
-/* =====================================================
-   MOSTRARE / NASCONDERE LE VIEW DELL'APP
-   ===================================================== */
-
-/**
- * Nasconde tutte le view principali dell'applicazione
- * (tutte le sezioni con class="app-view").
- */
-function hideAllAppViews() {
-  const allViews = document.querySelectorAll(".app-view");
-  allViews.forEach((v) => v.classList.add("hidden"));
-}
-
-/**
- * Mostra una singola view della app (dashboard o pagina interna).
- * Accetta direttamente il nodo DOM della view.
- */
-function showAppView(viewElement) {
-  if (!viewElement) return;
-  hideAllAppViews();
-  viewElement.classList.remove("hidden");
-  // Scroll automatico in alto quando apro una nuova view
-  window.scrollTo({ top: 0, behavior: "instant" });
-}
-
-/**
- * Wrapper comodo: mostra una view a partire dal suo id.
- */
-function showViewById(viewId) {
-  if (!viewId) return;
-  const el = document.getElementById(viewId);
-  if (!el) {
-    logDebug("showViewById: view non trovata:", viewId);
-    return;
-  }
-  showAppView(el);
-}
-
-/* =====================================================
-   FUNZIONI PER APRIRE LE DASHBOARD PER RUOLO
-   (usate da goToDashboardForRole definita nella parte 1)
-   ===================================================== */
-
-/**
- * Dashboard per il TITOLARE.
- * Viene richiamata da goToDashboardForRole(user) se user.role === ROLES.TITOLARE.
- */
-function showOwnerDashboard() {
-  if (!appShell) return;
-
-  // Mostro il guscio principale (nav + contenuto)
-  appShell.classList.remove("hidden");
-
-  // Mostro la dashboard titolare
-  if (viewOwnerDashboard) {
-    showAppView(viewOwnerDashboard);
+  // Imposto default
+  if (roleSelectorBtns.length && regRuoloHiddenInput && !regRuoloHiddenInput.value) {
+    updateRoleSelector("dipendente");
   }
 
-  // Imposto eventuali testi di intestazione
-  const headerTitle = document.getElementById("mainHeaderTitle");
-  const headerSubtitle = document.getElementById("mainHeaderSubtitle");
-  if (headerTitle) headerTitle.textContent = "Dashboard Titolare";
-  if (headerSubtitle) {
-    headerSubtitle.textContent = "Controllo completo della Farmacia Montesano";
+  /* ----------------------------------------------------------
+     AUTH: REGISTRAZIONE
+     ---------------------------------------------------------- */
+
+  const registerForm = qs("#registerForm");
+  const registerMessage = qs("#registerMessage");
+
+  function setFormMessage(el, type, text) {
+    if (!el) return;
+    el.textContent = text;
+    el.className = "form-message " + type;
   }
 
-  // In futuro qui possiamo aggiungere:
-  // - refresh rapido dei counters
-  // - badge notifiche
-  // - riepiloghi veloci
-}
-
-/**
- * Dashboard per la FARMACIA / DIPENDENTI.
- * Usata quando role === ROLES.FARMACIA oppure role === ROLES.DIPENDENTE.
- */
-function showPharmacyDashboard() {
-  if (!appShell) return;
-  appShell.classList.remove("hidden");
-
-  if (viewPharmacyDashboard) {
-    showAppView(viewPharmacyDashboard);
+  function getUsers() {
+    return lsGet(LS_KEYS.USERS, []);
   }
 
-  const headerTitle = document.getElementById("mainHeaderTitle");
-  const headerSubtitle = document.getElementById("mainHeaderSubtitle");
-  if (headerTitle) headerTitle.textContent = "Dashboard Farmacia";
-  if (headerSubtitle) {
-    headerSubtitle.textContent = "Operatività quotidiana in Banco e Retro";
+  function saveUsers(users) {
+    lsSet(LS_KEYS.USERS, users);
   }
 
-  // Qui in futuro:
-  // - refresh vista assenti
-  // - card con turni e comunicazioni aggiornate
-}
+  if (registerForm) {
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const formData = new FormData(registerForm);
+      const nome = (formData.get("nome") || "").toString().trim();
+      const cognome = (formData.get("cognome") || "").toString().trim();
+      const email = (formData.get("email") || "").toString().trim().toLowerCase();
+      const password = (formData.get("password") || "").toString().trim();
+      const ruolo =
+        (formData.get("ruolo") || regRuoloHiddenInput?.value || "dipendente")
+          .toString()
+          .trim();
 
-/**
- * Dashboard per il CLIENTE.
- * Usata quando role === ROLES.CLIENTE.
- */
-function showClientDashboard() {
-  if (!appShell) return;
-  appShell.classList.remove("hidden");
-
-  if (viewClientDashboard) {
-    showAppView(viewClientDashboard);
-  }
-
-  const headerTitle = document.getElementById("mainHeaderTitle");
-  const headerSubtitle = document.getElementById("mainHeaderSubtitle");
-  if (headerTitle) headerTitle.textContent = "Area Cliente";
-  if (headerSubtitle) {
-    headerSubtitle.textContent = "Eventi, promozioni e informazioni utili";
-  }
-
-  // In futuro:
-  // - caricare eventi
-  // - caricare promozioni
-  // - mostrare farmacia di turno
-}
-
-/* =====================================================
-   NAVIGAZIONE DAL MENU (NAVBAR / SIDEBAR)
-   ===================================================== */
-
-/**
- * Inizializza il menu di navigazione principale:
- * - link alle dashboard
- * - link ad alcune pagine chiave (es. Impostazioni)
- */
-function initMainNavigation() {
-  if (!appNav) return;
-
-  // Esempio di elementi nella navbar:
-  // <button id="navOwnerDashboard">Titolare</button>
-  // <button id="navPharmacyDashboard">Farmacia</button>
-  // <button id="navClientDashboard">Cliente</button>
-  //
-  // Se nel tuo HTML hai nomi diversi, basta cambiare gli id qui.
-
-  const navOwnerDashboard = document.getElementById("navOwnerDashboard");
-  const navPharmacyDashboard = document.getElementById("navPharmacyDashboard");
-  const navClientDashboard = document.getElementById("navClientDashboard");
-
-  if (navOwnerDashboard) {
-    navOwnerDashboard.addEventListener("click", () => {
-      const dummyOwner = {
-        username: "titolare",
-        role: ROLES.TITOLARE,
-        nome: "Titolare",
-        cognome: "Farmacia"
-      };
-      setSessionUser(dummyOwner);
-      updateNavUserInfo(dummyOwner);
-      showOwnerDashboard();
-    });
-  }
-
-  if (navPharmacyDashboard) {
-    navPharmacyDashboard.addEventListener("click", () => {
-      const dummyPharma = {
-        username: "farmacia",
-        role: ROLES.FARMACIA,
-        nome: "Farmacia",
-        cognome: "Montesano"
-      };
-      setSessionUser(dummyPharma);
-      updateNavUserInfo(dummyPharma);
-      showPharmacyDashboard();
-    });
-  }
-
-  if (navClientDashboard) {
-    navClientDashboard.addEventListener("click", () => {
-      const dummyClient = {
-        username: "ospite",
-        role: ROLES.CLIENTE,
-        nome: "Cliente",
-        cognome: "Ospite"
-      };
-      setSessionUser(dummyClient);
-      updateNavUserInfo(dummyClient);
-      showClientDashboard();
-    });
-  }
-
-  // Link "Impostazioni" (solo esempio, verrà completato dopo)
-  const navSettings = document.getElementById("navSettings");
-  if (navSettings) {
-    navSettings.addEventListener("click", () => {
-      // Mostreremo una view apposita per le impostazioni del titolare
-      showViewById("viewSettings");
-    });
-  }
-}
-
-/* =====================================================
-   DOMCONTENTLOADED – INIT DELLA PARTE 3
-   ===================================================== */
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Inizializzo riferimenti alle view principali
-  initMainViews();
-
-  // Inizializzo navigazione principale
-  initMainNavigation();
-
-  // Se esiste un utente già loggato (gestito nella parte 1),
-  // lo portiamo direttamente alla sua dashboard (goToDashboardForRole)
-  const currentUser = getSessionUser();
-  if (currentUser) {
-    goToDashboardForRole(currentUser);
-  }
-});
-
-// ======================================================
-// SCRIPT.JS – PARTE 4/7
-// Dati applicativi Titolare: Assenze, Turni, Comunicazioni
-// ======================================================
-
-/* =====================================================
-   CHIAVI DI STORAGE PER I DATI DI GESTIONE
-   ===================================================== */
-
-// Assenti oggi / storico assenze personale
-const KEY_ASSENZE = "fm_assenti_personale";
-
-// Informazioni farmacia di turno / appoggio
-const KEY_TURNI_INFO = "fm_turni_info";
-
-// Comunicazioni interne
-const KEY_COMUNICAZIONI = "fm_comunicazioni";
-
-/* =====================================================
-   HELPER GENERICI PER LOCALSTORAGE
-   ===================================================== */
-
-/**
- * Carica un array da localStorage.
- * Se non esiste nulla, ritorna [].
- */
-function loadArrayFromStorage(key) {
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (err) {
-    logDebug("Errore loadArrayFromStorage per chiave", key, err);
-    return [];
-  }
-}
-
-/**
- * Salva un array in localStorage in modo sicuro.
- */
-function saveArrayToStorage(key, arr) {
-  try {
-    const serialized = JSON.stringify(arr || []);
-    window.localStorage.setItem(key, serialized);
-  } catch (err) {
-    logDebug("Errore saveArrayFromStorage per chiave", key, err);
-  }
-}
-
-/**
- * Carica un oggetto da localStorage.
- * Se non esiste, ritorna defaultValue (o {}).
- */
-function loadObjectFromStorage(key, defaultValue = {}) {
-  try {
-    const raw = window.localStorage.getItem(key);
-    if (!raw) return defaultValue;
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : defaultValue;
-  } catch (err) {
-    logDebug("Errore loadObjectFromStorage per chiave", key, err);
-    return defaultValue;
-  }
-}
-
-/**
- * Salva un oggetto in localStorage.
- */
-function saveObjectToStorage(key, obj) {
-  try {
-    const serialized = JSON.stringify(obj || {});
-    window.localStorage.setItem(key, serialized);
-  } catch (err) {
-    logDebug("Errore saveObjectToStorage per chiave", key, err);
-  }
-}
-
-/* =====================================================
-   ASSENZE – DATI + FUNZIONI TITOLARE
-   ===================================================== */
-
-// Riferimenti DOM (inizializzati in initOwnerSections())
-let ownerAssenzeTableBody = null;
-let ownerAssenzeForm = null;
-let ownerAssenzeNomeInput = null;
-let ownerAssenzeDataInput = null;
-let ownerAssenzeMotivoInput = null;
-let ownerAssenzeEmptyState = null;
-
-/**
- * Ritorna l'elenco aggiornato delle assenze (array).
- */
-function getAssenzeList() {
-  return loadArrayFromStorage(KEY_ASSENZE);
-}
-
-/**
- * Salva l'elenco assenze.
- */
-function setAssenzeList(list) {
-  saveArrayToStorage(KEY_ASSENZE, list);
-}
-
-/**
- * Aggiunge una nuova assenza.
- */
-function addAssenza({ nome, data, motivo }) {
-  const list = getAssenzeList();
-  const newItem = {
-    id: Date.now(), // id semplice
-    nome: nome.trim(),
-    data: data.trim(),
-    motivo: motivo.trim()
-  };
-  list.push(newItem);
-  setAssenzeList(list);
-}
-
-/**
- * Inizializza la sezione "Assenti oggi" del Titolare.
- */
-function initOwnerAssenzeSection() {
-  if (!viewOwnerAssenze) return;
-
-  ownerAssenzeTableBody = document.getElementById("ownerAssenzeTableBody");
-  ownerAssenzeForm = document.getElementById("ownerAssenzeForm");
-  ownerAssenzeNomeInput = document.getElementById("ownerAssenzeNome");
-  ownerAssenzeDataInput = document.getElementById("ownerAssenzeData");
-  ownerAssenzeMotivoInput = document.getElementById("ownerAssenzeMotivo");
-  ownerAssenzeEmptyState = document.getElementById("ownerAssenzeEmptyState");
-
-  // Se non ci sono assenze salvate, inizializzo qualche dato demo
-  const currentList = getAssenzeList();
-  if (!currentList || currentList.length === 0) {
-    const today = new Date();
-    const iso = today.toISOString().slice(0, 10); // AAAA-MM-GG
-    const demo = [
-      { id: Date.now(), nome: "Cosimo", data: iso, motivo: "Ferie" },
-      {
-        id: Date.now() + 1,
-        nome: "Patrizia",
-        data: iso,
-        motivo: "Visita medica"
-      }
-    ];
-    setAssenzeList(demo);
-  }
-
-  // Se esiste il form, aggancio l'evento submit
-  if (ownerAssenzeForm) {
-    ownerAssenzeForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const nomeVal = (ownerAssenzeNomeInput?.value || "").trim();
-      const dataVal = (ownerAssenzeDataInput?.value || "").trim();
-      const motivoVal = (ownerAssenzeMotivoInput?.value || "").trim();
-
-      if (!nomeVal || !dataVal) {
-        alert("Inserisci almeno NOME e DATA per l'assenza.");
+      if (!nome || !cognome || !email || !password) {
+        setFormMessage(registerMessage, "error", "Compila tutti i campi obbligatori.");
         return;
       }
 
-      addAssenza({
-        nome: nomeVal,
-        data: dataVal,
-        motivo: motivoVal || "Non specificato"
-      });
+      const users = getUsers();
+      if (users.some((u) => u.email === email)) {
+        setFormMessage(
+          registerMessage,
+          "error",
+          "Esiste già un utente registrato con questa email."
+        );
+        return;
+      }
 
-      if (ownerAssenzeForm) ownerAssenzeForm.reset();
-      renderOwnerAssenzeTable();
-    });
-  }
-
-  // Prima renderizzazione tabella
-  renderOwnerAssenzeTable();
-}
-
-/**
- * Renderizza la tabella delle assenze nella pagina Titolare.
- */
-function renderOwnerAssenzeTable() {
-  if (!ownerAssenzeTableBody) return;
-
-  const list = getAssenzeList().sort((a, b) => {
-    return a.data.localeCompare(b.data);
-  });
-
-  ownerAssenzeTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (ownerAssenzeEmptyState) {
-      ownerAssenzeEmptyState.classList.remove("hidden");
-    }
-    return;
-  }
-
-  if (ownerAssenzeEmptyState) {
-    ownerAssenzeEmptyState.classList.add("hidden");
-  }
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdNome = document.createElement("td");
-    tdNome.textContent = item.nome;
-
-    const tdData = document.createElement("td");
-    tdData.textContent = formatDateIT(item.data || "");
-
-    const tdMotivo = document.createElement("td");
-    tdMotivo.textContent = item.motivo || "–";
-
-    tr.appendChild(tdNome);
-    tr.appendChild(tdData);
-    tr.appendChild(tdMotivo);
-
-    ownerAssenzeTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   TURNI FARMACIA / APPORGIO – DATI + FUNZIONI TITOLARE
-   ===================================================== */
-
-// Riferimenti DOM sezione turni titolare
-let ownerTurniForm = null;
-let ownerTurniFarmaciaNome = null;
-let ownerTurniFarmaciaIndirizzo = null;
-let ownerTurniFarmaciaTelefono = null;
-let ownerTurniAppoggioNome = null;
-let ownerTurniAppoggioIndirizzo = null;
-let ownerTurniAppoggioTelefono = null;
-
-// Riferimenti anche a qualche elemento di sola lettura (riassunto)
-let ownerTurniSummaryFarmacia = null;
-let ownerTurniSummaryAppoggio = null;
-
-/**
- * Ritorna le info turno/appoggio.
- */
-function getTurniInfo() {
-  const defaults = {
-    farmaciaNome: "Farmacia Montesano",
-    farmaciaIndirizzo: "Via Esempio 12, Matera",
-    farmaciaTelefono: "0835 000000",
-    appoggioNome: "Farmacia Centrale",
-    appoggioIndirizzo: "Via Dante 8, Matera",
-    appoggioTelefono: "0835 111111"
-  };
-  return loadObjectFromStorage(KEY_TURNI_INFO, defaults);
-}
-
-/**
- * Salva le info turno/appoggio.
- */
-function setTurniInfo(info) {
-  saveObjectToStorage(KEY_TURNI_INFO, info);
-}
-
-/**
- * Inizializza la sezione "Farmacia di turno / appoggio" per Titolare.
- */
-function initOwnerTurniSection() {
-  if (!viewOwnerTurni) return;
-
-  ownerTurniForm = document.getElementById("ownerTurniForm");
-  ownerTurniFarmaciaNome = document.getElementById("ownerTurniFarmaciaNome");
-  ownerTurniFarmaciaIndirizzo = document.getElementById("ownerTurniFarmaciaIndirizzo");
-  ownerTurniFarmaciaTelefono = document.getElementById("ownerTurniFarmaciaTelefono");
-  ownerTurniAppoggioNome = document.getElementById("ownerTurniAppoggioNome");
-  ownerTurniAppoggioIndirizzo = document.getElementById("ownerTurniAppoggioIndirizzo");
-  ownerTurniAppoggioTelefono = document.getElementById("ownerTurniAppoggioTelefono");
-
-  ownerTurniSummaryFarmacia = document.getElementById("ownerTurniSummaryFarmacia");
-  ownerTurniSummaryAppoggio = document.getElementById("ownerTurniSummaryAppoggio");
-
-  // Carico i dati correnti
-  const info = getTurniInfo();
-
-  // Pre-compilo il form
-  if (ownerTurniFarmaciaNome) ownerTurniFarmaciaNome.value = info.farmaciaNome || "";
-  if (ownerTurniFarmaciaIndirizzo) ownerTurniFarmaciaIndirizzo.value = info.farmaciaIndirizzo || "";
-  if (ownerTurniFarmaciaTelefono) ownerTurniFarmaciaTelefono.value = info.farmaciaTelefono || "";
-  if (ownerTurniAppoggioNome) ownerTurniAppoggioNome.value = info.appoggioNome || "";
-  if (ownerTurniAppoggioIndirizzo) ownerTurniAppoggioIndirizzo.value = info.appoggioIndirizzo || "";
-  if (ownerTurniAppoggioTelefono) ownerTurniAppoggioTelefono.value = info.appoggioTelefono || "";
-
-  // Renderizzo il riassunto (box info visibile anche in altre pagine)
-  renderTurniSummary();
-
-  // Gestione submit form
-  if (ownerTurniForm) {
-    ownerTurniForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const updated = {
-        farmaciaNome: ownerTurniFarmaciaNome?.value || "",
-        farmaciaIndirizzo: ownerTurniFarmaciaIndirizzo?.value || "",
-        farmaciaTelefono: ownerTurniFarmaciaTelefono?.value || "",
-        appoggioNome: ownerTurniAppoggioNome?.value || "",
-        appoggioIndirizzo: ownerTurniAppoggioIndirizzo?.value || "",
-        appoggioTelefono: ownerTurniAppoggioTelefono?.value || ""
+      const newUser = {
+        id: Date.now(),
+        nome,
+        cognome,
+        email,
+        password,
+        ruolo, // titolare / farmacia / dipendente / cliente
       };
 
-      setTurniInfo(updated);
-      renderTurniSummary();
-
-      alert("✅ Dati farmacia di turno / appoggio salvati (localStorage).");
-    });
-  }
-}
-
-/**
- * Aggiorna i box di riepilogo "Farmacia di turno" e "Farmacia di appoggio".
- * Verrà riutilizzato anche nelle dashboard Farmacia e Cliente.
- */
-function renderTurniSummary() {
-  const info = getTurniInfo();
-
-  if (ownerTurniSummaryFarmacia) {
-    ownerTurniSummaryFarmacia.innerHTML = `
-      <strong>${info.farmaciaNome}</strong><br>
-      ${info.farmaciaIndirizzo}<br>
-      Tel: ${info.farmaciaTelefono}
-    `;
-  }
-
-  if (ownerTurniSummaryAppoggio) {
-    ownerTurniSummaryAppoggio.innerHTML = `
-      <strong>${info.appoggioNome}</strong><br>
-      ${info.appoggioIndirizzo}<br>
-      Tel: ${info.appoggioTelefono}
-    `;
-  }
-
-  // In futuro: possiamo aggiornare anche elementi della dashboard farmacia/cliente
-}
-
-/* =====================================================
-   COMUNICAZIONI – DATI + FUNZIONI TITOLARE
-   ===================================================== */
-
-// Riferimenti DOM per la bacheca comunicazioni
-let ownerComunicazioniList = null;
-let ownerComunicazioniForm = null;
-let ownerComunicazioniTitolo = null;
-let ownerComunicazioniTesto = null;
-let ownerComunicazioniVisibileFarmacia = null;
-let ownerComunicazioniVisibileClienti = null;
-let ownerComunicazioniEmptyState = null;
-
-/**
- * Ottiene l'elenco delle comunicazioni.
- */
-function getComunicazioniList() {
-  return loadArrayFromStorage(KEY_COMUNICAZIONI);
-}
-
-/**
- * Salva la lista comunicazioni.
- */
-function setComunicazioniList(list) {
-  saveArrayToStorage(KEY_COMUNICAZIONI, list);
-}
-
-/**
- * Aggiunge una nuova comunicazione.
- */
-function addComunicazione({ titolo, testo, visFarmacia, visClienti }) {
-  const list = getComunicazioniList();
-  const now = new Date();
-  const dataISO = now.toISOString();
-  const prettyDate = formatDateIT(dataISO.slice(0, 10));
-
-  const currentUser = getSessionUser();
-  const autore = currentUser
-    ? `${currentUser.nome || ""} ${currentUser.cognome || ""}`.trim() ||
-      currentUser.username ||
-      "Titolare"
-    : "Titolare";
-
-  const newItem = {
-    id: Date.now(),
-    titolo: titolo.trim(),
-    testo: testo.trim(),
-    dataISO,
-    data: prettyDate,
-    autore,
-    visibileFarmacia: !!visFarmacia,
-    visibileClienti: !!visClienti
-  };
-
-  // Ultime comunicazioni in alto
-  list.unshift(newItem);
-  setComunicazioniList(list);
-}
-
-/**
- * Inizializza la sezione Comunicazioni del Titolare.
- */
-function initOwnerComunicazioniSection() {
-  if (!viewOwnerComunicazioni) return;
-
-  ownerComunicazioniList = document.getElementById("ownerComunicazioniList");
-  ownerComunicazioniForm = document.getElementById("ownerComunicazioniForm");
-  ownerComunicazioniTitolo = document.getElementById("ownerComunicazioneTitolo");
-  ownerComunicazioniTesto = document.getElementById("ownerComunicazioneTesto");
-  ownerComunicazioniVisibileFarmacia = document.getElementById(
-    "ownerComunicazioneVisibileFarmacia"
-  );
-  ownerComunicazioniVisibileClienti = document.getElementById(
-    "ownerComunicazioneVisibileClienti"
-  );
-  ownerComunicazioniEmptyState = document.getElementById("ownerComunicazioniEmptyState");
-
-  // Se non ci sono comunicazioni, preparo qualche esempio
-  const current = getComunicazioniList();
-  if (!current || current.length === 0) {
-    const demo = [
-      {
-        id: Date.now(),
-        titolo: "Aggiornamento orari natalizi",
-        testo: "Dal 20/12 al 06/01 la farmacia seguirà l'orario continuato 8–20.",
-        dataISO: new Date().toISOString(),
-        data: formatDateIT(new Date().toISOString().slice(0, 10)),
-        autore: "Titolare",
-        visibileFarmacia: true,
-        visibileClienti: true
-      },
-      {
-        id: Date.now() + 1,
-        titolo: "Inventario magazzino",
-        testo:
-          "Lunedì mattina dalle 8 alle 10 inventario rapido banco automedicazione.",
-        dataISO: new Date().toISOString(),
-        data: formatDateIT(new Date().toISOString().slice(0, 10)),
-        autore: "Titolare",
-        visibileFarmacia: true,
-        visibileClienti: false
-      }
-    ];
-    setComunicazioniList(demo);
-  }
-
-  // Gestione form invio nuova comunicazione
-  if (ownerComunicazioniForm) {
-    ownerComunicazioniForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const titoloVal = (ownerComunicazioniTitolo?.value || "").trim();
-      const testoVal = (ownerComunicazioniTesto?.value || "").trim();
-      const visFarmacia = !!ownerComunicazioniVisibileFarmacia?.checked;
-      const visClienti = !!ownerComunicazioniVisibileClienti?.checked;
-
-      if (!titoloVal || !testoVal) {
-        alert("Inserisci almeno TITOLO e TESTO per la comunicazione.");
-        return;
-      }
-
-      addComunicazione({
-        titolo: titoloVal,
-        testo: testoVal,
-        visFarmacia,
-        visClienti
-      });
-
-      ownerComunicazioniForm.reset();
-      renderOwnerComunicazioniList();
+      users.push(newUser);
+      saveUsers(users);
+      setFormMessage(
+        registerMessage,
+        "success",
+        "Registrazione completata! Ora puoi effettuare il login."
+      );
+      showToast("success", "Utente registrato correttamente.");
+      registerForm.reset();
+      // reset ruolo
+      updateRoleSelector("dipendente");
     });
   }
 
-  // Prima renderizzazione lista
-  renderOwnerComunicazioniList();
-}
+  /* ----------------------------------------------------------
+     AUTH: LOGIN
+     ---------------------------------------------------------- */
 
-/**
- * Renderizza la lista delle comunicazioni in modalità Titolare.
- */
-function renderOwnerComunicazioniList() {
-  if (!ownerComunicazioniList) return;
+  const loginForm = qs("#loginForm");
+  const loginMessage = qs("#loginMessage");
 
-  const list = getComunicazioniList();
-  ownerComunicazioniList.innerHTML = "";
+  function setCurrentUser(user) {
+    lsSet(LS_KEYS.CURRENT_USER, user);
+  }
 
-  if (!list.length) {
-    if (ownerComunicazioniEmptyState) {
-      ownerComunicazioniEmptyState.classList.remove("hidden");
+  function getCurrentUser() {
+    return lsGet(LS_KEYS.CURRENT_USER, null);
+  }
+
+  function goToDashboardForRole(ruolo) {
+    switch (ruolo) {
+      case "titolare":
+        showView("view-dashboard-titolare", "Dashboard Titolare");
+        break;
+      case "farmacia":
+        showView("view-dashboard-farmacia", "Dashboard Farmacia");
+        break;
+      case "dipendente":
+        showView("view-dashboard-dipendente", "Dashboard Dipendente");
+        break;
+      case "cliente":
+        showView("view-dashboard-cliente", "Area Clienti");
+        break;
+      default:
+        showView("view-dashboard-dipendente", "Dashboard");
     }
-    return;
-  }
-  if (ownerComunicazioniEmptyState) {
-    ownerComunicazioniEmptyState.classList.add("hidden");
   }
 
-  list.forEach((item) => {
-    const card = document.createElement("article");
-    card.className = "com-card";
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const formData = new FormData(loginForm);
+      const email = (formData.get("email") || "").toString().trim().toLowerCase();
+      const password = (formData.get("password") || "").toString().trim();
 
-    const header = document.createElement("div");
-    header.className = "com-card-header";
-
-    const titleEl = document.createElement("h3");
-    titleEl.className = "com-card-title";
-    titleEl.textContent = item.titolo;
-
-    const metaEl = document.createElement("div");
-    metaEl.className = "com-card-meta";
-    const visFarm = item.visibileFarmacia ? "Farmacia" : "";
-    const visCli = item.visibileClienti ? "Clienti" : "";
-    const visText = [visFarm, visCli].filter(Boolean).join(" · ") || "Solo titolare";
-    metaEl.textContent = `${item.data} · ${item.autore} · ${visText}`;
-
-    header.appendChild(titleEl);
-    header.appendChild(metaEl);
-
-    const body = document.createElement("p");
-    body.className = "com-card-text";
-    body.textContent = item.testo;
-
-    card.appendChild(header);
-    card.appendChild(body);
-
-    ownerComunicazioniList.appendChild(card);
-  });
-}
-
-/* =====================================================
-   INIT SPECIFICO DELLE SEZIONI TITOLARE
-   (viene eseguito dopo DOMContentLoaded)
-   ===================================================== */
-
-function initOwnerSections() {
-  initOwnerAssenzeSection();
-  initOwnerTurniSection();
-  initOwnerComunicazioniSection();
-}
-
-// Aggiungo un altro listener DOMContentLoaded che si limita
-// ad inizializzare le sezioni titolare (se esistono gli elementi).
-document.addEventListener("DOMContentLoaded", () => {
-  initOwnerSections();
-});
-
-// ======================================================
-// SCRIPT.JS – PARTE 5/7
-// Arrivi, Scadenze, Scorte, Cambio Cassa (Titolare)
-// ======================================================
-
-/* =====================================================
-   CHIAVI STORAGE DATI GESTIONALI
-   ===================================================== */
-
-const KEY_ARRIVI = "fm_arrivi_logistica";
-const KEY_SCADENZE_PRODOTTI = "fm_scadenze_prodotti";
-const KEY_SCORTE = "fm_scorte_servizio";
-const KEY_CAMBIO_CASSA = "fm_cambio_cassa";
-
-/* =====================================================
-   ARRIVI – DATI + FUNZIONI
-   ===================================================== */
-
-function getArriviList() {
-  return loadArrayFromStorage(KEY_ARRIVI);
-}
-
-function setArriviList(list) {
-  saveArrayToStorage(KEY_ARRIVI, list);
-}
-
-/**
- * Aggiunge un nuovo arrivo (consegna, espositore, corriere ecc.)
- */
-function addArrivo({ data, descrizione, fornitore }) {
-  const list = getArriviList();
-  list.push({
-    id: Date.now(),
-    data: data.trim(),
-    descrizione: descrizione.trim(),
-    fornitore: fornitore.trim()
-  });
-  setArriviList(list);
-}
-
-// Riferimenti DOM sezione Arrivi Titolare
-let ownerArriviForm = null;
-let ownerArriviDataInput = null;
-let ownerArriviDescrizioneInput = null;
-let ownerArriviFornitoreInput = null;
-let ownerArriviTableBody = null;
-let ownerArriviEmptyState = null;
-
-function initOwnerArriviSection() {
-  if (!viewOwnerArrivi) return;
-
-  ownerArriviForm = document.getElementById("ownerArriviForm");
-  ownerArriviDataInput = document.getElementById("ownerArrivoData");
-  ownerArriviDescrizioneInput = document.getElementById("ownerArrivoDescrizione");
-  ownerArriviFornitoreInput = document.getElementById("ownerArrivoFornitore");
-  ownerArriviTableBody = document.getElementById("ownerArriviTableBody");
-  ownerArriviEmptyState = document.getElementById("ownerArriviEmptyState");
-
-  // Dati demo se la lista è vuota
-  const current = getArriviList();
-  if (!current || current.length === 0) {
-    const todayISO = new Date().toISOString().slice(0, 10);
-    const demo = [
-      {
-        id: Date.now(),
-        data: todayISO,
-        descrizione: "Consegna espositore dermocosmesi + scatoloni promo",
-        fornitore: "Unico"
-      },
-      {
-        id: Date.now() + 1,
-        data: todayISO,
-        descrizione: "Ordine giornaliero + tamponi rapidi",
-        fornitore: "Alliance"
-      }
-    ];
-    setArriviList(demo);
-  }
-
-  // Gestione form
-  if (ownerArriviForm) {
-    ownerArriviForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const dataVal = (ownerArriviDataInput?.value || "").trim();
-      const descVal = (ownerArriviDescrizioneInput?.value || "").trim();
-      const fornVal = (ownerArriviFornitoreInput?.value || "").trim();
-
-      if (!dataVal || !descVal) {
-        alert("Inserisci almeno DATA e DESCRIZIONE dell'arrivo.");
+      if (!email || !password) {
+        setFormMessage(loginMessage, "error", "Inserisci email e password.");
         return;
       }
 
-      addArrivo({
-        data: dataVal,
-        descrizione: descVal,
-        fornitore: fornVal || "Non specificato"
-      });
+      const users = getUsers();
+      const user = users.find(
+        (u) => u.email === email && u.password === password
+      );
 
-      ownerArriviForm.reset();
-      renderOwnerArriviTable();
-    });
-  }
-
-  renderOwnerArriviTable();
-}
-
-function renderOwnerArriviTable() {
-  if (!ownerArriviTableBody) return;
-
-  const list = getArriviList().sort((a, b) => a.data.localeCompare(b.data));
-
-  ownerArriviTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (ownerArriviEmptyState) ownerArriviEmptyState.classList.remove("hidden");
-    return;
-  }
-  if (ownerArriviEmptyState) ownerArriviEmptyState.classList.add("hidden");
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdData = document.createElement("td");
-    tdData.textContent = formatDateIT(item.data || "");
-
-    const tdFornitore = document.createElement("td");
-    tdFornitore.textContent = item.fornitore || "–";
-
-    const tdDesc = document.createElement("td");
-    tdDesc.textContent = item.descrizione || "–";
-
-    tr.appendChild(tdData);
-    tr.appendChild(tdFornitore);
-    tr.appendChild(tdDesc);
-
-    ownerArriviTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   SCADENZE – DATI + FUNZIONI
-   ===================================================== */
-
-function getScadenzeList() {
-  return loadArrayFromStorage(KEY_SCADENZE_PRODOTTI);
-}
-
-function setScadenzeList(list) {
-  saveArrayToStorage(KEY_SCADENZE_PRODOTTI, list);
-}
-
-/**
- * Aggiunge una nuova scadenza prodotto.
- */
-function addScadenza({ descrizione, dataScadenza, note }) {
-  const list = getScadenzeList();
-  list.push({
-    id: Date.now(),
-    descrizione: descrizione.trim(),
-    dataScadenza: dataScadenza.trim(),
-    note: note.trim()
-  });
-  setScadenzeList(list);
-}
-
-/**
- * Ritorna true se la scadenza è entro 45 giorni da oggi.
- */
-function isScadenzaCritica(isoDate) {
-  if (!isoDate) return false;
-  try {
-    const today = new Date();
-    const target = new Date(isoDate + "T00:00:00");
-    const diffMs = target - today;
-    const diffDays = diffMs / (1000 * 60 * 60 * 24);
-    return diffDays <= 45;
-  } catch (err) {
-    return false;
-  }
-}
-
-// DOM scadenze titolare
-let ownerScadenzeForm = null;
-let ownerScadenzaDescrizioneInput = null;
-let ownerScadenzaDataInput = null;
-let ownerScadenzaNoteInput = null;
-let ownerScadenzeTableBody = null;
-let ownerScadenzeEmptyState = null;
-
-function initOwnerScadenzeSection() {
-  if (!viewOwnerScadenze) return;
-
-  ownerScadenzeForm = document.getElementById("ownerScadenzeForm");
-  ownerScadenzaDescrizioneInput = document.getElementById("ownerScadenzaDescrizione");
-  ownerScadenzaDataInput = document.getElementById("ownerScadenzaData");
-  ownerScadenzaNoteInput = document.getElementById("ownerScadenzaNote");
-  ownerScadenzeTableBody = document.getElementById("ownerScadenzeTableBody");
-  ownerScadenzeEmptyState = document.getElementById("ownerScadenzeEmptyState");
-
-  // Dati demo se vuoto
-  const current = getScadenzeList();
-  if (!current || current.length === 0) {
-    const today = new Date();
-    const d1 = new Date(today.getTime() + 20 * 24 * 60 * 60 * 1000);
-    const d2 = new Date(today.getTime() + 50 * 24 * 60 * 60 * 1000);
-
-    const iso1 = d1.toISOString().slice(0, 10);
-    const iso2 = d2.toISOString().slice(0, 10);
-
-    const demo = [
-      {
-        id: Date.now(),
-        descrizione: "Fermenti lattici bambini",
-        dataScadenza: iso1,
-        note: "Controllare rotazione scaffale"
-      },
-      {
-        id: Date.now() + 1,
-        descrizione: "Omeprazolo 20mg 28 cps",
-        dataScadenza: iso2,
-        note: "Backstock magazzino alto"
-      }
-    ];
-    setScadenzeList(demo);
-  }
-
-  if (ownerScadenzeForm) {
-    ownerScadenzeForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const descVal = (ownerScadenzaDescrizioneInput?.value || "").trim();
-      const dataVal = (ownerScadenzaDataInput?.value || "").trim();
-      const noteVal = (ownerScadenzaNoteInput?.value || "").trim();
-
-      if (!descVal || !dataVal) {
-        alert("Inserisci almeno DESCRIZIONE e DATA SCADENZA.");
+      if (!user) {
+        setFormMessage(
+          loginMessage,
+          "error",
+          "Credenziali non valide. Controlla email e password."
+        );
+        showToast("error", "Accesso negato.");
         return;
       }
 
-      addScadenza({
-        descrizione: descVal,
-        dataScadenza: dataVal,
-        note: noteVal
-      });
-
-      ownerScadenzeForm.reset();
-      renderOwnerScadenzeTable();
+      setCurrentUser(user);
+      updateTopbarUser(user);
+      setFormMessage(loginMessage, "success", "Accesso effettuato.");
+      showToast("success", `Benvenuto, ${user.nome}!`);
+      goToDashboardForRole(user.ruolo);
     });
   }
 
-  renderOwnerScadenzeTable();
-}
-
-function renderOwnerScadenzeTable() {
-  if (!ownerScadenzeTableBody) return;
-
-  const list = getScadenzeList().sort((a, b) =>
-    a.dataScadenza.localeCompare(b.dataScadenza)
-  );
-
-  ownerScadenzeTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (ownerScadenzeEmptyState) ownerScadenzeEmptyState.classList.remove("hidden");
-    return;
-  }
-  if (ownerScadenzeEmptyState) ownerScadenzeEmptyState.classList.add("hidden");
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdDesc = document.createElement("td");
-    tdDesc.textContent = item.descrizione;
-
-    const tdData = document.createElement("td");
-    tdData.textContent = formatDateIT(item.dataScadenza || "");
-
-    const tdNote = document.createElement("td");
-    tdNote.textContent = item.note || "–";
-
-    // Se scadenza entro 45 giorni, evidenzio la riga
-    if (isScadenzaCritica(item.dataScadenza)) {
-      tr.classList.add("row-scadenza-critica");
-    }
-
-    tr.appendChild(tdDesc);
-    tr.appendChild(tdData);
-    tr.appendChild(tdNote);
-
-    ownerScadenzeTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   SCORTE – DATI + FUNZIONI
-   (prodotti di servizio: bicchieri, carta igienica ecc.)
-   ===================================================== */
-
-function getScorteList() {
-  return loadArrayFromStorage(KEY_SCORTE);
-}
-
-function setScorteList(list) {
-  saveArrayToStorage(KEY_SCORTE, list);
-}
-
-function addScorta({ descrizione, quantita, minimo, note }) {
-  const list = getScorteList();
-  list.push({
-    id: Date.now(),
-    descrizione: descrizione.trim(),
-    quantita: Number(quantita) || 0,
-    minimo: Number(minimo) || 0,
-    note: note.trim()
-  });
-  setScorteList(list);
-}
-
-function segnaScortaBassa(scortaId) {
-  const list = getScorteList();
-  const found = list.find((s) => s.id === scortaId);
-  if (found) {
-    // Per ora semplicemente abbassiamo la quantità di 1
-    found.quantita = Math.max(0, (Number(found.quantita) || 0) - 1);
-    setScorteList(list);
-  }
-}
-
-// DOM scorte titolare
-let ownerScorteForm = null;
-let ownerScortaDescrizioneInput = null;
-let ownerScortaQuantitaInput = null;
-let ownerScortaMinimoInput = null;
-let ownerScortaNoteInput = null;
-let ownerScorteTableBody = null;
-let ownerScorteEmptyState = null;
-
-function initOwnerScorteSection() {
-  if (!viewOwnerScorte) return;
-
-  ownerScorteForm = document.getElementById("ownerScorteForm");
-  ownerScortaDescrizioneInput = document.getElementById("ownerScortaDescrizione");
-  ownerScortaQuantitaInput = document.getElementById("ownerScortaQuantita");
-  ownerScortaMinimoInput = document.getElementById("ownerScortaMinimo");
-  ownerScortaNoteInput = document.getElementById("ownerScortaNote");
-  ownerScorteTableBody = document.getElementById("ownerScorteTableBody");
-  ownerScorteEmptyState = document.getElementById("ownerScorteEmptyState");
-
-  // Dati demo se vuoto
-  const current = getScorteList();
-  if (!current || current.length === 0) {
-    const demo = [
-      {
-        id: Date.now(),
-        descrizione: "Bicchierini monouso",
-        quantita: 500,
-        minimo: 200,
-        note: "Usati per acqua e sciroppi"
-      },
-      {
-        id: Date.now() + 1,
-        descrizione: "Rotoli POS",
-        quantita: 8,
-        minimo: 5,
-        note: "Banco 1 + Banco 2"
-      },
-      {
-        id: Date.now() + 2,
-        descrizione: "Carta igienica",
-        quantita: 12,
-        minimo: 6,
-        note: "Bagno clienti + bagno personale"
-      }
-    ];
-    setScorteList(demo);
-  }
-
-  if (ownerScorteForm) {
-    ownerScorteForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const descVal = (ownerScortaDescrizioneInput?.value || "").trim();
-      const qtyVal = (ownerScortaQuantitaInput?.value || "").trim();
-      const minVal = (ownerScortaMinimoInput?.value || "").trim();
-      const noteVal = (ownerScortaNoteInput?.value || "").trim();
-
-      if (!descVal) {
-        alert("Inserisci la DESCRIZIONE della scorta.");
-        return;
-      }
-
-      addScorta({
-        descrizione: descVal,
-        quantita: qtyVal,
-        minimo: minVal,
-        note: noteVal
-      });
-
-      ownerScorteForm.reset();
-      renderOwnerScorteTable();
-    });
-  }
-
-  renderOwnerScorteTable();
-}
-
-function renderOwnerScorteTable() {
-  if (!ownerScorteTableBody) return;
-
-  const list = getScorteList();
-
-  ownerScorteTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (ownerScorteEmptyState) ownerScorteEmptyState.classList.remove("hidden");
-    return;
-  }
-  if (ownerScorteEmptyState) ownerScorteEmptyState.classList.add("hidden");
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdDesc = document.createElement("td");
-    tdDesc.textContent = item.descrizione;
-
-    const tdQty = document.createElement("td");
-    tdQty.textContent = item.quantita ?? 0;
-
-    const tdMin = document.createElement("td");
-    tdMin.textContent = item.minimo ?? 0;
-
-    const tdNote = document.createElement("td");
-    tdNote.textContent = item.note || "–";
-
-    // Se quantità sotto il minimo, evidenzio
-    if (Number(item.quantita) <= Number(item.minimo)) {
-      tr.classList.add("row-scorta-bassa");
-    }
-
-    tr.appendChild(tdDesc);
-    tr.appendChild(tdQty);
-    tr.appendChild(tdMin);
-    tr.appendChild(tdNote);
-
-    ownerScorteTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   CAMBIO CASSA – DATI + FUNZIONI
-   ===================================================== */
-
-function getCambioCassaList() {
-  return loadArrayFromStorage(KEY_CAMBIO_CASSA);
-}
-
-function setCambioCassaList(list) {
-  saveArrayToStorage(KEY_CAMBIO_CASSA, list);
-}
-
-function addCambioCassa({ data, turno, importo, note }) {
-  const list = getCambioCassaList();
-  list.push({
-    id: Date.now(),
-    data: data.trim(),
-    turno: turno.trim(),
-    importo: importo.trim(),
-    note: note.trim()
-  });
-  setCambioCassaList(list);
-}
-
-// DOM cambio cassa titolare
-let ownerCambioForm = null;
-let ownerCambioDataInput = null;
-let ownerCambioTurnoInput = null;
-let ownerCambioImportoInput = null;
-let ownerCambioNoteInput = null;
-let ownerCambioTableBody = null;
-let ownerCambioEmptyState = null;
-
-function initOwnerCambioCassaSection() {
-  if (!viewOwnerCambioCassa) return;
-
-  ownerCambioForm = document.getElementById("ownerCambioForm");
-  ownerCambioDataInput = document.getElementById("ownerCambioData");
-  ownerCambioTurnoInput = document.getElementById("ownerCambioTurno");
-  ownerCambioImportoInput = document.getElementById("ownerCambioImporto");
-  ownerCambioNoteInput = document.getElementById("ownerCambioNote");
-  ownerCambioTableBody = document.getElementById("ownerCambioTableBody");
-  ownerCambioEmptyState = document.getElementById("ownerCambioEmptyState");
-
-  // Dati demo se vuoto
-  const current = getCambioCassaList();
-  if (!current || current.length === 0) {
-    const iso = new Date().toISOString().slice(0, 10);
-    const demo = [
-      {
-        id: Date.now(),
-        data: iso,
-        turno: "Mattina",
-        importo: "Fondo cassa 250€",
-        note: "Banco 1 + Banco 2"
-      },
-      {
-        id: Date.now() + 1,
-        data: iso,
-        turno: "Pomeriggio",
-        importo: "Cambio 50€ in monete",
-        note: "Richiesta Banco 1"
-      }
-    ];
-    setCambioCassaList(demo);
-  }
-
-  if (ownerCambioForm) {
-    ownerCambioForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const dataVal = (ownerCambioDataInput?.value || "").trim();
-      const turnoVal = (ownerCambioTurnoInput?.value || "").trim();
-      const importoVal = (ownerCambioImportoInput?.value || "").trim();
-      const noteVal = (ownerCambioNoteInput?.value || "").trim();
-
-      if (!dataVal || !turnoVal) {
-        alert("Inserisci almeno DATA e TURNO per il cambio cassa.");
-        return;
-      }
-
-      addCambioCassa({
-        data: dataVal,
-        turno: turnoVal,
-        importo: importoVal,
-        note: noteVal
-      });
-
-      ownerCambioForm.reset();
-      renderOwnerCambioCassaTable();
-    });
-  }
-
-  renderOwnerCambioCassaTable();
-}
-
-function renderOwnerCambioCassaTable() {
-  if (!ownerCambioTableBody) return;
-
-  const list = getCambioCassaList().sort((a, b) =>
-    a.data.localeCompare(b.data)
-  );
-
-  ownerCambioTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (ownerCambioEmptyState) ownerCambioEmptyState.classList.remove("hidden");
-    return;
-  }
-  if (ownerCambioEmptyState) ownerCambioEmptyState.classList.add("hidden");
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdData = document.createElement("td");
-    tdData.textContent = formatDateIT(item.data || "");
-
-    const tdTurno = document.createElement("td");
-    tdTurno.textContent = item.turno || "–";
-
-    const tdImporto = document.createElement("td");
-    tdImporto.textContent = item.importo || "–";
-
-    const tdNote = document.createElement("td");
-    tdNote.textContent = item.note || "–";
-
-    tr.appendChild(tdData);
-    tr.appendChild(tdTurno);
-    tr.appendChild(tdImporto);
-    tr.appendChild(tdNote);
-
-    ownerCambioTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   RIDEFINIZIONE initOwnerSections
-   (aggiungo le nuove sezioni Arrivi / Scadenze / Scorte / Cambio)
-   ===================================================== */
-
-function initOwnerSections() {
-  initOwnerAssenzeSection();
-  initOwnerTurniSection();
-  initOwnerComunicazioniSection();
-  initOwnerArriviSection();
-  initOwnerScadenzeSection();
-  initOwnerScorteSection();
-  initOwnerCambioCassaSection();
-}
-// ======================================================
-// SCRIPT.JS – PARTE 6/7
-// Farmacia / Dipendente: Arrivi, Scadenze, Scorte, Cambio Cassa
-// ======================================================
-
-/* =====================================================
-   ARRIVI – VISTA FARMACIA / DIPENDENTE
-   ===================================================== */
-
-// DOM Farmacia Arrivi
-let farmArriviForm = null;
-let farmArrivoDescrizioneInput = null;
-let farmArrivoFornitoreInput = null;
-let farmArriviTableBody = null;
-let farmArriviEmptyState = null;
-
-/**
- * Inizializza sezione ARRIVI per Farmacia/Dipendenti.
- * Usa gli stessi dati del Titolare (KEY_ARRIVI).
- */
-function initFarmaciaArriviSection() {
-  farmArriviForm = document.getElementById("farmArriviForm");
-  farmArrivoDescrizioneInput = document.getElementById("farmArrivoDescrizione");
-  farmArrivoFornitoreInput = document.getElementById("farmArrivoFornitore");
-  farmArriviTableBody = document.getElementById("farmArriviTableBody");
-  farmArriviEmptyState = document.getElementById("farmArriviEmptyState");
-
-  // Se non esiste la sezione nel DOM, esco (magari non è in questa pagina)
-  if (!farmArriviTableBody) return;
-
-  // Form "Segnala arrivo" – lato Farmacia
-  if (farmArriviForm) {
-    farmArriviForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const descVal = (farmArrivoDescrizioneInput?.value || "").trim();
-      const fornVal = (farmArrivoFornitoreInput?.value || "").trim();
-
-      if (!descVal) {
-        alert("Inserisci almeno una DESCRIZIONE dell'arrivo.");
-        return;
-      }
-
-      const todayIso = new Date().toISOString().slice(0, 10);
-
-      addArrivo({
-        data: todayIso,
-        descrizione: descVal,
-        fornitore: fornVal || "Non specificato"
-      });
-
-      farmArriviForm.reset();
-      renderFarmaciaArriviTable();
-    });
-  }
-
-  renderFarmaciaArriviTable();
-}
-
-/**
- * Render tabella degli arrivi per Farmacia/Dipendenti (sola lettura elenco).
- */
-function renderFarmaciaArriviTable() {
-  if (!farmArriviTableBody) return;
-
-  const list = getArriviList().sort((a, b) => a.data.localeCompare(b.data));
-
-  farmArriviTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (farmArriviEmptyState) farmArriviEmptyState.classList.remove("hidden");
-    return;
-  }
-  if (farmArriviEmptyState) farmArriviEmptyState.classList.add("hidden");
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdData = document.createElement("td");
-    tdData.textContent = formatDateIT(item.data || "");
-
-    const tdFornitore = document.createElement("td");
-    tdFornitore.textContent = item.fornitore || "–";
-
-    const tdDesc = document.createElement("td");
-    tdDesc.textContent = item.descrizione || "–";
-
-    tr.appendChild(tdData);
-    tr.appendChild(tdFornitore);
-    tr.appendChild(tdDesc);
-
-    farmArriviTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   SCADENZE – VISTA FARMACIA / DIPENDENTE
-   (lettura + possibilità di aggiungere o eliminare)
-   ===================================================== */
-
-let farmScadenzeForm = null;
-let farmScadDescrizioneInput = null;
-let farmScadDataInput = null;
-let farmScadNoteInput = null;
-let farmScadenzeTableBody = null;
-let farmScadenzeEmptyState = null;
-
-function initFarmaciaScadenzeSection() {
-  farmScadenzeForm = document.getElementById("farmScadenzeForm");
-  farmScadDescrizioneInput = document.getElementById("farmScadDescrizione");
-  farmScadDataInput = document.getElementById("farmScadData");
-  farmScadNoteInput = document.getElementById("farmScadNote");
-  farmScadenzeTableBody = document.getElementById("farmScadenzeTableBody");
-  farmScadenzeEmptyState = document.getElementById("farmScadenzeEmptyState");
-
-  if (!farmScadenzeTableBody) return;
-
-  if (farmScadenzeForm) {
-    farmScadenzeForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const descVal = (farmScadDescrizioneInput?.value || "").trim();
-      const dataVal = (farmScadDataInput?.value || "").trim();
-      const noteVal = (farmScadNoteInput?.value || "").trim();
-
-      if (!descVal || !dataVal) {
-        alert("Inserisci almeno DESCRIZIONE e DATA SCADENZA.");
-        return;
-      }
-
-      addScadenza({
-        descrizione: descVal,
-        dataScadenza: dataVal,
-        note: noteVal
-      });
-
-      farmScadenzeForm.reset();
-      renderFarmaciaScadenzeTable();
-      // Aggiorno anche la vista del Titolare se aperta
-      renderOwnerScadenzeTable && renderOwnerScadenzeTable();
-    });
-  }
-
-  // Delego gestione click "Elimina" sulla tabella
-  farmScadenzeTableBody.addEventListener("click", (evt) => {
-    const btn = evt.target.closest("[data-scadenza-id]");
-    if (!btn) return;
-
-    const idStr = btn.getAttribute("data-scadenza-id");
-    const scadId = Number(idStr);
-
-    if (!scadId) return;
-    if (!confirm("Vuoi eliminare questa scadenza dall'elenco?")) return;
-
-    const list = getScadenzeList().filter((item) => item.id !== scadId);
-    setScadenzeList(list);
-
-    renderFarmaciaScadenzeTable();
-    renderOwnerScadenzeTable && renderOwnerScadenzeTable();
-  });
-
-  renderFarmaciaScadenzeTable();
-}
-
-function renderFarmaciaScadenzeTable() {
-  if (!farmScadenzeTableBody) return;
-
-  const list = getScadenzeList().sort((a, b) =>
-    a.dataScadenza.localeCompare(b.dataScadenza)
-  );
-
-  farmScadenzeTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (farmScadenzeEmptyState) farmScadenzeEmptyState.classList.remove("hidden");
-    return;
-  }
-  if (farmScadenzeEmptyState) farmScadenzeEmptyState.classList.add("hidden");
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdDesc = document.createElement("td");
-    tdDesc.textContent = item.descrizione;
-
-    const tdData = document.createElement("td");
-    tdData.textContent = formatDateIT(item.dataScadenza || "");
-
-    const tdNote = document.createElement("td");
-    tdNote.textContent = item.note || "–";
-
-    const tdAzioni = document.createElement("td");
-    const btnDel = document.createElement("button");
-    btnDel.type = "button";
-    btnDel.className = "btn-table-small btn-danger-ghost";
-    btnDel.textContent = "Elimina";
-    btnDel.setAttribute("data-scadenza-id", String(item.id));
-    tdAzioni.appendChild(btnDel);
-
-    if (isScadenzaCritica(item.dataScadenza)) {
-      tr.classList.add("row-scadenza-critica");
-    }
-
-    tr.appendChild(tdDesc);
-    tr.appendChild(tdData);
-    tr.appendChild(tdNote);
-    tr.appendChild(tdAzioni);
-
-    farmScadenzeTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   SCORTE – VISTA FARMACIA / DIPENDENTE
-   (lettura + segnala scorta bassa + aggiungi semplice)
-   ===================================================== */
-
-let farmScorteForm = null;
-let farmScortaDescrizioneInput = null;
-let farmScortaNoteInput = null;
-let farmScorteTableBody = null;
-let farmScorteEmptyState = null;
-
-function initFarmaciaScorteSection() {
-  farmScorteForm = document.getElementById("farmScorteForm");
-  farmScortaDescrizioneInput = document.getElementById("farmScortaDescrizione");
-  farmScortaNoteInput = document.getElementById("farmScortaNote");
-  farmScorteTableBody = document.getElementById("farmScorteTableBody");
-  farmScorteEmptyState = document.getElementById("farmScorteEmptyState");
-
-  if (!farmScorteTableBody) return;
-
-  // Aggiunta scorte "veloce" (solo descrizione + note; quantità iniziale 0, minimo 1)
-  if (farmScorteForm) {
-    farmScorteForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const descVal = (farmScortaDescrizioneInput?.value || "").trim();
-      const noteVal = (farmScortaNoteInput?.value || "").trim();
-
-      if (!descVal) {
-        alert("Inserisci la DESCRIZIONE della scorta da segnalare.");
-        return;
-      }
-
-      addScorta({
-        descrizione: descVal,
-        quantita: 0,
-        minimo: 1,
-        note: noteVal
-      });
-
-      farmScorteForm.reset();
-      renderFarmaciaScorteTable();
-      renderOwnerScorteTable && renderOwnerScorteTable();
-    });
-  }
-
-  // Delego click su "Segnala scorta bassa"
-  farmScorteTableBody.addEventListener("click", (evt) => {
-    const btn = evt.target.closest("[data-scorta-id]");
-    if (!btn) return;
-
-    const idStr = btn.getAttribute("data-scorta-id");
-    const scortaId = Number(idStr);
-    if (!scortaId) return;
-
-    segnaScortaBassa(scortaId);
-    renderFarmaciaScorteTable();
-    renderOwnerScorteTable && renderOwnerScorteTable();
-  });
-
-  renderFarmaciaScorteTable();
-}
-
-function renderFarmaciaScorteTable() {
-  if (!farmScorteTableBody) return;
-
-  const list = getScorteList();
-
-  farmScorteTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (farmScorteEmptyState) farmScorteEmptyState.classList.remove("hidden");
-    return;
-  }
-  if (farmScorteEmptyState) farmScorteEmptyState.classList.add("hidden");
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdDesc = document.createElement("td");
-    tdDesc.textContent = item.descrizione;
-
-    const tdQty = document.createElement("td");
-    tdQty.textContent = item.quantita ?? 0;
-
-    const tdMin = document.createElement("td");
-    tdMin.textContent = item.minimo ?? 0;
-
-    const tdNote = document.createElement("td");
-    tdNote.textContent = item.note || "–";
-
-    const tdAzioni = document.createElement("td");
-    const btnSegnala = document.createElement("button");
-    btnSegnala.type = "button";
-    btnSegnala.className = "btn-table-small btn-warning-ghost";
-    btnSegnala.textContent = "Scorta bassa";
-    btnSegnala.setAttribute("data-scorta-id", String(item.id));
-    tdAzioni.appendChild(btnSegnala);
-
-    // Evidenzio righe sotto minimo
-    if (Number(item.quantita) <= Number(item.minimo)) {
-      tr.classList.add("row-scorta-bassa");
-    }
-
-    tr.appendChild(tdDesc);
-    tr.appendChild(tdQty);
-    tr.appendChild(tdMin);
-    tr.appendChild(tdNote);
-    tr.appendChild(tdAzioni);
-
-    farmScorteTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   CAMBIO CASSA – VISTA FARMACIA / DIPENDENTE
-   (segnala cambio cassa + storico)
-   ===================================================== */
-
-let farmCambioForm = null;
-let farmCambioTurnoInput = null;
-let farmCambioImportoInput = null;
-let farmCambioNoteInput = null;
-let farmCambioTableBody = null;
-let farmCambioEmptyState = null;
-
-function initFarmaciaCambioCassaSection() {
-  farmCambioForm = document.getElementById("farmCambioForm");
-  farmCambioTurnoInput = document.getElementById("farmCambioTurno");
-  farmCambioImportoInput = document.getElementById("farmCambioImporto");
-  farmCambioNoteInput = document.getElementById("farmCambioNote");
-  farmCambioTableBody = document.getElementById("farmCambioTableBody");
-  farmCambioEmptyState = document.getElementById("farmCambioEmptyState");
-
-  if (!farmCambioTableBody) return;
-
-  // Segnalazione cambio cassa veloce
-  if (farmCambioForm) {
-    farmCambioForm.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-
-      const turnoVal = (farmCambioTurnoInput?.value || "").trim();
-      const importoVal = (farmCambioImportoInput?.value || "").trim();
-      const noteVal = (farmCambioNoteInput?.value || "").trim();
-
-      if (!turnoVal) {
-        alert("Inserisci almeno il TURNO (es. Mattina, Pomeriggio, Notte).");
-        return;
-      }
-
-      const todayIso = new Date().toISOString().slice(0, 10);
-
-      addCambioCassa({
-        data: todayIso,
-        turno: turnoVal,
-        importo: importoVal,
-        note: noteVal
-      });
-
-      farmCambioForm.reset();
-      renderFarmaciaCambioCassaTable();
-      renderOwnerCambioCassaTable && renderOwnerCambioCassaTable();
-    });
-  }
-
-  renderFarmaciaCambioCassaTable();
-}
-
-function renderFarmaciaCambioCassaTable() {
-  if (!farmCambioTableBody) return;
-
-  const list = getCambioCassaList().sort((a, b) => a.data.localeCompare(b.data));
-
-  farmCambioTableBody.innerHTML = "";
-
-  if (!list.length) {
-    if (farmCambioEmptyState) farmCambioEmptyState.classList.remove("hidden");
-    return;
-  }
-  if (farmCambioEmptyState) farmCambioEmptyState.classList.add("hidden");
-
-  list.forEach((item) => {
-    const tr = document.createElement("tr");
-
-    const tdData = document.createElement("td");
-    tdData.textContent = formatDateIT(item.data || "");
-
-    const tdTurno = document.createElement("td");
-    tdTurno.textContent = item.turno || "–";
-
-    const tdImporto = document.createElement("td");
-    tdImporto.textContent = item.importo || "–";
-
-    const tdNote = document.createElement("td");
-    tdNote.textContent = item.note || "–";
-
-    tr.appendChild(tdData);
-    tr.appendChild(tdTurno);
-    tr.appendChild(tdImporto);
-    tr.appendChild(tdNote);
-
-    farmCambioTableBody.appendChild(tr);
-  });
-}
-
-/* =====================================================
-   INIT SEZIONI FARMACIA / DIPENDENTI
-   (versione estesa – sicura con typeof per funzioni già esistenti)
-   ===================================================== */
-
-function initFarmaciaSections() {
-  // Se in parti precedenti avevamo già definito altre funzioni specifiche
-  // per Farmacia (assenze, turni, comunicazioni, procedure, archivio...)
-  // le richiamiamo solo se esistono davvero.
-  if (typeof initFarmaciaAssenzeSection === "function") {
-    initFarmaciaAssenzeSection();
-  }
-  if (typeof initFarmaciaTurniSection === "function") {
-    initFarmaciaTurniSection();
-  }
-  if (typeof initFarmaciaComunicazioniSection === "function") {
-    initFarmaciaComunicazioniSection();
-  }
-  if (typeof initFarmaciaProcedureSection === "function") {
-    initFarmaciaProcedureSection();
-  }
-  if (typeof initFarmaciaArchivioSection === "function") {
-    initFarmaciaArchivioSection();
-  }
-
-  // Nuove sezioni "gestionali" collegate ai dati del Titolare
-  initFarmaciaArriviSection();
-  initFarmaciaScadenzeSection();
-  initFarmaciaScorteSection();
-  initFarmaciaCambioCassaSection();
-}
-// ======================================================
-// SCRIPT.JS – PARTE 7/7
-// Dashboard CLIENTE: Eventi, Promozioni, Farmacia di turno
-// ======================================================
-
-/* =====================================================
-   CLIENTE – DOM RIFERIMENTI
-   ===================================================== */
-
-// Eventi
-let clientEventiList = null;
-let clientEventiEmpty = null;
-
-// Promozioni (carosello)
-let clientPromoTrack = null;
-let clientPromoEmpty = null;
-let clientPromoPrev = null;
-let clientPromoNext = null;
-let clientPromoDotsContainer = null;
-let clientPromoIndex = 0;
-let clientPromoDataCache = [];
-
-// Farmacia di turno / appoggio
-let clientTurnoPrimarioNome = null;
-let clientTurnoPrimarioIndirizzo = null;
-let clientTurnoPrimarioTelefono = null;
-let clientTurnoAppoggioNome = null;
-let clientTurnoAppoggioIndirizzo = null;
-let clientTurnoAppoggioTelefono = null;
-
-/* =====================================================
-   CLIENTE – EVENTI
-   ===================================================== */
-
-/**
- * Renderizza la lista Eventi per il Cliente.
- * I dati vengono dalle impostazioni del Titolare (localStorage).
- */
-function renderClienteEventi() {
-  if (!clientEventiList) return;
-
-  // Se esiste una funzione di utilità per gli eventi, la uso.
-  // Altrimenti considero una lista vuota.
-  const eventi = typeof getEventiList === "function" ? getEventiList() : [];
-
-  clientEventiList.innerHTML = "";
-
-  if (!eventi.length) {
-    if (clientEventiEmpty) clientEventiEmpty.classList.remove("hidden");
-    return;
-  }
-  if (clientEventiEmpty) clientEventiEmpty.classList.add("hidden");
-
-  // Mostro max 6 eventi sulla dashboard cliente
-  eventi.slice(0, 6).forEach((ev) => {
-    const li = document.createElement("li");
-    li.className = "client-event-item";
-
-    const title = document.createElement("div");
-    title.className = "client-event-title";
-    title.textContent = ev.titolo || "Evento";
-
-    const meta = document.createElement("div");
-    meta.className = "client-event-meta";
-    const dataLabel = ev.data ? formatDateIT(ev.data) : "Data da definire";
-    meta.textContent = dataLabel;
-
-    const desc = document.createElement("div");
-    desc.className = "client-event-desc";
-    desc.textContent = ev.descrizione || "";
-
-    li.appendChild(title);
-    li.appendChild(meta);
-    li.appendChild(desc);
-
-    clientEventiList.appendChild(li);
-  });
-}
-
-/* =====================================================
-   CLIENTE – PROMOZIONI (CAROSELLO)
-   ===================================================== */
-
-/**
- * Prepara il carosello promozioni per il Cliente.
- * Usa i dati gestiti dal Titolare (localStorage).
- */
-function renderClientePromozioni() {
-  if (!clientPromoTrack) return;
-
-  clientPromoTrack.innerHTML = "";
-  clientPromoDataCache = [];
-
-  const promos =
-    typeof getPromozioniList === "function" ? getPromozioniList() : [];
-
-  if (!promos.length) {
-    if (clientPromoEmpty) clientPromoEmpty.classList.remove("hidden");
-    return;
-  }
-  if (clientPromoEmpty) clientPromoEmpty.classList.add("hidden");
-
-  clientPromoDataCache = promos;
-  clientPromoIndex = 0;
-
-  promos.forEach((promo, index) => {
-    const slide = document.createElement("div");
-    slide.className = "promo-slide";
-
-    const inner = document.createElement("div");
-    inner.className = "promo-slide-inner";
-
-    // "Immagine" stilizzata – anche solo box colorato con testo
-    const imageBox = document.createElement("div");
-    imageBox.className = "promo-image-box";
-    imageBox.textContent = promo.nomeBreve || promo.titolo || "Promo";
-
-    const title = document.createElement("div");
-    title.className = "promo-title";
-    title.textContent = promo.titolo || "Promozione";
-
-    const price = document.createElement("div");
-    price.className = "promo-price";
-    if (promo.prezzo && promo.prezzo !== "") {
-      price.textContent = promo.prezzo;
+  /* ----------------------------------------------------------
+     RIPRISTINA SESSIONE SE UTENTE GIÀ LOGGATO
+     ---------------------------------------------------------- */
+
+  (function restoreSession() {
+    const cu = getCurrentUser();
+    if (cu) {
+      updateTopbarUser(cu);
+      goToDashboardForRole(cu.ruolo);
     } else {
-      price.textContent = promo.sottotitolo || "";
+      showView("view-landing", "Portale Professionale");
+    }
+  })();
+
+  /* ----------------------------------------------------------
+     ASSENTI OGGI
+     ---------------------------------------------------------- */
+
+  const assentiListEl = qs("#assentiList");
+  const assentiFormEl = qs("#assentiForm");
+  const assentiTotaliEl = qs("#assentiTotali");
+  const assentiOggiEl = qs("#assentiOggi");
+  const assentiFerieEl = qs("#assentiFerie");
+  const assentiFormFeedbackEl = qs("#assentiFormFeedback");
+
+  function getAssenti() {
+    return lsGet(LS_KEYS.ASSENTI, []);
+  }
+
+  function saveAssenti(list) {
+    lsSet(LS_KEYS.ASSENTI, list);
+  }
+
+  function renderAssenti() {
+    if (!assentiListEl) return;
+    const assenti = getAssenti();
+
+    // stats
+    if (assentiTotaliEl) assentiTotaliEl.textContent = assenti.length.toString();
+    if (assentiOggiEl)
+      assentiOggiEl.textContent = assenti.filter((a) => a.data === todayStr()).length.toString();
+    if (assentiFerieEl)
+      assentiFerieEl.textContent = assenti.filter((a) => a.tipo === "ferie").length.toString();
+
+    assentiListEl.innerHTML = "";
+    if (!assenti.length) {
+      const empty = document.createElement("div");
+      empty.className = "table-empty";
+      empty.textContent = "Nessuna assenza registrata.";
+      assentiListEl.appendChild(empty);
+      return;
     }
 
-    const desc = document.createElement("div");
-    desc.className = "promo-desc";
-    desc.textContent = promo.descrizione || "";
+    assenti
+      .slice()
+      .sort((a, b) => (a.data || "").localeCompare(b.data || ""))
+      .forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "assente-item";
 
-    inner.appendChild(imageBox);
-    inner.appendChild(title);
-    inner.appendChild(price);
-    inner.appendChild(desc);
+        const main = document.createElement("div");
+        main.className = "assente-main";
 
-    slide.appendChild(inner);
-    clientPromoTrack.appendChild(slide);
+        const nomeEl = document.createElement("div");
+        nomeEl.className = "assente-nome";
+        nomeEl.textContent = item.nome;
+
+        const meta = document.createElement("div");
+        meta.className = "assente-meta";
+        meta.textContent = `${item.data || ""} · ${item.motivo || ""}`;
+
+        main.appendChild(nomeEl);
+        main.appendChild(meta);
+
+        const tag = document.createElement("span");
+        tag.className = "assente-tag " + (item.tipo || "");
+        tag.textContent = (item.tipo || "").toUpperCase();
+
+        row.appendChild(main);
+        row.appendChild(tag);
+        assentiListEl.appendChild(row);
+      });
+  }
+
+  function todayStr() {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  if (assentiFormEl) {
+    assentiFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(assentiFormEl);
+      const nome = (fd.get("nome") || "").toString().trim();
+      const data = (fd.get("data") || "").toString().trim() || todayStr();
+      const tipo = (fd.get("tipo") || "ferie").toString().trim();
+      const motivo = (fd.get("motivo") || "").toString().trim();
+
+      if (!nome) {
+        if (assentiFormFeedbackEl) {
+          assentiFormFeedbackEl.textContent = "Inserisci il nome.";
+        }
+        return;
+      }
+
+      const list = getAssenti();
+      list.push({
+        id: Date.now(),
+        nome,
+        data,
+        tipo,
+        motivo,
+      });
+      saveAssenti(list);
+      assentiFormEl.reset();
+      if (assentiFormFeedbackEl) {
+        assentiFormFeedbackEl.textContent = "Assenza registrata.";
+      }
+      showToast("success", "Assenza aggiunta.");
+      renderAssenti();
+    });
+  }
+
+  renderAssenti();
+
+  /* ----------------------------------------------------------
+     ARRIVI
+     ---------------------------------------------------------- */
+
+  const arriviFormEl = qs("#arriviForm");
+  const arriviTableBody = qs("#arriviTableBody");
+  const arriviFormFeedbackEl = qs("#arriviFormFeedback");
+
+  function getArrivi() {
+    return lsGet(LS_KEYS.ARRIVI, []);
+  }
+  function saveArrivi(arr) {
+    lsSet(LS_KEYS.ARRIVI, arr);
+  }
+
+  function renderArrivi() {
+    if (!arriviTableBody) return;
+    const arr = getArrivi();
+    arriviTableBody.innerHTML = "";
+    if (!arr.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.className = "table-empty";
+      td.textContent = "Nessun arrivo registrato.";
+      tr.appendChild(td);
+      arriviTableBody.appendChild(tr);
+      return;
+    }
+
+    arr
+      .slice()
+      .sort((a, b) => (a.data || "").localeCompare(b.data || ""))
+      .forEach((a) => {
+        const tr = document.createElement("tr");
+        const tdData = document.createElement("td");
+        const tdForn = document.createElement("td");
+        const tdDescr = document.createElement("td");
+        const tdUrg = document.createElement("td");
+
+        tdData.textContent = a.data || "";
+        tdForn.innerHTML = `<span class="arrivo-fornitore">${a.fornitore || ""}</span>`;
+        tdDescr.textContent = a.descrizione || "";
+
+        if (a.urgente) {
+          const badge = document.createElement("span");
+          badge.className = "arrivo-badge-urgente";
+          badge.textContent = "Urgente";
+          tdUrg.appendChild(badge);
+        } else {
+          tdUrg.textContent = "-";
+        }
+
+        tr.appendChild(tdData);
+        tr.appendChild(tdForn);
+        tr.appendChild(tdDescr);
+        tr.appendChild(tdUrg);
+        arriviTableBody.appendChild(tr);
+      });
+  }
+
+  if (arriviFormEl) {
+    arriviFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(arriviFormEl);
+      const fornitore = (fd.get("fornitore") || "").toString().trim();
+      const data = (fd.get("data") || "").toString().trim() || todayStr();
+      const descrizione = (fd.get("descrizione") || "").toString().trim();
+      const urgente = fd.get("urgente") === "on";
+
+      if (!fornitore) {
+        if (arriviFormFeedbackEl) {
+          arriviFormFeedbackEl.textContent = "Inserisci il fornitore.";
+        }
+        return;
+      }
+
+      const arr = getArrivi();
+      arr.push({
+        id: Date.now(),
+        fornitore,
+        data,
+        descrizione,
+        urgente,
+      });
+      saveArrivi(arr);
+      arriviFormEl.reset();
+      if (arriviFormFeedbackEl) {
+        arriviFormFeedbackEl.textContent = "Arrivo registrato.";
+      }
+      showToast("success", "Nuovo arrivo salvato.");
+      renderArrivi();
+    });
+  }
+
+  renderArrivi();
+
+  /* ----------------------------------------------------------
+     SCADENZE PRODOTTI
+     ---------------------------------------------------------- */
+
+  const scadenzeFormEl = qs("#scadenzeForm");
+  const scadenzeBodyEl = qs("#scadenzeTableBody");
+  const scadenzeFormFeedbackEl = qs("#scadenzeFormFeedback");
+
+  function getScadenze() {
+    return lsGet(LS_KEYS.SCADENZE, []);
+  }
+  function saveScadenze(list) {
+    lsSet(LS_KEYS.SCADENZE, list);
+  }
+
+  function diffDays(fromIso) {
+    if (!fromIso) return Infinity;
+    const today = new Date(todayStr());
+    const target = new Date(fromIso);
+    const diffMs = target.getTime() - today.getTime();
+    return Math.round(diffMs / (1000 * 60 * 60 * 24));
+  }
+
+  function renderScadenze() {
+    if (!scadenzeBodyEl) return;
+    const list = getScadenze();
+    scadenzeBodyEl.innerHTML = "";
+
+    if (!list.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.className = "table-empty";
+      td.textContent = "Nessuna scadenza registrata.";
+      tr.appendChild(td);
+      scadenzeBodyEl.appendChild(tr);
+      return;
+    }
+
+    list
+      .slice()
+      .sort((a, b) => (a.data || "").localeCompare(b.data || ""))
+      .forEach((s) => {
+        const tr = document.createElement("tr");
+        const giorni = diffDays(s.data);
+        if (giorni <= 45) {
+          tr.classList.add("scadenza-critical");
+        }
+
+        const tdData = document.createElement("td");
+        const tdProd = document.createElement("td");
+        const tdQt = document.createElement("td");
+        const tdGg = document.createElement("td");
+
+        tdData.textContent = s.data || "";
+        tdProd.textContent = s.prodotto || "";
+        tdQt.textContent = s.quantita || "";
+
+        if (giorni <= 45) {
+          const pill = document.createElement("span");
+          pill.className = "scadenza-pill-warning";
+          pill.textContent = `${giorni} gg`;
+          tdGg.appendChild(pill);
+        } else {
+          tdGg.textContent = `${giorni} gg`;
+        }
+
+        tr.appendChild(tdData);
+        tr.appendChild(tdProd);
+        tr.appendChild(tdQt);
+        tr.appendChild(tdGg);
+        scadenzeBodyEl.appendChild(tr);
+      });
+  }
+
+  if (scadenzeFormEl) {
+    scadenzeFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(scadenzeFormEl);
+      const prodotto = (fd.get("prodotto") || "").toString().trim();
+      const data = (fd.get("data") || "").toString().trim();
+      const quantita = (fd.get("quantita") || "").toString().trim();
+
+      if (!prodotto || !data) {
+        if (scadenzeFormFeedbackEl) {
+          scadenzeFormFeedbackEl.textContent =
+            "Inserisci prodotto e data di scadenza.";
+        }
+        return;
+      }
+
+      const list = getScadenze();
+      list.push({
+        id: Date.now(),
+        prodotto,
+        data,
+        quantita,
+      });
+      saveScadenze(list);
+      scadenzeFormEl.reset();
+      if (scadenzeFormFeedbackEl) {
+        scadenzeFormFeedbackEl.textContent = "Scadenza registrata.";
+      }
+      showToast("success", "Nuova scadenza aggiunta.");
+      renderScadenze();
+    });
+  }
+
+  renderScadenze();
+
+  /* ----------------------------------------------------------
+     SCORTE INTERNE
+     ---------------------------------------------------------- */
+
+  const scorteFormEl = qs("#scorteForm");
+  const scorteListEl = qs("#scorteList");
+  const scorteFormFeedbackEl = qs("#scorteFormFeedback");
+
+  function getScorte() {
+    return lsGet(LS_KEYS.SCORTE, []);
+  }
+  function saveScorte(list) {
+    lsSet(LS_KEYS.SCORTE, list);
+  }
+
+  function renderScorte() {
+    if (!scorteListEl) return;
+    const list = getScorte();
+    scorteListEl.innerHTML = "";
+    if (!list.length) {
+      const empty = document.createElement("div");
+      empty.className = "table-empty";
+      empty.textContent = "Nessuna scorta registrata.";
+      scorteListEl.appendChild(empty);
+      return;
+    }
+
+    list.forEach((s) => {
+      const item = document.createElement("div");
+      item.className = "scorta-item";
+
+      const main = document.createElement("div");
+      main.className = "scorta-main";
+
+      const nomeEl = document.createElement("div");
+      nomeEl.className = "scorta-nome";
+      nomeEl.textContent = s.nome || "";
+
+      const meta = document.createElement("div");
+      meta.className = "scorta-meta";
+      meta.textContent = s.note || "";
+
+      main.appendChild(nomeEl);
+      main.appendChild(meta);
+
+      const side = document.createElement("div");
+      side.className = "scorta-actions";
+
+      const levelPill = document.createElement("span");
+      levelPill.className =
+        "scorta-level-pill " +
+        (s.livello === "ok"
+          ? "scorta-ok"
+          : s.livello === "bassa"
+          ? "scorta-bassa"
+          : "scorta-critica");
+      levelPill.textContent =
+        s.livello === "ok"
+          ? "OK"
+          : s.livello === "bassa"
+          ? "Bassa"
+          : "Critica";
+
+      const btnSegnala = document.createElement("button");
+      btnSegnala.type = "button";
+      btnSegnala.className = "btn-secondary small";
+      btnSegnala.textContent = "Segnala bassa";
+      btnSegnala.addEventListener("click", () => {
+        if (s.livello !== "critica") {
+          s.livello = "bassa";
+          saveScorte(list);
+          renderScorte();
+          showToast("info", `Scorta "${s.nome}" segnalata come bassa.`);
+        }
+      });
+
+      side.appendChild(levelPill);
+      side.appendChild(btnSegnala);
+
+      item.appendChild(main);
+      item.appendChild(side);
+
+      scorteListEl.appendChild(item);
+    });
+  }
+
+  if (scorteFormEl) {
+    scorteFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(scorteFormEl);
+      const nome = (fd.get("nome") || "").toString().trim();
+      const livello = (fd.get("livello") || "ok").toString().trim();
+      const note = (fd.get("note") || "").toString().trim();
+
+      if (!nome) {
+        if (scorteFormFeedbackEl) {
+          scorteFormFeedbackEl.textContent = "Inserisci il nome della scorta.";
+        }
+        return;
+      }
+
+      const list = getScorte();
+      list.push({
+        id: Date.now(),
+        nome,
+        livello,
+        note,
+      });
+      saveScorte(list);
+      scorteFormEl.reset();
+      if (scorteFormFeedbackEl) {
+        scorteFormFeedbackEl.textContent = "Scorta salvata.";
+      }
+      showToast("success", "Nuova scorta aggiunta.");
+      renderScorte();
+    });
+  }
+
+  renderScorte();
+
+  /* ----------------------------------------------------------
+     CAMBIO CASSA
+     ---------------------------------------------------------- */
+
+  const cassaFormEl = qs("#cassaForm");
+  const cassaTableBody = qs("#cassaTableBody");
+  const cassaFormFeedbackEl = qs("#cassaFormFeedback");
+
+  function getCassa() {
+    return lsGet(LS_KEYS.CASSA, []);
+  }
+  function saveCassa(list) {
+    lsSet(LS_KEYS.CASSA, list);
+  }
+
+  function renderCassa() {
+    if (!cassaTableBody) return;
+    const list = getCassa();
+    cassaTableBody.innerHTML = "";
+
+    if (!list.length) {
+      const tr = document.createElement("tr");
+      const td = document.createElement("td");
+      td.colSpan = 5;
+      td.className = "table-empty";
+      td.textContent = "Nessun cambio cassa registrato.";
+      tr.appendChild(td);
+      cassaTableBody.appendChild(tr);
+      return;
+    }
+
+    list
+      .slice()
+      .sort((a, b) => (a.data || "").localeCompare(b.data || ""))
+      .forEach((c) => {
+        const tr = document.createElement("tr");
+        const tdData = document.createElement("td");
+        const tdOra = document.createElement("td");
+        const tdTurno = document.createElement("td");
+        const tdOperatore = document.createElement("td");
+        const tdNote = document.createElement("td");
+
+        tdData.textContent = c.data || "";
+        tdOra.textContent = c.ora || "";
+
+        const pill = document.createElement("span");
+        pill.className = "cassa-turno-pill";
+        pill.textContent = c.turno || "";
+        tdTurno.appendChild(pill);
+
+        tdOperatore.textContent = c.operatore || "";
+        tdNote.textContent = c.note || "";
+
+        tr.appendChild(tdData);
+        tr.appendChild(tdOra);
+        tr.appendChild(tdTurno);
+        tr.appendChild(tdOperatore);
+        tr.appendChild(tdNote);
+        cassaTableBody.appendChild(tr);
+      });
+  }
+
+  if (cassaFormEl) {
+    cassaFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(cassaFormEl);
+      const data = (fd.get("data") || "").toString().trim() || todayStr();
+      const ora = (fd.get("ora") || "").toString().trim();
+      const turno = (fd.get("turno") || "").toString().trim();
+      const operatore = (fd.get("operatore") || "").toString().trim();
+      const note = (fd.get("note") || "").toString().trim();
+
+      if (!operatore || !turno) {
+        if (cassaFormFeedbackEl) {
+          cassaFormFeedbackEl.textContent =
+            "Inserisci almeno operatore e turno.";
+        }
+        return;
+      }
+
+      const list = getCassa();
+      list.push({
+        id: Date.now(),
+        data,
+        ora,
+        turno,
+        operatore,
+        note,
+      });
+      saveCassa(list);
+      cassaFormEl.reset();
+      if (cassaFormFeedbackEl) {
+        cassaFormFeedbackEl.textContent = "Cambio cassa registrato.";
+      }
+      showToast("success", "Cambio cassa salvato.");
+      renderCassa();
+    });
+  }
+
+  renderCassa();
+
+  /* ----------------------------------------------------------
+     ARCHIVIO FILE
+     ---------------------------------------------------------- */
+
+  const archivioFormEl = qs("#archivioForm");
+  const archivioListEl = qs("#archivioList");
+  const archivioFormFeedbackEl = qs("#archivioFormFeedback");
+
+  function getArchivio() {
+    return lsGet(LS_KEYS.ARCHIVIO, []);
+  }
+  function saveArchivio(list) {
+    lsSet(LS_KEYS.ARCHIVIO, list);
+  }
+
+  function renderArchivio() {
+    if (!archivioListEl) return;
+    const list = getArchivio();
+    archivioListEl.innerHTML = "";
+
+    if (!list.length) {
+      const empty = document.createElement("div");
+      empty.className = "table-empty";
+      empty.textContent = "Nessun file in archivio.";
+      archivioListEl.appendChild(empty);
+      return;
+    }
+
+    list.forEach((f) => {
+      const item = document.createElement("div");
+      item.className = "archivio-item";
+
+      const icon = document.createElement("div");
+      icon.className = "archivio-icon";
+      icon.textContent = f.emoji || "📄";
+
+      const main = document.createElement("div");
+      main.className = "archivio-main";
+
+      const fn = document.createElement("div");
+      fn.className = "archivio-filename";
+      fn.textContent = f.nome || "";
+
+      const meta = document.createElement("div");
+      meta.className = "archivio-meta";
+      meta.textContent = `${f.categoria || ""} · ${f.data || ""}`;
+
+      main.appendChild(fn);
+      main.appendChild(meta);
+
+      if (f.note || f.link) {
+        const note = document.createElement("div");
+        note.className = "archivio-note";
+        if (f.link) {
+          const a = document.createElement("a");
+          a.href = f.link;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.textContent = f.note || "Apri";
+          note.appendChild(a);
+        } else {
+          note.textContent = f.note;
+        }
+        main.appendChild(note);
+      }
+
+      const cat = document.createElement("div");
+      cat.className = "archivio-category-pill";
+      cat.textContent = f.categoria || "Altro";
+
+      item.appendChild(icon);
+      item.appendChild(main);
+      item.appendChild(cat);
+
+      archivioListEl.appendChild(item);
+    });
+  }
+
+  if (archivioFormEl) {
+    archivioFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(archivioFormEl);
+      const nome = (fd.get("nome") || "").toString().trim();
+      const categoria = (fd.get("categoria") || "").toString().trim() || "Generale";
+      const note = (fd.get("note") || "").toString().trim();
+      const link = (fd.get("link") || "").toString().trim();
+      const emoji = (fd.get("emoji") || "").toString().trim() || "📄";
+
+      if (!nome) {
+        if (archivioFormFeedbackEl) {
+          archivioFormFeedbackEl.textContent = "Inserisci il nome del file.";
+        }
+        return;
+      }
+
+      const list = getArchivio();
+      list.push({
+        id: Date.now(),
+        nome,
+        categoria,
+        note,
+        link,
+        emoji,
+        data: todayStr(),
+      });
+      saveArchivio(list);
+      archivioFormEl.reset();
+      if (archivioFormFeedbackEl) {
+        archivioFormFeedbackEl.textContent = "File aggiunto all'archivio.";
+      }
+      showToast("success", "File salvato in archivio.");
+      renderArchivio();
+    });
+  }
+
+  renderArchivio();
+
+  /* ----------------------------------------------------------
+     COMUNICAZIONI (DEMO)
+     ---------------------------------------------------------- */
+
+  const comFormEl = qs("#comunicazioniForm");
+  const comListEl = qs("#comunicazioniList");
+  const comFilterBtns = qsa(".btn-com-filter");
+  const comCounterEl = qs("#comCounter");
+  const comFormFeedbackEl = qs("#comFormFeedback");
+
+  function getComunicazioni() {
+    return lsGet(LS_KEYS.COMUNICAZIONI, []);
+  }
+  function saveComunicazioni(list) {
+    lsSet(LS_KEYS.COMUNICAZIONI, list);
+  }
+
+  let currentComFilter = "tutte";
+
+  function renderComunicazioni() {
+    if (!comListEl) return;
+    let list = getComunicazioni();
+
+    if (currentComFilter !== "tutte") {
+      list = list.filter((c) => c.categoria === currentComFilter);
+    }
+
+    comListEl.innerHTML = "";
+
+    if (comCounterEl) {
+      comCounterEl.textContent = `${getComunicazioni().length} totali`;
+    }
+
+    if (!list.length) {
+      const empty = document.createElement("div");
+      empty.className = "table-empty";
+      empty.textContent = "Nessuna comunicazione.";
+      comListEl.appendChild(empty);
+      return;
+    }
+
+    list
+      .slice()
+      .sort((a, b) => (b.dataIso || "").localeCompare(a.dataIso || ""))
+      .forEach((c) => {
+        const card = document.createElement("div");
+        card.className = "com-card";
+
+        const pill = document.createElement("div");
+        pill.className = `com-pill ${c.categoria}`;
+        pill.textContent = (c.categoria || "info").toUpperCase();
+
+        const title = document.createElement("div");
+        title.className = "com-title";
+        title.textContent = c.titolo || "";
+
+        const meta = document.createElement("div");
+        meta.className = "com-meta";
+        meta.textContent = `${c.autore || ""} · ${c.dataVis || ""}`;
+
+        const text = document.createElement("div");
+        text.className = "com-text";
+        text.textContent = c.testo || "";
+
+        if (!c.letta) {
+          const badge = document.createElement("div");
+          badge.className = "com-badge-unread";
+          card.appendChild(badge);
+        }
+
+        card.appendChild(pill);
+        card.appendChild(title);
+        card.appendChild(meta);
+        card.appendChild(text);
+        comListEl.appendChild(card);
+      });
+  }
+
+  comFilterBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const cat = btn.getAttribute("data-cat") || "tutte";
+      currentComFilter = cat;
+      comFilterBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderComunicazioni();
+    });
   });
 
-  // Dots
-  if (clientPromoDotsContainer) {
-    clientPromoDotsContainer.innerHTML = "";
-    promos.forEach((_, idx) => {
-      const dot = document.createElement("button");
-      dot.type = "button";
-      dot.className = "promo-dot";
-      if (idx === clientPromoIndex) dot.classList.add("active");
-      dot.setAttribute("data-promo-index", String(idx));
-      clientPromoDotsContainer.appendChild(dot);
+  if (comFormEl) {
+    comFormEl.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const fd = new FormData(comFormEl);
+      const titolo = (fd.get("titolo") || "").toString().trim();
+      const testo = (fd.get("testo") || "").toString().trim();
+      const categoria = (fd.get("categoria") || "informativa").toString().trim();
+
+      if (!titolo || !testo) {
+        if (comFormFeedbackEl) {
+          comFormFeedbackEl.textContent = "Inserisci titolo e testo.";
+        }
+        return;
+      }
+
+      const cu = getCurrentUser();
+      const fullList = getComunicazioni();
+      const nowIso = new Date().toISOString();
+      const dataVis = new Date().toLocaleString("it-IT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      fullList.push({
+        id: Date.now(),
+        titolo,
+        testo,
+        categoria,
+        autore: cu ? `${cu.nome} ${cu.cognome}` : "Anonimo",
+        dataIso: nowIso,
+        dataVis,
+        letta: false,
+      });
+      saveComunicazioni(fullList);
+      comFormEl.reset();
+      if (comFormFeedbackEl) {
+        comFormFeedbackEl.textContent = "Comunicazione inviata.";
+      }
+      showToast("success", "Comunicazione salvata.");
+      renderComunicazioni();
     });
   }
 
-  updateClientePromoTransform();
-}
+  renderComunicazioni();
 
-/**
- * Aggiorna la posizione del carosello in base a clientPromoIndex.
- */
-function updateClientePromoTransform() {
-  if (!clientPromoTrack) return;
+  /* ----------------------------------------------------------
+     PROCEDURE (DEMO)
+     ---------------------------------------------------------- */
 
-  const total = clientPromoDataCache.length || 0;
-  if (!total) return;
+  const procedureListEl = qs("#procedureList");
+  const procedureDetailEl = qs("#procedureDetail");
+  const procedureSearchInput = qs("#procedureSearch");
+  const procedureFilterBtns = qsa(".btn-procedure-filter");
 
-  if (clientPromoIndex < 0) clientPromoIndex = total - 1;
-  if (clientPromoIndex >= total) clientPromoIndex = 0;
+  function getProcedure() {
+    return lsGet(LS_KEYS.PROCEDURE, []);
+  }
+  function saveProcedure(list) {
+    lsSet(LS_KEYS.PROCEDURE, list);
+  }
 
-  const offset = -clientPromoIndex * 100;
-  clientPromoTrack.style.transform = `translateX(${offset}%)`;
+  // Se non ci sono procedure, aggiungo qualche demo
+  (function seedProcedureIfEmpty() {
+    const existing = getProcedure();
+    if (existing.length) return;
+    const base = [
+      {
+        id: 1,
+        titolo: "Gestione temperature frigo",
+        reparto: "magazzino",
+        descrizione:
+          "Controllo e registrazione delle temperature di frigoriferi e freezer.",
+        testo:
+          "1. Verificare le temperature due volte al giorno.\n2. Registrare su apposito registro.\n3. In caso di anomalia avvisare il titolare.",
+      },
+      {
+        id: 2,
+        titolo: "Consegna farmaci a domicilio",
+        reparto: "servizi",
+        descrizione: "Procedura standard per consegna a domicilio.",
+        testo:
+          "1. Compilare modulo con dati paziente.\n2. Preparare confezioni in busta sigillata.\n3. Registrare consegna e firma ricevuta.",
+      },
+    ];
+    saveProcedure(base);
+  })();
 
-  if (clientPromoDotsContainer) {
-    const dots = clientPromoDotsContainer.querySelectorAll(".promo-dot");
-    dots.forEach((dot, idx) => {
-      if (idx === clientPromoIndex) dot.classList.add("active");
-      else dot.classList.remove("active");
+  let currentProcedureFilter = "tutti";
+  let currentProcedureSearch = "";
+
+  function renderProcedureList() {
+    if (!procedureListEl) return;
+    const all = getProcedure();
+    let list = all;
+
+    if (currentProcedureFilter !== "tutti") {
+      list = list.filter((p) => p.reparto === currentProcedureFilter);
+    }
+
+    if (currentProcedureSearch) {
+      const term = currentProcedureSearch.toLowerCase();
+      list = list.filter(
+        (p) =>
+          p.titolo.toLowerCase().includes(term) ||
+          p.descrizione.toLowerCase().includes(term)
+      );
+    }
+
+    procedureListEl.innerHTML = "";
+
+    if (!list.length) {
+      const empty = document.createElement("div");
+      empty.className = "table-empty";
+      empty.textContent = "Nessuna procedura trovata.";
+      procedureListEl.appendChild(empty);
+      if (procedureDetailEl) {
+        procedureDetailEl.innerHTML =
+          '<div class="procedure-empty">Seleziona una procedura sulla sinistra.</div>';
+      }
+      return;
+    }
+
+    list.forEach((p) => {
+      const item = document.createElement("div");
+      item.className = "procedure-item";
+
+      const main = document.createElement("div");
+      main.className = "procedure-item-main";
+
+      const title = document.createElement("div");
+      title.className = "procedure-item-title";
+      title.textContent = p.titolo;
+
+      const meta = document.createElement("div");
+      meta.className = "procedure-item-meta";
+      meta.textContent = p.descrizione || "";
+
+      main.appendChild(title);
+      main.appendChild(meta);
+
+      const tag = document.createElement("span");
+      tag.className = "procedure-tag";
+      tag.textContent = "Apri";
+
+      item.appendChild(main);
+      item.appendChild(tag);
+
+      item.addEventListener("click", () => {
+        renderProcedureDetail(p.id);
+      });
+
+      procedureListEl.appendChild(item);
+    });
+
+    // Mostro dettaglio della prima se non c'è selezione
+    if (list.length && procedureDetailEl) {
+      renderProcedureDetail(list[0].id);
+    }
+  }
+
+  function renderProcedureDetail(id) {
+    if (!procedureDetailEl) return;
+    const all = getProcedure();
+    const p = all.find((x) => x.id === id);
+    if (!p) {
+      procedureDetailEl.innerHTML =
+        '<div class="procedure-empty">Seleziona una procedura sulla sinistra.</div>';
+      return;
+    }
+
+    const html = `
+      <h3>${p.titolo}</h3>
+      <p class="text-soft mb-4">${p.descrizione || ""}</p>
+      <p>${(p.testo || "").replace(/\n/g, "<br>")}</p>
+    `;
+    procedureDetailEl.innerHTML = html;
+  }
+
+  procedureFilterBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const rep = btn.getAttribute("data-reparto") || "tutti";
+      currentProcedureFilter = rep;
+      procedureFilterBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderProcedureList();
+    });
+  });
+
+  if (procedureSearchInput) {
+    procedureSearchInput.addEventListener("input", () => {
+      currentProcedureSearch = procedureSearchInput.value.trim();
+      renderProcedureList();
     });
   }
-}
 
-/**
- * Sposta il carosello avanti/indietro di 1 slide.
- * @param {number} delta +1 avanti, -1 indietro
- */
-function moveClientePromo(delta) {
-  const total = clientPromoDataCache.length || 0;
-  if (!total) return;
-  clientPromoIndex += delta;
-  updateClientePromoTransform();
-}
+  renderProcedureList();
 
-/* =====================================================
-   CLIENTE – FARMACIA DI TURNO / APPOGGIO
-   ===================================================== */
+  /* ----------------------------------------------------------
+     OVERLAY GENERICO (SE TI SERVIRÀ IN FUTURO)
+     ---------------------------------------------------------- */
 
-/**
- * Renderizza le informazioni su Farmacia di turno / appoggio
- * per il Cliente, usando le impostazioni del Titolare.
- */
-function renderClienteTurno() {
-  // Se esiste una funzione per recuperare le impostazioni turno, la uso
-  const turnoSettings =
-    typeof getTurnoSettings === "function" ? getTurnoSettings() : null;
+  const overlayEl = qs("#genericOverlay");
+  const overlayCloseBtns = qsa(".overlay-close-btn");
 
-  if (!turnoSettings) return;
-
-  if (clientTurnoPrimarioNome) {
-    clientTurnoPrimarioNome.textContent =
-      turnoSettings.turnoNome || "Farmacia di turno non impostata";
-  }
-  if (clientTurnoPrimarioIndirizzo) {
-    clientTurnoPrimarioIndirizzo.textContent =
-      turnoSettings.turnoIndirizzo || "";
-  }
-  if (clientTurnoPrimarioTelefono) {
-    clientTurnoPrimarioTelefono.textContent =
-      turnoSettings.turnoTelefono || "";
+  function openOverlay() {
+    if (!overlayEl) return;
+    overlayEl.classList.remove("hidden");
   }
 
-  if (clientTurnoAppoggioNome) {
-    clientTurnoAppoggioNome.textContent =
-      turnoSettings.appoggioNome || "Farmacia di appoggio non impostata";
-  }
-  if (clientTurnoAppoggioIndirizzo) {
-    clientTurnoAppoggioIndirizzo.textContent =
-      turnoSettings.appoggioIndirizzo || "";
-  }
-  if (clientTurnoAppoggioTelefono) {
-    clientTurnoAppoggioTelefono.textContent =
-      turnoSettings.appoggioTelefono || "";
-  }
-}
-
-/* =====================================================
-   CLIENTE – INIT SEZIONI
-   ===================================================== */
-
-function initClienteSections() {
-  // Eventi – elementi DOM
-  clientEventiList = document.getElementById("clientEventiList");
-  clientEventiEmpty = document.getElementById("clientEventiEmpty");
-
-  // Promozioni – elementi DOM
-  clientPromoTrack = document.getElementById("clientPromoTrack");
-  clientPromoEmpty = document.getElementById("clientPromoEmpty");
-  clientPromoPrev = document.getElementById("clientPromoPrev");
-  clientPromoNext = document.getElementById("clientPromoNext");
-  clientPromoDotsContainer = document.getElementById("clientPromoDots");
-
-  // Turno – elementi DOM
-  clientTurnoPrimarioNome = document.getElementById("clientTurnoNome");
-  clientTurnoPrimarioIndirizzo = document.getElementById("clientTurnoIndirizzo");
-  clientTurnoPrimarioTelefono = document.getElementById("clientTurnoTelefono");
-  clientTurnoAppoggioNome = document.getElementById("clientAppoggioNome");
-  clientTurnoAppoggioIndirizzo = document.getElementById("clientAppoggioIndirizzo");
-  clientTurnoAppoggioTelefono = document.getElementById("clientAppoggioTelefono");
-
-  // Render iniziale Eventi / Promozioni / Turni
-  renderClienteEventi();
-  renderClientePromozioni();
-  renderClienteTurno();
-
-  // Eventi click dots carosello promozioni
-  if (clientPromoDotsContainer) {
-    clientPromoDotsContainer.addEventListener("click", (evt) => {
-      const dot = evt.target.closest(".promo-dot");
-      if (!dot) return;
-      const idx = Number(dot.getAttribute("data-promo-index"));
-      if (Number.isNaN(idx)) return;
-      clientPromoIndex = idx;
-      updateClientePromoTransform();
-    });
+  function closeOverlay() {
+    if (!overlayEl) return;
+    overlayEl.classList.add("hidden");
   }
 
-  // Bottoni prev/next promos
-  if (clientPromoPrev) {
-    clientPromoPrev.addEventListener("click", () => {
-      moveClientePromo(-1);
-    });
-  }
-  if (clientPromoNext) {
-    clientPromoNext.addEventListener("click", () => {
-      moveClientePromo(1);
-    });
-  }
+  overlayCloseBtns.forEach((btn) => {
+    btn.addEventListener("click", closeOverlay);
+  });
 
-  // Auto-scroll leggero del carosello (opzionale)
-  // Lo faccio solo se ci sono almeno 2 promozioni.
-  const totalPromos = clientPromoDataCache.length;
-  if (totalPromos > 1) {
-    setInterval(() => {
-      // Se la dashboard cliente non è visibile potresti voler
-      // aggiungere un controllo, ma per ora lasciamo semplice.
-      moveClientePromo(1);
-    }, 8000); // ogni 8 secondi
-  }
-}
+  // Espongo alcune funzioni globalmente se vuoi usarle dall'HTML
+  window.FMPortal = {
+    showToast,
+    startLoading,
+    endLoading,
+    openOverlay,
+    closeOverlay,
+    goToDashboardForRole,
+  };
+});
