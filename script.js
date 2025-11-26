@@ -2,12 +2,13 @@
 // PORTALE FARMACIA MONTESANO – SCRIPT COMPLETO
 // ======================================================
 
-// ------- DATI DEMO ASSENZE -------
+// ------- DATI DEMO ASSENZE (con DAL / AL) -------
 const assenzeDemo = [
-  { date: "2025-11-26", names: ["Mario Rossi", "Giulia Bianchi"] },
-  { date: "2025-11-28", names: ["Cosimo Verdi"] },
-  { date: "2025-12-02", names: ["Annalisa Neri"] },
-  { date: "2025-12-05", names: ["Daniela Blu"] }
+  { id: 1, from: "2025-11-26", to: "2025-11-26", nome: "Mario Rossi" },
+  { id: 2, from: "2025-11-26", to: "2025-11-26", nome: "Giulia Bianchi" },
+  { id: 3, from: "2025-11-28", to: "2025-11-28", nome: "Cosimo Verdi" },
+  { id: 4, from: "2025-12-02", to: "2025-12-05", nome: "Annalisa Neri" },
+  { id: 5, from: "2025-12-05", to: "2025-12-07", nome: "Daniela Blu" }
 ];
 
 // ------- DATI DEMO FARMACIA DI TURNO OGGI -------
@@ -25,34 +26,22 @@ const notifichePerRuolo = {
   farmacia: [
     {
       id: 1,
-      text: "Nuova assenza approvata: Mario Rossi (20/12).",
-      read: false,
-      area: "assenze"
-    },
-    {
-      id: 2,
-      text: "Nuova assenza approvata: Giulia Bianchi (22/12).",
+      text: "Nuova assenza approvata: Mario Rossi (26/11).",
       read: false,
       area: "assenze"
     }
   ],
   titolare: [
     {
-      id: 3,
+      id: 2,
       text: "Nuova richiesta ferie: Cosimo Verdi (28/11).",
-      read: false,
-      area: "assenze"
-    },
-    {
-      id: 4,
-      text: "Nuova richiesta permesso: Daniela Blu (05/12).",
       read: false,
       area: "assenze"
     }
   ],
   dipendente: [
     {
-      id: 5,
+      id: 3,
       text: "La tua richiesta del 2/12 è stata approvata.",
       read: false,
       area: "assenze"
@@ -60,7 +49,7 @@ const notifichePerRuolo = {
   ]
 };
 
-let nextNotifId = 6;
+let nextNotifId = 4;
 
 // ------- STATO GENERALE -------
 let currentRole = "farmacia";
@@ -88,7 +77,7 @@ const LS_ARCHIVIO = "montesano_archivio";
 // ------- RIFERIMENTI DOM -------
 let authContainer, app, loginForm, loginRoleLabel, authTabs;
 let sidebar, hamburger, closeSidebar, logoutBtn, rolePill;
-let dashboardSection, arriviPage, archivioPage;
+let dashboardSection, archivioPage;
 
 let listaAssentiOggi, listaAssentiProssimi, calOggiLabel;
 let calMiniGrid, calMiniMonthLabel, calMiniInfo;
@@ -107,8 +96,9 @@ let scadenzeForm, scadenzeList;
 let consumabiliForm, consumabiliList;
 
 // Archivio DOM
-let btnApriArrivi, btnApriArchivio;
-let backFromArrivi, backFromArchivio;
+let btnCardArrivi, btnCardScadenze, btnCardConsumabili;
+let btnApriArchivio;
+let backFromArchivio;
 let archivioForm, archFileNameInput, archDestSelect;
 let archListDip, archListTit, archListTutti;
 
@@ -158,17 +148,16 @@ function formatDateLabel(dateObj) {
   return `${gSettimana} ${giorno} ${mese}`;
 }
 
-function formatMonthYearLabel(year, month) {
-  const mesiCompleti = [
-    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
-  ];
-  return `${mesiCompleti[month]} ${year}`;
+function formatDateIT(isoDate) {
+  if (!isoDate) return "";
+  const [y, m, d] = isoDate.split("-");
+  return `${d}/${m}/${y}`;
 }
 
 function getAssenzeByDate(isoDate) {
-  const item = assenzeDemo.find(a => a.date === isoDate);
-  return item ? item.names : [];
+  return assenzeDemo
+    .filter(a => isoDate >= a.from && isoDate <= a.to)
+    .map(a => a.nome);
 }
 
 function getOggiISO() {
@@ -179,10 +168,10 @@ function getOggiISO() {
   return `${y}-${m}-${d}`;
 }
 
-// Mostra / nasconde le sezioni principali
+// Mostra / nasconde le sezioni principali (solo index)
 function showSection(sectionEl) {
   if (!sectionEl) return;
-  [dashboardSection, arriviPage, archivioPage].forEach(sec => {
+  [dashboardSection, archivioPage].forEach(sec => {
     if (sec) sec.classList.add("hidden");
   });
   sectionEl.classList.remove("hidden");
@@ -200,30 +189,27 @@ function updateAssentiOggiEProssimi() {
 
   calOggiLabel.textContent = formatDateLabel(oggi);
 
-  // Assenti oggi
-  const assOggi = getAssenzeByDate(oggiISO);
+  // Assenti oggi (uso getAssenzeByDate)
+  const assOggiNomi = getAssenzeByDate(oggiISO);
   listaAssentiOggi.innerHTML = "";
-  if (assOggi.length === 0) {
+  if (assOggiNomi.length === 0) {
     const li = document.createElement("li");
     li.textContent = "Nessun assente oggi.";
     listaAssentiOggi.appendChild(li);
   } else {
-    assOggi.forEach(nome => {
+    assOggiNomi.forEach(nome => {
       const li = document.createElement("li");
       li.textContent = nome;
       listaAssentiOggi.appendChild(li);
     });
   }
 
-  // Assenti prossimamente (dopo oggi, primi 3)
+  // Assenti prossimamente – dal ... al ...
   const oggiTime = oggi.getTime();
   const prossimi = assenzeDemo
-    .map(a => ({
-      ...a,
-      time: new Date(a.date).getTime()
-    }))
-    .filter(a => a.time > oggiTime)
-    .sort((a, b) => a.time - b.time)
+    .map(a => ({ ...a, fromTime: new Date(a.from).getTime() }))
+    .filter(a => a.fromTime > oggiTime)
+    .sort((a, b) => a.fromTime - b.fromTime)
     .slice(0, 3);
 
   listaAssentiProssimi.innerHTML = "";
@@ -233,14 +219,13 @@ function updateAssentiOggiEProssimi() {
     listaAssentiProssimi.appendChild(li);
   } else {
     prossimi.forEach(a => {
-      const dt = new Date(a.date);
-      const label = formatDateLabel(dt);
       const li = document.createElement("li");
-      li.innerHTML = `<strong>${label}</strong> – ${a.names.join(", ")}`;
+      li.innerHTML = `<strong>${a.nome}</strong> – dal ${formatDateIT(a.from)} al ${formatDateIT(a.to)}`;
       listaAssentiProssimi.appendChild(li);
     });
   }
 }
+
 // ======================================================
 // MINI CALENDARIO
 // ======================================================
@@ -314,6 +299,14 @@ function buildMiniCalendar(year, month) {
   calMiniGrid.appendChild(currentRow);
 }
 
+function formatMonthYearLabel(year, month) {
+  const mesiCompleti = [
+    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+  ];
+  return `${mesiCompleti[month]} ${year}`;
+}
+
 function mostraAssenzeGiorno(dateISO, el) {
   if (!calMiniInfo) return;
 
@@ -346,7 +339,6 @@ function mostraAssenzeGiorno(dateISO, el) {
     calMiniInfo.appendChild(ul);
   }
 }
-
 // ======================================================
 // NOTIFICHE
 // ======================================================
@@ -482,6 +474,8 @@ function saveArrivi() {
 function renderArrivi() {
   if (!arriviList) return;
   arriviList.innerHTML = "";
+  if (arriviState.length === 0) return;
+
   arriviState.forEach(item => {
     const li = document.createElement("li");
     const data = new Date(item.when);
@@ -663,7 +657,6 @@ document.addEventListener("DOMContentLoaded", () => {
   rolePill = document.getElementById("currentRolePill");
 
   dashboardSection = document.getElementById("dashboard");
-  arriviPage = document.getElementById("arriviPage");
   archivioPage = document.getElementById("archivioPage");
 
   listaAssentiOggi = document.getElementById("listaAssentiOggi");
@@ -711,9 +704,10 @@ document.addEventListener("DOMContentLoaded", () => {
   consumabiliList = document.getElementById("consumabiliList");
 
   // Archivio
-  btnApriArrivi = document.getElementById("btnApriArrivi");
+  btnCardArrivi = document.getElementById("btnCardArrivi");
+  btnCardScadenze = document.getElementById("btnCardScadenze");
+  btnCardConsumabili = document.getElementById("btnCardConsumabili");
   btnApriArchivio = document.getElementById("btnApriArchivio");
-  backFromArrivi = document.getElementById("backFromArrivi");
   backFromArchivio = document.getElementById("backFromArchivio");
 
   archivioForm = document.getElementById("archivioForm");
@@ -722,6 +716,18 @@ document.addEventListener("DOMContentLoaded", () => {
   archListDip = document.getElementById("archListDip");
   archListTit = document.getElementById("archListTit");
   archListTutti = document.getElementById("archListTutti");
+
+  // --- CARICAMENTO DATI LOCALSTORAGE (valido anche per arrivi.html, ecc.) ---
+  loadArrivi();
+  loadScadenze();
+  loadConsumabili();
+  loadArchivio();
+
+  renderArrivi();
+  renderScadenze();
+  renderConsumabili();
+  renderArchivioLists();
+  renderTurnoToday();
 
   // --- ROLE TABS (login) ---
   authTabs.forEach(tab => {
@@ -753,28 +759,17 @@ document.addEventListener("DOMContentLoaded", () => {
       currentMonth = today.getMonth();
       currentYear = today.getFullYear();
 
-      // Carica dati locali
-      loadArrivi();
-      loadScadenze();
-      loadConsumabili();
-      loadArchivio();
-
       setRole(role);
-      renderTurnoToday();
       updateAssentiOggiEProssimi();
       buildMiniCalendar(currentYear, currentMonth);
       mostraAssenzeGiorno(getOggiISO());
 
-      renderArrivi();
-      renderScadenze();
-      renderConsumabili();
-      renderArchivioLists();
-
+      renderNotifiche();
       showSection(dashboardSection);
     });
   }
 
-  // --- SIDEBAR / NAV ---
+  // --- SIDEBAR / NAV (solo index) ---
   if (hamburger) {
     hamburger.addEventListener("click", () => {
       sidebar && sidebar.classList.add("open");
@@ -803,7 +798,6 @@ document.addEventListener("DOMContentLoaded", () => {
       item.addEventListener("click", () => {
         const target = item.dataset.nav;
         if (target === "dashboard") showSection(dashboardSection);
-        if (target === "arriviPage") showSection(arriviPage);
         if (target === "archivioPage") showSection(archivioPage);
         sidebar.classList.remove("open");
       });
@@ -822,32 +816,36 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- BOTTONI DASHBOARD -> PAGINE ---
-  if (btnApriArrivi && arriviPage) {
-    btnApriArrivi.addEventListener("click", () => {
-      showSection(arriviPage);
+  // --- BOTTONI CARD DASHBOARD -> PAGINE HTML ---
+  if (btnCardArrivi) {
+    btnCardArrivi.addEventListener("click", () => {
+      window.location.href = "arrivi.html";
+    });
+  }
+  if (btnCardScadenze) {
+    btnCardScadenze.addEventListener("click", () => {
+      window.location.href = "scadenze.html";
+    });
+  }
+  if (btnCardConsumabili) {
+    btnCardConsumabili.addEventListener("click", () => {
+      window.location.href = "consumabili.html";
     });
   }
 
+  // --- ARCHIVIO NAV ---
   if (btnApriArchivio && archivioPage) {
     btnApriArchivio.addEventListener("click", () => {
       showSection(archivioPage);
     });
   }
-
-  if (backFromArrivi) {
-    backFromArrivi.addEventListener("click", () => {
-      showSection(dashboardSection);
-    });
-  }
-
   if (backFromArchivio) {
     backFromArchivio.addEventListener("click", () => {
       showSection(dashboardSection);
     });
   }
 
-  // --- BOTTONI CARD ASSENZE (per ora solo alert demo) ---
+  // --- BOTTONI CARD ASSENZE (demo) ---
   if (btnFarmaciaAssenze) {
     btnFarmaciaAssenze.addEventListener("click", () => {
       alert("Demo: qui in futuro vedrai l’elenco completo di tutti gli assenti.");
@@ -879,26 +877,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- CALENDARIO NAV ---
   if (calPrevMonthBtn) {
     calPrevMonthBtn.addEventListener("click", () => {
-      currentMonth--;
+      currentMonth = (currentMonth ?? new Date().getMonth()) - 1;
       if (currentMonth < 0) {
         currentMonth = 11;
-        currentYear--;
+        currentYear = (currentYear ?? new Date().getFullYear()) - 1;
       }
       buildMiniCalendar(currentYear, currentMonth);
     });
   }
   if (calNextMonthBtn) {
     calNextMonthBtn.addEventListener("click", () => {
-      currentMonth++;
+      currentMonth = (currentMonth ?? new Date().getMonth()) + 1;
       if (currentMonth > 11) {
         currentMonth = 0;
-        currentYear++;
+        currentYear = (currentYear ?? new Date().getFullYear()) + 1;
       }
       buildMiniCalendar(currentYear, currentMonth);
     });
   }
 
-  // --- NOTIFICHE ---
+  // --- NOTIFICHE (badge assenze) ---
   if (badgeNotifiche) {
     badgeNotifiche.addEventListener("click", e => {
       e.stopPropagation();
@@ -931,16 +929,21 @@ document.addEventListener("DOMContentLoaded", () => {
         if (arriviFeedback) arriviFeedback.textContent = "Inserisci almeno il nome/descrizione.";
         return;
       }
+      const nowIso = new Date().toISOString();
       arriviState.push({
         id: Date.now(),
         nome,
         nota,
-        when: new Date().toISOString()
+        when: nowIso
       });
       saveArrivi();
       renderArrivi();
       arriviForm.reset();
       if (arriviFeedback) arriviFeedback.textContent = "Arrivo registrato (demo).";
+
+      const testo = `Nuovo arrivo: ${nome}${nota ? " (" + nota + ")" : ""}`;
+      // Notifica a FARMACIA + TITOLARE
+      addNotificaForRoles(["farmacia", "titolare"], testo, "arrivi");
     });
   }
 
@@ -996,6 +999,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (diffDays >= 0 && diffDays <= 45) {
         const dataStr = scadDate.toLocaleDateString("it-IT");
         const testo = `Scadenza vicina: ${nome} (${pezzi} pz) – ${dataStr}`;
+        // Notifica a FARMACIA + TITOLARE
         addNotificaForRoles(["farmacia", "titolare"], testo, "scadenze");
       }
 
@@ -1026,6 +1030,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderConsumabili();
 
       const testo = `Segnalato consumabile: ${nome}${nota ? " (" + nota + ")" : ""}`;
+      // Notifica SOLO al TITOLARE
       addNotificaForRoles(["titolare"], testo, "consumabili");
 
       consumabiliForm.reset();
@@ -1067,5 +1072,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Non facciamo altro all’avvio: tutto parte dopo il login
+  // Se siamo su pagine secondarie (arrivi.html, ecc.), non c’è login: lasciamo così.
 });
