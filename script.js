@@ -969,7 +969,152 @@ function markNotificationAsRead(cardKey, notifId) {
 
   updateBadgeForCard(cardKey);
 }
+// ======================================================
+// CALENDARIO ASSENZE – CARD DASHBOARD TITOLARE
+// ======================================================
+function renderCalendarioAssenzeDashboard() {
+  const today = new Date();
+  const todayStr = today.toISOString().slice(0, 10);
 
+  const giorni = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
+  const mesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio",
+    "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+
+  const todayDateEl = document.getElementById("calAssenzeTodayDate");
+  const todayListEl = document.getElementById("calAssenzeTodayList");
+  const nextListEl = document.getElementById("calAssenzeNextList");
+  const monthLabelEl = document.getElementById("calMiniMonthLabel");
+  const miniGridEl = document.getElementById("calMiniGrid");
+
+  if (!todayDateEl || !todayListEl || !nextListEl || !monthLabelEl || !miniGridEl) return;
+
+  // Etichetta data di oggi (es. Mer 26 Nov)
+  const dow = giorni[today.getDay()];
+  const dayNum = today.getDate();
+  const monthIdx = today.getMonth();
+  const monthShort = mesi[monthIdx].slice(0, 3);
+  todayDateEl.textContent = `${dow} ${dayNum} ${monthShort}`;
+
+  // ASSENTI OGGI
+  const assOggi = assenzeProgrammate.filter(a => a.data === todayStr);
+  todayListEl.innerHTML = "";
+  if (assOggi.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "Nessun assente oggi";
+    li.className = "cal-assenze-none";
+    todayListEl.appendChild(li);
+  } else {
+    assOggi.forEach(a => {
+      const li = document.createElement("li");
+      li.textContent = a.nome;
+      todayListEl.appendChild(li);
+    });
+  }
+
+  // ASSENTI PROSSIMAMENTE (prime 3 date diverse)
+  const future = assenzeProgrammate
+    .filter(a => a.data > todayStr)
+    .sort((a, b) => a.data.localeCompare(b.data));
+
+  const grouped = [];
+  future.forEach(a => {
+    let g = grouped.find(x => x.data === a.data);
+    if (!g) {
+      g = { data: a.data, nomi: [] };
+      grouped.push(g);
+    }
+    g.nomi.push(a.nome);
+  });
+
+  nextListEl.innerHTML = "";
+  if (grouped.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "Nessuna assenza futura";
+    li.className = "cal-assenze-none";
+    nextListEl.appendChild(li);
+  } else {
+    grouped.slice(0, 3).forEach(g => {
+      const d = new Date(g.data);
+      const lblDow = giorni[d.getDay()];
+      const lblDay = d.getDate();
+      const lblMonth = mesi[d.getMonth()].slice(0, 3);
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${lblDow} ${lblDay} ${lblMonth}</strong> · ${g.nomi.join(", ")}`;
+      nextListEl.appendChild(li);
+    });
+  }
+
+  // MINI CALENDARIO
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  monthLabelEl.textContent = `${mesi[month]} ${year}`;
+
+  miniGridEl.innerHTML = "";
+
+  // riga intestazione (L M M G V S D)
+  const headerRow = document.createElement("div");
+  headerRow.className = "cal-mini-row cal-mini-header-row";
+  const labelsShort = ["L", "M", "M", "G", "V", "S", "D"];
+  labelsShort.forEach(lbl => {
+    const span = document.createElement("span");
+    span.textContent = lbl;
+    headerRow.appendChild(span);
+  });
+  miniGridEl.appendChild(headerRow);
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+
+  // giorni con assenze in questo mese
+  const daysWithAbsence = new Set(
+    assenzeProgrammate
+      .filter(a => {
+        const d = new Date(a.data);
+        return d.getMonth() === month && d.getFullYear() === year;
+      })
+      .map(a => new Date(a.data).getDate())
+  );
+
+  let currentRow = document.createElement("div");
+  currentRow.className = "cal-mini-row";
+
+  // inizio della settimana (lunedì = 0)
+  let weekday = (firstDay.getDay() + 6) % 7;
+  for (let i = 0; i < weekday; i++) {
+    const empty = document.createElement("span");
+    empty.className = "empty";
+    currentRow.appendChild(empty);
+  }
+
+  for (let day = 1; day <= lastDay.getDate(); day++) {
+    if (weekday === 7) {
+      miniGridEl.appendChild(currentRow);
+      currentRow = document.createElement("div");
+      currentRow.className = "cal-mini-row";
+      weekday = 0;
+    }
+
+    const cell = document.createElement("span");
+    cell.className = "day";
+    const inner = document.createElement("span");
+    inner.textContent = String(day);
+    cell.appendChild(inner);
+
+    if (daysWithAbsence.has(day)) {
+      cell.classList.add("has-assenza");
+    }
+    if (day === today.getDate()) {
+      cell.classList.add("today");
+    }
+
+    currentRow.appendChild(cell);
+    weekday++;
+  }
+
+  if (currentRow.childNodes.length > 0) {
+    miniGridEl.appendChild(currentRow);
+  }
+}
 // ======================================================
 // DOM READY
 // ======================================================
