@@ -67,7 +67,10 @@
 
       <ul class="sidebar-list">
         <li data-nav="dashboard">Dashboard</li>
-        <li data-nav="arriviPage">Arrivi / Scadenze / Consumabili</li>
+        <!-- Link diretti alle pagine separate -->
+        <li><a href="arrivi.html">Arrivi</a></li>
+        <li><a href="scadenze.html">Scadenze</a></li>
+        <li><a href="consumabili.html">Consumabili</a></li>
         <li data-nav="archivioPage">Archivio file</li>
         <li id="logoutBtn" class="logout">Logout</li>
       </ul>
@@ -89,8 +92,11 @@
           <p class="header-subtitle">Portale interno</p>
           <span id="currentRolePill" class="role-pill">Farmacia (accesso generico)</span>
         </div>
+      </header>
 
-        <!-- BLOCCO FARMACIA DI TURNO SEMPRE VISIBILE -->
+      <div class="dashboard-content">
+
+        <!-- 1) BANNER LARGO FARMACIA DI TURNO OGGI -->
         <div class="dashboard-turno-today" id="turnoTodayBox">
           <div class="turno-today-icon">⏰</div>
           <div class="turno-today-text">
@@ -108,15 +114,14 @@
             </p>
           </div>
         </div>
-      </header>
 
-      <div class="dashboard-content">
-        <div class="cards-grid single-card-grid">
+        <!-- GRIGLIA CARDS -->
+        <div class="cards-grid dashboard-grid">
 
-          <!-- ============ CARD ASSENZE – UNICA PER TUTTI I RUOLI ============ -->
+          <!-- 2+3) CARD ASSENTI OGGI + ASSENTI PROSSIMAMENTE + CALENDARIO -->
           <article class="card card-assenze-hero">
 
-            <!-- Badge notifiche che pulsa -->
+            <!-- Badge notifiche assenze che pulsa -->
             <button class="cal-assenze-notif-badge hidden" id="assenzeNotifBadge">
               <span id="assenzeNotifCount">0</span>
             </button>
@@ -132,6 +137,7 @@
               </div>
             </div>
 
+            <!-- LATO SINISTRO: OGGI + PROSSIMI -->
             <div class="cal-assenze-left">
               <p class="cal-assenze-date" id="calOggiLabel">Mer 26 Nov</p>
 
@@ -142,7 +148,7 @@
 
               <h3 class="cal-assenze-subtitle ass-prox">Assenti prossimamente</h3>
               <ul class="cal-assenze-list" id="listaAssentiProssimi">
-                <!-- Riempito da JS -->
+                <!-- Riempito da JS: Nome – dal … al … -->
               </ul>
 
               <!-- Bottoni diversi per ruolo -->
@@ -170,6 +176,7 @@
               </div>
             </div>
 
+            <!-- LATO DESTRO: MINI CALENDARIO LARGO -->
             <div class="cal-assenze-right">
               <div class="cal-mini-header">
                 <button class="cal-mini-nav" id="calPrevMonth">‹</button>
@@ -190,39 +197,137 @@
               </div>
             </div>
           </article>
-                    <!-- FARMACIA DI TURNO (CARD DASHBOARD) -->
-          <article class="card card-turno">
-            <div class="card-badge js-card-badge" data-card-key="turni">
+                    <!-- 4) ARRIVI – CARD BLU -->
+          <article class="card card-arrivi">
+            <div class="card-badge js-card-badge" data-card-key="arrivi">
               <span class="badge-count"></span>
             </div>
-            <div class="card-badge-label" data-card-key="turni"></div>
+            <div class="card-badge-label" data-card-key="arrivi"></div>
 
             <div class="card-header">
-              <div class="card-icon">⏰</div>
+              <div class="card-icon">📦</div>
               <div class="card-title-group">
-                <h2>Farmacia di turno</h2>
-                <span class="chip chip-turno">Oggi</span>
+                <h2>Arrivi</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Segnala arrivi di corrieri, espositori e materiale.
+              </p>
+            </div>
+            <div class="card-footer">
+              <button class="btn-primary small" id="btnCardArrivi">
+                Vai alla sezione
+              </button>
+            </div>
+          </article>
+
+          <!-- 5) SCADENZE – CARD GIALLA -->
+          <article class="card card-scadenze">
+            <div class="card-badge js-card-badge" data-card-key="scadenze">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="scadenze"></div>
+
+            <div class="card-header">
+              <div class="card-icon">⌛</div>
+              <div class="card-title-group">
+                <h2>Scadenze</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Prodotti in scadenza: segnala nome, pezzi e data.
+              </p>
+            </div>
+            <div class="card-footer">
+              <button class="btn-primary small" id="btnCardScadenze">
+                Vai alla sezione
+              </button>
+            </div>
+          </article>
+
+          <!-- 6) CONSUMABILI – CARD ARANCIONE -->
+          <article class="card card-consumabili">
+            <div class="card-badge js-card-badge" data-card-key="consumabili">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="consumabili"></div>
+
+            <div class="card-header">
+              <div class="card-icon">☕</div>
+              <div class="card-title-group">
+                <h2>Consumabili</h2>
+              </div>
+            </div>
+            <div class="card-body">
+              <p class="small-text">
+                Caffè, zucchero, carta igienica, rotoli POS, toner...
+              </p>
+            </div>
+            <div class="card-footer">
+              <button class="btn-primary small" id="btnCardConsumabili">
+                Vai alla sezione
+              </button>
+            </div>
+          </article>
+
+          <!-- 7) CAMBIO CASSA (INVARIATA) -->
+          <article class="card card-cambiocassa">
+            <div class="card-badge js-card-badge" data-card-key="cambiocassa">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="cambiocassa"></div>
+
+            <div class="card-header">
+              <div class="card-icon">💶</div>
+              <div class="card-title-group">
+                <h2>Cambio cassa</h2>
               </div>
             </div>
 
             <div class="card-body">
               <p class="small-text">
-                <strong>Farmacia Montesano</strong><br />
-                Via Esempio 12, Matera – Tel: 0835 000000
+                Segnala velocemente se servono spiccioli o tagli specifici:
               </p>
-              <div class="divider"></div>
               <p class="small-text">
-                <strong>Farmacia di appoggio</strong><br />
-                Farmacia Centrale – Via Dante 8 – Tel: 0835 111111
+                0,50 € · 1 € · 2 € · 5 € · 10 € · 20 €
               </p>
             </div>
 
             <div class="card-footer">
-              <button class="btn-secondary">Vedi calendario turni (demo)</button>
+              <button class="btn-primary">Segnala necessità (demo)</button>
             </div>
           </article>
 
-          <!-- COMUNICAZIONI -->
+          <!-- 8) ARCHIVIO FILE -->
+          <article class="card card-archivio">
+            <div class="card-badge js-card-badge" data-card-key="archivio">
+              <span class="badge-count"></span>
+            </div>
+            <div class="card-badge-label" data-card-key="archivio"></div>
+
+            <div class="card-header">
+              <div class="card-icon">🗄️</div>
+              <div class="card-title-group">
+                <h2>Archivio file</h2>
+                <span class="chip chip-archivio">Condiviso</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <p class="small-text">
+                Gestisci file interni e scegli i destinatari:
+                Dipendenti, Titolare o Tutti.
+              </p>
+            </div>
+
+            <div class="card-footer">
+              <button class="btn-secondary" id="btnApriArchivio">Apri archivio</button>
+            </div>
+          </article>
+
+          <!-- 9) COMUNICAZIONI -->
           <article class="card card-comunicazioni">
             <div class="card-badge js-card-badge" data-card-key="comunicazioni">
               <span class="badge-count"></span>
@@ -256,7 +361,7 @@
             </div>
           </article>
 
-          <!-- PROCEDURE INTERNE -->
+          <!-- 10) PROCEDURE INTERNE -->
           <article class="card card-procedure">
             <div class="card-badge js-card-badge" data-card-key="procedure">
               <span class="badge-count"></span>
@@ -286,194 +391,8 @@
             </div>
           </article>
 
-          <!-- ARRIVI & SCORTE (solo pulsante ARRIVI) -->
-          <article class="card card-arrivi">
-            <div class="card-badge js-card-badge" data-card-key="arrivi">
-              <span class="badge-count"></span>
-            </div>
-            <div class="card-badge-label" data-card-key="arrivi"></div>
-
-            <div class="card-header">
-              <div class="card-icon">📦</div>
-              <div class="card-title-group">
-                <h2>Arrivi & scorte</h2>
-              </div>
-            </div>
-
-            <div class="card-body">
-              <p class="small-text">
-                Segnala rapidamente arrivi corrieri e materiale in farmacia.
-              </p>
-            </div>
-
-            <div class="card-footer">
-              <button class="btn-primary small" id="btnApriArrivi">Segnala arrivo</button>
-            </div>
-          </article>
-
-          <!-- CAMBIO CASSA (card dashboard, lasciata invariata) -->
-          <article class="card card-cambiocassa">
-            <div class="card-badge js-card-badge" data-card-key="cambiocassa">
-              <span class="badge-count"></span>
-            </div>
-            <div class="card-badge-label" data-card-key="cambiocassa"></div>
-
-            <div class="card-header">
-              <div class="card-icon">💶</div>
-              <div class="card-title-group">
-                <h2>Cambio cassa</h2>
-              </div>
-            </div>
-
-            <div class="card-body">
-              <p class="small-text">
-                Segnala velocemente se servono spiccioli o tagli specifici:
-              </p>
-              <p class="small-text">
-                0,50 € · 1 € · 2 € · 5 € · 10 € · 20 €
-              </p>
-            </div>
-
-            <div class="card-footer">
-              <button class="btn-primary">Segnala necessità (demo)</button>
-            </div>
-          </article>
-
-          <!-- ARCHIVIO FILE -->
-          <article class="card card-archivio">
-            <div class="card-badge js-card-badge" data-card-key="archivio">
-              <span class="badge-count"></span>
-            </div>
-            <div class="card-badge-label" data-card-key="archivio"></div>
-
-            <div class="card-header">
-              <div class="card-icon">🗄️</div>
-              <div class="card-title-group">
-                <h2>Archivio file</h2>
-                <span class="chip chip-archivio">Condiviso</span>
-              </div>
-            </div>
-
-            <div class="card-body">
-              <p class="small-text">
-                Gestisci file interni e scegli i destinatari:
-                Dipendenti, Titolare o Tutti.
-              </p>
-            </div>
-
-            <div class="card-footer">
-              <button class="btn-secondary" id="btnApriArchivio">Apri archivio</button>
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ PAGINA ARRIVI / SCADENZE / CONSUMABILI ============ -->
-    <section id="arriviPage" class="page hidden">
-      <header class="page-header">
-        <button id="backFromArrivi" class="back-button">← Dashboard</button>
-        <div class="page-title-block">
-          <h1>Arrivi, scadenze e consumabili</h1>
-          <p>Segnala arrivi, gestisci scadenze e consumabili.</p>
-        </div>
-      </header>
-
-      <div class="page-grid">
-        <!-- CARD ARRIVI (semplice elenco) -->
-        <article class="card">
-          <h2>Arrivi</h2>
-          <p class="small-text">
-            Segnala velocemente l’arrivo di corrieri, espositori, materiale.
-          </p>
-          <form id="arriviForm" class="simple-form">
-            <div class="form-row">
-              <label for="arrNome">Nome/descrizione arrivo</label>
-              <input id="arrNome" type="text" placeholder="Es. Espositore dermocosmesi" />
-            </div>
-            <div class="form-row">
-              <label for="arrNota">Nota (opzionale)</label>
-              <textarea id="arrNota" rows="2" placeholder="Note aggiuntive (facoltative)"></textarea>
-            </div>
-            <button type="submit" class="btn-primary small">Segnala arrivo</button>
-          </form>
-          <p class="small-text" id="arriviFeedback"></p>
-          <ul id="arriviList" class="small-text"></ul>
-        </article>
-
-        <!-- CARD CAMBIO CASSA (stessa logica, ripetuta nella pagina) -->
-        <article class="card">
-          <h2>Cambio cassa</h2>
-          <p class="small-text">
-            Indica quali tagli servono in cassa (richiesta al titolare).
-          </p>
-          <form id="cambioCassaForm" class="simple-form">
-            <div class="form-row">
-              <label for="ccTagli">Tagli richiesti</label>
-              <input id="ccTagli" type="text" placeholder="Es. 0,50 €, 1 €, 2 €..." />
-            </div>
-            <div class="form-row">
-              <label for="ccNota">Nota (opzionale)</label>
-              <textarea id="ccNota" rows="2" placeholder="Es. cassa 1, turno pomeriggio"></textarea>
-            </div>
-            <button type="submit" class="btn-primary small">Segnala necessità</button>
-          </form>
-          <p class="small-text" id="cambioCassaFeedback"></p>
-        </article>
-
-        <!-- CARD SCADENZE -->
-        <article class="card">
-          <h2>Scadenze</h2>
-          <p class="small-text">
-            Segnala prodotti in scadenza. Se mancano meno di 45 giorni viene creata
-            una notifica per Farmacia e Titolare.
-          </p>
-
-          <form id="scadenzeForm" class="simple-form">
-            <div class="form-row">
-              <label for="scadNome">Nome prodotto</label>
-              <input id="scadNome" type="text" placeholder="Es. Tachipirina 500 mg" />
-            </div>
-            <div class="form-row two-cols">
-              <div class="form-row">
-                <label for="scadPezzi">Numero pezzi</label>
-                <input id="scadPezzi" type="number" min="1" placeholder="Es. 12" />
-              </div>
-              <div class="form-row">
-                <label for="scadData">Data di scadenza</label>
-                <input id="scadData" type="date" />
-              </div>
-            </div>
-            <button type="submit" class="btn-primary small">Segnala scadenza</button>
-          </form>
-
-          <ul id="scadenzeList" class="small-text scadenze-list"></ul>
-        </article>
-
-        <!-- CARD CONSUMABILI -->
-        <article class="card">
-          <h2>Consumabili</h2>
-          <p class="small-text">
-            Segnala consumabili da reintegrare (caffè, zucchero, carta igienica,
-            rotoli POS, toner, ecc.). La notifica va al titolare.
-          </p>
-
-          <form id="consumabiliForm" class="simple-form">
-            <div class="form-row">
-              <label for="consNome">Nome consumabile</label>
-              <input id="consNome" type="text" placeholder="Es. Carta igienica" />
-            </div>
-            <div class="form-row">
-              <label for="consNota">Nota (opzionale)</label>
-              <textarea id="consNota" rows="2" placeholder="Es. bagno dipendenti, rotoli finiti"></textarea>
-            </div>
-            <button type="submit" class="btn-primary small">Segnala consumabile</button>
-          </form>
-
-          <ul id="consumabiliList" class="small-text scadenze-list"></ul>
-        </article>
-      </div>
+        </div> <!-- /cards-grid -->
+      </div> <!-- /dashboard-content -->
     </section>
 
     <!-- ============ PAGINA ARCHIVIO FILE ============ -->
