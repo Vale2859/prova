@@ -1542,4 +1542,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initNotificationBadges();
   loadFS();
   renderArchivio();
+  initMiniCalendarDashboard();
 });
