@@ -83,7 +83,7 @@
               <p id="assenzeOggiDataLabel" class="assenze-data-label">Mer 26 Nov</p>
               <h2 class="card-title">Assenti oggi</h2>
             </div>
-            <button class="card-notif-badge" data-card="assenti">
+            <button class="card-notif-badge" data-card="assenze">
               <span class="badge-label">NUOVI</span>
               <span class="badge-dot"></span>
               <span class="badge-count">0</span>
@@ -114,7 +114,7 @@
                 <span id="calMonthLabel">Novembre 2025</span>
                 <button id="calNextMonth" class="cal-nav">&gt;</button>
               </div>
-              <div class="cal-mini-weekdays">
+              <div id="calMiniWeekdays" class="cal-mini-weekdays">
                 <span>L</span><span>M</span><span>M</span><span>G</span><span>V</span><span>S</span><span>D</span>
               </div>
               <div id="calMiniGrid" class="cal-mini-grid">
@@ -194,7 +194,7 @@
               <div class="card-icon-circle">💶</div>
               <h2 class="card-title">Cambio cassa</h2>
             </div>
-            <button class="card-notif-badge" data-card="cambiocassa">
+            <button class="card-notif-badge" data-card="cambio">
               <span class="badge-dot"></span>
               <span class="badge-count">0</span>
             </button>
@@ -209,8 +209,7 @@
 
       </div>
     </section>
-
-    <!-- ============ PAGINE INTERNE ============ -->
+        <!-- ============ PAGINE INTERNE ============ -->
 
     <!-- PAGINA ASSENZE -->
     <section id="assenzePage" class="page hidden">
@@ -385,8 +384,7 @@
         </article>
       </div>
     </section>
-
-    <!-- PAGINA CAMBIO CASSA -->
+        <!-- PAGINA CAMBIO CASSA -->
     <section id="cambioPage" class="page hidden">
       <header class="page-header">
         <button class="back-button" data-back="dashboard">← Dashboard</button>
@@ -431,6 +429,7 @@
       <div class="notif-modal">
         <button id="notifClose" class="notif-close" aria-label="Chiudi">✕</button>
         <h2 id="notifTitle">Notifiche</h2>
+        <p id="notifIntro" class="notif-intro"></p>
         <div id="notifList" class="notif-list"></div>
         <div class="notif-footer">
           <button id="notifSegnaTutte" class="btn-secondary small">Segna tutte come lette</button>
