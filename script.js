@@ -1219,6 +1219,12 @@ document.addEventListener("DOMContentLoaded", () => {
   notifClose = document.getElementById("notifClose");
   notifCloseBottom = document.getElementById("notifCloseBottom");
   btnVaiTuttiAssenti = document.getElementById("btnVaiTuttiAssenti");
+  
+  if (btnVaiTuttiAssenti) {
+  btnVaiTuttiAssenti.addEventListener("click", () => {
+    showSection(assenzePage);
+  });
+}  
   // ====== LOGIN ======
   authTabs.forEach(tab => {
     tab.addEventListener("click", () => {
