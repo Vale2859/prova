@@ -260,6 +260,8 @@ let procedureSearchInput, procedureFilterButtons, procedureListContainer, proced
 let archivioGrid, archivioPath, archivioUpload, archivioBtnUpload, archivioUpBtn, archivioNewFolderBtn;
 let archivioContextMenu, menuNuova, menuRinomina, menuElimina, menuCopia, menuIncolla, menuDownload;
 let notifOverlay, notifTitle, notifIntro, notifList, notifClose, notifCloseBottom;
+let btnVaiTuttiAssenti;
+let calMiniGrid, calMiniMonthLabel;
 // ======================================================
 // FUNZIONI DI SUPPORTO GENERALI
 // ======================================================
