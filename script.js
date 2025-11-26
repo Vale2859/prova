@@ -209,6 +209,15 @@ const notificationConfig = {
     ]
   }
 };
+// ====== DATI DEMO: ASSENZE PER CALENDARIO TITOLARE ======
+const assenzeProgrammate = [
+  { data: "2025-11-26", nome: "Mario Rossi" },
+  { data: "2025-11-26", nome: "Giulia Bianchi" },
+  { data: "2025-11-28", nome: "Cosimo Verdi" },
+  { data: "2025-12-02", nome: "Annalisa Neri" },
+  { data: "2025-12-05", nome: "Daniela Blu" },
+  { data: "2025-12-10", nome: "Patrizia Rosa" }
+];
 
 // ====== STATO GENERALE ======
 let currentRole = "farmacia";
