@@ -1,2890 +1,822 @@
-/* ====== RESET ====== */
+/* ============================================================
+   PORTALE FARMACIA MONTESANO – STYLE.CSS
+   (PARTE 1/3)
+   ============================================================ */
+
+/* RESET DI BASE */
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
 }
 
+:root {
+  --bg-main: #051729;
+  --bg-gradient: radial-gradient(circle at top left, #0f9bdd 0, #051729 45%, #020815 100%);
+  --card-dark: rgba(4, 21, 40, 0.94);
+  --card-border: rgba(255, 255, 255, 0.05);
+
+  --green-primary: #3cf26c;
+  --green-dark: #15963e;
+  --blue-card: #0f7eff;
+  --yellow-card: #f7b733;
+  --orange-card: #ff7f3f;
+
+  --text-main: #ffffff;
+  --text-muted: #a8b5d4;
+  --shadow-strong: 0 25px 60px rgba(0, 0, 0, 0.7);
+  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.55);
+  --radius-card: 26px;
+  --radius-pill: 999px;
+
+  --notif-red: #ff395f;
+  --notif-pulse: #ff879e;
+  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+}
+
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top left, #0fd2ff 0, #00426b 35%, #001827 80%);
-  color: #ffffff;
+  font-family: var(--font-main);
+  background: var(--bg-gradient);
+  color: var(--text-main);
   min-height: 100vh;
 }
+
+/* UTILI */
 
 .hidden {
   display: none !important;
 }
 
-/* ====== BUTTONS ====== */
-button {
-  font-family: inherit;
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 16px 40px;
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: radial-gradient(circle at top left, #0b8cd2 0, #041223 50%, #020915 100%);
+  border-radius: 28px;
+  padding: 32px 26px 28px;
+  box-shadow: var(--shadow-strong);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.auth-logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.auth-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+}
+
+.auth-card h1 {
+  font-size: 1.4rem;
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.auth-intro {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin: 8px 0 18px;
+}
+
+.auth-tabs {
+  display: flex;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--radius-pill);
+  padding: 4px;
+  margin-bottom: 12px;
+}
+
+.auth-tab {
+  flex: 1;
   border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  border-radius: var(--radius-pill);
+  padding: 7px 0;
   cursor: pointer;
+}
+
+.auth-tab.active {
+  background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+  color: #001010;
+  font-weight: 600;
+}
+
+.auth-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 14px;
+}
+
+.auth-subtitle span {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.auth-form .form-row {
+  margin-bottom: 12px;
+}
+
+/* CAMPI & BOTTONI BASE */
+
+.form-row label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  color: var(--text-muted);
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(3, 11, 22, 0.9);
+  color: #ffffff;
+  padding: 8px 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  border-color: var(--green-primary);
+  box-shadow: 0 0 0 1px rgba(60, 242, 108, 0.4);
+}
+
+.form-row textarea {
+  resize: vertical;
+}
+
+.form-row.two-cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .btn-primary,
 .btn-secondary {
-  border-radius: 999px;
-  font-weight: 600;
-  padding: 10px 18px;
-  font-size: 14px;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  border-radius: var(--radius-pill);
+  border: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #00c853, #00e676);
-  color: #001016;
-  box-shadow: 0 10px 25px rgba(0, 200, 83, 0.45);
+  background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
+  color: #00210e;
+  font-weight: 600;
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.6);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 30px rgba(0, 200, 83, 0.6);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
 }
 
 .btn-secondary {
-  background: rgba(0, 0, 0, 0.72);
+  background: rgba(0, 0, 0, 0.55);
   color: #ffffff;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .btn-secondary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.8);
-}
-
-.btn-secondary.small,
-.btn-primary.small {
-  padding: 6px 14px;
-  font-size: 13px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
 }
 
 .btn-primary.wide {
   width: 100%;
 }
 
-/* ====== LOGIN ====== */
-.auth-container {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-}
-
-.auth-card {
-  width: 100%;
-  max-width: 420px;
-  background: linear-gradient(135deg, rgba(4, 32, 61, 0.97), rgba(1, 15, 28, 0.97));
-  border-radius: 28px;
-  padding: 26px 22px 26px;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.75),
-    0 0 1px rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(18px);
-  color: #ffffff;
-}
-
-.auth-logo-wrap {
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.auth-logo {
-  max-width: 210px;
-  width: 80%;
-  display: inline-block;
-  filter: drop-shadow(0 14px 35px rgba(0, 0, 0, 0.6));
-}
-
-.auth-card h1 {
-  font-size: 24px;
-  font-weight: 800;
-  margin-bottom: 6px;
-}
-
-.auth-intro {
-  font-size: 14px;
-  opacity: 0.9;
-  margin-bottom: 14px;
-}
-
-.auth-tabs {
-  display: flex;
-  gap: 8px;
-  background: rgba(0, 0, 0, 0.35);
-  padding: 4px;
-  border-radius: 999px;
-  margin-bottom: 10px;
-}
-
-.auth-tab {
-  flex: 1;
-  border-radius: 999px;
-  padding: 8px 0;
-  background: transparent;
-  color: #e0e6ff;
-  font-size: 14px;
-  font-weight: 600;
-  opacity: 0.7;
-}
-
-.auth-tab.active {
-  background: linear-gradient(135deg, #00c853, #00e676);
-  color: #001016;
-  opacity: 1;
-}
-
-.auth-subtitle {
-  font-size: 13px;
-  margin-bottom: 12px;
-}
-
-.auth-subtitle span {
-  font-weight: 700;
-}
-
-.auth-form .form-row {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 12px;
-}
-
-.auth-form label {
-  font-size: 13px;
-  margin-bottom: 4px;
-  opacity: 0.9;
-}
-
-.auth-form input {
-  border-radius: 999px;
-  border: none;
-  padding: 10px 14px;
-  background: rgba(0, 0, 0, 0.72);
-  color: #ffffff;
-  font-size: 14px;
-  outline: none;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-}
-
-.auth-form input:focus {
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 230, 118, 0.9),
-    0 0 0 1px rgba(0, 230, 118, 0.3);
-}
-
 .login-hint {
-  margin-top: 8px;
-  font-size: 11px;
-  opacity: 0.7;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 6px;
 }
 
-/* ====== APP LAYOUT ====== */
-.app {
-  min-height: 100vh;
-  position: relative;
-  padding-bottom: 32px;
-}
+/* ============================================================
+   HEADER APP & BANNER FARMACIA DI TURNO
+   ============================================================ */
 
-/* Sidebar */
-.sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
-  width: 260px;
-  background: rgba(1, 14, 26, 0.98);
-  color: #ffffff;
-  transform: translateX(-270px);
-  transition: transform 0.25s ease-out;
-  z-index: 40;
+.app-header {
   display: flex;
-  flex-direction: column;
-  padding: 16px 14px;
-  box-shadow: 12px 0 35px rgba(0, 0, 0, 0.85);
-}
-
-.sidebar.open {
-  transform: translateX(0);
-}
-
-.sidebar-header {
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
-}
-
-.sidebar-logo-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.sidebar-logo {
-  width: 40px;
-  height: auto;
-  border-radius: 10px;
-}
-
-.sidebar-title {
-  font-weight: 700;
-  font-size: 14px;
-}
-
-.icon-button {
-  background: transparent;
-  color: #ffffff;
-  font-size: 18px;
-  padding: 4px 8px;
-  border-radius: 999px;
-}
-
-.sidebar-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 14px;
-}
-
-.sidebar-list li {
-  padding: 10px 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  margin-bottom: 4px;
-  transition: background 0.15s ease, transform 0.1s ease;
-}
-
-.sidebar-list li:hover {
-  background: rgba(255, 255, 255, 0.07);
-  transform: translateX(2px);
-}
-
-.sidebar-list li.logout {
-  margin-top: 12px;
-  color: #ff8a80;
-}
-
-.sidebar-list li.divider-label {
-  text-transform: uppercase;
-  font-size: 11px;
-  opacity: 0.6;
-  margin-top: 8px;
-  margin-bottom: 2px;
-  cursor: default;
-}
-
-.hamburger {
-  position: fixed;
-  top: 14px;
-  left: 14px;
-  z-index: 30;
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.7);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.75);
-}
-
-/* ====== DASHBOARD ====== */
-
-.dashboard {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 70px 16px 32px;
-}
-
-.dashboard-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
+  gap: 18px;
   margin-bottom: 22px;
 }
 
-.dashboard-logo-block {
-  flex-shrink: 0;
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-.dash-logo {
-  width: 230px;
-  max-width: 60vw;
-  height: auto;
-  filter: drop-shadow(0 22px 60px rgba(0, 0, 0, 0.8));
+.header-logo-big {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
 }
 
-.dashboard-header-text h1 {
+.header-title {
+  font-size: 1.2rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   margin: 0;
-  font-size: 24px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
-.header-subtitle {
-  margin: 2px 0 6px;
-  font-size: 13px;
-  opacity: 0.9;
-  letter-spacing: 0.12em;
+.header-subtitle-main {
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
+  margin: 2px 0 6px;
+  color: var(--text-muted);
 }
 
 .role-pill {
   display: inline-block;
-  padding: 6px 14px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.7);
-  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-/* Contenuto centrale con margini anche su mobile */
-.dashboard-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 10px 32px;
-}
-
-/* Cards grid */
-.cards-grid {
-  display: grid;
-  gap: 22px;
-  grid-template-columns: repeat(3, minmax(260px, 1fr));
-}
-
-/* Card base */
 .card {
+  background: var(--card-dark);
+  border-radius: var(--radius-card);
+  padding: 16px 16px 18px;
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-soft);
   position: relative;
-  background: linear-gradient(145deg, rgba(8, 53, 85, 0.97), rgba(4, 24, 42, 0.98));
-  border-radius: 26px;
-  padding: 18px 18px 16px;
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(18px);
+  overflow: hidden;
 }
 
-/* Colori specifici */
-.card-assenze {
-  background: linear-gradient(145deg, #00c853, #009c3b);
-}
-.card-turno {
-  background: linear-gradient(145deg, #2196f3, #1769aa);
-}
-.card-comunicazioni {
-  background: linear-gradient(145deg, #ff4081, #d81b60);
-}
-.card-procedure {
-  background: linear-gradient(145deg, #26a69a, #00897b);
-}
-.card-logistica {
-  background: linear-gradient(145deg, #fdd835, #f9a825);
-}
-.card-magazziniera {
-  background: linear-gradient(145deg, #1e88e5, #1565c0);
-}
-.card-archivio {
-  background: linear-gradient(145deg, #7c4dff, #651fff);
+/* Banner “Farmacia di turno oggi” */
+.card-mini-turno {
+  min-width: 260px;
+  flex: 1;
+  background: linear-gradient(135deg, #30d47a, #0ba561);
+  color: #03140b;
 }
 
-/* Badge notifica */
-.card-badge {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: radial-gradient(circle at 30% 30%, #ffebee 0, #ff1744 30%, #b71c1c 100%);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.09);
-  color: #fff;
-}
-
-.card-badge-label {
-  position: absolute;
-  top: 14px;
-  right: 52px;
-  font-size: 11px;
-  font-weight: 600;
+.turno-title {
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: .06em;
-  opacity: 0.9;
-  display: none;
+  letter-spacing: 0.12em;
+  margin: 0 0 4px;
 }
 
-/* ANIMAZIONE SOLO SE CI SONO NON LETTI */
-.card-badge.has-unread {
-  display: flex;
-  animation: badgePulse 2.2s infinite ease-out;
+.turno-info p {
+  margin: 2px 0;
+  font-size: 0.85rem;
 }
 
-.card-badge.has-unread::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.45);
-  animation: badgeHalo 2.2s infinite ease-out;
-  z-index: -1;
-}
+/* ============================================================
+   DASHBOARD & CARDS PRINCIPALI
+   ============================================================ */
 
-/* Card struttura */
-.card-header {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.card-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 18px;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-}
-
-.card-title-group h2 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.chip {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 11px;
+.dashboard {
   margin-top: 4px;
 }
 
-.chip-today {
-  background: rgba(0, 0, 0, 0.36);
+.cards-grid-main {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) repeat(3, minmax(0, 1.4fr));
+  gap: 18px;
 }
 
-.chip-turno {
-  background: rgba(0, 0, 0, 0.38);
+/* Card base */
+.card-title {
+  margin: 0;
+  font-size: 1rem;
 }
 
-.chip-archivio {
-  background: rgba(0, 0, 0, 0.4);
+.card-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 8px 0 16px;
 }
 
-.card-body {
-  font-size: 14px;
-  margin-bottom: 12px;
+.card-top-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
-.card-body-list .list-item {
-  background: rgba(0, 0, 0, 0.16);
-  padding: 7px 10px;
-  border-radius: 12px;
-  font-size: 13px;
-  margin-bottom: 5px;
+.card-top-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-icon-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+/* Colori cards */
+.card-assenti {
+  grid-row: 1 / span 2;
+  background: radial-gradient(circle at top left, #152b4f 0, #071221 55%, #030910 100%);
+}
+
+.card-arrivi {
+  background: radial-gradient(circle at top left, #1aa2ff 0, #0b4f96 45%, #05244e 100%);
+}
+
+.card-scadenze {
+  background: radial-gradient(circle at top left, #ffcf4f 0, #f8a51e 40%, #b96a06 100%);
+}
+
+.card-consumabili {
+  background: radial-gradient(circle at top left, #ff964f 0, #f76b1c 40%, #c04403 100%);
+}
+
+.card-cambio {
+  background: radial-gradient(circle at top left, #18d18b 0, #07945a 40%, #045334 100%);
+}
+/* ============================================================
+   CARD NOTIFICHE (PALLINO PULSANTE)
+   ============================================================ */
+
+.card-notif-badge {
+  border: none;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 6px;
+  cursor: pointer;
+  position: relative;
+  font-size: 0.7rem;
+  color: #ffffff;
+}
+
+.card-notif-badge .badge-label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 600;
+  font-size: 0.65rem;
+}
+
+.card-notif-badge .badge-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--notif-red);
+  box-shadow: 0 0 0 0 var(--notif-red);
+  animation: notifPulse 1.4s infinite;
+}
+
+.card-notif-badge .badge-count {
+  min-width: 14px;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* animazione */
+@keyframes notifPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 57, 95, 0.9);
+  }
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 8px rgba(255, 57, 95, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 57, 95, 0);
+  }
+}
+
+/* ============================================================
+   CARD ASSENTI OGGI + CALENDARIO
+   ============================================================ */
+
+.assenze-data-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 2px;
+}
+
+.assenti-content {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.assenti-left {
   display: flex;
   flex-direction: column;
 }
 
-.list-title {
-  font-weight: 600;
+.assenze-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 10px;
+  font-size: 0.85rem;
 }
 
-.list-meta {
-  font-size: 11px;
-  opacity: 0.85;
+.assenze-list li + li {
+  margin-top: 3px;
 }
 
-.caption {
-  font-size: 13px;
-  opacity: 0.95;
-  margin-top: 0;
+.assenti-subtitle {
+  margin: 8px 0 4px;
+  font-size: 0.9rem;
 }
 
-.small-text {
-  font-size: 13px;
+.assenti-btn {
+  margin-top: auto;
+  align-self: flex-start;
 }
 
-.small-text.muted {
-  opacity: 0.7;
+.cal-mini-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 6px;
 }
 
-.card-footer {
-  margin-top: 10px;
+.cal-nav {
+  border-radius: 999px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Divider */
-.divider {
-  height: 1px;
-  background: rgba(255, 255, 255, 0.25);
-  margin: 10px 0;
+.cal-mini-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
 }
 
-/* ====== PAGINE INTERNE GENERICHE ====== */
+.cal-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  font-size: 0.75rem;
+}
+
+.cal-day {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #cfd6e8;
+}
+
+.cal-day--empty {
+  opacity: 0;
+}
+
+.cal-day--today {
+  border: 1px solid var(--green-primary);
+}
+
+.cal-day--has-assenze {
+  background: rgba(255, 255, 255, 0.06);
+  position: relative;
+}
+
+.cal-day--has-assenze::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green-primary);
+}
+
+.cal-legend {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.cal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-primary);
+}
+
+/* ============================================================
+   PAGINE INTERNE – STRUTTURA GENERALE
+   ============================================================ */
+
 .page {
-  max-width: 1300px;
-  margin: 0 auto;
-  padding: 70px 16px 32px;
+  margin-top: 10px;
 }
 
 .page-header {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .page-title-block h1 {
-  margin: 0 0 4px;
-  font-size: 24px;
+  margin: 0;
+  font-size: 1.1rem;
 }
 
 .page-title-block p {
-  margin: 0;
-  font-size: 14px;
-  opacity: 0.9;
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
 }
 
 .back-button {
-  border-radius: 999px;
-  padding: 8px 14px;
-  background: rgba(0, 0, 0, 0.72);
+  border-radius: var(--radius-pill);
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
   color: #ffffff;
-  font-size: 13px;
+  padding: 7px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
 }
 
-.summary-badges {
-  margin-left: auto;
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.badge {
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.badge-pending {
-  background: rgba(255, 214, 0, 0.16);
-}
-.badge-approved {
-  background: rgba(0, 230, 118, 0.18);
-}
-.badge-rejected {
-  background: rgba(255, 82, 82, 0.22);
-}
-.badge-today {
-  background: rgba(129, 212, 250, 0.3);
-}
-.badge-week {
-  background: rgba(200, 230, 201, 0.3);
-}
-.badge-month {
-  background: rgba(244, 143, 177, 0.3);
-}
-
-/* ====== PAGINA ASSENZE ====== */
-
-.assenze-top-cards {
+.page-content-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(220px, 1fr));
-  gap: 18px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.mini-card {
-  background: rgba(1, 22, 39, 0.92);
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85);
-}
+/* Moduli semplici */
 
-.mini-card h3 {
-  margin: 0 0 6px;
-  font-size: 15px;
-}
-
-.big-number {
-  margin: 0 0 4px;
-  font-size: 22px;
-  font-weight: 700;
-}
-
-/* Layout centrale assenze */
-.assenze-layout {
-  display: grid;
-  grid-template-columns: 2.1fr 1.1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-/* Calendario */
-.calendar-card .calendar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.calendar-controls {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.calendar-controls select {
-  border-radius: 999px;
-  padding: 6px 10px;
-  border: none;
-  font-size: 13px;
-}
-
-.calendar-grid {
-  background: rgba(0, 0, 0, 0.28);
-  border-radius: 18px;
-  padding: 10px;
-  font-size: 12px;
-}
-
-.calendar-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.calendar-header-row {
-  opacity: 0.85;
-}
-
-.calendar-row span {
-  text-align: center;
-  padding: 4px 0;
-}
-
-.day {
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  position: relative;
-}
-
-.day.today {
-  background: rgba(0, 230, 118, 0.26);
-}
-
-.day-holiday {
-  background: rgba(255, 193, 7, 0.26);
-}
-
-.empty {
-  opacity: 0;
-}
-
-.dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-}
-
-.dot-ferie {
-  background: #ffca28;
-}
-.dot-oggi {
-  background: #00e676;
-}
-
-.calendar-legend {
-  display: flex;
-  gap: 12px;
-  font-size: 11px;
-  margin-top: 8px;
-}
-
-.legend-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  display: inline-block;
-  margin-right: 4px;
-}
-
-.legend-dot.ferie {
-  background: #ffca28;
-}
-.legend-dot.permesso {
-  background: #80deea;
-}
-.legend-dot.oggi {
-  background: #00e676;
-}
-
-/* Oggi card */
-.oggi-card h2 {
-  margin-top: 0;
-}
-
-.assenze-list {
-  list-style: none;
-  margin: 10px 0;
-  padding: 0;
-}
-
-.assenze-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.assenze-list.small li {
-  font-size: 13px;
-}
-
-.tag {
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-size: 11px;
-}
-
-.tag-ferie {
-  background: rgba(255, 214, 0, 0.22);
-}
-.tag-permesso {
-  background: rgba(129, 212, 250, 0.24);
-}
-.tag-malattia {
-  background: rgba(244, 143, 177, 0.26);
-}
-
-/* Tabella richieste assenza */
-.requests-card {
-  margin-bottom: 20px;
-}
-
-.requests-table {
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: 18px;
-  overflow: hidden;
-  font-size: 13px;
-}
-
-.requests-row {
-  display: grid;
-  grid-template-columns: 1.2fr 1.2fr 1.1fr 1.1fr 1.6fr;
-  padding: 8px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.requests-row.header {
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.status {
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 11px;
-}
-
-.status-approved {
-  background: rgba(0, 230, 118, 0.3);
-}
-.status-pending {
-  background: rgba(255, 241, 118, 0.3);
-}
-.status-rejected {
-  background: rgba(244, 67, 54, 0.4);
-}
-
-/* Form assenze */
-.form-card .assenze-form {
-  margin-top: 10px;
-  font-size: 13px;
-}
-
-.form-row {
-  display: flex;
-  flex-direction: column;
+.simple-form .form-row {
   margin-bottom: 10px;
-}
-
-.form-row.two-cols {
-  flex-direction: row;
-  gap: 10px;
-}
-
-.form-row label {
-  margin-bottom: 3px;
-  font-size: 13px;
-}
-
-.form-row input,
-.form-row select,
-.form-row textarea {
-  border-radius: 12px;
-  border: none;
-  padding: 8px 10px;
-  font-size: 13px;
-  font-family: inherit;
-}
-
-.checkbox-inline {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.form-actions {
-  margin-top: 8px;
 }
 
 .form-feedback {
   margin-top: 8px;
-  font-size: 13px;
+  font-size: 0.8rem;
+  color: var(--green-primary);
 }
 
-/* ====== PAGINA TURNI ====== */
+/* Tabelle / elenchi */
 
-.turni-tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+.table-like {
+  width: 100%;
+  font-size: 0.85rem;
 }
 
-.turni-tab {
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.55);
-  color: #e0f7fa;
-  font-size: 13px;
+.table-like.small {
+  font-size: 0.8rem;
 }
 
-.turni-tab.active {
-  background: linear-gradient(135deg, #29b6f6, #00b0ff);
-  color: #00101a;
-}
-
-.turni-layout {
+.table-like .row {
   display: grid;
-  grid-template-columns: 1.1fr 2fr;
-  gap: 20px;
-}
-
-.turni-oggi-card h2 {
-  margin-top: 0;
-}
-
-.turno-main h3,
-.turno-appoggio h3 {
-  margin: 2px 0 2px;
-}
-
-.turno-main {
-  margin-bottom: 10px;
-}
-
-.turni-actions {
-  display: flex;
-  flex-wrap: wrap;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  margin-top: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-/* Tabella turni */
-.turni-table-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.turni-filters {
-  display: flex;
-  gap: 8px;
-}
-
-.turni-filters select {
-  border-radius: 999px;
-  padding: 6px 10px;
-  border: none;
-  font-size: 12px;
-}
-
-.turni-table {
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: 18px;
-  overflow: hidden;
-  font-size: 13px;
-}
-
-.turni-row {
-  display: grid;
-  grid-template-columns: 1.1fr 1fr 1.7fr 1.7fr 1.3fr 1.4fr;
-  padding: 8px 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.turni-row.header {
-  background: rgba(255, 255, 255, 0.08);
-  font-weight: 600;
-}
-
-.turni-row:nth-child(odd):not(.header) {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.turni-row .turno-type-pill {
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 11px;
-}
-
-.turno-type-pill.normale {
-  background: rgba(0, 230, 118, 0.25);
-}
-.turno-type-pill.festivo {
-  background: rgba(255, 213, 79, 0.3);
-}
-.turno-type-pill.notturno {
-  background: rgba(171, 71, 188, 0.35);
-}
-
-/* ====== PAGINA COMUNICAZIONI ====== */
-
-.comunicazioni-layout {
-  display: grid;
-  grid-template-columns: 2fr 1.4fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.comunicazioni-list-card h2 {
-  margin-top: 0;
-}
-
-.comunicazioni-list {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.com-card {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 18px;
-  padding: 10px 12px;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    "pill title"
-    "pill meta";
-  column-gap: 8px;
-  row-gap: 2px;
-}
-
-.com-pill {
-  grid-area: pill;
-  align-self: center;
-  border-radius: 999px;
-  padding: 4px 8px;
-  font-size: 11px;
+.table-like .row.header {
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.12em;
+  font-size: 0.7rem;
+  color: var(--text-muted);
 }
 
-.com-pill.urgente {
-  background: rgba(244, 67, 54, 0.7);
-}
-.com-pill.importante {
-  background: rgba(251, 192, 45, 0.85);
-  color: #102027;
-}
-.com-pill.informativa {
-  background: rgba(129, 212, 250, 0.85);
-  color: #102027;
+.table-like .row span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.com-title {
-  grid-area: title;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.com-meta {
-  grid-area: meta;
-  font-size: 11px;
-  opacity: 0.82;
-}
-
-.com-text {
-  grid-column: 1 / -1;
-  margin-top: 4px;
-  font-size: 12px;
-  opacity: 0.9;
-}
-
-/* Colonna destra comunicazioni */
-.comunicazioni-side-card h2 {
-  margin-top: 0;
-}
-
-.comunicazioni-storico-card {
-  margin-top: 4px;
-}
-
-/* ====== PAGINA PROCEDURE ====== */
-
-.procedure-filters {
+.table-like .row .actions {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 8px 0 10px;
+  gap: 4px;
 }
 
-.proc-filter-btn {
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  background: rgba(0, 0, 0, 0.55);
-  color: #e0f7fa;
-}
-
-.proc-filter-btn.active {
-  background: linear-gradient(135deg, #80cbc4, #26a69a);
-  color: #001012;
-}
-
-.procedure-list {
-  margin-top: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.proc-item {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 14px;
-  padding: 8px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.proc-item-main {
-  display: flex;
-  flex-direction: column;
-}
-
-.proc-item-title {
-  font-weight: 600;
-}
-
-.proc-item-meta {
-  font-size: 11px;
-  opacity: 0.8;
-}
-
-.proc-tag {
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 11px;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.procedure-detail {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: rgba(0, 0, 0, 0.35);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* ====== OVERLAY NOTIFICHE ====== */
+/* ============================================================
+   OVERLAY NOTIFICHE
+   ============================================================ */
 
 .notif-overlay {
   position: fixed;
   inset: 0;
-  z-index: 80;
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
 }
 
-.notif-overlay.active {
-  display: block;
+.notif-overlay.hidden {
+  display: none;
 }
 
 .notif-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(1, 5, 12, 0.7);
 }
 
 .notif-modal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(480px, 92vw);
-  max-height: 80vh;
-  transform: translate(-50%, -50%);
-  background: linear-gradient(135deg, rgba(8, 53, 85, 0.97), rgba(1, 15, 28, 0.97));
-  border-radius: 24px;
-  padding: 18px 18px 14px;
-  box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(255, 255, 255, 0.09);
-  color: #ffffff;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  background: radial-gradient(circle at top left, #17335f 0, #050e1c 60%, #02060c 100%);
+  border-radius: 22px;
+  padding: 18px 18px 16px;
+  width: min(420px, calc(100% - 32px));
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 1;
+}
+
+.notif-modal h2 {
+  margin: 0 0 8px;
 }
 
 .notif-close {
   position: absolute;
   top: 10px;
   right: 10px;
-  background: transparent;
-  font-size: 18px;
-  padding: 4px 6px;
   border-radius: 999px;
-}
-
-.notif-modal h2 {
-  margin: 0 0 4px;
-  padding-right: 26px;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
 }
 
 .notif-list {
-  margin-top: 10px;
-  padding-right: 4px;
+  max-height: 260px;
   overflow-y: auto;
-  flex: 1;
+  margin: 4px 0 10px;
 }
 
 .notif-item {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 18px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 8px;
+  padding: 8px 6px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.45);
+  margin-bottom: 6px;
 }
 
-.notif-text h3 {
-  margin: 0 0 4px;
-  font-size: 14px;
-}
-
-.notif-text p {
-  margin: 0;
-  font-size: 12px;
-  opacity: 0.9;
-}
-
-.notif-footer {
-  margin-top: 10px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* ====== ARCHIVIO FILE ====== */
-
-.archivio-card {
-  margin-top: 8px;
-}
-
-.archivio-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.archivio-path {
-  font-size: 13px;
-  opacity: 0.9;
-}
-
-.archivio-path span {
+.notif-item-title {
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
-.archivio-actions {
+.notif-item-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.notif-footer {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
 }
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
 
-/* Griglia file */
-.file-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 18px;
-  margin-top: 14px;
-  padding: 10px 4px 4px;
-  min-height: 180px;
-}
-
-.file-item {
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
-}
-
-.file-icon {
-  width: 72px;
-  height: 72px;
-  border-radius: 20px;
-  margin: 0 auto 4px;
-  background: linear-gradient(145deg, #0a375a, #062536);
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 18px 28px rgba(0, 0, 0, 0.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 34px;
-  color: #d1eeff;
-  transition: transform 0.16s ease, box-shadow 0.16s ease;
-}
-
-.file-icon.folder {
-  background: linear-gradient(145deg, #1da8ff, #0473c2);
-  color: #eafbff;
-}
-
-.file-icon.pdf {
-  background: linear-gradient(145deg, #ff5252, #d32f2f);
-}
-
-.file-icon.image {
-  background: linear-gradient(145deg, #00e676, #00c853);
-}
-
-.file-icon.word {
-  background: linear-gradient(145deg, #2979ff, #0d47a1);
-}
-
-.file-icon.txt {
-  background: linear-gradient(145deg, #cccccc, #777777);
-}
-
-.file-item:hover .file-icon {
-  transform: translateY(-3px);
-  box-shadow:
-    0 24px 38px rgba(0, 0, 0, 0.7),
-    0 0 0 2px rgba(255, 255, 255, 0.12);
-}
-
-.file-name {
-  font-size: 12px;
-  color: #e2f6ff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* selezione */
-.file-item.selected .file-icon {
-  outline: 3px solid rgba(0, 220, 255, 0.9);
-  outline-offset: 2px;
-  box-shadow: 0 0 25px rgba(0, 220, 255, 0.6);
-}
-
-/* MENU TASTO DESTRO */
-
-.context-menu {
-  position: fixed;
-  z-index: 9999;
-  background: rgba(6, 16, 28, 0.96);
-  backdrop-filter: blur(16px);
-  border-radius: 14px;
-  padding: 6px 0;
-  width: 190px;
-  box-shadow:
-    0 20px 45px rgba(0, 0, 0, 0.85),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
-}
-
-.context-menu.hidden {
-  display: none;
-}
-
-.context-menu-item {
-  width: 100%;
-  text-align: left;
-  padding: 8px 12px;
-  font-size: 13px;
-  background: transparent;
-}
-
-.context-menu-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.context-menu-item.danger {
-  color: #ff8a80;
-}
-
-/* Hint */
-.long-press-hint {
-  font-size: 11px;
-  opacity: 0.7;
-  margin-bottom: 4px;
-}
-
-/* ====== MEDIA QUERIES ====== */
-
-@media (max-width: 1100px) {
-  .cards-grid {
-    grid-template-columns: repeat(2, minmax(240px, 1fr));
+@media (max-width: 1024px) {
+  .cards-grid-main {
+    grid-template-columns: minmax(0, 1.8fr) repeat(2, minmax(0, 1.3fr));
+    grid-auto-rows: auto;
   }
-  .turni-layout {
-    grid-template-columns: 1fr;
+
+  .card-consumabili,
+  .card-cambio {
+    grid-column: span 1;
   }
-  .comunicazioni-layout {
+
+  .page-content-grid {
     grid-template-columns: 1fr;
   }
 }
 
-@media (max-width: 900px) {
-  .assenze-layout {
-    grid-template-columns: 1fr;
-  }
-  .assenze-top-cards {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .hamburger {
-    top: 10px;
-    left: 10px;
+@media (max-width: 800px) {
+  .app {
+    padding: 12px 10px 24px;
   }
 
-  .dashboard {
-    padding-top: 66px;
-  }
-
-  .dashboard-header {
+  .app-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .dashboard-content {
-    padding: 0 12px 32px;
+  .cards-grid-main {
+    grid-template-columns: 1fr;
   }
 
-  .cards-grid {
+  .card-assenti {
+    grid-row: auto;
+  }
+
+  .assenti-content {
     grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px 16px 20px;
+  }
+
+  .header-logo-big {
+    width: 64px;
+    height: 64px;
+  }
+
+  .header-title {
+    font-size: 1rem;
+  }
+
+  .role-pill {
+    font-size: 0.7rem;
   }
 
   .card {
-    padding: 16px 14px 14px;
+    padding: 14px 13px 15px;
   }
 
-  .page {
-    padding-top: 66px;
-  }
-
-  .turni-row {
-    grid-template-columns: 1.2fr 1.2fr 1.6fr 1.6fr;
-  }
-
-  .turni-row span:nth-child(5),
-  .turni-row span:nth-child(6) {
-    display: none;
-  }
-
-  .requests-row {
-    grid-template-columns: 1.1fr 1.1fr 1.1fr 1.1fr;
-  }
-
-  .requests-row span:nth-child(5) {
-    display: none;
-  }
-}
-
-/* Animazioni badge */
-@keyframes badgePulse {
-  0% {
-    transform: scale(1);
-    box-shadow:
-      0 0 0 0 rgba(255, 255, 255, 0.45),
-      0 8px 16px rgba(0, 0, 0, 0.35);
-  }
-  40% {
-    transform: scale(1.05);
-    box-shadow:
-      0 0 0 6px rgba(255, 255, 255, 0.0),
-      0 12px 26px rgba(0, 0, 0, 0.5);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow:
-      0 0 0 0 rgba(255, 255, 255, 0.0),
-      0 8px 16px rgba(0, 0, 0, 0.35);
-  }
-}
-
-@keyframes badgeHalo {
-  0% {
-    transform: scale(1);
-    opacity: 0.9;
-  }
-  40% {
-    transform: scale(1.12);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
-}
-/* NASCONDE LE VECCHIE CARD DELLA DASHBOARD */
-.cards-grid .card-assenze,
-.cards-grid .card-turno,
-.cards-grid .card-comunicazioni,
-.cards-grid .card-procedure,
-.cards-grid .card-logistica,
-.cards-grid .card-magazziniera,
-.cards-grid .card-archivio {
-  display: none !important;
-}
-/* ============================
-   CARD CALENDARIO ASSENZE
-   ============================ */
-
-.card-calendario-assenze {
-  display: flex !important;
-  flex-direction: row;
-  gap: 2rem;
-  padding: 1.75rem 2rem;
-  align-items: stretch;
-}
-
-.cal-assenze-left,
-.cal-assenze-right {
-  flex: 1;
-  min-width: 0;
-}
-
-.cal-assenze-left {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-/* Testi grandi per papà */
-.cal-assenze-date {
-  font-size: 1.1rem;
-  font-weight: 600;
-  opacity: 0.9;
-  margin-bottom: 0.25rem;
-}
-
-.cal-assenze-title {
-  font-size: 1.6rem;
-  margin: 0 0 0.75rem 0;
-}
-
-.cal-assenze-subtitle {
-  font-size: 1.2rem;
-  margin: 0 0 0.5rem 0;
-}
-
-.cal-assenze-list,
-.cal-assenze-next-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.cal-assenze-list li,
-.cal-assenze-next-list li {
-  font-size: 1rem;
-  line-height: 1.3;
-}
-
-.cal-assenze-next-list li strong {
-  font-weight: 600;
-}
-
-.cal-assenze-none {
-  opacity: 0.7;
-}
-
-/* Bottone grande e ben visibile */
-.cal-assenze-btn {
-  margin-top: auto;
-  align-self: flex-start;
-  padding: 0.7rem 1.4rem;
-  font-size: 1rem;
-}
-
-/* Mini calendario a destra */
-
-.cal-assenze-right {
-  background: radial-gradient(circle at top left, rgba(255,255,255,0.18), transparent 60%);
-  border-radius: 1.2rem;
-  padding: 1rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.cal-mini-header {
-  display: flex;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 1.05rem;
-  margin-bottom: 0.25rem;
-}
-
-.cal-mini-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.cal-mini-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 0.25rem;
-  font-size: 0.8rem;
-}
-
-.cal-mini-header-row span {
-  text-align: center;
-  opacity: 0.7;
-  font-weight: 600;
-}
-
-.cal-mini-row span {
-  text-align: center;
-}
-
-.cal-mini-row span.day {
-  position: relative;
-  padding: 0.25rem 0;
-  border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.cal-mini-row span.day.today {
-  outline: 2px solid rgba(255, 255, 255, 0.45);
-  background: rgba(255, 255, 255, 0.06);
-  font-weight: 600;
-}
-
-.cal-mini-row span.day.has-assenza::after {
-  content: "●";
-  position: absolute;
-  bottom: 0.05rem;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.55rem;
-  line-height: 1;
-  color: #ff5a5f; /* pallino rosso */
-}
-
-.cal-mini-row span.empty {
-  opacity: 0;
-}
-
-.cal-mini-legend {
-  font-size: 0.8rem;
-  opacity: 0.75;
-  text-align: center;
-}
-
-/* Responsive: su schermi piccoli la card va in colonna */
-@media (max-width: 900px) {
-  .card-calendario-assenze {
-    flex-direction: column;
-  }
-
-  .cal-assenze-right {
-    margin-top: 0.5rem;
-  }
-}
-/* ============================
-   LAYOUT ASSENZE – RUOLO FARMACIA
-   ============================ */
-
-.assenze-farmacia {
-  margin-top: 1.5rem;
-}
-
-.farm-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.5rem;
-}
-
-.farm-card {
-  padding: 1.3rem 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-/* Etichette colorate (ASSENTI OGGI, PROSSIME, ecc.) */
-
-.farm-card-header {
-  display: flex;
-  justify-content: flex-start;
-}
-
-.farm-chip {
-  padding: 0.35rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #ffffff;
-}
-
-.farm-chip-richieste {
-  background: linear-gradient(135deg, #ff8a00, #ffb347);
-}
-
-.farm-chip-oggi {
-  background: linear-gradient(135deg, #19b46b, #32d18b);
-}
-
-.farm-chip-prossime {
-  background: linear-gradient(135deg, #007bff, #56a8ff);
-}
-
-.farm-chip-ritardi {
-  background: linear-gradient(135deg, #a259ff, #c77dff);
-}
-
-/* Contenuti */
-
-.farm-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.center-number {
-  align-items: flex-start;
-}
-
-.farm-big-number {
-  font-size: 2.4rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-/* Liste */
-
-.farm-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.95rem;
-}
-
-.farm-list li span.farm-name {
-  font-weight: 600;
-}
-
-.farm-list li span.farm-date {
-  opacity: 0.8;
-  font-size: 0.9rem;
-}
-
-/* Testo “nessun dato” */
-
-.farm-empty {
-  opacity: 0.7;
-  font-size: 0.9rem;
-}
-
-/* Responsive: su schermi piccoli la griglia va in colonna */
-
-@media (max-width: 900px) {
-  .farm-grid {
-    grid-template-columns: 1fr;
-  }
-}
-/* ==========================================================
-   CARD ASSENZE – LAYOUT UNICO
-   ========================================================== */
-
-.single-card-grid {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.card-assenze-hero {
-  display: flex;
-  gap: 32px;
-  padding: 24px 28px;
-  position: relative;
-  align-items: stretch;
-}
-
-.card-assenze-hero .cal-assenze-left,
-.card-assenze-hero .cal-assenze-right {
-  flex: 1;
-  min-width: 0;
-}
-
-.cal-assenze-left {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cal-assenze-date {
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-.cal-assenze-title {
-  font-size: 1.6rem;
-  margin: 0;
-}
-
-.cal-assenze-subtitle {
-  margin-top: 16px;
-  font-size: 1.05rem;
-}
-
-.cal-assenze-list {
-  list-style: none;
-  padding: 0;
-  margin: 4px 0 0 0;
-}
-
-.cal-assenze-list li {
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.cal-assenze-actions {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.cal-assenze-btn {
-  min-width: 180px;
-}
-
-/* Mini calendario */
-
-.cal-assenze-right {
-  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.35));
-  border-radius: 20px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.cal-mini-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.cal-mini-nav {
-  border: none;
-  border-radius: 999px;
-  padding: 4px 10px;
-  cursor: pointer;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-}
-
-.cal-mini-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 0.8rem;
-}
-
-.cal-mini-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-
-.cal-mini-header-row span {
-  text-align: center;
-  opacity: 0.7;
-  font-weight: 600;
-}
-
-.cal-mini-day {
-  text-align: center;
-  padding: 6px 0;
-  border-radius: 10px;
-  position: relative;
-  cursor: default;
-}
-
-.cal-mini-day.empty {
-  opacity: 0;
-}
-
-.cal-mini-day.has-assenze {
-  cursor: pointer;
-}
-
-.cal-mini-day.has-assenze:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.cal-mini-day-dot {
-  display: block;
-  font-size: 0.55rem;
-  margin-top: 2px;
-  color: #9cff7a;
-}
-
-.cal-mini-day.selected {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.cal-mini-legend {
-  font-size: 0.75rem;
-  opacity: 0.8;
-}
-
-.cal-mini-info h4 {
-  margin: 8px 0 4px;
-  font-size: 0.95rem;
-}
-
-/* Badge notifiche che pulsa */
-
-.cal-assenze-notif-badge {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background: #3cff7a;
-  color: #000;
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(60, 255, 122, 0.8);
-  animation: pulseBadge 1.4s infinite;
-}
-
-.cal-assenze-notif-badge span {
-  transform: translateY(-1px);
-}
-
-@keyframes pulseBadge {
-  0% { transform: scale(1); box-shadow: 0 0 10px rgba(60,255,122,0.8); }
-  50% { transform: scale(1.08); box-shadow: 0 0 14px rgba(60,255,122,1); }
-  100% { transform: scale(1); box-shadow: 0 0 10px rgba(60,255,122,0.8); }
-}
-
-/* Popup notifiche dentro la card */
-
-.notif-popup {
-  position: absolute;
-  top: 52px;
-  right: 16px;
-  z-index: 5;
-}
-
-.notif-popup-inner {
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 16px;
-  padding: 10px 12px 12px;
-  min-width: 230px;
-  max-width: 280px;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
-}
-
-.notif-popup-inner h3 {
-  font-size: 0.95rem;
-  margin: 0 0 6px;
-}
-
-#assenzeNotifList {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-}
-
-#assenzeNotifList li {
-  margin-bottom: 4px;
-}
-
-.notif-popup .small {
-  font-size: 0.8rem;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Responsive */
-
-@media (max-width: 800px) {
-  .card-assenze-hero {
-    flex-direction: column;
-  }
-}
-/* ==========================================================
-   CARD ASSENZE – LAYOUT UNICO
-   ========================================================== */
-
-.single-card-grid {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.card-assenze-hero {
-  display: flex;
-  gap: 32px;
-  padding: 24px 28px;
-  position: relative;
-  align-items: stretch;
-}
-
-.card-assenze-hero .cal-assenze-left,
-.card-assenze-hero .cal-assenze-right {
-  flex: 1;
-  min-width: 0;
-}
-
-.cal-assenze-left {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cal-assenze-date {
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-.cal-assenze-title {
-  font-size: 1.6rem;
-  margin: 0;
-}
-
-.cal-assenze-subtitle {
-  margin-top: 16px;
-  font-size: 1.05rem;
-}
-
-.cal-assenze-list {
-  list-style: none;
-  padding: 0;
-  margin: 4px 0 0 0;
-}
-
-.cal-assenze-list li {
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.cal-assenze-actions {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.cal-assenze-btn {
-  min-width: 180px;
-}
-
-/* Mini calendario */
-
-.cal-assenze-right {
-  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.35));
-  border-radius: 20px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.cal-mini-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.cal-mini-nav {
-  border: none;
-  border-radius: 999px;
-  padding: 4px 10px;
-  cursor: pointer;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-}
-
-.cal-mini-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 0.8rem;
-}
-
-.cal-mini-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-
-.cal-mini-header-row span {
-  text-align: center;
-  opacity: 0.7;
-  font-weight: 600;
-}
-
-.cal-mini-day {
-  text-align: center;
-  padding: 6px 0;
-  border-radius: 10px;
-  position: relative;
-  cursor: default;
-}
-
-.cal-mini-day.empty {
-  opacity: 0;
-}
-
-.cal-mini-day.has-assenze {
-  cursor: pointer;
-}
-
-.cal-mini-day.has-assenze:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.cal-mini-day-dot {
-  display: block;
-  font-size: 0.55rem;
-  margin-top: 2px;
-  color: #9cff7a;
-}
-
-.cal-mini-day.selected {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.cal-mini-legend {
-  font-size: 0.75rem;
-  opacity: 0.8;
-}
-
-.cal-mini-info h4 {
-  margin: 8px 0 4px;
-  font-size: 0.95rem;
-}
-
-/* Badge notifiche che pulsa */
-
-.cal-assenze-notif-badge {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background: #3cff7a;
-  color: #000;
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(60, 255, 122, 0.8);
-  animation: pulseBadge 1.4s infinite;
-}
-
-.cal-assenze-notif-badge span {
-  transform: translateY(-1px);
-}
-
-@keyframes pulseBadge {
-  0% { transform: scale(1); box-shadow: 0 0 10px rgba(60,255,122,0.8); }
-  50% { transform: scale(1.08); box-shadow: 0 0 14px rgba(60,255,122,1); }
-  100% { transform: scale(1); box-shadow: 0 0 10px rgba(60,255,122,0.8); }
-}
-
-/* Popup notifiche dentro la card */
-
-.notif-popup {
-  position: absolute;
-  top: 52px;
-  right: 16px;
-  z-index: 5;
-}
-
-.notif-popup-inner {
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 16px;
-  padding: 10px 12px 12px;
-  min-width: 230px;
-  max-width: 280px;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
-}
-
-.notif-popup-inner h3 {
-  font-size: 0.95rem;
-  margin: 0 0 6px;
-}
-
-#assenzeNotifList {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-}
-
-#assenzeNotifList li {
-  margin-bottom: 4px;
-}
-
-.notif-popup .small {
-  font-size: 0.8rem;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Responsive */
-
-@media (max-width: 800px) {
-  .card-assenze-hero {
-    flex-direction: column;
-  }
-}
-/* ==========================================================
-   CARD ASSENZE – LAYOUT UNICO
-   ========================================================== */
-
-.single-card-grid {
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.card-assenze-hero {
-  display: flex;
-  gap: 32px;
-  padding: 24px 28px;
-  position: relative;
-  align-items: stretch;
-}
-
-.card-assenze-hero .cal-assenze-left,
-.card-assenze-hero .cal-assenze-right {
-  flex: 1;
-  min-width: 0;
-}
-
-.cal-assenze-left {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.cal-assenze-date {
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-.cal-assenze-title {
-  font-size: 1.6rem;
-  margin: 0;
-}
-
-.cal-assenze-subtitle {
-  margin-top: 16px;
-  font-size: 1.05rem;
-}
-
-.cal-assenze-list {
-  list-style: none;
-  padding: 0;
-  margin: 4px 0 0 0;
-}
-
-.cal-assenze-list li {
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.cal-assenze-actions {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.cal-assenze-btn {
-  min-width: 180px;
-}
-
-/* Mini calendario */
-
-.cal-assenze-right {
-  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.35));
-  border-radius: 20px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.cal-mini-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 4px;
-  font-weight: 600;
-}
-
-.cal-mini-nav {
-  border: none;
-  border-radius: 999px;
-  padding: 4px 10px;
-  cursor: pointer;
-  background: rgba(255,255,255,0.1);
-  color: #fff;
-}
-
-.cal-mini-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 0.8rem;
-}
-
-.cal-mini-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-}
-
-.cal-mini-header-row span {
-  text-align: center;
-  opacity: 0.7;
-  font-weight: 600;
-}
-
-.cal-mini-day {
-  text-align: center;
-  padding: 6px 0;
-  border-radius: 10px;
-  position: relative;
-  cursor: default;
-}
-
-.cal-mini-day.empty {
-  opacity: 0;
-}
-
-.cal-mini-day.has-assenze {
-  cursor: pointer;
-}
-
-.cal-mini-day.has-assenze:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.cal-mini-day-dot {
-  display: block;
-  font-size: 0.55rem;
-  margin-top: 2px;
-  color: #9cff7a;
-}
-
-.cal-mini-day.selected {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.cal-mini-legend {
-  font-size: 0.75rem;
-  opacity: 0.8;
-}
-
-.cal-mini-info h4 {
-  margin: 8px 0 4px;
-  font-size: 0.95rem;
-}
-
-/* Badge notifiche che pulsa */
-
-.cal-assenze-notif-badge {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background: #3cff7a;
-  color: #000;
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(60, 255, 122, 0.8);
-  animation: pulseBadge 1.4s infinite;
-}
-
-.cal-assenze-notif-badge span {
-  transform: translateY(-1px);
-}
-
-@keyframes pulseBadge {
-  0% { transform: scale(1); box-shadow: 0 0 10px rgba(60,255,122,0.8); }
-  50% { transform: scale(1.08); box-shadow: 0 0 14px rgba(60,255,122,1); }
-  100% { transform: scale(1); box-shadow: 0 0 10px rgba(60,255,122,0.8); }
-}
-
-/* Popup notifiche dentro la card */
-
-.notif-popup {
-  position: absolute;
-  top: 52px;
-  right: 16px;
-  z-index: 5;
-}
-
-.notif-popup-inner {
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 16px;
-  padding: 10px 12px 12px;
-  min-width: 230px;
-  max-width: 280px;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
-}
-
-.notif-popup-inner h3 {
-  font-size: 0.95rem;
-  margin: 0 0 6px;
-}
-
-#assenzeNotifList {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-}
-
-#assenzeNotifList li {
-  margin-bottom: 4px;
-}
-
-.notif-popup .small {
-  font-size: 0.8rem;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* Blocco FARMACIA DI TURNO in alto */
-
-.dashboard-turno-today {
-  margin-left: auto;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #1fba6c, #25d98b);
-  color: #fff;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-  max-width: 280px;
-  font-size: 0.8rem;
-}
-
-.turno-today-icon {
-  font-size: 1.4rem;
-  line-height: 1;
-}
-
-.turno-today-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin: 0 0 2px;
-}
-
-.turno-today-main,
-.turno-today-appoggio {
-  margin: 0 0 4px;
-}
-
-.turno-today-label {
-  opacity: 0.9;
-}
-
-/* Archivio colonne */
-
-.archivio-columns {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.archivio-col h3 {
-  margin-top: 0;
-  margin-bottom: 6px;
-}
-
-.archivio-list {
-  list-style: none;
-  padding-left: 0;
-}
-
-.archivio-list li {
-  margin-bottom: 6px;
-}
-
-.btn-inline {
-  display: inline-block;
-  margin-left: 6px;
-  margin-top: 4px;
-}
-
-/* Responsive */
-
-@media (max-width: 900px) {
-  .dashboard-turno-today {
-    margin-left: 0;
-    margin-top: 12px;
-    max-width: 100%;
-  }
-
-  .card-assenze-hero {
-    flex-direction: column;
-  }
-
-  .archivio-columns {
-    grid-template-columns: 1fr;
-  }
-}
-/* ==========================================================
-   BANNER FARMACIA DI TURNO – LARGO, RESPONSIVE
-   ========================================================== */
-
-.dashboard-content {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 18px;
-}
-
-.dashboard-turno-today {
-  width: 100%;
-  border-radius: 20px;
-  background: linear-gradient(120deg, #1fba6c, #25d98b);
-  color: #fff;
-  padding: 14px 18px;
-  box-shadow: 0 14px 35px rgba(0,0,0,0.35);
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  font-size: 0.85rem;
-}
-
-.turno-today-icon {
-  font-size: 1.8rem;
-  line-height: 1;
-  margin-top: 2px;
-}
-
-.turno-today-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0 0 4px;
-}
-
-.turno-today-main,
-.turno-today-appoggio {
-  margin: 0 0 4px;
-}
-
-.turno-today-label {
-  opacity: 0.9;
-}
-
-/* ==========================================================
-   CARD ASSENZE – LAYOUT LARGO (PC) + CALENDARIO
-   ========================================================== */
-
-.card-assenze-hero {
-  display: flex;
-  gap: 32px;
-  padding: 24px 28px;
-  position: relative;
-  align-items: stretch;
-  min-height: 260px;
-}
-
-.card-assenze-hero .cal-assenze-left,
-.card-assenze-hero .cal-assenze-right {
-  flex: 1;
-  min-width: 0;
-}
-
-.cal-assenze-left {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.cal-assenze-date {
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-.cal-assenze-title {
-  font-size: 1.6rem;
-  margin: 0;
-}
-
-.cal-assenze-subtitle {
-  margin-top: 16px;
-  font-size: 1.05rem;
-}
-
-.cal-assenze-list {
-  list-style: none;
-  padding: 0;
-  margin: 4px 0 0 0;
-}
-
-.cal-assenze-list li {
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.cal-assenze-actions {
-  margin-top: 18px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.cal-assenze-btn {
-  min-width: 180px;
-}
-
-/* Lato destro: calendario più largo */
-
-.cal-assenze-right {
-  background: linear-gradient(135deg, rgba(255,255,255,0.06), rgba(0,0,0,0.45));
-  border-radius: 20px;
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.cal-mini-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  font-weight: 600;
-}
-
-.cal-mini-nav {
-  border: none;
-  border-radius: 999px;
-  padding: 4px 12px;
-  cursor: pointer;
-  background: rgba(255,255,255,0.12);
-  color: #fff;
-}
-
-.cal-mini-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 0.8rem;
-}
-
-.cal-mini-row {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-}
-
-.cal-mini-header-row span {
-  text-align: center;
-  opacity: 0.8;
-  font-weight: 600;
-}
-
-.cal-mini-day {
-  text-align: center;
-  padding: 6px 0;
-  border-radius: 10px;
-  position: relative;
-  cursor: default;
-}
-
-.cal-mini-day.empty {
-  opacity: 0;
-}
-
-.cal-mini-day.has-assenze {
-  cursor: pointer;
-}
-
-.cal-mini-day.has-assenze:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.cal-mini-day-dot {
-  display: block;
-  font-size: 0.55rem;
-  margin-top: 2px;
-  color: #9cff7a;
-}
-
-.cal-mini-day.selected {
-  background: rgba(0, 0, 0, 0.5);
-}
-
-.cal-mini-legend {
-  font-size: 0.75rem;
-  opacity: 0.8;
-}
-
-.cal-mini-info h4 {
-  margin: 8px 0 4px;
-  font-size: 0.95rem;
-}
-
-/* Badge notifiche che pulsa sulla card assenze */
-
-.cal-assenze-notif-badge {
-  position: absolute;
-  top: 12px;
-  right: 16px;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background: #ff4b4b;
-  color: #fff;
-  font-weight: 700;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(255, 75, 75, 0.9);
-  animation: pulseBadge 1.4s infinite;
-}
-
-.cal-assenze-notif-badge span {
-  transform: translateY(-1px);
-}
-
-@keyframes pulseBadge {
-  0% { transform: scale(1); box-shadow: 0 0 10px rgba(255,75,75,0.9); }
-  50% { transform: scale(1.08); box-shadow: 0 0 16px rgba(255,75,75,1); }
-  100% { transform: scale(1); box-shadow: 0 0 10px rgba(255,75,75,0.9); }
-}
-
-/* Popup notifiche dentro la card */
-
-.notif-popup {
-  position: absolute;
-  top: 52px;
-  right: 16px;
-  z-index: 5;
-}
-
-.notif-popup-inner {
-  background: rgba(0, 0, 0, 0.9);
-  border-radius: 16px;
-  padding: 10px 12px 12px;
-  min-width: 230px;
-  max-width: 280px;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
-}
-
-.notif-popup-inner h3 {
-  font-size: 0.95rem;
-  margin: 0 0 6px;
-}
-
-#assenzeNotifList {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-}
-
-#assenzeNotifList li {
-  margin-bottom: 4px;
-}
-
-.notif-popup .small {
-  font-size: 0.8rem;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* ==========================================================
-   CARDS COLORATE: ARRIVI / SCADENZE / CONSUMABILI
-   ========================================================== */
-
-.card-arrivi {
-  background: linear-gradient(135deg, #2f80ed, #56ccf2);
-  color: #fff;
-}
-
-.card-scadenze {
-  background: linear-gradient(135deg, #f2c94c, #f2994a);
-  color: #3a2a00;
-}
-
-.card-consumabili {
-  background: linear-gradient(135deg, #f2994a, #eb5757);
-  color: #fff;
-}
-
-.card-arrivi .card-header,
-.card-scadenze .card-header,
-.card-consumabili .card-header {
-  border-bottom: none;
-}
-
-.card-arrivi .card-body,
-.card-scadenze .card-body,
-.card-consumabili .card-body {
-  color: inherit;
-}
-
-/* Badge pallino rosso sulle cards (già usato con js-card-badge) */
-.card-badge.has-unread {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: #ff4b4b;
-  color: #fff;
-  width: 22px;
-  height: 22px;
-  font-size: 0.78rem;
-  box-shadow: 0 0 8px rgba(255,75,75,0.9);
-  animation: pulseBadge 1.4s infinite;
-}
-
-/* Archivio colonne (come prima) */
-.archivio-columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 12px;
-}
-
-.archivio-col h3 {
-  margin-top: 0;
-  margin-bottom: 6px;
-}
-
-.archivio-list {
-  list-style: none;
-  padding-left: 0;
-}
-
-.archivio-list li {
-  margin-bottom: 6px;
-}
-
-.btn-inline {
-  display: inline-block;
-  margin-left: 6px;
-  margin-top: 4px;
-}
-
-/* Responsive */
-
-@media (max-width: 900px) {
-  .card-assenze-hero {
-    flex-direction: column;
-  }
-
-  .dashboard-turno-today {
-    font-size: 0.85rem;
+  .card-title {
+    font-size: 0.95rem;
   }
 }
