@@ -246,6 +246,7 @@ let turniTabs, turniRowsContainer, turniMeseSelect, turniFarmaciaSelect;
 let comunicazioniList, filtroCategoria, filtroSoloNonLette, comunicazioneForm, comunicazioneFeedback;
 let badgeTotComunicazioni, badgeNonLette, badgeUrgenti;
 let assenzeForm, assenzeFeedback;
+let btnVaiTuttiAssenti;
 let procedureSearchInput, procedureFilterButtons, procedureListContainer, procedureDetail;
 let archivioGrid, archivioPath, archivioUpload, archivioBtnUpload, archivioUpBtn, archivioNewFolderBtn;
 let archivioContextMenu, menuNuova, menuRinomina, menuElimina, menuCopia, menuIncolla, menuDownload;
