@@ -212,7 +212,7 @@ function initLogin() {
         : "Sei un dipendente nuovo? Registrati";
     });
   }
-  if (registerForm) {
+    if (registerForm) {
     registerForm.addEventListener("submit", e => {
       e.preventDefault();
       const userEl = document.getElementById("regUsername");
@@ -533,7 +533,7 @@ function renderAssenti() {
   };
 
   const prossime = prossimePerRuolo(currentRole);
-  // data label card
+    // data label card
   const dataLabel = document.getElementById("assenzeOggiDataLabel");
   if (dataLabel) {
     const d = parseISO(today);
@@ -590,7 +590,7 @@ function renderAssenti() {
     "Nessuna assenza programmata.",
     true
   );
-  // storico personale dipendente
+    // storico personale dipendente
   const storicoBox = document.getElementById("storicoPersonale");
   if (storicoBox) {
     storicoBox.innerHTML = "";
