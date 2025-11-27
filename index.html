@@ -1,449 +1,134 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-  <meta charset="UTF-8" />
-  <title>Portale Farmacia Montesano</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <link rel="stylesheet" href="style.css" />
-  <script src="script.js" defer></script>
+Portale Farmacia Montesano
+Seleziona il tipo di accesso, inserisci le credenziali o registrati come dipendente.
+Farmacia Titolare Dipendente
+Accesso come: Farmacia
+Username
+Password
+Entra
+Titolare / Farmacia: credenziali predefinite. Dipendente: usa quelle registrate.
+Registrazione dipendente
+Nome utente (es. mario.rossi)
+Password
+Registra
 
-  <link rel="apple-touch-icon" sizes="180x180" href="logo.jpg">
-  <link rel="icon" type="image/png" href="logo.jpg">
-</head>
-<body>
+Sei un dipendente nuovo? Registrati
 
-  <!-- ============ LOGIN ============ -->
-  <div id="authContainer" class="auth-container">
-    <div class="auth-card">
-      <div class="auth-logo-wrap">
-        <img src="logo.jpg" alt="Farmacia Montesano" class="auth-logo" />
-      </div>
-      <h1>Portale Farmacia Montesano</h1>
-      <p class="auth-intro">
-        Seleziona il tipo di accesso e inserisci le credenziali.
-      </p>
+FARMACIA MONTESANO
+PORTALE INTERNO
+Farmacia (accesso generico)
+Farmacia di turno oggi
 
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-role="farmacia">Farmacia</button>
-        <button class="auth-tab" data-role="titolare">Titolare</button>
-        <button class="auth-tab" data-role="dipendente">Dipendente</button>
-      </div>
+👥
+Mer 26 Nov
+Assenze / permessi
+	•	
+Assenti prossimamente
+	•	
+Vai a tutti gli assenti Richiedi assenza / ritardo Segna assenza / ritardo
+< Novembre 2025 >
 
-      <p class="auth-subtitle">
-        Accesso come: <span id="loginRoleLabel">Farmacia</span>
-      </p>
 
-      <form id="loginForm" class="auth-form">
-        <div class="form-row">
-          <label for="loginUsername">Username</label>
-          <input id="loginUsername" type="text" placeholder="Inserisci username" />
-        </div>
-        <div class="form-row">
-          <label for="loginPassword">Password</label>
-          <input id="loginPassword" type="password" placeholder="Inserisci password" />
-        </div>
-        <button type="submit" class="btn-primary wide">Entra</button>
-        <p class="login-hint">
-          Demo: per ora puoi inserire qualsiasi username e password.
-        </p>
-      </form>
-    </div>
-  </div>
+giorno con almeno un assente
+🚚
+Consegne / ritiri
+Registra consegne, ritiri di espositori e materiale.
+⏳
+Prodotti in scadenza
+Elenco completo, allerta a 45/30 giorni e prodotti scaduti.
+📦
+Consumabili
+Lista quotidiana di caffè, carta, toner, rotoli POS e altro.
+💶
+Cambio cassa
+Segnala velocemente: necessito riordino di monete e banconote.
+💬
+Comunicazioni
+Messaggi interni, note veloci e avvisi per tutto lo staff.
+← Dashboard
+Assenze / permessi
+Richieste, approvazioni e riepilogo per ruolo.
+Oggi e prossimi giorni
+Assenti oggi
+	•	
+Assenti prossimamente
+	•	
+Richiedi assenza / permesso
+Tipo richiesta
+                Assenza
+                Permesso
+                Ritardo
+                Uscita anticipata
+              
+Dal
+Al
+Motivo
+Invia richiesta
 
-  <!-- ============ APP PRINCIPALE ============ -->
-  <main id="app" class="app hidden">
+Storico personale
 
-    <!-- HEADER + LOGO + FARMACIA DI TURNO -->
-    <header class="app-header">
-      <div class="header-left">
-        <img src="logo-farmacia-montesano.jpg" alt="Farmacia Montesano" class="header-logo-big" />
-        <div>
-          <h1 class="header-title">FARMACIA MONTESANO</h1>
-          <p class="header-subtitle-main">PORTALE INTERNO</p>
-          <span id="currentRolePill" class="role-pill">Farmacia (accesso generico)</span>
-        </div>
-      </div>
-      <div class="header-right card card-mini-turno">
-        <h2 class="turno-title">Farmacia di turno oggi</h2>
-        <div id="turnoTodayInfo" class="turno-info">
-          <!-- riempito da JS -->
-        </div>
-      </div>
-    </header>
+Richieste da gestire (tutti)
 
-    <!-- ============ DASHBOARD ============ -->
-    <section id="dashboard" class="dashboard">
-      <div class="cards-grid-main">
+← Dashboard
+Consegne / ritiri
+Corrieri, espositori, materiale in ingresso o uscita.
+Registra consegna / ritiro
+Data
+Descrizione
+Note
+Registra
 
-        <!-- ASSENTI OGGI -->
-        <article class="card card-assenti">
-          <div class="card-top-row">
-            <div class="card-top-left">
-              <p id="assenzeOggiDataLabel" class="assenze-data-label">Mar 26 Nov</p>
-              <h2 class="card-title">Assenti oggi</h2>
-            </div>
-            <button class="card-notif-badge" data-card="assenze">
-              <span class="badge-label">NUOVI</span>
-              <span class="badge-dot"></span>
-              <span class="badge-count">0</span>
-            </button>
-          </div>
+Elenco consegne / ritiri
 
-          <div class="assenti-content">
-            <div class="assenti-left">
-              <div>
-                <ul id="listaAssentiOggi" class="assenze-list">
-                  <!-- riempito da JS -->
-                </ul>
-              </div>
+← Dashboard
+Prodotti in scadenza
+Elenco completo, allerta a 45/30 giorni e scaduti non rimossi.
+Segnala scadenza
+Nome prodotto
+Numero pezzi
+Mese / anno scadenza
+Registra scadenza
 
-              <h3 class="assenti-subtitle">Assenti prossimamente</h3>
-              <ul id="listaAssentiProssimi" class="assenze-list">
-                <!-- riempito da JS -->
-              </ul>
+Tutti i prodotti in scadenza
+Evidenziati quelli entro 45 giorni.
 
-              <div class="assenti-actions">
-                <button id="btnVaiTuttiAssenti" class="btn-primary assenti-btn">
-                  Vai a tutti gli assenti
-                </button>
-                <button id="btnRichiediAssenza" class="btn-secondary assenti-extra-btn hidden">
-                  Richiedi assenza / ritardo
-                </button>
-                <button id="btnSegnaAssenza" class="btn-secondary assenti-extra-btn hidden">
-                  Segna assenza / ritardo
-                </button>
-              </div>
-            </div>
+Prodotti scaduti non ancora tolti
 
-            <div class="assenti-right">
-              <div class="cal-mini-header">
-                <button id="calPrevMonth" class="cal-nav">&lt;</button>
-                <span id="calMonthLabel">Novembre 2025</span>
-                <button id="calNextMonth" class="cal-nav">&gt;</button>
-              </div>
-              <div id="calMiniWeekdays" class="cal-mini-weekdays">
-                <span>L</span><span>M</span><span>M</span><span>G</span><span>V</span><span>S</span><span>D</span>
-              </div>
-              <div id="calMiniGrid" class="cal-mini-grid">
-                <!-- riempito da JS -->
-              </div>
-              <p class="cal-legend">
-                <span class="cal-dot"></span> giorno con almeno un assente
-              </p>
-            </div>
-          </div>
-        </article>
+← Dashboard
+Consumabili
+Controllo quotidiano di caffè, carta, toner, rotoli e altro.
+Lista consumabili giornaliera
+Spunta ciò che è stato controllato oggi. I flag si resettano ogni giorno.
+Aggiungi nuovo consumabile
+Aggiungi alla lista
 
-        <!-- ARRIVI -->
-        <article class="card card-arrivi">
-          <div class="card-top-row">
-            <div class="card-top-left">
-              <div class="card-icon-circle">🚚</div>
-              <h2 class="card-title">Arrivi</h2>
-            </div>
-            <button class="card-notif-badge" data-card="arrivi">
-              <span class="badge-dot"></span>
-              <span class="badge-count">0</span>
-            </button>
-          </div>
-          <p class="card-text">
-            Segnala arrivi di corrieri, espositori e materiale (demo).
-          </p>
-          <button id="btnVaiArrivi" class="btn-secondary">
-            Vai alla sezione
-          </button>
-        </article>
 
-        <!-- SCADENZE -->
-        <article class="card card-scadenze">
-          <div class="card-top-row">
-            <div class="card-top-left">
-              <div class="card-icon-circle">⏳</div>
-              <h2 class="card-title">Scadenze</h2>
-            </div>
-            <button class="card-notif-badge" data-card="scadenze">
-              <span class="badge-dot"></span>
-              <span class="badge-count">0</span>
-            </button>
-          </div>
-          <p class="card-text">
-            Prodotti in scadenza (meno di 45 giorni).
-          </p>
-          <button id="btnVaiScadenze" class="btn-secondary">
-            Vai alla sezione
-          </button>
-        </article>
+← Dashboard
+Cambio cassa
+Segnala velocemente necessità di monete e banconote.
+Richiesta cambio cassa
+Dettaglio richiesta
+Urgenza
+              Normale
+              Alta
+            
+Invia richiesta
 
-        <!-- CONSUMABILI -->
-        <article class="card card-consumabili">
-          <div class="card-top-row">
-            <div class="card-top-left">
-              <div class="card-icon-circle">📦</div>
-              <h2 class="card-title">Consumabili</h2>
-            </div>
-            <button class="card-notif-badge" data-card="consumabili">
-              <span class="badge-dot"></span>
-              <span class="badge-count">0</span>
-            </button>
-          </div>
-          <p class="card-text">
-            Caffè, zucchero, carta igienica, rotoli POS, toner...
-          </p>
-          <button id="btnVaiConsumabili" class="btn-secondary">
-            Vai alla sezione
-          </button>
-        </article>
+Ultime richieste
 
-        <!-- CAMBIO CASSA -->
-        <article class="card card-cambio">
-          <div class="card-top-row">
-            <div class="card-top-left">
-              <div class="card-icon-circle">💶</div>
-              <h2 class="card-title">Cambio cassa</h2>
-            </div>
-            <button class="card-notif-badge" data-card="cambio">
-              <span class="badge-dot"></span>
-              <span class="badge-count">0</span>
-            </button>
-          </div>
-          <p class="card-text">
-            Segnala velocemente se servono spiccioli o tagli specifici.
-          </p>
-          <button id="btnVaiCambio" class="btn-secondary">
-            Vai alla sezione
-          </button>
-        </article>
+← Dashboard
+Comunicazioni interne
+Messaggi rapidi per tutto lo staff.
+Nuova comunicazione
+Titolo
+Testo
+Invia comunicazione
 
-      </div>
-    </section>
+Comunicazioni recenti
 
-    <!-- ============ PAGINE INTERNE ============ -->
 
-    <!-- PAGINA ASSENZE -->
-    <section id="assenzePage" class="page hidden">
-      <header class="page-header">
-        <button class="back-button" data-back="dashboard">← Dashboard</button>
-        <div class="page-title-block">
-          <h1>Gestione assenze</h1>
-          <p>Richieste, segnalazioni e riepilogo.</p>
-        </div>
-      </header>
+✕
+Notifiche
 
-      <div class="page-content-grid">
-        <!-- Elenco assenze -->
-        <article class="card">
-          <h2>Assenze oggi</h2>
-          <ul id="pageAssentiOggi" class="assenze-list"></ul>
-          <h2>Assenze prossimamente</h2>
-          <ul id="pageAssentiProssimi" class="assenze-list"></ul>
-        </article>
 
-        <!-- Form assenza / ritardo -->
-        <article id="boxRichiestaAssenza" class="card">
-          <h2 id="assenzaFormTitle">Richiedi assenza / ritardo</h2>
-          <form id="formRichiestaAssenza" class="simple-form">
-            <div class="form-row">
-              <label>Nome</label>
-              <input type="text" id="assNome" />
-            </div>
-            <div class="form-row two-cols">
-              <div>
-                <label>Dal</label>
-                <input type="date" id="assDal" />
-              </div>
-              <div>
-                <label>Al</label>
-                <input type="date" id="assAl" />
-              </div>
-            </div>
-            <div class="form-row">
-              <label>Motivo / Note</label>
-              <textarea id="assMotivo" rows="2"></textarea>
-            </div>
-            <button type="submit" class="btn-primary">Invia</button>
-            <p id="assRichiestaFeedback" class="form-feedback hidden">
-              ✅ Operazione registrata (demo).
-            </p>
-          </form>
-        </article>
-      </div>
-    </section>
-
-    <!-- PAGINA ARRIVI -->
-    <section id="arriviPage" class="page hidden">
-      <header class="page-header">
-        <button class="back-button" data-back="dashboard">← Dashboard</button>
-        <div class="page-title-block">
-          <h1>Arrivi</h1>
-          <p>Segnala arrivi di corrieri, espositori e materiale.</p>
-        </div>
-      </header>
-
-      <div class="page-content-grid">
-        <article class="card">
-          <h2>Segnala arrivo</h2>
-          <form id="formArrivo" class="simple-form">
-            <div class="form-row">
-              <label>Data</label>
-              <input type="date" id="arrData" />
-            </div>
-            <div class="form-row">
-              <label>Descrizione</label>
-              <input type="text" id="arrDescrizione" placeholder="Es. Corriere ABC, espositore Vichy..." />
-            </div>
-            <div class="form-row">
-              <label>Note</label>
-              <textarea id="arrNote" rows="2"></textarea>
-            </div>
-            <button type="submit" class="btn-primary">Registra arrivo</button>
-            <p id="arrivoFeedback" class="form-feedback hidden">
-              ✅ Arrivo registrato (demo).
-            </p>
-          </form>
-        </article>
-
-        <article class="card">
-          <h2>Arrivi registrati</h2>
-          <div id="listaArrivi" class="table-like small"></div>
-        </article>
-      </div>
-    </section>
-
-    <!-- PAGINA SCADENZE -->
-    <section id="scadenzePage" class="page hidden">
-      <header class="page-header">
-        <button class="back-button" data-back="dashboard">← Dashboard</button>
-        <div class="page-title-block">
-          <h1>Scadenze</h1>
-          <p>Prodotti in scadenza (meno di 45 giorni).</p>
-        </div>
-      </header>
-
-      <div class="page-content-grid">
-        <article class="card">
-          <h2>Segnala scadenza</h2>
-          <form id="formScadenza" class="simple-form">
-            <div class="form-row">
-              <label>Nome prodotto</label>
-              <input type="text" id="scadNome" />
-            </div>
-            <div class="form-row two-cols">
-              <div>
-                <label>Numero pezzi</label>
-                <input type="number" id="scadPezzi" min="1" />
-              </div>
-              <div>
-                <label>Data scadenza</label>
-                <input type="date" id="scadData" />
-              </div>
-            </div>
-            <button type="submit" class="btn-primary">Registra scadenza</button>
-            <p id="scadFeedback" class="form-feedback hidden">
-              ✅ Scadenza registrata (demo).
-            </p>
-          </form>
-        </article>
-
-        <article class="card">
-          <h2>Elenco scadenze</h2>
-          <div id="listaScadenze" class="table-like small"></div>
-        </article>
-      </div>
-    </section>
-
-    <!-- PAGINA CONSUMABILI -->
-    <section id="consumabiliPage" class="page hidden">
-      <header class="page-header">
-        <button class="back-button" data-back="dashboard">← Dashboard</button>
-        <div class="page-title-block">
-          <h1>Consumabili</h1>
-          <p>Segnala necessità di consumabili vari.</p>
-        </div>
-      </header>
-
-      <div class="page-content-grid">
-        <article class="card">
-          <h2>Segnala consumabili</h2>
-          <form id="formConsumabile" class="simple-form">
-            <div class="form-row">
-              <label>Nome prodotto</label>
-              <input type="text" id="consNome" placeholder="Es. Caffè, carta igienica, toner Brother..." />
-            </div>
-            <div class="form-row">
-              <label>Note (opzionali)</label>
-              <textarea id="consNote" rows="2"></textarea>
-            </div>
-            <button type="submit" class="btn-primary">Registra segnalazione</button>
-            <p id="consFeedback" class="form-feedback hidden">
-              ✅ Segnalazione registrata (demo).
-            </p>
-          </form>
-        </article>
-
-        <article class="card">
-          <h2>Segnalazioni consumabili</h2>
-          <div id="listaConsumabili" class="table-like small"></div>
-        </article>
-      </div>
-    </section>
-
-    <!-- PAGINA CAMBIO CASSA -->
-    <section id="cambioPage" class="page hidden">
-      <header class="page-header">
-        <button class="back-button" data-back="dashboard">← Dashboard</button>
-        <div class="page-title-block">
-          <h1>Cambio cassa</h1>
-          <p>Segnala necessità di spiccioli o tagli specifici.</p>
-        </div>
-      </header>
-
-      <div class="page-content-grid">
-        <article class="card">
-          <h2>Segnala necessità</h2>
-          <form id="formCambio" class="simple-form">
-            <div class="form-row two-cols">
-              <div>
-                <label>Dettaglio richiesta</label>
-                <input type="text" id="cambioDettaglio" placeholder="Es. servono 20 pezzi da 0,50€" />
-              </div>
-              <div>
-                <label>Urgenza</label>
-                <select id="cambioUrgenza">
-                  <option value="normale">Normale</option>
-                  <option value="alta">Alta</option>
-                </select>
-              </div>
-            </div>
-            <button type="submit" class="btn-primary">Invia segnalazione</button>
-            <p id="cambioFeedback" class="form-feedback hidden">
-              ✅ Segnalazione inviata (demo).
-            </p>
-          </form>
-        </article>
-
-        <article class="card">
-          <h2>Ultime segnalazioni</h2>
-          <div id="listaCambio" class="table-like small"></div>
-        </article>
-      </div>
-    </section>
-
-    <!-- OVERLAY NOTIFICHE GENERALE -->
-    <div id="notifOverlay" class="notif-overlay hidden">
-      <div class="notif-backdrop"></div>
-      <div class="notif-modal">
-        <button id="notifClose" class="notif-close" aria-label="Chiudi">✕</button>
-        <h2 id="notifTitle">Notifiche</h2>
-        <p id="notifIntro" class="notif-intro"></p>
-        <div id="notifList" class="notif-list"></div>
-        <div class="notif-footer">
-          <button id="notifSegnaTutte" class="btn-secondary small">Segna tutte come lette</button>
-          <button id="notifCloseBottom" class="btn-secondary small">Chiudi</button>
-        </div>
-      </div>
-    </div>
-
-  </main>
-</body>
-</html>
+Segna tutte come lette Chiudi
