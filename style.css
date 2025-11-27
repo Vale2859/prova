@@ -1,7 +1,3 @@
-/* ==========================
-   STILE BASE APPLICAZIONE
-   ========================== */
-
 *,
 *::before,
 *::after {
@@ -43,10 +39,7 @@ body {
   color: var(--txt-main);
 }
 
-/* ==========================
-   APP SHELL + HEADER
-   ========================== */
-
+/* HEADER */
 .app-shell {
   min-height: 100vh;
   display: flex;
@@ -72,15 +65,15 @@ body {
   color: var(--txt-muted);
 }
 
-/* ==========================
+/* =======================
    DASHBOARD LAYOUT
-   ========================== */
+   ======================= */
 
 .dashboard {
   flex: 1;
   padding: 10px 32px 32px;
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
+  grid-template-columns: 340px minmax(0, 1fr); /* colonna sinistra un po' più larga */
   gap: 24px;
   align-items: flex-start;
 }
@@ -95,12 +88,12 @@ body {
 /* Colonna destra */
 .dashboard-right {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(120px, auto);
+  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 card per riga */
+  grid-auto-rows: minmax(150px, auto);
   gap: 18px;
 }
 
-/* Card generica */
+/* CARD BASE */
 .card {
   background: linear-gradient(145deg, var(--bg-card), #061932);
   border-radius: var(--radius-lg);
@@ -133,7 +126,6 @@ body {
   opacity: 1;
 }
 
-/* Card header */
 .card-header {
   display: flex;
   align-items: center;
@@ -184,7 +176,7 @@ body {
   color: var(--txt-muted);
 }
 
-/* Badge notifiche */
+/* Badge comunicazioni */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -199,11 +191,7 @@ body {
   color: #fff;
 }
 
-/* ---------------------------
-   CARDS SPECIFICHE
-   --------------------------- */
-
-/* Logo */
+/* LOGO */
 .card-logo {
   display: flex;
   align-items: center;
@@ -239,9 +227,9 @@ body {
   color: var(--txt-muted);
 }
 
-/* Calendario */
-.card-calendar {
-  padding-bottom: 18px;
+/* CALENDARIO (più grande) */
+.card-calendar-big {
+  min-height: 260px;
 }
 
 .calendar-body {
@@ -269,7 +257,6 @@ body {
 }
 
 .calendar-grid span:nth-child(-n + 7) {
-  /* intestazioni lu ma me ... */
   font-weight: 600;
   text-transform: lowercase;
 }
@@ -279,11 +266,14 @@ body {
   color: #fff;
 }
 
-/* Assenti / permessi (card alta) */
+/* ASSENTI / PERMESSI (più alta) */
 .card-tall {
-  min-height: 220px;
   display: flex;
   flex-direction: column;
+}
+
+.card-tall-big {
+  min-height: 220px;
 }
 
 .card-list {
@@ -298,25 +288,35 @@ body {
   margin-top: 4px;
 }
 
-/* Cards turno & appoggio (larghe) */
+/* CARD UNICA TURNO + APPOGGIO */
 .card-wide {
-  grid-column: span 3;
+  grid-column: 1 / -1; /* prende tutta la larghezza della colonna destra */
 }
 
-.card-turno {
-  background: linear-gradient(140deg, #1cc88a, #0b2340);
+.card-turno-appoggio {
+  background: linear-gradient(135deg, #1cc88a 0, #19c1d8 50%, #0b2340 100%);
 }
 
-.card-appoggio {
-  background: linear-gradient(140deg, #19c1d8, #0b2340);
+.turno-appoggio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
 }
 
-/* Cards normali seconda e terza riga */
-.card-normal {
-  /* Ogni card occupa 1 colonna della griglia di destra */
+.turno-block,
+.appoggio-block {
+  min-height: 90px;
 }
 
-/* Colori rapidi */
+/* 6 CARD GRANDI (3 per riga) */
+.card-big {
+  min-height: 150px;          /* più grande rispetto alle card normali */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Colori card */
 .card-consegne {
   background: linear-gradient(140deg, #1b78ff, #0b2340);
 }
@@ -378,9 +378,9 @@ body {
   color: #d1e2ff;
 }
 
-/* ==========================
+/* =======================
    RESPONSIVE
-   ========================== */
+   ======================= */
 
 @media (max-width: 1100px) {
   .dashboard {
@@ -396,7 +396,7 @@ body {
     flex: 1 1 230px;
   }
 
-  .card-calendar,
+  .card-calendar-big,
   .card-assenti {
     flex: 1 1 260px;
   }
@@ -429,5 +429,9 @@ body {
 
   .card {
     border-radius: var(--radius-md);
+  }
+
+  .turno-appoggio-grid {
+    grid-template-columns: 1fr;
   }
 }
