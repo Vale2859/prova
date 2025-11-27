@@ -8,16 +8,14 @@
 </head>
 <body>
   <div class="app-shell">
-    <!-- HEADER SEMPLICE (puoi integrarlo con il tuo) -->
     <header class="app-header">
       <h1>Portale Farmacia Montesano</h1>
       <span class="app-header__subtitle">Dashboard principale</span>
     </header>
 
-    <!-- ====== DASHBOARD PRINCIPALE (NUOVO LAYOUT) ====== -->
     <main class="dashboard">
 
-      <!-- COLONNA SINISTRA: LOGO + CALENDARIO + ASSENTI -->
+      <!-- COLONNA SINISTRA: LOGO + CALENDARIO + ASSENTI/PERMESSI -->
       <section class="dashboard-left">
 
         <!-- LOGO FARMACIA -->
@@ -29,17 +27,17 @@
           </div>
         </div>
 
-        <!-- CALENDARIO -->
-        <div class="card card-calendar">
+        <!-- CALENDARIO (PIÙ GRANDE) -->
+        <div class="card card-calendar card-calendar-big">
           <div class="card-header">
             <span class="card-title">Calendario</span>
             <span class="card-pill" id="today-pill">Oggi</span>
           </div>
+
           <div class="calendar-body">
             <div class="calendar-month" id="calendar-month">Aprile 2024</div>
             <div class="calendar-grid">
               <span>lu</span><span>ma</span><span>me</span><span>gi</span><span>ve</span><span>sa</span><span>do</span>
-              <!-- Giorni fittizi – puoi sostituire con il tuo script -->
               <span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
               <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span>
               <span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
@@ -49,45 +47,51 @@
           </div>
         </div>
 
-        <!-- ASSENTI / PERMESSI -->
-        <div class="card card-tall card-assenti">
+        <!-- ASSENTI / PERMESSI (PIÙ GRANDE) -->
+        <div class="card card-tall card-tall-big card-assenti">
           <div class="card-header">
             <span class="card-title">Assenti / Permessi</span>
           </div>
           <ul class="card-list" id="assenti-list">
-            <li>Nessun assente registrato oggi</li>
+            <li>Nessun assente registrato oggi.</li>
           </ul>
           <button class="btn-primary btn-full">Vai alla gestione assenze</button>
         </div>
 
       </section>
 
-      <!-- COLONNA DESTRA: TUTTE LE ALTRE CARD IN GRIGLIA -->
+      <!-- COLONNA DESTRA -->
       <section class="dashboard-right">
 
-        <!-- RIGA 1 BOZZA: TURNO + APPOGGIO -->
-        <div class="card card-wide card-turno">
-          <div class="card-header">
-            <span class="card-label">Turno</span>
-            <span class="card-pill pill-success">Farmacia 1</span>
+        <!-- CARD UNICA: TURNO + APPOGGIO -->
+        <div class="card card-wide card-turno-appoggio">
+          <div class="turno-appoggio-grid">
+            <div class="turno-block">
+              <div class="card-header">
+                <span class="card-label">Turno</span>
+                <span class="card-pill pill-success">Farmacia 1</span>
+              </div>
+              <p class="card-main-text">
+                Farmacia di turno oggi – in servizio fino alle <strong>08:00</strong> di domani.
+              </p>
+            </div>
+
+            <div class="appoggio-block">
+              <div class="card-header">
+                <span class="card-label">Appoggio</span>
+                <span class="card-pill pill-info">Farmacia 2</span>
+              </div>
+              <p class="card-main-text">
+                Farmacia di appoggio – attiva fasce <strong>08:30 – 20:30</strong>.
+              </p>
+            </div>
           </div>
-          <p class="card-main-text">
-            Farmacia di turno oggi – in servizio fino alle <strong>08:00</strong> di domani.
-          </p>
         </div>
 
-        <div class="card card-wide card-appoggio">
-          <div class="card-header">
-            <span class="card-label">Appoggio</span>
-            <span class="card-pill pill-info">Farmacia 2</span>
-          </div>
-          <p class="card-main-text">
-            Farmacia di appoggio – attiva fasce <strong>08:30 – 20:30</strong>.
-          </p>
-        </div>
+        <!-- 6 CARD GRANDI: 3 PER RIGA, 2 RIGHE -->
 
-        <!-- RIGA 2 BOZZA: CONSEGNE / RITIRI – PRODOTTI IN SCADENZA – CONSUMABILI -->
-        <div class="card card-normal card-consegne">
+        <!-- RIGA 1 -->
+        <div class="card card-big card-consegne">
           <div class="card-header">
             <span class="card-title">Consegne / Ritiri</span>
           </div>
@@ -97,7 +101,7 @@
           <button class="btn-link">Apri registro consegne</button>
         </div>
 
-        <div class="card card-normal card-scadenze">
+        <div class="card card-big card-scadenze">
           <div class="card-header">
             <span class="card-title">Prodotti in scadenza</span>
           </div>
@@ -107,7 +111,7 @@
           <button class="btn-link">Visualizza elenco completo</button>
         </div>
 
-        <div class="card card-normal card-consumabili">
+        <div class="card card-big card-consumabili">
           <div class="card-header">
             <span class="card-title">Consumabili</span>
           </div>
@@ -117,8 +121,8 @@
           <button class="btn-link">Gestisci consumi</button>
         </div>
 
-        <!-- RIGA 3 BOZZA: CAMBIO CASSA – COMUNICAZIONI – ARCHIVIO FILE -->
-        <div class="card card-normal card-cassa">
+        <!-- RIGA 2 -->
+        <div class="card card-big card-cassa">
           <div class="card-header">
             <span class="card-title">Cambio cassa</span>
           </div>
@@ -128,7 +132,7 @@
           <button class="btn-link">Apri modulo cambio cassa</button>
         </div>
 
-        <div class="card card-normal card-comunicazioni">
+        <div class="card card-big card-comunicazioni">
           <div class="card-header">
             <span class="card-title">Comunicazioni</span>
             <span class="badge">1 nuovo</span>
@@ -139,7 +143,7 @@
           <button class="btn-link">Vai alle comunicazioni</button>
         </div>
 
-        <div class="card card-normal card-archivio">
+        <div class="card card-big card-archivio">
           <div class="card-header">
             <span class="card-title">Archivio file</span>
           </div>
