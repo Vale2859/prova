@@ -2,19 +2,17 @@
    PORTALE FARMACIA MONTESANO – STYLE.CSS
    ============================================================ */
 
-/* RESET DI BASE */
+/* RESET */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
 html,
 body {
   margin: 0;
   padding: 0;
 }
-
 :root {
   --bg-main: #051729;
   --bg-gradient: radial-gradient(circle at top left, #0f9bdd 0, #051729 45%, #020815 100%);
@@ -26,6 +24,7 @@ body {
   --blue-card: #0f7eff;
   --yellow-card: #f7b733;
   --orange-card: #ff7f3f;
+  --pink-card: #ff5fa8;
 
   --text-main: #ffffff;
   --text-muted: #a8b5d4;
@@ -44,23 +43,15 @@ body {
   color: var(--text-main);
   min-height: 100vh;
 }
-
-/* UTILI */
-
 .hidden {
   display: none !important;
 }
-
 .app {
   max-width: 1200px;
   margin: 0 auto;
   padding: 16px 16px 40px;
 }
-
-/* ============================================================
-   LOGIN
-   ============================================================ */
-
+/* LOGIN */
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -68,7 +59,6 @@ body {
   justify-content: center;
   padding: 24px;
 }
-
 .auth-card {
   width: 100%;
   max-width: 420px;
@@ -78,19 +68,16 @@ body {
   box-shadow: var(--shadow-strong);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
-
 .auth-logo-wrap {
   display: flex;
   justify-content: center;
   margin-bottom: 12px;
 }
-
 .auth-logo {
   width: 90px;
   height: 90px;
   object-fit: contain;
 }
-
 .auth-card h1 {
   font-size: 1.4rem;
   text-align: center;
@@ -98,14 +85,12 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-
 .auth-intro {
   text-align: center;
   color: var(--text-muted);
   font-size: 0.9rem;
   margin: 8px 0 18px;
 }
-
 .auth-tabs {
   display: flex;
   background: rgba(0, 0, 0, 0.25);
@@ -113,7 +98,6 @@ body {
   padding: 4px;
   margin-bottom: 12px;
 }
-
 .auth-tab {
   flex: 1;
   border: none;
@@ -125,37 +109,46 @@ body {
   padding: 7px 0;
   cursor: pointer;
 }
-
 .auth-tab.active {
   background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
   color: #001010;
   font-weight: 600;
 }
-
 .auth-subtitle {
   font-size: 0.85rem;
   color: var(--text-muted);
-  margin: 0 0 14px;
+  margin: 0 0 10px;
 }
-
 .auth-subtitle span {
   color: #ffffff;
   font-weight: 600;
 }
-
 .auth-form .form-row {
   margin-bottom: 12px;
 }
 
-/* CAMPI & BOTTONI BASE */
-
+/* REGISTRAZIONE DIPENDENTE */
+.register-box {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.link-button {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: var(--green-primary);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+/* CAMPI & BOTTONI */
 .form-row label {
   display: block;
   font-size: 0.8rem;
   margin-bottom: 4px;
   color: var(--text-muted);
 }
-
 .form-row input,
 .form-row select,
 .form-row textarea {
@@ -169,18 +162,15 @@ body {
   font-size: 0.9rem;
   outline: none;
 }
-
 .form-row input:focus,
 .form-row select:focus,
 .form-row textarea:focus {
   border-color: var(--green-primary);
   box-shadow: 0 0 0 1px rgba(60, 242, 108, 0.4);
 }
-
 .form-row textarea {
   resize: vertical;
 }
-
 .form-row.two-cols {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -197,32 +187,33 @@ body {
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
 }
-
 .btn-primary {
   background: linear-gradient(135deg, var(--green-primary), var(--green-dark));
   color: #00210e;
   font-weight: 600;
   box-shadow: 0 12px 26px rgba(0, 0, 0, 0.6);
 }
-
 .btn-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
 }
-
 .btn-secondary {
   background: rgba(0, 0, 0, 0.55);
   color: #ffffff;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
-
 .btn-secondary:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
 }
-
-.btn-primary.wide {
+.btn-primary.wide,
+.btn-secondary.wide {
   width: 100%;
+}
+.btn-primary.small,
+.btn-secondary.small {
+  padding: 6px 12px;
+  font-size: 0.8rem;
 }
 
 .login-hint {
@@ -231,11 +222,15 @@ body {
   text-align: center;
   margin-top: 6px;
 }
-
-/* ============================================================
-   HEADER APP & BANNER FARMACIA DI TURNO
-   ============================================================ */
-
+.form-feedback {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--green-primary);
+}
+.form-feedback.small {
+  font-size: 0.75rem;
+}
+/* HEADER APP */
 .app-header {
   display: flex;
   flex-wrap: wrap;
@@ -244,99 +239,57 @@ body {
   gap: 18px;
   margin-bottom: 22px;
 }
-
 .header-left {
   display: flex;
   align-items: center;
   gap: 14px;
 }
-
 .header-logo-big {
   width: 80px;
   height: 80px;
   object-fit: contain;
 }
-
 .header-title {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin: 0;
 }
-
 .header-subtitle-main {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  margin: 2px 0 6px;
+  margin: 4px 0 6px;
   color: var(--text-muted);
 }
-
 .role-pill {
   display: inline-block;
   padding: 4px 10px;
   border-radius: var(--radius-pill);
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+/* CARDS BASE */
 .card {
   background: var(--card-dark);
   border-radius: var(--radius-card);
-  padding: 16px 16px 18px;
+  padding: 18px 18px 20px;
   border: 1px solid var(--card-border);
   box-shadow: var(--shadow-soft);
   position: relative;
   overflow: hidden;
 }
-
-/* Banner “Farmacia di turno oggi” */
-.card-mini-turno {
-  min-width: 260px;
-  flex: 1;
-  background: linear-gradient(135deg, #30d47a, #0ba561);
-  color: #03140b;
-}
-
-.turno-title {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin: 0 0 4px;
-}
-
-.turno-info p {
-  margin: 2px 0;
-  font-size: 0.85rem;
-}
-
-/* ============================================================
-   DASHBOARD & CARDS PRINCIPALI
-   ============================================================ */
-
-.dashboard {
-  margin-top: 4px;
-}
-
-.cards-grid-main {
-  display: grid;
-  grid-template-columns: minmax(0, 2.1fr) repeat(3, minmax(0, 1.4fr));
-  gap: 18px;
-}
-
-/* Card base */
 .card-title {
   margin: 0;
   font-size: 1rem;
 }
-
 .card-text {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
-  margin: 8px 0 16px;
+  margin: 8px 0 10px;
 }
-
 .card-top-row {
   display: flex;
   align-items: flex-start;
@@ -344,50 +297,72 @@ body {
   gap: 8px;
   margin-bottom: 10px;
 }
-
 .card-top-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
-
 .card-icon-circle {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 18px;
   background: rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
 }
-
-/* Colori cards */
+/* CARD COLORI */
+.card-mini-turno {
+  min-width: 260px;
+  flex: 1;
+  background: linear-gradient(135deg, #30d47a, #0ba561);
+  color: #03140b;
+}
+.turno-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0 0 4px;
+}
+.turno-info p {
+  margin: 2px 0;
+  font-size: 0.9rem;
+}
 .card-assenti {
   grid-row: 1 / span 2;
   background: radial-gradient(circle at top left, #152b4f 0, #071221 55%, #030910 100%);
 }
-
 .card-arrivi {
   background: radial-gradient(circle at top left, #1aa2ff 0, #0b4f96 45%, #05244e 100%);
 }
-
 .card-scadenze {
   background: radial-gradient(circle at top left, #ffcf4f 0, #f8a51e 40%, #b96a06 100%);
 }
-
 .card-consumabili {
   background: radial-gradient(circle at top left, #ff964f 0, #f76b1c 40%, #c04403 100%);
 }
-
 .card-cambio {
   background: radial-gradient(circle at top left, #18d18b 0, #07945a 40%, #045334 100%);
 }
+.card-comunicazioni {
+  background: radial-gradient(circle at top left, #ff6fab 0, #c02389 40%, #5b0c41 100%);
+}
 
-/* ============================================================
-   CARD NOTIFICHE (PALLINO PULSANTE)
-   ============================================================ */
+/* DASHBOARD GRID */
+.dashboard {
+  margin-top: 4px;
+}
+.cards-grid-main {
+  display: grid;
+  grid-template-columns: minmax(0, 2.1fr) repeat(3, minmax(0, 1.4fr));
+  gap: 18px;
+}
+.card-link {
+  cursor: pointer;
+}
 
+/* NOTIFICHE PALLINO */
 .card-notif-badge {
   border: none;
   background: rgba(0, 0, 0, 0.45);
@@ -395,203 +370,161 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 8px 4px 6px;
+  padding: 4px 10px 4px 8px;
   cursor: pointer;
   position: relative;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   color: #ffffff;
 }
-
 .card-notif-badge .badge-label {
   text-transform: uppercase;
   letter-spacing: 0.16em;
   font-weight: 600;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
 }
-
 .card-notif-badge .badge-dot {
-  width: 9px;
-  height: 9px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: var(--notif-red);
   box-shadow: 0 0 0 0 var(--notif-red);
   animation: notifPulse 1.4s infinite;
 }
-
 .card-notif-badge .badge-count {
-  min-width: 14px;
+  min-width: 18px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
 }
-
-/* animazione */
 @keyframes notifPulse {
   0% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(255, 57, 95, 0.9);
   }
   70% {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 8px rgba(255, 57, 95, 0);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 10px rgba(255, 57, 95, 0);
   }
   100% {
     transform: scale(1);
     box-shadow: 0 0 0 0 rgba(255, 57, 95, 0);
   }
 }
-
-/* ============================================================
-   CARD ASSENTI OGGI + CALENDARIO
-   ============================================================ */
-
+/* ASSENZE + CALENDARIO */
 .assenze-data-label {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   margin: 0 0 2px;
 }
-
 .assenti-content {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1.3fr 1fr;
   gap: 12px;
   align-items: stretch;
 }
-
 .assenti-left {
   display: flex;
   flex-direction: column;
 }
-
 .assenze-list {
   list-style: none;
   padding: 0;
   margin: 4px 0 10px;
-  font-size: 0.85rem;
-}
-
-.assenze-list li + li {
-  margin-top: 3px;
-}
-
-.assenti-subtitle {
-  margin: 8px 0 4px;
   font-size: 0.9rem;
 }
-
+.assenze-list li + li {
+  margin-top: 4px;
+}
+.assenti-subtitle {
+  margin: 8px 0 4px;
+  font-size: 0.95rem;
+}
 .assenti-actions {
   margin-top: auto;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 6px;
-  align-items: flex-start;
 }
-
-.assenti-btn {
-  align-self: flex-start;
-}
-
-.assenti-extra-btn {
-  font-size: 0.8rem;
-  padding-inline: 16px;
-}
-
 .cal-mini-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   margin-bottom: 6px;
 }
-
 .cal-nav {
   border-radius: 999px;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border: none;
   background: rgba(0, 0, 0, 0.5);
   color: #fff;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-
 .cal-mini-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   text-align: center;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   margin-bottom: 4px;
 }
-
 .cal-mini-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 2px;
-  font-size: 0.75rem;
+  gap: 4px;
+  font-size: 0.8rem;
 }
-
 .cal-day {
-  height: 22px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
   color: #cfd6e8;
 }
-
 .cal-day--empty {
   opacity: 0;
 }
-
 .cal-day--today {
   border: 1px solid var(--green-primary);
 }
-
 .cal-day--has-assenze {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
   position: relative;
 }
-
 .cal-day--has-assenze::after {
   content: "";
   position: absolute;
   bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--green-primary);
 }
-
 .cal-legend {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   margin-top: 6px;
   display: flex;
   align-items: center;
   gap: 6px;
-  justify-content: flex-start;
 }
-
 .cal-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--green-primary);
 }
-
-/* ============================================================
-   PAGINE INTERNE – STRUTTURA GENERALE
-   ============================================================ */
-
+/* PAGINE INTERNE */
 .page {
-  margin-top: 10px;
+  margin-top: 14px;
 }
-
 .page-header {
   display: flex;
   align-items: center;
@@ -599,18 +532,15 @@ body {
   gap: 14px;
   margin-bottom: 16px;
 }
-
 .page-title-block h1 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
-
 .page-title-block p {
   margin: 4px 0 0;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
 }
-
 .back-button {
   border-radius: var(--radius-pill);
   border: none;
@@ -618,68 +548,49 @@ body {
   color: #ffffff;
   padding: 7px 14px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
-
 .page-content-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
-/* Moduli semplici */
-
-.simple-form .form-row {
-  margin-bottom: 10px;
-}
-
-.form-feedback {
-  margin-top: 8px;
-  font-size: 0.8rem;
-  color: var(--green-primary);
-}
-
-/* Tabelle / elenchi */
-
+/* TABELLE / ELENCHI */
 .table-like {
   width: 100%;
+  font-size: 0.9rem;
+}
+.table-like.small {
   font-size: 0.85rem;
 }
-
-.table-like.small {
-  font-size: 0.8rem;
-}
-
 .table-like .row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-
 .table-like .row.header {
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
-
 .table-like .row span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
 .table-like .row .actions {
   display: flex;
   gap: 4px;
 }
-
-/* ============================================================
-   OVERLAY NOTIFICHE
-   ============================================================ */
-
+.small-muted {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+/* OVERLAY NOTIFICHE */
 .notif-overlay {
   position: fixed;
   inset: 0;
@@ -688,38 +599,32 @@ body {
   justify-content: center;
   z-index: 50;
 }
-
 .notif-overlay.hidden {
   display: none;
 }
-
 .notif-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(1, 5, 12, 0.7);
+  background: rgba(1, 5, 12, 0.75);
 }
-
 .notif-modal {
   position: relative;
   background: radial-gradient(circle at top left, #17335f 0, #050e1c 60%, #02060c 100%);
   border-radius: 22px;
   padding: 18px 18px 16px;
-  width: min(420px, calc(100% - 32px));
+  width: min(460px, calc(100% - 32px));
   box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.06);
   z-index: 1;
 }
-
 .notif-modal h2 {
   margin: 0 0 4px;
 }
-
 .notif-intro {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin: 0 0 8px;
 }
-
 .notif-close {
   position: absolute;
   top: 10px;
@@ -732,108 +637,142 @@ body {
   height: 26px;
   cursor: pointer;
 }
-
 .notif-list {
   max-height: 260px;
   overflow-y: auto;
   margin: 4px 0 10px;
 }
-
 .notif-item {
   padding: 8px 6px;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.45);
   margin-bottom: 6px;
 }
-
 .notif-item-title {
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   font-weight: 600;
 }
-
 .notif-item-text {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-top: 2px;
 }
-
 .notif-footer {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
-
+/* CONSUMABILI */
+.consumabili-form-inline {
+  margin-bottom: 12px;
+}
+.consumabili-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.consumabile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+}
+.consumabile-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.consumabile-label {
+  font-size: 0.9rem;
+}
+.consumabile-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.consumabile-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.consumabile-checkbox {
+  width: 18px;
+  height: 18px;
+}
+/* RESPONSIVE */
 @media (max-width: 1024px) {
   .cards-grid-main {
     grid-template-columns: minmax(0, 1.8fr) repeat(2, minmax(0, 1.3fr));
     grid-auto-rows: auto;
   }
-
-  .card-consumabili,
-  .card-cambio {
-    grid-column: span 1;
+  .card-assenti {
+    grid-row: auto;
   }
-
   .page-content-grid {
     grid-template-columns: 1fr;
   }
 }
-
 @media (max-width: 800px) {
   .app {
     padding: 12px 10px 24px;
   }
-
   .app-header {
     flex-direction: column;
     align-items: flex-start;
   }
-
   .cards-grid-main {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .card-assenti {
-    grid-row: auto;
+  .card {
+    padding: 14px 13px 15px;
   }
-
+  .card-title {
+    font-size: 0.95rem;
+  }
+  .card-icon-circle {
+    width: 30px;
+    height: 30px;
+    font-size: 1.2rem;
+  }
   .assenti-content {
     grid-template-columns: 1fr;
   }
-
   .page-header {
     flex-direction: column;
     align-items: flex-start;
   }
 }
-
+@media (max-width: 600px) {
+  .cards-grid-main {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .card-notif-badge {
+    transform: scale(1.02);
+  }
+}
 @media (max-width: 480px) {
   .auth-card {
     padding: 24px 16px 20px;
   }
-
   .header-logo-big {
     width: 64px;
     height: 64px;
   }
-
   .header-title {
-    font-size: 1rem;
+    font-size: 1.2rem;
   }
-
   .role-pill {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
-
-  .card {
-    padding: 14px 13px 15px;
+  .cards-grid-main {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .card-title {
-    font-size: 0.95rem;
+  .page-content-grid {
+    grid-template-columns: 1fr;
   }
 }
