@@ -10,6 +10,19 @@
   <div class="app-shell">
 
     <!-- ======================
+         HEADER DESKTOP
+         ====================== -->
+    <header class="app-header desktop-only">
+      <div class="app-header-left">
+        <h1>PORTALE FARMACIA MONTESANO</h1>
+        <span class="app-header__subtitle">Dashboard principale</span>
+      </div>
+      <div class="app-header-right">
+        <span class="app-header-pill" id="today-date-desktop"></span>
+      </div>
+    </header>
+
+    <!-- ======================
          VISTA MOBILE (CARD)
          ====================== -->
     <div class="mobile-dashboard">
@@ -26,79 +39,101 @@
         <section class="m-card-grid">
 
           <!-- RIGA 1 -->
-          <button class="m-card m-card-assenti">
+          <button class="m-card m-card-green" data-open="assenti">
             <div class="m-card-label">NUOVI</div>
-            <div class="m-card-title">Assenti / Permessi</div>
-            <div class="m-card-badge">2</div>
-            <div class="m-card-icon">📅</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Assenti / Permessi</div>
+              <div class="m-card-icon">📅</div>
+            </div>
+            <div class="m-card-badge" data-badge="assenti">0</div>
           </button>
 
-          <button class="m-card m-card-turno">
+          <button class="m-card m-card-blue" data-open="turno">
             <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Farmacia di turno</div>
-            <div class="m-card-badge">1</div>
-            <div class="m-card-icon">⏰</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Farmacia di turno</div>
+              <div class="m-card-icon">⏰</div>
+            </div>
+            <div class="m-card-badge" data-badge="turno">1</div>
           </button>
 
           <!-- RIGA 2 -->
-          <button class="m-card m-card-comunicazioni">
+          <button class="m-card m-card-pink" data-open="comunicazioni">
             <div class="m-card-label">NUOVA</div>
-            <div class="m-card-title">Comunicazioni</div>
-            <div class="m-card-badge">1</div>
-            <div class="m-card-icon">📢</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Comunicazioni</div>
+              <div class="m-card-icon">📢</div>
+            </div>
+            <div class="m-card-badge" data-badge="comunicazioni">1</div>
           </button>
 
-          <button class="m-card m-card-procedure">
+          <button class="m-card m-card-teal" data-open="procedure">
             <div class="m-card-label">NUOVE</div>
-            <div class="m-card-title">Procedure</div>
-            <div class="m-card-icon">📚</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Procedure</div>
+              <div class="m-card-icon">📚</div>
+            </div>
           </button>
 
           <!-- RIGA 3 -->
-          <button class="m-card m-card-logistica">
+          <button class="m-card m-card-yellow" data-open="logistica">
             <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Logistica</div>
-            <div class="m-card-badge">1</div>
-            <div class="m-card-icon">📦</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Logistica</div>
+              <div class="m-card-icon">📦</div>
+            </div>
+            <div class="m-card-badge" data-badge="logistica">1</div>
           </button>
 
-          <button class="m-card m-card-magazziniera">
+          <button class="m-card m-card-cyan" data-open="magazziniera">
             <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Magazziniera</div>
-            <div class="m-card-badge">2</div>
-            <div class="m-card-icon">📋</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Magazziniera</div>
+              <div class="m-card-icon">📋</div>
+            </div>
+            <div class="m-card-badge" data-badge="magazziniera">2</div>
           </button>
 
           <!-- RIGA 4 -->
-          <button class="m-card m-card-scadenze">
+          <button class="m-card m-card-orange" data-open="scadenze">
             <div class="m-card-label">NUOVI</div>
-            <div class="m-card-title">Prodotti in scadenza</div>
-            <div class="m-card-icon">⏳</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Prodotti in scadenza</div>
+              <div class="m-card-icon">⏳</div>
+            </div>
           </button>
 
-          <button class="m-card m-card-consumabili">
+          <button class="m-card m-card-green2" data-open="consumabili">
             <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Consumabili</div>
-            <div class="m-card-icon">🧪</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Consumabili</div>
+              <div class="m-card-icon">🧪</div>
+            </div>
           </button>
 
           <!-- RIGA 5 -->
-          <button class="m-card m-card-consegne">
+          <button class="m-card m-card-blue2" data-open="consegne">
             <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Consegne / Ritiri</div>
-            <div class="m-card-icon">🚚</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Consegne / Ritiri</div>
+              <div class="m-card-icon">🚚</div>
+            </div>
           </button>
 
-          <button class="m-card m-card-cassa">
+          <button class="m-card m-card-purple" data-open="cassa">
             <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Cambio cassa</div>
-            <div class="m-card-icon">💶</div>
+            <div class="m-card-main">
+              <div class="m-card-title">Cambio cassa</div>
+              <div class="m-card-icon">💶</div>
+            </div>
           </button>
 
           <!-- RIGA 6: ARCHIVIO A TUTTA LARGHEZZA -->
-          <button class="m-card m-card-archivio m-card-wide">
-            <div class="m-card-title">Archivio file</div>
-            <div class="m-card-icon">🗄️</div>
+          <button class="m-card m-card-dark m-card-wide" data-open="archivio">
+            <div class="m-card-main">
+              <div class="m-card-title">Archivio file</div>
+              <div class="m-card-icon">🗄️</div>
+            </div>
           </button>
 
         </section>
@@ -109,187 +144,340 @@
          VISTA DESKTOP (PC)
          ====================== -->
     <div class="desktop-dashboard">
-      <header class="app-header">
-        <h1>PORTALE FARMACIA MONTESANO</h1>
-        <span class="app-header__subtitle">Dashboard principale</span>
-      </header>
 
-      <main class="dashboard">
+      <!-- STRISCIA ALTA “DA GUERRA” -->
+      <section class="top-strip">
+        <div class="top-pill top-pill-turno" data-open="turno">
+          <span class="top-pill-label">Turno attivo</span>
+          <span class="top-pill-value" id="top-turno-value">Farmacia Montesano · 08:00–08:00</span>
+        </div>
+        <div class="top-pill top-pill-appoggio" data-open="turno">
+          <span class="top-pill-label">Farmacia di appoggio</span>
+          <span class="top-pill-value" id="top-appoggio-value">Farmacia Centrale · 08:30–20:30</span>
+        </div>
+        <div class="top-pill top-pill-assenti" data-open="assenti">
+          <span class="top-pill-label">Assenti oggi</span>
+          <span class="top-pill-value" id="top-assenti-count">0</span>
+        </div>
+        <div class="top-pill top-pill-clienti" data-open="appuntamenti">
+          <span class="top-pill-label">Appuntamenti oggi</span>
+          <span class="top-pill-value" id="top-appuntamenti-count">0</span>
+        </div>
+      </section>
 
-        <!-- COLONNA SINISTRA: LOGO + CALENDARIO + ASSENTI/PERMESSI -->
-        <section class="dashboard-left">
+      <!-- GRID PRINCIPALE – COLORI STILE TELEFONO -->
+      <main class="desktop-main">
 
-          <!-- LOGO FARMACIA -->
-          <div class="card card-logo">
-            <div class="card-logo__icon">+</div>
-            <div class="card-logo__text">
-              <span class="card-logo__title">FARMACIA MONTESANO</span>
-              <span class="card-logo__subtitle">Portale interno</span>
-            </div>
-          </div>
-
-          <!-- CALENDARIO -->
-          <div class="card card-calendar card-calendar-big">
-            <div class="card-header">
-              <span class="card-title">Calendario</span>
-              <span class="card-pill" id="today-pill">Oggi</span>
-            </div>
-
-            <div class="calendar-body">
-              <div class="calendar-month" id="calendar-month">Novembre 2025</div>
-              <div class="calendar-grid">
-                <span>lu</span><span>ma</span><span>me</span><span>gi</span><span>ve</span><span>sa</span><span>do</span>
-                <span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
-                <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span>
-                <span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
-                <span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span>
-                <span>28</span><span>29</span><span>30</span><span></span><span></span><span></span><span></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- ASSENTI / PERMESSI -->
-          <div class="card card-tall card-assenti-desktop">
-            <div class="card-header">
-              <span class="card-title">Assenti / Permessi oggi</span>
-            </div>
-            <ul class="card-list" id="assenti-list">
-              <!-- riempito da JS -->
-            </ul>
-            <button class="btn-primary btn-full">Vedi tutte le assenze</button>
-          </div>
-
-        </section>
-
-        <!-- COLONNA DESTRA -->
-        <section class="dashboard-right">
-
-          <!-- CARD UNICA: TURNO + APPOGGIO -->
-          <div class="card card-wide card-turno-appoggio">
-            <div class="turno-appoggio-grid">
-              <div class="turno-block">
-                <div class="card-header">
-                  <span class="card-label">Turno</span>
-                  <span class="card-pill pill-success">Farmacia di turno</span>
-                </div>
-                <p class="card-main-text" id="turno-main">
-                  <!-- testo da JS -->
-                </p>
-              </div>
-
-              <div class="appoggio-block">
-                <div class="card-header">
-                  <span class="card-label">Appoggio</span>
-                  <span class="card-pill pill-info">Farmacia di appoggio</span>
-                </div>
-                <p class="card-main-text" id="turno-appoggio">
-                  <!-- testo da JS -->
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 7 CARD GRANDI (3 per riga) -->
+        <!-- BLOCCO OPERAZIONI RAPIDE -->
+        <section class="desktop-grid">
 
           <!-- RIGA 1 -->
-          <div class="card card-big card-consegne">
-            <div class="card-header">
-              <span class="card-title">Consegne / Ritiri</span>
+          <div class="d-card d-card-green" data-open="assenti">
+            <div class="d-card-label">NUOVI</div>
+            <div class="d-card-title-row">
+              <h2>Assenti / Permessi</h2>
+              <span class="d-badge" data-badge="assenti">0</span>
             </div>
-            <p class="card-main-text" id="consegne-info">
-              <!-- testo da JS -->
+            <p class="d-card-text" id="preview-assenti">
+              Nessun assente registrato oggi.
             </p>
-            <button class="btn-link">Apri registro consegne</button>
           </div>
 
-          <div class="card card-big card-scadenze">
-            <div class="card-header">
-              <span class="card-title">Prodotti in scadenza</span>
+          <div class="d-card d-card-blue" data-open="turno">
+            <div class="d-card-label">NUOVO</div>
+            <div class="d-card-title-row">
+              <h2>Farmacia di turno</h2>
+              <span class="d-badge" data-badge="turno">1</span>
             </div>
-            <p class="card-main-text" id="scadenze-info">
-              <!-- testo da JS -->
+            <p class="d-card-text" id="preview-turno">
+              Farmacia Montesano di turno oggi – in servizio fino alle 08:00 di domani.
             </p>
-            <button class="btn-link">Visualizza elenco completo</button>
           </div>
 
-          <div class="card card-big card-consumabili">
-            <div class="card-header">
-              <span class="card-title">Consumabili</span>
+          <div class="d-card d-card-pink" data-open="comunicazioni">
+            <div class="d-card-label">NUOVA</div>
+            <div class="d-card-title-row">
+              <h2>Comunicazioni</h2>
+              <span class="d-badge" data-badge="comunicazioni">1</span>
             </div>
-            <p class="card-main-text" id="consumabili-info">
-              <!-- testo da JS -->
+            <p class="d-card-text" id="preview-comunicazioni">
+              1 comunicazione interna non letta.
             </p>
-            <button class="btn-link">Gestisci consumi</button>
           </div>
 
           <!-- RIGA 2 -->
-          <div class="card card-big card-clienti">
-            <div class="card-header">
-              <span class="card-title">Appuntamenti clienti oggi</span>
+          <div class="d-card d-card-teal" data-open="procedure">
+            <div class="d-card-label">NUOVE</div>
+            <div class="d-card-title-row">
+              <h2>Procedure</h2>
             </div>
-            <ul class="card-list card-list-tight" id="clienti-list">
-              <!-- riempito da JS -->
-            </ul>
-            <button class="btn-link">Vai a tutti gli appuntamenti</button>
-          </div>
-
-          <div class="card card-big card-magazziniera">
-            <div class="card-header">
-              <span class="card-title">Magazziniera</span>
-            </div>
-            <ul class="card-list card-list-tight">
-              <li>✔ Controllo banco automedicazione</li>
-              <li>⬜ Inventario dermocosmesi</li>
-              <li>⬜ Resi grossista fine settimana</li>
-            </ul>
-            <button class="btn-link">Apri pannello magazzino</button>
-          </div>
-
-          <div class="card card-big card-comunicazioni">
-            <div class="card-header">
-              <span class="card-title">Comunicazioni</span>
-              <span class="badge" id="badge-comunicazioni">1 NUOVO</span>
-            </div>
-            <p class="card-main-text" id="comunicazioni-info">
-              <!-- testo da JS -->
+            <p class="d-card-text">
+              Le 4 procedure più usate sempre in evidenza.
             </p>
-            <button class="btn-link">Vai alle comunicazioni</button>
           </div>
 
-          <!-- RIGA 3 -->
-          <div class="card card-big card-cassa">
-            <div class="card-header">
-              <span class="card-title">Cambio cassa</span>
+          <div class="d-card d-card-yellow" data-open="logistica">
+            <div class="d-card-label">NUOVO</div>
+            <div class="d-card-title-row">
+              <h2>Logistica</h2>
+              <span class="d-badge" data-badge="logistica">1</span>
             </div>
-            <p class="card-main-text" id="cassa-info">
-              <!-- testo da JS -->
+            <p class="d-card-text" id="preview-logistica">
+              2 consegne e 1 ritiro programmati nella giornata.
             </p>
-            <button class="btn-link">Apri modulo cambio cassa</button>
           </div>
 
-          <div class="card card-big card-logistica">
-            <div class="card-header">
-              <span class="card-title">Logistica</span>
+          <div class="d-card d-card-cyan" data-open="magazziniera">
+            <div class="d-card-label">NUOVO</div>
+            <div class="d-card-title-row">
+              <h2>Magazziniera</h2>
+              <span class="d-badge" data-badge="magazziniera">2</span>
             </div>
-            <p class="card-main-text" id="logistica-info">
-              <!-- testo da JS -->
+            <p class="d-card-text">
+              Inventario rapido, scorte critiche e resi in un colpo d’occhio.
             </p>
-            <button class="btn-link">Gestisci logistica</button>
           </div>
 
-          <div class="card card-big card-archivio">
-            <div class="card-header">
-              <span class="card-title">Archivio file</span>
+          <!-- RIGA 3 – STATO FARMACIA -->
+          <div class="d-card d-card-orange" data-open="scadenze">
+            <div class="d-card-label">NUOVI</div>
+            <div class="d-card-title-row">
+              <h2>Prodotti in scadenza</h2>
             </div>
-            <p class="card-main-text">
-              4 documenti aggiunti questa settimana.
+            <p class="d-card-text" id="preview-scadenze">
+              6 articoli in scadenza entro 7 giorni.
             </p>
-            <button class="btn-link">Apri archivio</button>
+          </div>
+
+          <div class="d-card d-card-green2" data-open="consumabili">
+            <div class="d-card-label">NUOVO</div>
+            <div class="d-card-title-row">
+              <h2>Consumabili</h2>
+            </div>
+            <p class="d-card-text">
+              Disponibilità sufficiente per le prossime 2 settimane.
+            </p>
+          </div>
+
+          <div class="d-card d-card-purple" data-open="cassa">
+            <div class="d-card-label">NUOVO</div>
+            <div class="d-card-title-row">
+              <h2>Cambio cassa</h2>
+            </div>
+            <p class="d-card-text">
+              Ultimo cambio registrato alle 14:22.
+            </p>
+          </div>
+
+          <!-- RIGA 4 – CLIENTI + ARCHIVIO -->
+          <div class="d-card d-card-clienti" data-open="appuntamenti">
+            <div class="d-card-label">CLIENTI</div>
+            <div class="d-card-title-row">
+              <h2>Appuntamenti clienti oggi</h2>
+              <span class="d-badge" id="badge-appuntamenti">0</span>
+            </div>
+            <p class="d-card-text" id="preview-appuntamenti">
+              Nessun appuntamento programmato.
+            </p>
+          </div>
+
+          <div class="d-card d-card-clienti" data-open="richieste">
+            <div class="d-card-label">CLIENTI</div>
+            <div class="d-card-title-row">
+              <h2>Richieste clienti</h2>
+            </div>
+            <p class="d-card-text">
+              In futuro: prenotazioni, richieste online, promemoria clienti.
+            </p>
+          </div>
+
+          <div class="d-card d-card-dark" data-open="archivio">
+            <div class="d-card-label">FILE</div>
+            <div class="d-card-title-row">
+              <h2>Archivio file</h2>
+            </div>
+            <p class="d-card-text">
+              4 documenti aggiunti questa settimana. Tutte le schede operative in un posto.
+            </p>
           </div>
 
         </section>
       </main>
     </div>
+
+    <!-- ======================
+         PAGINE INTERNE
+         (stesso HTML per mobile + desktop)
+         ====================== -->
+
+    <!-- TEMPLATE BASE: ogni pagina ha un id "page-xxx" -->
+    <main class="page-shell">
+
+      <!-- ASSENTI / PERMESSI -->
+      <section class="page hidden" id="page-assenti">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Assenti / Permessi approvati</h1>
+          <p class="page-subtitle">Vedi subito chi manca, da quando e fino a quando.</p>
+        </header>
+
+        <section class="page-highlight">
+          <h2>Oggi</h2>
+          <ul id="lista-assenti-oggi"></ul>
+        </section>
+
+        <section class="page-section">
+          <h2>Prossimi giorni</h2>
+          <ul id="lista-assenti-prossimi"></ul>
+        </section>
+      </section>
+
+      <!-- TURNO FARMACIA -->
+      <section class="page hidden" id="page-turno">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Farmacia di turno</h1>
+          <p class="page-subtitle">Turno attuale e prossimi cambi.</p>
+        </header>
+
+        <section class="page-highlight" id="turno-attuale-box"></section>
+
+        <section class="page-section">
+          <h2>Prossimi turni</h2>
+          <ul id="lista-prossimi-turni"></ul>
+        </section>
+      </section>
+
+      <!-- COMUNICAZIONI -->
+      <section class="page hidden" id="page-comunicazioni">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Comunicazioni interne</h1>
+          <p class="page-subtitle">Solo quello che serve, in ordine dalla più recente.</p>
+        </header>
+
+        <section class="page-section" id="lista-comunicazioni"></section>
+      </section>
+
+      <!-- PROCEDURE -->
+      <section class="page hidden" id="page-procedure">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Procedure rapide</h1>
+          <p class="page-subtitle">Le procedure essenziali, pronte da aprire mentre stai lavorando.</p>
+        </header>
+
+        <section class="page-section" id="lista-procedure"></section>
+      </section>
+
+      <!-- LOGISTICA -->
+      <section class="page hidden" id="page-logistica">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Logistica</h1>
+          <p class="page-subtitle">Consegne e ritiri della giornata.</p>
+        </header>
+
+        <section class="page-highlight" id="logistica-oggi-box"></section>
+      </section>
+
+      <!-- MAGAZZINIERA -->
+      <section class="page hidden" id="page-magazziniera">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Magazziniera</h1>
+          <p class="page-subtitle">Controlli periodici, inventario e resi.</p>
+        </header>
+
+        <section class="page-section" id="magazzino-box"></section>
+      </section>
+
+      <!-- SCADENZE -->
+      <section class="page hidden" id="page-scadenze">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Prodotti in scadenza</h1>
+          <p class="page-subtitle">Focus solo su ciò che scade prima.</p>
+        </header>
+
+        <section class="page-section" id="lista-scadenze"></section>
+      </section>
+
+      <!-- CONSUMABILI -->
+      <section class="page hidden" id="page-consumabili">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Consumabili</h1>
+          <p class="page-subtitle">Carta, siringhe, guanti ecc. – livello scorte rapido.</p>
+        </header>
+
+        <section class="page-section" id="lista-consumabili"></section>
+      </section>
+
+      <!-- CONSEGNE / RITIRI -->
+      <section class="page hidden" id="page-consegne">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Consegne / Ritiri</h1>
+          <p class="page-subtitle">Tutto quello che deve entrare o uscire oggi.</p>
+        </header>
+
+        <section class="page-section" id="lista-consegne"></section>
+      </section>
+
+      <!-- CAMBIO CASSA -->
+      <section class="page hidden" id="page-cassa">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Cambio cassa</h1>
+          <p class="page-subtitle">Ultimi cambi registrati (solo demo, poi colleghiamo il modulo vero).</p>
+        </header>
+
+        <section class="page-section" id="lista-cambi-cassa"></section>
+      </section>
+
+      <!-- APPUNTAMENTI CLIENTI -->
+      <section class="page hidden" id="page-appuntamenti">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Appuntamenti clienti di oggi</h1>
+          <p class="page-subtitle">Orario, nome e servizio in un attimo.</p>
+        </header>
+
+        <section class="page-section" id="lista-appuntamenti"></section>
+      </section>
+
+      <!-- RICHIESTE CLIENTI -->
+      <section class="page hidden" id="page-richieste">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Richieste clienti</h1>
+          <p class="page-subtitle">Sezione pronta per future integrazioni (online, app, ecc.).</p>
+        </header>
+
+        <section class="page-section">
+          <p>In questa pagina in futuro potrai vedere:</p>
+          <ul>
+            <li>Richieste da app o sito</li>
+            <li>Promemoria per prodotti da riordinare per singolo cliente</li>
+            <li>Note veloci collegate alla scheda cliente</li>
+          </ul>
+        </section>
+      </section>
+
+      <!-- ARCHIVIO FILE -->
+      <section class="page hidden" id="page-archivio">
+        <header class="page-header">
+          <button class="back-btn" data-back="dashboard">← Torna alla Dashboard</button>
+          <h1>Archivio file</h1>
+          <p class="page-subtitle">Documenti operativi, procedure, PDF, schede interne.</p>
+        </header>
+
+        <section class="page-section" id="lista-archivio"></section>
+      </section>
+
+    </main>
+
   </div>
 
   <script src="script.js"></script>
