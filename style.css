@@ -1,3 +1,4 @@
+/* RESET BASE */
 *,
 *::before,
 *::after {
@@ -6,24 +7,28 @@
 
 :root {
   --bg-body: #041427;
-  --bg-panel: #061a33;
-  --bg-card: #0b2340;
   --txt-main: #f9fbff;
   --txt-muted: #c3c8d9;
-
-  --accent-blue: #1b78ff;
-  --accent-green: #1cc88a;
-  --accent-orange: #f6a623;
-  --accent-pink: #ff3d9a;
-  --accent-purple: #7a5cff;
-  --accent-cyan: #19c1d8;
-
-  --radius-lg: 18px;
-  --radius-md: 14px;
-  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.35);
-  --transition-fast: 0.18s ease-out;
   --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Helvetica Neue", Arial, sans-serif;
+
+  /* colori card – uguali mobile + desktop */
+  --card-assenti: linear-gradient(145deg, #09c15b, #02a445);
+  --card-turno: linear-gradient(145deg, #1a8cff, #045ad6);
+  --card-comunicazioni: linear-gradient(145deg, #ff3689, #ff0066);
+  --card-procedure: linear-gradient(145deg, #0dbda7, #049c8a);
+  --card-logistica: linear-gradient(145deg, #ffc933, #f6a623);
+  --card-magazziniera: linear-gradient(145deg, #1d8dff, #0064e0);
+  --card-scadenze: linear-gradient(145deg, #ffb32c, #ff8b00);
+  --card-consumabili: linear-gradient(145deg, #34d27b, #02ad55);
+  --card-consegne: linear-gradient(145deg, #1a8cff, #0066ff);
+  --card-cassa: linear-gradient(145deg, #9152ff, #6b39e4);
+  --card-archivio: linear-gradient(145deg, #02182e, #03101f);
+
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --shadow-soft: 0 20px 45px rgba(0, 0, 0, 0.55);
+  --transition-fast: 0.18s ease-out;
 }
 
 html,
@@ -35,16 +40,178 @@ body {
 
 body {
   font-family: var(--font-main);
-  background: radial-gradient(circle at 0 0, #115a9c 0, #041427 55%, #020711 100%);
+  background: radial-gradient(circle at 0 0, #0b63a5 0, #041427 55%, #020711 100%);
   color: var(--txt-main);
 }
 
-/* HEADER */
+/* SHELL + VISUAL SWITCH */
 .app-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
+
+/* MOBILE DEFAULT, DESKTOP HIDDEN */
+.mobile-dashboard {
+  display: block;
+}
+.desktop-dashboard {
+  display: none;
+}
+
+/* ======================
+   MOBILE – HEADER
+   ====================== */
+
+.m-header {
+  padding: 16px 18px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.m-logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.m-logo {
+  width: 180px;
+  max-width: 70vw;
+  height: auto;
+  filter: drop-shadow(0 14px 35px rgba(0, 0, 0, 0.5));
+}
+
+/* hamburger tondo a destra */
+.m-hamburger {
+  width: 46px;
+  height: 38px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: radial-gradient(circle at 30% 20%,
+      rgba(255, 255, 255, 0.22),
+      rgba(0, 0, 0, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.95);
+  cursor: pointer;
+}
+
+.m-hamburger span {
+  position: relative;
+  width: 20px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow:
+    0 -6px 0 #ffffff,
+    0  6px 0 #ffffff;
+}
+
+/* ======================
+   MOBILE – GRID CARD
+   ====================== */
+
+.m-main {
+  padding: 4px 14px 18px;
+}
+
+.m-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* Card base */
+.m-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-soft);
+  color: #ffffff;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.m-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 0 0,
+    rgba(255, 255, 255, 0.16),
+    transparent 55%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.m-card:hover::before {
+  opacity: 1;
+}
+
+.m-card-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.m-card-title {
+  margin-top: 4px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  max-width: 9ch;
+}
+
+/* badge rosso */
+.m-card-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #ffe3ec 0, #ff1744 40%, #c51162 100%);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.15);
+}
+
+/* emoji in basso a sinistra */
+.m-card-icon {
+  margin-top: 16px;
+  font-size: 1.8rem;
+}
+
+/* varianti colore – condivise con desktop */
+.m-card-assenti        { background: var(--card-assenti); }
+.m-card-turno          { background: var(--card-turno); }
+.m-card-comunicazioni  { background: var(--card-comunicazioni); }
+.m-card-procedure      { background: var(--card-procedure); }
+.m-card-logistica      { background: var(--card-logistica); }
+.m-card-magazziniera   { background: var(--card-magazziniera); }
+.m-card-scadenze       { background: var(--card-scadenze); }
+.m-card-consumabili    { background: var(--card-consumabili); }
+.m-card-consegne       { background: var(--card-consegne); }
+.m-card-cassa          { background: var(--card-cassa); }
+.m-card-archivio       { background: var(--card-archivio); }
+
+.m-card-wide {
+  grid-column: 1 / -1;
+}
+
+/* ======================
+   DESKTOP
+   ====================== */
 
 .app-header {
   padding: 18px 40px 10px;
@@ -55,7 +222,7 @@ body {
 
 .app-header h1 {
   font-size: 1.4rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   margin: 0;
 }
@@ -65,15 +232,12 @@ body {
   color: var(--txt-muted);
 }
 
-/* =======================
-   DASHBOARD LAYOUT
-   ======================= */
-
+/* Layout desktop principale */
 .dashboard {
   flex: 1;
   padding: 10px 32px 32px;
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr); /* colonna sinistra un po' più larga */
+  grid-template-columns: 320px minmax(0, 1fr);
   gap: 24px;
   align-items: flex-start;
 }
@@ -88,15 +252,15 @@ body {
 /* Colonna destra */
 .dashboard-right {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 card per riga */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-auto-rows: minmax(150px, auto);
   gap: 18px;
 }
 
-/* CARD BASE */
+/* CARD DESKTOP BASE */
 .card {
-  background: linear-gradient(145deg, var(--bg-card), #061932);
-  border-radius: var(--radius-lg);
+  background: linear-gradient(145deg, #0b2340, #061932);
+  border-radius: var(--radius-md);
   padding: 16px 18px;
   box-shadow: var(--shadow-soft);
   position: relative;
@@ -110,7 +274,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.08), transparent 55%);
+  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.1), transparent 55%);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--transition-fast);
@@ -118,8 +282,8 @@ body {
 
 .card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .card:hover::before {
@@ -176,21 +340,6 @@ body {
   color: var(--txt-muted);
 }
 
-/* Badge comunicazioni */
-.badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3px 9px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  background: #ff3d9a;
-  color: #fff;
-}
-
 /* LOGO */
 .card-logo {
   display: flex;
@@ -211,11 +360,6 @@ body {
   font-weight: 700;
 }
 
-.card-logo__text {
-  display: flex;
-  flex-direction: column;
-}
-
 .card-logo__title {
   font-size: 0.95rem;
   font-weight: 700;
@@ -227,9 +371,9 @@ body {
   color: var(--txt-muted);
 }
 
-/* CALENDARIO (più grande) */
+/* CALENDARIO */
 .card-calendar-big {
-  min-height: 260px;
+  min-height: 240px;
 }
 
 .calendar-body {
@@ -262,18 +406,26 @@ body {
 }
 
 .calendar-grid span.today {
-  background: var(--accent-blue);
+  background: var(--card-turno);
   color: #fff;
 }
 
-/* ASSENTI / PERMESSI (più alta) */
+/* ASSENTI */
 .card-tall {
   display: flex;
   flex-direction: column;
 }
 
-.card-tall-big {
-  min-height: 220px;
+.card-assenti-desktop {
+  background: var(--card-assenti);
+}
+
+.card-assenti-desktop .card-title {
+  color: #ffffff;
+}
+
+.card-assenti-desktop .card-list {
+  color: #ffffff;
 }
 
 .card-list {
@@ -288,9 +440,13 @@ body {
   margin-top: 4px;
 }
 
-/* CARD UNICA TURNO + APPOGGIO */
+.card-list-tight li + li {
+  margin-top: 3px;
+}
+
+/* CARD WIDE TURNI */
 .card-wide {
-  grid-column: 1 / -1; /* prende tutta la larghezza della colonna destra */
+  grid-column: 1 / -1;
 }
 
 .card-turno-appoggio {
@@ -303,42 +459,38 @@ body {
   gap: 18px;
 }
 
-.turno-block,
-.appoggio-block {
-  min-height: 90px;
-}
-
-/* 6 CARD GRANDI (3 per riga) */
+/* card grandi (griglia destra) */
 .card-big {
-  min-height: 150px;          /* più grande rispetto alle card normali */
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* Colori card */
-.card-consegne {
-  background: linear-gradient(140deg, #1b78ff, #0b2340);
-}
+/* Colori card desktop = stessi del mobile */
+.card-consegne      { background: var(--card-consegne); }
+.card-scadenze      { background: var(--card-scadenze); }
+.card-consumabili   { background: var(--card-consumabili); }
+.card-clienti       { background: var(--card-procedure); } /* teal, tipo servizi */
+.card-magazziniera  { background: var(--card-magazziniera); }
+.card-comunicazioni { background: var(--card-comunicazioni); }
+.card-cassa         { background: var(--card-cassa); }
+.card-logistica     { background: var(--card-logistica); }
+.card-archivio      { background: var(--card-archivio); }
 
-.card-scadenze {
-  background: linear-gradient(140deg, #f6a623, #0b2340);
-}
-
-.card-consumabili {
-  background: linear-gradient(140deg, #19c1d8, #0b2340);
-}
-
-.card-cassa {
-  background: linear-gradient(140deg, #1b78ff, #0b2340);
-}
-
-.card-comunicazioni {
-  background: linear-gradient(140deg, #ff3d9a, #0b2340);
-}
-
-.card-archivio {
-  background: linear-gradient(140deg, #7a5cff, #0b2340);
+/* Badge comunicazioni */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #ff3d9a;
+  color: #fff;
 }
 
 /* Bottoni */
@@ -351,7 +503,7 @@ body {
 }
 
 .btn-primary {
-  background: var(--accent-blue);
+  background: var(--card-turno);
   color: #fff;
   border-radius: 999px;
   padding: 7px 14px;
@@ -378,60 +530,27 @@ body {
   color: #d1e2ff;
 }
 
-/* =======================
-   RESPONSIVE
-   ======================= */
+/* ======================
+   RESPONSIVE SWITCH
+   ====================== */
 
-@media (max-width: 1100px) {
+@media (min-width: 900px) {
+  .mobile-dashboard {
+    display: none;
+  }
+  .desktop-dashboard {
+    display: block;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 900px) {
   .dashboard {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-left {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-
-  .card-logo {
-    flex: 1 1 230px;
-  }
-
-  .card-calendar-big,
-  .card-assenti {
-    flex: 1 1 260px;
-  }
-
-  .dashboard-right {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .card-wide {
-    grid-column: 1 / -1;
+    grid-template-columns: 280px minmax(0, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  .app-header {
-    padding-inline: 16px;
-  }
-
-  .dashboard {
-    padding-inline: 16px;
-  }
-
-  .dashboard-left {
-    flex-direction: column;
-  }
-
-  .dashboard-right {
-    grid-template-columns: 1fr;
-  }
-
-  .card {
-    border-radius: var(--radius-md);
-  }
-
-  .turno-appoggio-grid {
-    grid-template-columns: 1fr;
+  .m-card-title {
+    max-width: 8ch;
   }
 }
