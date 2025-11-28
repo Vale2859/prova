@@ -8,153 +8,288 @@
 </head>
 <body>
   <div class="app-shell">
-    <header class="app-header">
-      <h1>Portale Farmacia Montesano</h1>
-      <span class="app-header__subtitle">Dashboard principale</span>
-    </header>
 
-    <main class="dashboard">
-
-      <!-- COLONNA SINISTRA: LOGO + CALENDARIO + ASSENTI/PERMESSI -->
-      <section class="dashboard-left">
-
-        <!-- LOGO FARMACIA -->
-        <div class="card card-logo">
-          <div class="card-logo__icon">+</div>
-          <div class="card-logo__text">
-            <span class="card-logo__title">FARMACIA MONTESANO</span>
-            <span class="card-logo__subtitle">Portale interno</span>
-          </div>
+    <!-- ======================
+         VISTA MOBILE (CARD)
+         ====================== -->
+    <div class="mobile-dashboard">
+      <header class="m-header">
+        <div class="m-logo-wrap">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="m-logo" />
         </div>
+        <button class="m-hamburger" aria-label="Menu">
+          <span></span>
+        </button>
+      </header>
 
-        <!-- CALENDARIO (PIÙ GRANDE) -->
-        <div class="card card-calendar card-calendar-big">
-          <div class="card-header">
-            <span class="card-title">Calendario</span>
-            <span class="card-pill" id="today-pill">Oggi</span>
-          </div>
+      <main class="m-main">
+        <section class="m-card-grid">
 
-          <div class="calendar-body">
-            <div class="calendar-month" id="calendar-month">Aprile 2024</div>
-            <div class="calendar-grid">
-              <span>lu</span><span>ma</span><span>me</span><span>gi</span><span>ve</span><span>sa</span><span>do</span>
-              <span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
-              <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span>
-              <span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
-              <span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span>
-              <span>28</span><span>29</span><span>30</span><span></span><span></span><span></span><span></span>
+          <!-- RIGA 1 -->
+          <button class="m-card m-card-assenti">
+            <div class="m-card-label">NUOVI</div>
+            <div class="m-card-title">Assenti / Permessi</div>
+            <div class="m-card-badge">2</div>
+            <div class="m-card-icon">📅</div>
+          </button>
+
+          <button class="m-card m-card-turno">
+            <div class="m-card-label">NUOVO</div>
+            <div class="m-card-title">Farmacia di turno</div>
+            <div class="m-card-badge">1</div>
+            <div class="m-card-icon">⏰</div>
+          </button>
+
+          <!-- RIGA 2 -->
+          <button class="m-card m-card-comunicazioni">
+            <div class="m-card-label">NUOVA</div>
+            <div class="m-card-title">Comunicazioni</div>
+            <div class="m-card-badge">1</div>
+            <div class="m-card-icon">📢</div>
+          </button>
+
+          <button class="m-card m-card-procedure">
+            <div class="m-card-label">NUOVE</div>
+            <div class="m-card-title">Procedure</div>
+            <div class="m-card-icon">📚</div>
+          </button>
+
+          <!-- RIGA 3 -->
+          <button class="m-card m-card-logistica">
+            <div class="m-card-label">NUOVO</div>
+            <div class="m-card-title">Logistica</div>
+            <div class="m-card-badge">1</div>
+            <div class="m-card-icon">📦</div>
+          </button>
+
+          <button class="m-card m-card-magazziniera">
+            <div class="m-card-label">NUOVO</div>
+            <div class="m-card-title">Magazziniera</div>
+            <div class="m-card-badge">2</div>
+            <div class="m-card-icon">📋</div>
+          </button>
+
+          <!-- RIGA 4 -->
+          <button class="m-card m-card-scadenze">
+            <div class="m-card-label">NUOVI</div>
+            <div class="m-card-title">Prodotti in scadenza</div>
+            <div class="m-card-icon">⏳</div>
+          </button>
+
+          <button class="m-card m-card-consumabili">
+            <div class="m-card-label">NUOVO</div>
+            <div class="m-card-title">Consumabili</div>
+            <div class="m-card-icon">🧪</div>
+          </button>
+
+          <!-- RIGA 5 -->
+          <button class="m-card m-card-consegne">
+            <div class="m-card-label">NUOVO</div>
+            <div class="m-card-title">Consegne / Ritiri</div>
+            <div class="m-card-icon">🚚</div>
+          </button>
+
+          <button class="m-card m-card-cassa">
+            <div class="m-card-label">NUOVO</div>
+            <div class="m-card-title">Cambio cassa</div>
+            <div class="m-card-icon">💶</div>
+          </button>
+
+          <!-- RIGA 6: ARCHIVIO A TUTTA LARGHEZZA -->
+          <button class="m-card m-card-archivio m-card-wide">
+            <div class="m-card-title">Archivio file</div>
+            <div class="m-card-icon">🗄️</div>
+          </button>
+
+        </section>
+      </main>
+    </div>
+
+    <!-- ======================
+         VISTA DESKTOP (PC)
+         ====================== -->
+    <div class="desktop-dashboard">
+      <header class="app-header">
+        <h1>PORTALE FARMACIA MONTESANO</h1>
+        <span class="app-header__subtitle">Dashboard principale</span>
+      </header>
+
+      <main class="dashboard">
+
+        <!-- COLONNA SINISTRA: LOGO + CALENDARIO + ASSENTI/PERMESSI -->
+        <section class="dashboard-left">
+
+          <!-- LOGO FARMACIA -->
+          <div class="card card-logo">
+            <div class="card-logo__icon">+</div>
+            <div class="card-logo__text">
+              <span class="card-logo__title">FARMACIA MONTESANO</span>
+              <span class="card-logo__subtitle">Portale interno</span>
             </div>
           </div>
-        </div>
 
-        <!-- ASSENTI / PERMESSI (PIÙ GRANDE) -->
-        <div class="card card-tall card-tall-big card-assenti">
-          <div class="card-header">
-            <span class="card-title">Assenti / Permessi</span>
-          </div>
-          <ul class="card-list" id="assenti-list">
-            <li>Nessun assente registrato oggi.</li>
-          </ul>
-          <button class="btn-primary btn-full">Vai alla gestione assenze</button>
-        </div>
+          <!-- CALENDARIO -->
+          <div class="card card-calendar card-calendar-big">
+            <div class="card-header">
+              <span class="card-title">Calendario</span>
+              <span class="card-pill" id="today-pill">Oggi</span>
+            </div>
 
-      </section>
-
-      <!-- COLONNA DESTRA -->
-      <section class="dashboard-right">
-
-        <!-- CARD UNICA: TURNO + APPOGGIO -->
-        <div class="card card-wide card-turno-appoggio">
-          <div class="turno-appoggio-grid">
-            <div class="turno-block">
-              <div class="card-header">
-                <span class="card-label">Turno</span>
-                <span class="card-pill pill-success">Farmacia 1</span>
+            <div class="calendar-body">
+              <div class="calendar-month" id="calendar-month">Novembre 2025</div>
+              <div class="calendar-grid">
+                <span>lu</span><span>ma</span><span>me</span><span>gi</span><span>ve</span><span>sa</span><span>do</span>
+                <span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
+                <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span>
+                <span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
+                <span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span>
+                <span>28</span><span>29</span><span>30</span><span></span><span></span><span></span><span></span>
               </div>
-              <p class="card-main-text">
-                Farmacia di turno oggi – in servizio fino alle <strong>08:00</strong> di domani.
-              </p>
             </div>
+          </div>
 
-            <div class="appoggio-block">
-              <div class="card-header">
-                <span class="card-label">Appoggio</span>
-                <span class="card-pill pill-info">Farmacia 2</span>
+          <!-- ASSENTI / PERMESSI -->
+          <div class="card card-tall card-assenti-desktop">
+            <div class="card-header">
+              <span class="card-title">Assenti / Permessi oggi</span>
+            </div>
+            <ul class="card-list" id="assenti-list">
+              <!-- riempito da JS -->
+            </ul>
+            <button class="btn-primary btn-full">Vedi tutte le assenze</button>
+          </div>
+
+        </section>
+
+        <!-- COLONNA DESTRA -->
+        <section class="dashboard-right">
+
+          <!-- CARD UNICA: TURNO + APPOGGIO -->
+          <div class="card card-wide card-turno-appoggio">
+            <div class="turno-appoggio-grid">
+              <div class="turno-block">
+                <div class="card-header">
+                  <span class="card-label">Turno</span>
+                  <span class="card-pill pill-success">Farmacia di turno</span>
+                </div>
+                <p class="card-main-text" id="turno-main">
+                  <!-- testo da JS -->
+                </p>
               </div>
-              <p class="card-main-text">
-                Farmacia di appoggio – attiva fasce <strong>08:30 – 20:30</strong>.
-              </p>
+
+              <div class="appoggio-block">
+                <div class="card-header">
+                  <span class="card-label">Appoggio</span>
+                  <span class="card-pill pill-info">Farmacia di appoggio</span>
+                </div>
+                <p class="card-main-text" id="turno-appoggio">
+                  <!-- testo da JS -->
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- 6 CARD GRANDI: 3 PER RIGA, 2 RIGHE -->
+          <!-- 7 CARD GRANDI (3 per riga) -->
 
-        <!-- RIGA 1 -->
-        <div class="card card-big card-consegne">
-          <div class="card-header">
-            <span class="card-title">Consegne / Ritiri</span>
+          <!-- RIGA 1 -->
+          <div class="card card-big card-consegne">
+            <div class="card-header">
+              <span class="card-title">Consegne / Ritiri</span>
+            </div>
+            <p class="card-main-text" id="consegne-info">
+              <!-- testo da JS -->
+            </p>
+            <button class="btn-link">Apri registro consegne</button>
           </div>
-          <p class="card-main-text">
-            <strong>2</strong> consegne e <strong>1</strong> ritiro programmati oggi.
-          </p>
-          <button class="btn-link">Apri registro consegne</button>
-        </div>
 
-        <div class="card card-big card-scadenze">
-          <div class="card-header">
-            <span class="card-title">Prodotti in scadenza</span>
+          <div class="card card-big card-scadenze">
+            <div class="card-header">
+              <span class="card-title">Prodotti in scadenza</span>
+            </div>
+            <p class="card-main-text" id="scadenze-info">
+              <!-- testo da JS -->
+            </p>
+            <button class="btn-link">Visualizza elenco completo</button>
           </div>
-          <p class="card-main-text">
-            <strong>6</strong> articoli in scadenza entro <strong>7 giorni</strong>.
-          </p>
-          <button class="btn-link">Visualizza elenco completo</button>
-        </div>
 
-        <div class="card card-big card-consumabili">
-          <div class="card-header">
-            <span class="card-title">Consumabili</span>
+          <div class="card card-big card-consumabili">
+            <div class="card-header">
+              <span class="card-title">Consumabili</span>
+            </div>
+            <p class="card-main-text" id="consumabili-info">
+              <!-- testo da JS -->
+            </p>
+            <button class="btn-link">Gestisci consumi</button>
           </div>
-          <p class="card-main-text">
-            Disponibilità sufficiente per le prossime <strong>2 settimane</strong>.
-          </p>
-          <button class="btn-link">Gestisci consumi</button>
-        </div>
 
-        <!-- RIGA 2 -->
-        <div class="card card-big card-cassa">
-          <div class="card-header">
-            <span class="card-title">Cambio cassa</span>
+          <!-- RIGA 2 -->
+          <div class="card card-big card-clienti">
+            <div class="card-header">
+              <span class="card-title">Appuntamenti clienti oggi</span>
+            </div>
+            <ul class="card-list card-list-tight" id="clienti-list">
+              <!-- riempito da JS -->
+            </ul>
+            <button class="btn-link">Vai a tutti gli appuntamenti</button>
           </div>
-          <p class="card-main-text">
-            Ultimo cambio registrato alle <strong>14:22</strong>.
-          </p>
-          <button class="btn-link">Apri modulo cambio cassa</button>
-        </div>
 
-        <div class="card card-big card-comunicazioni">
-          <div class="card-header">
-            <span class="card-title">Comunicazioni</span>
-            <span class="badge">1 nuovo</span>
+          <div class="card card-big card-magazziniera">
+            <div class="card-header">
+              <span class="card-title">Magazziniera</span>
+            </div>
+            <ul class="card-list card-list-tight">
+              <li>✔ Controllo banco automedicazione</li>
+              <li>⬜ Inventario dermocosmesi</li>
+              <li>⬜ Resi grossista fine settimana</li>
+            </ul>
+            <button class="btn-link">Apri pannello magazzino</button>
           </div>
-          <p class="card-main-text">
-            1 comunicazione interna non letta.
-          </p>
-          <button class="btn-link">Vai alle comunicazioni</button>
-        </div>
 
-        <div class="card card-big card-archivio">
-          <div class="card-header">
-            <span class="card-title">Archivio file</span>
+          <div class="card card-big card-comunicazioni">
+            <div class="card-header">
+              <span class="card-title">Comunicazioni</span>
+              <span class="badge" id="badge-comunicazioni">1 NUOVO</span>
+            </div>
+            <p class="card-main-text" id="comunicazioni-info">
+              <!-- testo da JS -->
+            </p>
+            <button class="btn-link">Vai alle comunicazioni</button>
           </div>
-          <p class="card-main-text">
-            4 documenti aggiunti questa settimana.
-          </p>
-          <button class="btn-link">Apri archivio</button>
-        </div>
 
-      </section>
-    </main>
+          <!-- RIGA 3 -->
+          <div class="card card-big card-cassa">
+            <div class="card-header">
+              <span class="card-title">Cambio cassa</span>
+            </div>
+            <p class="card-main-text" id="cassa-info">
+              <!-- testo da JS -->
+            </p>
+            <button class="btn-link">Apri modulo cambio cassa</button>
+          </div>
+
+          <div class="card card-big card-logistica">
+            <div class="card-header">
+              <span class="card-title">Logistica</span>
+            </div>
+            <p class="card-main-text" id="logistica-info">
+              <!-- testo da JS -->
+            </p>
+            <button class="btn-link">Gestisci logistica</button>
+          </div>
+
+          <div class="card card-big card-archivio">
+            <div class="card-header">
+              <span class="card-title">Archivio file</span>
+            </div>
+            <p class="card-main-text">
+              4 documenti aggiunti questa settimana.
+            </p>
+            <button class="btn-link">Apri archivio</button>
+          </div>
+
+        </section>
+      </main>
+    </div>
   </div>
 
   <script src="script.js"></script>
