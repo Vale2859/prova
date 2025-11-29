@@ -1,179 +1,355 @@
 // script.js
 
-document.addEventListener("DOMContentLoaded", () => {
-  aggiornaDataHeader();
-  setupNavigazioneSezioni();
-  setupChat();
-  setupOfferteEventi();
-  setupAgenda();
-  setupCentralButton();
-});
+// =======================
+// STATO GLOBALE
+// =======================
 
-/* ==========================
-   DATA HEADER
-   ========================== */
+let lastCardInteractionTime = Date.now();
+let q2InactivityTimer = null;
 
-function aggiornaDataHeader() {
-  const el = document.getElementById("header-date-desktop");
-  if (!el) return;
-  const formatter = new Intl.DateTimeFormat("it-IT", {
-    weekday: "long",
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  el.textContent = formatter.format(new Date());
-}
+let agendaCurrentDate = new Date();
+let agendaViewMode = "month"; // "month" | "day"
+let agendaSelectedDayISO = null;
+let agendaInactivityTimer = null;
 
-/* ==========================
-   NAVIGAZIONE SEZIONI (ASSENTI / TURNO)
-   ========================== */
-
-function setupNavigazioneSezioni() {
-  const dashboards = document.querySelectorAll(
-    ".mobile-dashboard, .desktop-dashboard"
-  );
-  const sezioni = document.querySelectorAll(".sezione-dettaglio");
-
-  dashboards.forEach((d) => {
-    const computed = window.getComputedStyle(d);
-    d.dataset.displayOriginal = computed.display || "block";
-  });
-
-  function mostraDashboard() {
-    sezioni.forEach((sec) => (sec.style.display = "none"));
-    dashboards.forEach((d) => {
-      d.style.display = d.dataset.displayOriginal || "block";
-    });
-    window.scrollTo(0, 0);
+let promoOfferte = [
+  {
+    id: 1,
+    tipo: "offerta",
+    titolo: "Sconto 20% dermocosmesi",
+    data: "2025-11-30",
+    descrizione: "Linea viso idratante e anti-age."
   }
+];
 
-  function mostraSezione(id) {
-    dashboards.forEach((d) => (d.style.display = "none"));
-    sezioni.forEach((sec) => {
-      sec.style.display = sec.id === "sezione-" + id ? "block" : "none";
-    });
-
-    if (id === "assenti") {
-      renderAssenti();
-    } else if (id === "turno") {
-      renderTurno();
-    }
-    window.scrollTo(0, 0);
+let promoGiornate = [
+  {
+    id: 1,
+    tipo: "giornata",
+    titolo: "Giornata ECG",
+    data: "2025-12-02",
+    descrizione: "Elettrocardiogramma con referto cardiologo."
   }
+];
 
-  document.querySelectorAll("[data-section]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const id = btn.getAttribute("data-section");
-      if (!id) return;
-      mostraSezione(id);
-    });
-  });
+let nextPromoId = 2;
 
-  document.querySelectorAll("[data-close='sezione']").forEach((btn) => {
-    btn.addEventListener("click", mostraDashboard);
-  });
-
-  const ruoloAssSelect = document.getElementById("ruolo-assenti");
-  if (ruoloAssSelect) {
-    ruoloAssSelect.addEventListener("change", renderAssenti);
+// appuntamenti agenda
+let appuntamenti = [
+  {
+    id: 1,
+    data: "2025-11-29",
+    ora: "09:00",
+    nome: "Mario Rossi",
+    motivo: "ECG controllo",
+    servizio: "ECG"
+  },
+  {
+    id: 2,
+    data: "2025-11-29",
+    ora: "11:00",
+    nome: "Lucia Bianchi",
+    motivo: "Holter pressorio",
+    servizio: "HOLTER"
+  },
+  {
+    id: 3,
+    data: "2025-12-01",
+    ora: "10:30",
+    nome: "Giuseppe Verdi",
+    motivo: "ECG pre-operatorio",
+    servizio: "ECG"
   }
-}
+];
+let nextAppId = 4;
 
-/* ==========================
-   DATI DEMO – ASSENZE E TURNI
-   ========================== */
-
+// demo assenze
 const assenzeDemo = [
   {
     nome: "Mario Rossi",
     dal: "2025-11-29",
     al: "2025-11-30",
     tipo: "Ferie",
-    stato: "approvato",
+    stato: "approvato"
   },
   {
     nome: "Lucia Bianchi",
     dal: "2025-11-28",
     al: "2025-11-28",
     tipo: "Permesso",
-    stato: "approvato",
+    stato: "approvato"
   },
   {
     nome: "Giuseppe Neri",
     dal: "2025-12-03",
     al: "2025-12-05",
     tipo: "Malattia",
-    stato: "approvato",
+    stato: "approvato"
   },
   {
     nome: "Mario Rossi",
     dal: "2025-12-10",
     al: "2025-12-12",
     tipo: "Ferie",
-    stato: "approvato",
-  },
+    stato: "approvato"
+  }
 ];
 
+// demo turni
 const turniDemo = [
   {
     data: "2025-11-28",
     farmacia: "Farmacia Montesano",
     orario: "08:00 – 20:00",
     appoggio: "Farmacia Centrale",
-    note: "Turno ordinario diurno.",
+    note: "Turno ordinario diurno."
   },
   {
     data: "2025-11-29",
     farmacia: "Farmacia Centrale",
     orario: "08:00 – 20:00",
     appoggio: "Farmacia Montesano",
-    note: "Turno di scambio tra farmacie.",
+    note: "Turno di scambio tra farmacie."
   },
   {
     data: "2025-11-30",
     farmacia: "Farmacia Madonna delle Grazie",
     orario: "20:00 – 08:00",
     appoggio: "Farmacia Montesano",
-    note: "Turno notturno.",
+    note: "Turno notturno."
   },
   {
     data: "2025-12-01",
     farmacia: "Farmacia Montesano",
     orario: "00:00 – 24:00",
     appoggio: "Farmacia Centrale",
-    note: "Turno festivo.",
-  },
+    note: "Turno festivo."
+  }
 ];
 
 const oggiISO = (() => {
   const d = new Date();
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
   const day = String(d.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
+  return `${y}-${m}-${day}`;
 })();
 
-/* ===== ASSENTI ===== */
+// =======================
+// ON DOM READY
+// =======================
 
-function renderAssenti() {
-  const containerOggi = document.getElementById("assenti-oggi");
-  const containerNext = document.getElementById("assenti-prossimi");
-  if (!containerOggi || !containerNext) return;
+document.addEventListener("DOMContentLoaded", () => {
+  // click sulle card (mobile + desktop)
+  setupCardClicks();
 
-  const ruoloSelect = document.getElementById("ruolo-assenti");
-  const ruolo = ruoloSelect ? ruoloSelect.value : "farmacia";
+  // Q2: default + timer inattività
+  resetQ2Inactivity();
 
-  let lista = assenzeDemo.filter((a) => a.stato === "approvato");
+  // Q3: offerte / giornate
+  renderPromozioni();
 
-  if (ruolo === "dipendente") {
-    const mioNome = "Mario Rossi";
-    lista = lista.filter((a) => a.nome === mioNome);
+  // Q4: agenda
+  initAgenda();
+
+  // Chat
+  initChat();
+
+  // Modale generica
+  initModal();
+});
+
+// =======================
+// UTIL DATE
+// =======================
+
+function parseISO(dateStr) {
+  const [y, m, d] = dateStr.split("-");
+  return new Date(Number(y), Number(m) - 1, Number(d));
+}
+
+function formatShortDateIT(iso) {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}`;
+}
+
+function formatLongDateIT(iso) {
+  const [y, m, d] = iso.split("-");
+  const date = new Date(Number(y), Number(m) - 1, Number(d));
+  const formatter = new Intl.DateTimeFormat("it-IT", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit"
+  });
+  return formatter.format(date);
+}
+
+function toISODate(d) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+// =======================
+// CARD → Q2 AREA CONTENUTI
+// =======================
+
+function setupCardClicks() {
+  const clickable = document.querySelectorAll("[data-section]");
+  clickable.forEach((el) => {
+    el.addEventListener("click", () => {
+      const key = el.getAttribute("data-section");
+      if (!key) return;
+      showSectionInQ2(key);
+      registerInteraction();
+    });
+  });
+}
+
+function registerInteraction() {
+  lastCardInteractionTime = Date.now();
+  resetQ2Inactivity();
+}
+
+function resetQ2Inactivity() {
+  if (q2InactivityTimer) clearTimeout(q2InactivityTimer);
+  q2InactivityTimer = setTimeout(() => {
+    showQ2Default();
+  }, 20000); // 20 secondi
+}
+
+function showQ2Default() {
+  const q2 = document.getElementById("q2-content");
+  if (!q2) return;
+  q2.classList.add("fade");
+  q2.innerHTML = `
+    <div class="q2-placeholder">
+      <p class="q2-placeholder-main">Seleziona una funzione dalle card</p>
+      <p class="q2-placeholder-sub">
+        Qui vedrai in grande solo quello che ti interessa davvero:
+        assenze già approvate, turno di oggi, comunicazioni, offerte,
+        scadenze, consegne, giornate in farmacia, ecc.
+      </p>
+    </div>
+  `;
+  setTimeout(() => q2.classList.remove("fade"), 650);
+}
+
+function showSectionInQ2(key) {
+  const q2 = document.getElementById("q2-content");
+  if (!q2) return;
+
+  q2.classList.add("fade");
+
+  let html = "";
+
+  if (key === "assenti") {
+    html = renderAssentiHTML();
+  } else if (key === "turno") {
+    html = renderTurnoHTML();
+  } else if (key === "prodotti") {
+    html = `
+      <h3 class="q2-section-title">Prodotti in scadenza (demo)</h3>
+      <p class="q2-section-sub">Lista rapida dei prossimi articoli da controllare.</p>
+      <ul class="q2-list">
+        <li><strong>Integratore X</strong> – scade il 10/12</li>
+        <li><strong>Crema viso Y</strong> – scade il 15/12</li>
+        <li><strong>Collirio Z</strong> – scade il 20/12</li>
+      </ul>
+    `;
+  } else if (key === "consegne") {
+    html = `
+      <h3 class="q2-section-title">Consegne / ritiri di oggi (demo)</h3>
+      <p class="q2-section-sub">Rapido promemoria di ciò che deve entrare / uscire.</p>
+      <ul class="q2-list">
+        <li>Ore 10:00 – <strong>Corriere ABC</strong> · Ordine grossista</li>
+        <li>Ore 12:30 – <strong>Ritiro cliente</strong> · N. prenotazione 12345</li>
+        <li>Ore 17:00 – <strong>Corriere resi</strong> · scatolone dermocosmesi</li>
+      </ul>
+    `;
+  } else if (key === "cambiocassa") {
+    html = `
+      <h3 class="q2-section-title">Cambio cassa (demo)</h3>
+      <p class="q2-section-sub">Ultimo cambio registrato e note veloci.</p>
+      <ul class="q2-list">
+        <li><strong>Ultimo cambio</strong>: oggi ore 14:22</li>
+        <li>Fondo cassa confermato: 250,00 €</li>
+        <li>Segnalazioni: nessuna anomalia registrata.</li>
+      </ul>
+    `;
+  } else if (key === "comunicazioni") {
+    html = `
+      <h3 class="q2-section-title">Comunicazioni interne (demo)</h3>
+      <p class="q2-section-sub">Messaggi importanti compariranno qui in evidenza.</p>
+      <ul class="q2-list">
+        <li><strong>Oggi</strong> – Aggiornata procedura chiusura cassa.</li>
+        <li><strong>Ieri</strong> – Nuova promo dermocosmesi in vetrina 1.</li>
+      </ul>
+    `;
+  } else if (key === "procedure") {
+    html = `
+      <h3 class="q2-section-title">Procedure rapide (demo)</h3>
+      <p class="q2-section-sub">Le procedure più usate appariranno in questa area.</p>
+      <ul class="q2-list">
+        <li><strong>Chiusura serale</strong> – 3 step principali.</li>
+        <li><strong>Gestione resi</strong> – modulo + foto prodotto.</li>
+      </ul>
+    `;
+  } else if (key === "logistica" || key === "magazziniera") {
+    html = `
+      <h3 class="q2-section-title">Logistica / magazzino (demo)</h3>
+      <p class="q2-section-sub">
+        Controlli veloci su arrivi, resi, inventari e scaffali critici.
+      </p>
+      <ul class="q2-list">
+        <li>Scaffale A3 – prodotti quasi esauriti.</li>
+        <li>Resi da completare: 2 pratiche aperte.</li>
+        <li>Inventario rapido banco automedicazione lunedì mattina.</li>
+      </ul>
+    `;
+  } else if (key === "consumabili") {
+    html = `
+      <h3 class="q2-section-title">Consumabili (demo)</h3>
+      <p class="q2-section-sub">Materiale di uso quotidiano.</p>
+      <ul class="q2-list">
+        <li>Guanti lattice – OK per 2 settimane.</li>
+        <li>Garze sterili – da riordinare entro venerdì.</li>
+        <li>Rotoli scontrini – disponibile per ~15 giorni.</li>
+      </ul>
+    `;
+  } else if (key === "archivio") {
+    html = `
+      <h3 class="q2-section-title">Archivio file (demo)</h3>
+      <p class="q2-section-sub">
+        Qui troverai procedure PDF, contratti, promozioni e documenti interni.
+      </p>
+      <ul class="q2-list">
+        <li>Manuale procedure 2025.pdf</li>
+        <li>Listino servizi aggiornato.xlsx</li>
+      </ul>
+    `;
+  } else {
+    html = `
+      <h3 class="q2-section-title">Sezione in lavorazione</h3>
+      <p class="q2-section-sub">
+        Questa sezione sarà collegata a funzioni più avanzate del portale.
+      </p>
+    `;
   }
 
+  q2.innerHTML = html;
+
+  setTimeout(() => q2.classList.remove("fade"), 650);
+}
+
+// Assenti in HTML (per Q2)
+function renderAssentiHTML() {
   const oggiDate = parseISO(oggiISO);
   const oggiList = [];
   const nextList = [];
+
+  const lista = assenzeDemo.filter((a) => a.stato === "approvato");
 
   lista.forEach((a) => {
     const dal = parseISO(a.dal);
@@ -188,49 +364,45 @@ function renderAssenti() {
 
   nextList.sort((a, b) => parseISO(a.dal) - parseISO(b.dal));
 
-  let htmlOggi = '<h3 style="margin:0 0 6px;">Assenti oggi</h3>';
+  let htmlOggi = "<ul class='q2-list'>";
   if (oggiList.length === 0) {
     htmlOggi +=
-      '<p style="margin:0; font-size:0.9rem; opacity:0.8;">Nessuno assente oggi.</p>';
+      "<li>Nessun assente oggi.</li>";
   } else {
-    htmlOggi += '<ul style="list-style:none; padding:0; margin:0;">';
     oggiList.forEach((a) => {
-      const range = formatRangeIT(a.dal, a.al);
-      htmlOggi += `<li style="margin-bottom:4px; font-size:0.9rem;">
-        <strong>${a.nome}</strong> – ${a.tipo} (${range})
-      </li>`;
+      const range = formatShortDateIT(a.dal) === formatShortDateIT(a.al)
+        ? formatShortDateIT(a.dal)
+        : `${formatShortDateIT(a.dal)} → ${formatShortDateIT(a.al)}`;
+      htmlOggi += `<li><strong>${a.nome}</strong> – ${a.tipo} (${range})</li>`;
     });
-    htmlOggi += "</ul>";
   }
+  htmlOggi += "</ul>";
 
-  let htmlNext = '<h3 style="margin:12px 0 6px;">Assenze prossimi giorni</h3>';
+  let htmlNext = "<ul class='q2-list'>";
   if (nextList.length === 0) {
-    htmlNext +=
-      '<p style="margin:0; font-size:0.9rem; opacity:0.8;">Non ci sono altre assenze approvate nei prossimi giorni.</p>';
+    htmlNext += "<li>Nessuna assenza approvata nei prossimi giorni.</li>";
   } else {
-    htmlNext += '<ul style="list-style:none; padding:0; margin:0;">';
     nextList.forEach((a) => {
-      const range = formatRangeIT(a.dal, a.al);
-      htmlNext += `<li style="margin-bottom:4px; font-size:0.9rem;">
-        <strong>${a.nome}</strong> – ${a.tipo} (${range})
-      </li>`;
+      const range = formatShortDateIT(a.dal) === formatShortDateIT(a.al)
+        ? formatShortDateIT(a.dal)
+        : `${formatShortDateIT(a.dal)} → ${formatShortDateIT(a.al)}`;
+      htmlNext += `<li><strong>${a.nome}</strong> – ${a.tipo} (${range})</li>`;
     });
-    htmlNext += "</ul>";
   }
+  htmlNext += "</ul>";
 
-  containerOggi.innerHTML = htmlOggi;
-  containerNext.innerHTML = htmlNext;
+  return `
+    <h3 class="q2-section-title">Assenti / permessi approvati</h3>
+    <p class="q2-section-sub">Vista immediata di oggi e dei prossimi giorni (demo).</p>
+    <h4 style="margin:4px 0 2px; font-size:0.85rem;">Assenti oggi</h4>
+    ${htmlOggi}
+    <h4 style="margin:8px 0 2px; font-size:0.85rem;">Prossimi giorni</h4>
+    ${htmlNext}
+  `;
 }
 
-/* ===== TURNO ===== */
-
-function renderTurno() {
-  const boxOggi = document.getElementById("turno-oggi");
-  const boxNext = document.getElementById("turno-prossimi");
-  if (!boxOggi || !boxNext) return;
-
+function renderTurnoHTML() {
   const oggiDate = parseISO(oggiISO);
-
   let turnoOggi = turniDemo.find((t) => t.data === oggiISO);
   if (!turnoOggi) {
     const futuri = turniDemo
@@ -243,625 +415,609 @@ function renderTurno() {
     .filter((t) => t !== turnoOggi)
     .sort((a, b) => parseISO(a.data) - parseISO(b.data));
 
-  const labelDataOggi = formatLongDateIT(turnoOggi.data);
-
-  boxOggi.innerHTML = `
-    <h3 style="margin:0 0 6px;">Turno di oggi</h3>
-    <p style="margin:0 0 4px; font-size:0.9rem;">
-      <strong>${turnoOggi.farmacia}</strong> – ${labelDataOggi}
-    </p>
-    <p style="margin:0 0 4px; font-size:0.9rem;">Orario: <strong>${turnoOggi.orario}</strong></p>
-    <p style="margin:0 0 4px; font-size:0.9rem;">Appoggio: <strong>${turnoOggi.appoggio}</strong></p>
-    <p style="margin:0; font-size:0.9rem; opacity:0.85;">${turnoOggi.note}</p>
-  `;
-
-  let htmlNext = '<h3 style="margin:12px 0 6px;">Prossimi turni</h3>';
+  let htmlNext = "<ul class='q2-list'>";
   if (altri.length === 0) {
-    htmlNext +=
-      '<p style="margin:0; font-size:0.9rem; opacity:0.8;">Non ci sono altri turni in elenco.</p>';
+    htmlNext += "<li>Nessun altro turno in elenco.</li>";
   } else {
-    htmlNext += '<ul style="list-style:none; padding:0; margin:0;">';
     altri.forEach((t) => {
-      htmlNext += `<li style="margin-bottom:4px; font-size:0.9rem;">
-        <strong>${formatShortDateIT(t.data)}</strong> – ${t.farmacia} (${t.orario}) · Appoggio: ${t.appoggio}
-      </li>`;
+      htmlNext += `<li><strong>${formatShortDateIT(t.data)}</strong> – ${t.farmacia} (${t.orario}) · Appoggio: ${t.appoggio}</li>`;
     });
-    htmlNext += "</ul>";
   }
-  boxNext.innerHTML = htmlNext;
+  htmlNext += "</ul>";
+
+  return `
+    <h3 class="q2-section-title">Farmacia di turno</h3>
+    <p class="q2-section-sub">Turno di oggi in evidenza e prossimi turni (demo).</p>
+
+    <p style="font-size:0.9rem; margin:0 0 2px;">
+      <strong>${turnoOggi.farmacia}</strong> – ${formatLongDateIT(turnoOggi.data)}
+    </p>
+    <p style="font-size:0.85rem; margin:0 0 2px;">Orario: <strong>${turnoOggi.orario}</strong></p>
+    <p style="font-size:0.85rem; margin:0 0 4px;">Appoggio: <strong>${turnoOggi.appoggio}</strong></p>
+    <p style="font-size:0.8rem; opacity:0.9; margin:0 0 8px;">${turnoOggi.note}</p>
+
+    <h4 style="margin:4px 0 2px; font-size:0.85rem;">Prossimi turni</h4>
+    ${htmlNext}
+  `;
 }
 
-/* ==========================
-   FUNZIONI DATA
-   ========================== */
+// =======================
+// Q3 – PROMOZIONI
+// =======================
 
-function parseISO(dateStr) {
-  const [y, m, d] = dateStr.split("-");
-  return new Date(Number(y), Number(m) - 1, Number(d));
-}
+function renderPromozioni() {
+  const offerteList = document.getElementById("offerte-list");
+  const giornateList = document.getElementById("giornate-list");
+  if (!offerteList || !giornateList) return;
 
-function formatShortDateIT(iso) {
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}`;
-}
+  // ordina per data
+  promoOfferte.sort((a, b) => parseISO(a.data) - parseISO(b.data));
+  promoGiornate.sort((a, b) => parseISO(a.data) - parseISO(b.data));
 
-function formatRangeIT(dalISO, alISO) {
-  const dal = formatShortDateIT(dalISO);
-  const al = formatShortDateIT(alISO);
-  if (dal === al) return dal;
-  return `${dal} → ${al}`;
-}
+  offerteList.innerHTML = "";
+  giornateList.innerHTML = "";
 
-function formatLongDateIT(iso) {
-  const [y, m, d] = iso.split("-");
-  const date = new Date(Number(y), Number(m) - 1, Number(d));
-  const formatter = new Intl.DateTimeFormat("it-IT", {
-    weekday: "long",
-    day: "2-digit",
-    month: "2-digit",
-  });
-  return formatter.format(date);
-}
-
-/* ==========================
-   CHAT MODERNA
-   ========================== */
-
-const chatMessages = [
-  {
-    sender: "Emanuela (titolare)",
-    role: "titolare",
-    type: "Promemoria",
-    time: "17:17",
-    text: "Ricordarsi di verificare scorte HOLTER per la prossima settimana.",
-    attachment: "checklist_holter.pdf",
-    avatarUrl: null,
-  },
-  {
-    sender: "Daniela (dipendente)",
-    role: "dipendente",
-    type: "Turni",
-    time: "17:22",
-    text: "ok, grazie!",
-    attachment: "",
-    avatarUrl: null,
-  },
-];
-
-const avatarMap = {}; // { nome: dataURL }
-
-function setupChat() {
-  const listEl = document.getElementById("chat-messages");
-  const countEl = document.getElementById("chat-count");
-  const form = document.getElementById("chat-form");
-  const senderSelect = document.getElementById("chat-sender");
-  const typeSelect = document.getElementById("chat-type");
-  const txtEl = document.getElementById("chat-text");
-  const attachmentEl = document.getElementById("chat-attachment");
-  const avatarInput = document.getElementById("chat-avatar-file");
-
-  if (!listEl || !form) return;
-
-  function renderChat() {
-    let html = "";
-    chatMessages.forEach((msg) => {
-      const sideClass = msg.role === "titolare" ? "from-owner" : "from-staff";
-      const initials = getInitials(msg.sender);
-      const avatarUrl = msg.avatarUrl || avatarMap[msg.sender] || null;
-
-      const avatarHtml = avatarUrl
-        ? `<div class="chat-avatar"><img src="${avatarUrl}" alt="${initials}"></div>`
-        : `<div class="chat-avatar">${initials}</div>`;
-
-      const safeText = escapeHtml(msg.text);
-      const safeAttachment = escapeHtml(msg.attachment || "");
-
-      html += `
-        <div class="chat-row ${sideClass}">
-          ${sideClass === "from-staff" ? avatarHtml : ""}
-          <div class="chat-bubble">
-            <div class="chat-bubble-header">
-              <span class="chat-sender">${escapeHtml(msg.sender)}</span>
-              <span class="chat-type-pill">${escapeHtml(msg.type)}</span>
-              <span class="chat-time">${escapeHtml(msg.time)}</span>
-            </div>
-            <div class="chat-text-main">${safeText}</div>
-            ${
-              safeAttachment
-                ? `<div class="chat-attachment">📎 ${safeAttachment}</div>`
-                : ""
-            }
-          </div>
-          ${sideClass === "from-owner" ? avatarHtml : ""}
+  if (promoOfferte.length === 0) {
+    offerteList.innerHTML =
+      "<li class='promo-item'><span class='promo-desc'>Nessuna offerta inserita.</span></li>";
+  } else {
+    promoOfferte.forEach((p) => {
+      const li = document.createElement("li");
+      li.className = "promo-item";
+      li.innerHTML = `
+        <span class="promo-item-icon">🏷️</span>
+        <div class="promo-title-row">
+          <span class="promo-title">${p.titolo}</span>
+          <span class="promo-date">${formatShortDateIT(p.data)}</span>
         </div>
+        <p class="promo-desc">${p.descrizione || ""}</p>
+        <span class="promo-delete" data-delete-type="offerta" data-id="${p.id}">🗑️</span>
       `;
+      offerteList.appendChild(li);
     });
-    listEl.innerHTML = html;
-    listEl.scrollTop = listEl.scrollHeight;
-    if (countEl) countEl.textContent = String(chatMessages.length);
   }
 
-  renderChat();
+  if (promoGiornate.length === 0) {
+    giornateList.innerHTML =
+      "<li class='promo-item'><span class='promo-desc'>Nessuna giornata programmata.</span></li>";
+  } else {
+    promoGiornate.forEach((p) => {
+      const li = document.createElement("li");
+      li.className = "promo-item";
+      li.innerHTML = `
+        <span class="promo-item-icon">📅</span>
+        <div class="promo-title-row">
+          <span class="promo-title">${p.titolo}</span>
+          <span class="promo-date">${formatShortDateIT(p.data)}</span>
+        </div>
+        <p class="promo-desc">${p.descrizione || ""}</p>
+        <span class="promo-delete" data-delete-type="giornata" data-id="${p.id}">🗑️</span>
+      `;
+      giornateList.appendChild(li);
+    });
+  }
+
+  // gestione cestini
+  document.querySelectorAll(".promo-delete").forEach((del) => {
+    del.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const type = del.getAttribute("data-delete-type");
+      const id = Number(del.getAttribute("data-id"));
+      if (type === "offerta") {
+        promoOfferte = promoOfferte.filter((p) => p.id !== id);
+      } else {
+        promoGiornate = promoGiornate.filter((p) => p.id !== id);
+      }
+      renderPromozioni();
+    });
+  });
+
+  // pulsanti +
+  document.querySelectorAll("[data-add]").forEach((btn) => {
+    btn.onclick = () => {
+      const tipo = btn.getAttribute("data-add"); // "offerta" | "giornata"
+      openModalForPromo(tipo);
+    };
+  });
+}
+// =======================
+// MODALE GENERICA
+// =======================
+
+let modalType = null; // "offerta" | "giornata" | "appuntamento"
+let modalPreselectedDate = null;
+let modalPreselectedTime = null;
+
+function initModal() {
+  const overlay = document.getElementById("modal-overlay");
+  const closeBtn = document.getElementById("modal-close");
+  const cancelBtn = document.getElementById("modal-cancel");
+  const form = document.getElementById("modal-form");
+
+  if (!overlay || !closeBtn || !cancelBtn || !form) return;
+
+  function close() {
+    overlay.classList.add("hidden");
+    modalType = null;
+    modalPreselectedDate = null;
+    modalPreselectedTime = null;
+    form.reset();
+    document.getElementById("modal-section-appointment").classList.add("hidden");
+  }
+
+  closeBtn.addEventListener("click", close);
+  cancelBtn.addEventListener("click", close);
+  document.getElementById("modal-backdrop")?.addEventListener("click", close);
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay || e.target.classList.contains("modal-backdrop")) {
+      close();
+    }
+  });
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    const sender = senderSelect.value;
-    const type = typeSelect.value;
-    const text = txtEl.value.trim();
-    const attachment = attachmentEl.value.trim();
+    if (!modalType) return;
 
-    if (!text) return;
+    const titleInput = document.getElementById("modal-title-input");
+    const dateInput = document.getElementById("modal-date-input");
+    const descInput = document.getElementById("modal-desc-input");
 
-    const role = sender.toLowerCase().includes("titolare")
-      ? "titolare"
-      : "dipendente";
+    const title = titleInput.value.trim();
+    const date = dateInput.value;
+    const desc = descInput.value.trim();
 
-    const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2, "0")}:${String(
-      now.getMinutes()
-    ).padStart(2, "0")}`;
-
-    chatMessages.push({
-      sender,
-      role,
-      type,
-      time: timeStr,
-      text,
-      attachment,
-      avatarUrl: avatarMap[sender] || null,
-    });
-
-    txtEl.value = "";
-    attachmentEl.value = "";
-    renderChat();
-  });
-
-  if (avatarInput) {
-    avatarInput.addEventListener("change", () => {
-      const file = avatarInput.files && avatarInput.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      const senderNow = senderSelect.value;
-      reader.onload = (e) => {
-        avatarMap[senderNow] = e.target.result;
-        // aggiorno la chat per mostrare nuovo avatar
-        renderChat();
-      };
-      reader.readAsDataURL(file);
-    });
-  }
-}
-
-function getInitials(name) {
-  const parts = name.split(" ");
-  let init =
-    (parts[0]?.[0] || "") + (parts[1]?.[0] || parts[0]?.[1] || "");
-  return init.toUpperCase();
-}
-
-function escapeHtml(str) {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-/* ==========================
-   OFFERTE & EVENTI – Q2
-   ========================== */
-
-let offerteData = [
-  {
-    titolo: "Promo Colesterolo 2025",
-    descrizione: "Test + misurazione saturazione.",
-  },
-  {
-    titolo: "Vaccini influenza",
-    descrizione: "Sconto 20% prodotti stagionali abbinati.",
-  },
-];
-
-let eventiData = [
-  {
-    titolo: "Lunedì – Giornata misurazione pressione",
-    descrizione: "Mattino e pomeriggio, su prenotazione.",
-  },
-  {
-    titolo: "Martedì – Giornata HOLTER pressorio",
-    descrizione: "Pochi slot disponibili, consigliare prenotazione.",
-  },
-];
-
-function setupOfferteEventi() {
-  const offerteList = document.getElementById("offerte-list");
-  const eventiList = document.getElementById("eventi-list");
-  const btnOff = document.getElementById("btn-add-offerta");
-  const btnEv = document.getElementById("btn-add-evento");
-  if (!offerteList || !eventiList) return;
-
-  function renderLists() {
-    offerteList.innerHTML = offerteData
-      .map(
-        (item, idx) => `
-      <li class="q2-item">
-        <span class="q2-item-dot"></span>
-        <span class="q2-item-title">${escapeHtml(item.titolo)}</span>
-        <span class="q2-item-sub">${escapeHtml(item.descrizione)}</span>
-        <button class="q2-item-delete" data-type="offerta" data-index="${idx}">🗑</button>
-      </li>
-    `
-      )
-      .join("");
-
-    eventiList.innerHTML = eventiData
-      .map(
-        (item, idx) => `
-      <li class="q2-item">
-        <span class="q2-item-dot" style="background:#42a5f5;"></span>
-        <span class="q2-item-title">${escapeHtml(item.titolo)}</span>
-        <span class="q2-item-sub">${escapeHtml(item.descrizione)}</span>
-        <button class="q2-item-delete" data-type="evento" data-index="${idx}">🗑</button>
-      </li>
-    `
-      )
-      .join("");
-  }
-
-  renderLists();
-
-  if (btnOff) {
-    btnOff.addEventListener("click", () => {
-      const titolo = prompt("Titolo offerta (es. Promo colesterolo):");
-      if (!titolo) return;
-      const desc =
-        prompt("Dettaglio / note brevi:") || "Dettaglio non specificato.";
-      offerteData.push({ titolo, descrizione: desc });
-      renderLists();
-    });
-  }
-
-  if (btnEv) {
-    btnEv.addEventListener("click", () => {
-      const titolo = prompt("Titolo giornata/evento (es. Lunedì – Giornata ECO):");
-      if (!titolo) return;
-      const desc =
-        prompt("Dettaglio / note brevi:") || "Dettaglio non specificato.";
-      eventiData.push({ titolo, descrizione: desc });
-      renderLists();
-    });
-  }
-
-  function onDeleteClick(e) {
-    const btn = e.target.closest(".q2-item-delete");
-    if (!btn) return;
-    const type = btn.dataset.type;
-    const index = Number(btn.dataset.index);
-    if (!Number.isInteger(index)) return;
-
-    if (type === "offerta") {
-      offerteData.splice(index, 1);
-    } else if (type === "evento") {
-      eventiData.splice(index, 1);
+    if (!date) {
+      alert("Seleziona una data.");
+      return;
     }
-    renderLists();
-  }
 
-  offerteList.addEventListener("click", onDeleteClick);
-  eventiList.addEventListener("click", onDeleteClick);
+    if (modalType === "offerta" || modalType === "giornata") {
+      const obj = {
+        id: nextPromoId++,
+        tipo: modalType,
+        titolo: title || (modalType === "offerta" ? "Offerta" : "Giornata"),
+        data,
+        descrizione: desc
+      };
+      if (modalType === "offerta") {
+        promoOfferte.push(obj);
+      } else {
+        promoGiornate.push(obj);
+      }
+      renderPromozioni();
+    } else if (modalType === "appuntamento") {
+      const timeInput = document.getElementById("modal-time-input");
+      const nameInput = document.getElementById("modal-name-input");
+      const reasonInput = document.getElementById("modal-reason-input");
+
+      const ora = timeInput.value;
+      const nome = nameInput.value.trim();
+      const motivo = reasonInput.value.trim() || desc;
+
+      if (!ora || !nome || !motivo) {
+        alert("Compila ora, nome e motivo.");
+        return;
+      }
+
+      appuntamenti.push({
+        id: nextAppId++,
+        data,
+        ora,
+        nome,
+        motivo,
+        servizio: motivo
+      });
+      renderAgenda(); // aggiorno vista corrente
+    }
+
+    close();
+  });
 }
 
-/* ==========================
-   AGENDA – Q4
-   ========================== */
+function openModalForPromo(tipo) {
+  const overlay = document.getElementById("modal-overlay");
+  const titleEl = document.getElementById("modal-title");
+  const sectionBase = document.getElementById("modal-section-base");
+  const sectionApp = document.getElementById("modal-section-appointment");
 
-const agendaEvents = [
-  {
-    date: oggiISO,
-    start: "09:00",
-    end: "10:00",
-    servizio: "ECG",
-    paziente: "Rossi Maria",
-  },
-  {
-    date: oggiISO,
-    start: "10:30",
-    end: "11:30",
-    servizio: "Holter",
-    paziente: "Bianchi Luca",
-  },
-  {
-    date: oggiISO,
-    start: "12:00",
-    end: "12:30",
-    servizio: "Prelievo",
-    paziente: "Profilo lipidico",
-  },
-  {
-    date: oggiISO,
-    start: "17:00",
-    end: "18:00",
-    servizio: "Consulenza nutrizionale",
-    paziente: "Valutazione piano alimentare",
-  },
-];
+  if (!overlay || !titleEl || !sectionBase || !sectionApp) return;
 
-let agendaView = "week"; // default
-let selectedDate = parseISO(oggiISO);
+  modalType = tipo;
+  sectionBase.classList.remove("hidden");
+  sectionApp.classList.add("hidden");
 
-function setupAgenda() {
-  const container = document.getElementById("agenda-content");
-  const info = document.getElementById("agenda-current-info");
-  const tabs = document.querySelectorAll(".agenda-tab");
-  if (!container || !info) return;
+  const today = new Date();
+  const isoToday = toISODate(today);
 
-  function setView(newView) {
-    agendaView = newView;
-    tabs.forEach((t) =>
-      t.classList.toggle("active", t.dataset.view === newView)
-    );
-    renderAgenda();
+  document.getElementById("modal-date-input").value = isoToday;
+  document.getElementById("modal-title-input").value = "";
+  document.getElementById("modal-desc-input").value = "";
+
+  if (tipo === "offerta") {
+    titleEl.textContent = "Nuova offerta in corso";
+  } else {
+    titleEl.textContent = "Nuova giornata in farmacia";
   }
 
-  tabs.forEach((t) => {
-    t.addEventListener("click", () => {
-      const view = t.dataset.view;
-      if (!view) return;
-      if (view === "day") {
-        // vista giorno sull'attuale selectedDate
-        setView("day");
-      } else {
-        setView(view);
-      }
+  overlay.classList.remove("hidden");
+}
+
+function openModalForAppuntamento(dateISO, time) {
+  const overlay = document.getElementById("modal-overlay");
+  const titleEl = document.getElementById("modal-title");
+  const sectionBase = document.getElementById("modal-section-base");
+  const sectionApp = document.getElementById("modal-section-appointment");
+
+  if (!overlay || !titleEl || !sectionBase || !sectionApp) return;
+
+  modalType = "appuntamento";
+  modalPreselectedDate = dateISO;
+  modalPreselectedTime = time;
+
+  sectionBase.classList.remove("hidden");
+  sectionApp.classList.remove("hidden");
+
+  document.getElementById("modal-title-input").value = "Nuovo appuntamento";
+  document.getElementById("modal-desc-input").value = "";
+  document.getElementById("modal-date-input").value = dateISO;
+  document.getElementById("modal-time-input").value = time || "09:00";
+  document.getElementById("modal-name-input").value = "";
+  document.getElementById("modal-reason-input").value = "";
+
+  titleEl.textContent = "Nuovo appuntamento";
+
+  overlay.classList.remove("hidden");
+}
+
+// =======================
+// Q4 – AGENDA
+// =======================
+
+function initAgenda() {
+  const prev = document.getElementById("agenda-prev-month");
+  const next = document.getElementById("agenda-next-month");
+  const backMonth = document.getElementById("agenda-back-month");
+
+  if (prev) {
+    prev.addEventListener("click", () => {
+      agendaCurrentDate.setMonth(agendaCurrentDate.getMonth() - 1);
+      agendaViewMode = "month";
+      renderAgenda();
+      resetAgendaInactivity();
     });
-  });
+  }
 
-  const btnNuovo = document.getElementById("btn-nuovo-app");
-  if (btnNuovo) {
-    btnNuovo.addEventListener("click", () => {
-      const dataStr = prompt(
-        "Data appuntamento (formato GG/MM, vuoto = oggi):",
-        ""
-      );
-      let dateIso = oggiISO;
-      if (dataStr) {
-        const [gg, mm] = dataStr.split("/");
-        const d = new Date(
-          selectedDate.getFullYear(),
-          Number(mm) - 1,
-          Number(gg)
-        );
-        if (!isNaN(d)) {
-          dateIso = toISODate(d);
-          selectedDate = d;
-        }
-      } else {
-        dateIso = toISODate(selectedDate);
-      }
+  if (next) {
+    next.addEventListener("click", () => {
+      agendaCurrentDate.setMonth(agendaCurrentDate.getMonth() + 1);
+      agendaViewMode = "month";
+      renderAgenda();
+      resetAgendaInactivity();
+    });
+  }
 
-      const ora = prompt("Orario (es. 09:00-10:00):", "09:00-10:00");
-      if (!ora) return;
-      const [start, end] = ora.split("-");
-      const servizio = prompt(
-        "Servizio (ECG, Holter, Prelievo, Consulenza nutrizionale, Altro):",
-        "ECG"
-      );
-      if (!servizio) return;
-      const paziente =
-        prompt("Nome paziente / nota:", "Paziente demo") || "Paziente demo";
-
-      agendaEvents.push({
-        date: dateIso,
-        start: start || "09:00",
-        end: end || "09:30",
-        servizio,
-        paziente,
-      });
-
-      agendaView = "day";
+  if (backMonth) {
+    backMonth.addEventListener("click", () => {
+      agendaViewMode = "month";
       renderAgenda();
     });
   }
 
-  function renderAgenda() {
-    const iso = toISODate(selectedDate);
-    const giornoLabel = formatLongDateIT(iso);
-    if (agendaView === "day") {
-      info.textContent = `Vista GIORNO · ${giornoLabel}`;
-      renderAgendaDay(container, iso);
-    } else if (agendaView === "week") {
-      info.textContent = `Vista SETTIMANA · settimana di ${giornoLabel}`;
-      renderAgendaWeek(container, selectedDate);
-    } else {
-      info.textContent = `Vista MESE · ${selectedDate.toLocaleDateString(
-        "it-IT",
-        { month: "long", year: "numeric" }
-      )}`;
-      renderAgendaMonth(container, selectedDate);
-    }
-
-    document
-      .querySelectorAll(".agenda-tab")
-      .forEach((t) =>
-        t.classList.toggle("active", t.dataset.view === agendaView)
-      );
-  }
-
-  function goToDay(isoDate) {
-    selectedDate = parseISO(isoDate);
-    agendaView = "day";
-    renderAgenda();
-  }
-
-  // RENDER WEEK
-  function renderAgendaWeek(containerEl, baseDate) {
-    const monday = getMonday(baseDate);
-    const days = [];
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      days.push(d);
-    }
-
-    let html = '<div class="agenda-week-grid">';
-    days.forEach((d) => {
-      const iso = toISODate(d);
-      const dayEvents = agendaEvents
-        .filter((e) => e.date === iso)
-        .sort((a, b) => a.start.localeCompare(b.start));
-
-      const dayLabel = d.toLocaleDateString("it-IT", {
-        weekday: "short",
-        day: "2-digit",
-      });
-
-      html += `
-        <div class="agenda-week-day" data-day="${iso}">
-          <div class="agenda-week-day-header">
-            <span>${dayLabel}</span>
-            <span>${dayEvents.length || ""}</span>
-          </div>
-          <div class="agenda-week-slot-list">
-      `;
-
-      dayEvents.forEach((ev) => {
-        const pillClass = getAgendaPillClass(ev.servizio);
-        html += `
-          <div class="agenda-week-pill ${pillClass}" data-day="${iso}">
-            ${ev.start} · ${escapeHtml(ev.servizio)} – ${escapeHtml(
-          ev.paziente
-        )}
-          </div>
-        `;
-      });
-
-      html += `
-          </div>
-        </div>
-      `;
-    });
-    html += "</div>";
-    containerEl.innerHTML = html;
-
-    containerEl.querySelectorAll("[data-day]").forEach((el) => {
-      el.addEventListener("click", () => {
-        const iso = el.getAttribute("data-day");
-        if (iso) goToDay(iso);
-      });
-    });
-  }
-
-  // RENDER DAY
-  function renderAgendaDay(containerEl, isoDate) {
-    const events = agendaEvents
-      .filter((e) => e.date === isoDate)
-      .sort((a, b) => a.start.localeCompare(b.start));
-
-    const hours = [];
-    for (let h = 8; h <= 19; h++) {
-      hours.push(`${String(h).padStart(2, "0")}:00`);
-    }
-
-    let html = '<div class="agenda-day-view">';
-    html += '<div class="agenda-day-times">';
-    hours.forEach((h) => {
-      html += `<div>${h}</div>`;
-    });
-    html += "</div>";
-
-    html += '<div class="agenda-day-slots">';
-    hours.forEach(() => {
-      html += '<div class="agenda-day-gridline"></div>';
-    });
-
-    events.forEach((ev) => {
-      const cls = getAgendaPillClass(ev.servizio);
-      html += `
-        <div class="agenda-day-event ${cls}">
-          ${ev.start}–${ev.end} · ${escapeHtml(ev.servizio)} – ${escapeHtml(
-        ev.paziente
-      )}
-        </div>
-      `;
-    });
-
-    html += "</div></div>";
-    containerEl.innerHTML = html;
-  }
-
-  // RENDER MONTH
-  function renderAgendaMonth(containerEl, baseDate) {
-    const year = baseDate.getFullYear();
-    const month = baseDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const startWeekDay = firstDay.getDay() || 7; // 1-7 (lun=1)
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    let html = '<div class="agenda-month-grid">';
-    for (let i = 1; i < startWeekDay; i++) {
-      html += '<div class="agenda-month-cell"></div>';
-    }
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const d = new Date(year, month, day);
-      const iso = toISODate(d);
-      const evts = agendaEvents.filter((e) => e.date === iso);
-      html += `<div class="agenda-month-cell" data-day="${iso}">
-        <div class="agenda-month-cell-header">${day}</div>
-        <div>`;
-      if (evts.length) {
-        const main = evts[0];
-        const cls = getAgendaPillClass(main.servizio);
-        html += `<span class="agenda-month-dot ${cls}"></span>`;
-      }
-      html += `</div></div>`;
-    }
-
-    html += "</div>";
-    containerEl.innerHTML = html;
-
-    containerEl.querySelectorAll("[data-day]").forEach((el) => {
-      el.addEventListener("click", () => {
-        const iso = el.getAttribute("data-day");
-        if (iso) goToDay(iso);
-      });
-    });
-  }
-
   renderAgenda();
+  resetAgendaInactivity();
 }
 
-function getMonday(d) {
-  const date = new Date(d);
-  const day = date.getDay() || 7;
-  if (day !== 1) date.setDate(date.getDate() - (day - 1));
-  return date;
+function resetAgendaInactivity() {
+  if (agendaInactivityTimer) clearTimeout(agendaInactivityTimer);
+  agendaInactivityTimer = setTimeout(() => {
+    if (agendaViewMode === "day") {
+      agendaViewMode = "month";
+      renderAgenda();
+    }
+  }, 120000); // 2 minuti
 }
 
-function toISODate(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
+function renderAgenda() {
+  const monthLabel = document.getElementById("agenda-month-label");
+  const monthView = document.getElementById("agenda-month-view");
+  const dayView = document.getElementById("agenda-day-view");
+  const backMonthBtn = document.getElementById("agenda-back-month");
 
-function getAgendaPillClass(servizio) {
-  const s = servizio.toLowerCase();
-  if (s.includes("ecg")) return "agenda-pill-ecg";
-  if (s.includes("holter")) return "agenda-pill-holter";
-  if (s.includes("prelievo")) return "agenda-pill-prelievo";
-  if (s.includes("nutriz")) return "agenda-pill-nutrizione";
-  return "agenda-pill-altro";
-}
+  if (!monthLabel || !monthView || !dayView || !backMonthBtn) return;
 
-/* ==========================
-   BOTTONE CENTRALE
-   ========================== */
+  const year = agendaCurrentDate.getFullYear();
+  const monthIndex = agendaCurrentDate.getMonth();
 
-function setupCentralButton() {
-  const btn = document.getElementById("central-action-btn");
-  if (!btn) return;
-  btn.addEventListener("click", () => {
-    alert(
-      "Azione rapida: qui in futuro potrai scegliere se creare una nuova comunicazione, appuntamento, offerta o altro."
-    );
+  const monthFormatter = new Intl.DateTimeFormat("it-IT", {
+    month: "long",
+    year: "numeric"
   });
+  monthLabel.textContent = monthFormatter.format(agendaCurrentDate);
+
+  if (agendaViewMode === "month") {
+    backMonthBtn.classList.add("hidden");
+    monthView.classList.remove("hidden");
+    dayView.classList.add("hidden");
+    renderAgendaMonthView(monthView, year, monthIndex);
+  } else {
+    backMonthBtn.classList.remove("hidden");
+    monthView.classList.add("hidden");
+    dayView.classList.remove("hidden");
+    renderAgendaDayView(dayView);
+  }
+}
+
+function renderAgendaMonthView(container, year, monthIndex) {
+  container.innerHTML = "";
+
+  const grid = document.createElement("div");
+  grid.className = "agenda-month-grid";
+
+  const dayNames = ["lu", "ma", "me", "gi", "ve", "sa", "do"];
+  dayNames.forEach((d) => {
+    const cell = document.createElement("div");
+    cell.className = "agenda-month-grid-header";
+    cell.textContent = d;
+    grid.appendChild(cell);
+  });
+
+  const firstDay = new Date(year, monthIndex, 1);
+  const firstWeekday = (firstDay.getDay() + 6) % 7; // 0=lu ... 6=do
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+  for (let i = 0; i < firstWeekday; i++) {
+    const empty = document.createElement("div");
+    empty.className = "agenda-day-cell agenda-day-cell-empty";
+    grid.appendChild(empty);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(year, monthIndex, day);
+    const iso = toISODate(d);
+
+    const cell = document.createElement("div");
+    cell.className = "agenda-day-cell";
+
+    const dayNum = document.createElement("div");
+    dayNum.className = "agenda-day-number";
+    dayNum.textContent = String(day);
+    cell.appendChild(dayNum);
+
+    const apps = appuntamenti.filter((a) => a.data === iso);
+    if (apps.length > 0) {
+      const tipoServizio = apps[0].servizio?.toUpperCase() || "";
+      const badge = document.createElement("div");
+      badge.className = "agenda-day-badge";
+
+      if (tipoServizio.includes("ECG")) {
+        cell.classList.add("agenda-day-ecg");
+        badge.textContent = "ECG";
+      } else if (tipoServizio.includes("HOLTER")) {
+        cell.classList.add("agenda-day-holter");
+        badge.textContent = "HOLTER";
+      } else {
+        cell.classList.add("agenda-day-altro");
+        badge.textContent = "Servizi";
+      }
+      cell.appendChild(badge);
+    }
+
+    if (iso === oggiISO) {
+      cell.classList.add("agenda-day-today");
+    }
+
+    cell.addEventListener("click", () => {
+      agendaSelectedDayISO = iso;
+      agendaViewMode = "day";
+      renderAgenda();
+      resetAgendaInactivity();
+    });
+
+    grid.appendChild(cell);
+  }
+
+  container.appendChild(grid);
+}
+
+function renderAgendaDayView(container) {
+  const label = document.getElementById("agenda-day-label");
+  const slotsWrap = document.getElementById("agenda-slots");
+  if (!label || !slotsWrap) return;
+
+  const iso = agendaSelectedDayISO || toISODate(new Date());
+  label.textContent = formatLongDateIT(iso);
+
+  slotsWrap.innerHTML = "";
+
+  const dayApps = appuntamenti
+    .filter((a) => a.data === iso)
+    .sort((a, b) => a.ora.localeCompare(b.ora));
+
+  const startHour = 8;
+  const endHour = 20;
+
+  for (let h = startHour; h <= endHour; h++) {
+    const hourStr = String(h).padStart(2, "0") + ":00";
+    const row = document.createElement("div");
+    row.className = "agenda-slot-row";
+
+    const timeCell = document.createElement("div");
+    timeCell.className = "agenda-slot-time";
+    timeCell.textContent = hourStr;
+    row.appendChild(timeCell);
+
+    const contentCell = document.createElement("div");
+
+    const app = dayApps.find((a) => a.ora === hourStr);
+    if (app) {
+      row.classList.add("has-app");
+      const chip = document.createElement("span");
+      chip.className = "agenda-slot-chip";
+      const upperServizio = (app.servizio || "").toUpperCase();
+      if (upperServizio.includes("ECG")) {
+        chip.textContent = "ECG";
+      } else if (upperServizio.includes("HOLTER")) {
+        chip.textContent = "HOLTER";
+      } else {
+        chip.textContent = "Servizio";
+      }
+      contentCell.innerHTML = `<strong>${app.nome}</strong> – ${app.motivo} `;
+      contentCell.appendChild(chip);
+    } else {
+      const span = document.createElement("span");
+      span.className = "agenda-slot-content-empty";
+      span.textContent = "Slot libero – clicca per nuovo appuntamento";
+      contentCell.appendChild(span);
+
+      row.addEventListener("click", () => {
+        openModalForAppuntamento(iso, hourStr);
+        resetAgendaInactivity();
+      });
+    }
+
+    row.appendChild(contentCell);
+    slotsWrap.appendChild(row);
+  }
+}
+
+// =======================
+// CHAT INTERNA
+// =======================
+
+let currentChatAuthor = "titolare";
+let chatMessages = [
+  {
+    id: 1,
+    authorKey: "titolare",
+    autore: "Titolare",
+    testo: "Ricordate di aggiornare la promo dermocosmesi entro oggi.",
+    lato: "right"
+  },
+  {
+    id: 2,
+    authorKey: "dip1",
+    autore: "Farmacista 1",
+    testo: "Ok, mi occupo io della vetrina.",
+    lato: "left"
+  }
+];
+let nextChatId = 3;
+
+function initChat() {
+  const fab = document.getElementById("chat-fab");
+  const overlay = document.getElementById("chat-overlay");
+  const closeBtn = document.getElementById("chat-close");
+  const sendBtn = document.getElementById("chat-send-btn");
+  const input = document.getElementById("chat-input");
+  const attachBtn = document.getElementById("chat-attach-btn");
+  const fileInput = document.getElementById("chat-file-input");
+  const authorBtns = document.querySelectorAll(".chat-author-btn");
+
+  if (!fab || !overlay || !closeBtn || !sendBtn || !input) return;
+
+  function openChat() {
+    overlay.classList.remove("hidden");
+    renderChatMessages();
+    input.focus();
+  }
+
+  function closeChat() {
+    overlay.classList.add("hidden");
+  }
+
+  fab.addEventListener("click", openChat);
+  closeBtn.addEventListener("click", closeChat);
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay || e.target.classList.contains("chat-backdrop")) {
+      closeChat();
+    }
+  });
+
+  authorBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      authorBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentChatAuthor = btn.getAttribute("data-author") || "titolare";
+    });
+  });
+
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    let autoreLabel = "Dipendente";
+    let side = "left";
+    if (currentChatAuthor === "titolare") {
+      autoreLabel = "Titolare";
+      side = "right";
+    } else if (currentChatAuthor === "dip1") {
+      autoreLabel = "Farmacista 1";
+    } else if (currentChatAuthor === "dip2") {
+      autoreLabel = "Farmacista 2";
+    }
+
+    chatMessages.push({
+      id: nextChatId++,
+      authorKey: currentChatAuthor,
+      autore: autoreLabel,
+      testo: text,
+      lato: side
+    });
+
+    input.value = "";
+    document.getElementById("chat-attachment-label").classList.add("hidden");
+    renderChatMessages();
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  if (attachBtn && fileInput) {
+    attachBtn.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", () => {
+      const labelWrap = document.getElementById("chat-attachment-label");
+      const nameSpan = document.getElementById("chat-attachment-name");
+      if (fileInput.files && fileInput.files[0]) {
+        nameSpan.textContent = fileInput.files[0].name;
+        labelWrap.classList.remove("hidden");
+      } else {
+        labelWrap.classList.add("hidden");
+      }
+    });
+  }
+}
+
+function renderChatMessages() {
+  const container = document.getElementById("chat-messages");
+  if (!container) return;
+
+  container.innerHTML = "";
+  chatMessages.forEach((m) => {
+    const row = document.createElement("div");
+    row.className = `chat-msg-row ${m.lato === "right" ? "right" : "left"}`;
+
+    const bubble = document.createElement("div");
+    bubble.className = `chat-bubble ${m.lato === "right" ? "right" : "left"}`;
+
+    const author = document.createElement("div");
+    author.className = "chat-bubble-author";
+    author.textContent = m.autore;
+
+    const text = document.createElement("p");
+    text.className = "chat-bubble-text";
+    text.textContent = m.testo;
+
+    bubble.appendChild(author);
+    bubble.appendChild(text);
+    row.appendChild(bubble);
+    container.appendChild(row);
+  });
+
+  container.scrollTop = container.scrollHeight;
 }
