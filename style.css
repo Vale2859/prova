@@ -18,7 +18,7 @@
   --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Helvetica Neue", Arial, sans-serif;
 
-  /* Palette card – usata da mobile e desktop */
+  /* colori card */
   --card-green: linear-gradient(135deg, #00c853, #00e676);
   --card-blue: linear-gradient(135deg, #1b78ff, #4dabff);
   --card-pink: linear-gradient(135deg, #ff3d9a, #ff7bbf);
@@ -51,257 +51,316 @@ body {
   flex-direction: column;
 }
 
-/* di default: desktop visibile, mobile nascosto */
+/* default: desktop */
 .mobile-dashboard {
   display: none;
 }
-
 .desktop-dashboard {
+  display: block;
+}
+
+/* HEADER */
+.app-header {
+  padding: 18px 40px 10px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  gap: 4px;
 }
 
-/* =========================
-   HEADER DESKTOP
-   ========================= */
-.desk-header {
-  padding: 16px 32px 10px;
-}
-
-.desk-logo-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.desk-logo {
-  height: 38px;
-  width: auto;
-  border-radius: 8px;
-}
-
-.desk-title-wrap h1 {
-  margin: 0;
-  font-size: 1.3rem;
+.app-header h1 {
+  font-size: 1.4rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  margin: 0;
 }
 
-.desk-title-wrap span {
+.app-header__subtitle {
   font-size: 0.85rem;
   color: var(--txt-muted);
 }
 
-/* =========================
-   GRID 4 QUADRANTI DESKTOP
-   ========================= */
+/* ========= GRID 2×2 ========= */
 
-.desk-main {
+.desktop-main {
   flex: 1;
-  padding: 8px 24px 24px;
+  padding: 10px 32px 32px;
 }
 
-.desk-grid {
+.desktop-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;   /* 2 colonne uguali */
-  grid-template-rows: 1fr 1fr;      /* 2 righe uguali */
-  gap: 14px;
-  height: calc(100vh - 90px);       /* occupa quasi tutto il monitor */
-  max-height: 760px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 18px;
+  min-height: calc(100vh - 110px);
 }
 
+/* quadranti */
 .quad {
-  background: rgba(4, 20, 39, 0.9);
-  border-radius: 20px;
-  padding: 14px 16px;
-  box-shadow: var(--shadow-soft);
+  background: rgba(3, 16, 38, 0.9);
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  position: relative;
+  box-shadow: var(--shadow-soft);
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
+/* posizioni:
+   Q1: alto sx
+   Q3: alto dx
+   Q2: basso sx
+   Q4: basso dx */
+.quad-1 { grid-area: 1 / 1 / 2 / 2; }
+.quad-3 { grid-area: 1 / 2 / 2 / 3; }
+.quad-2 { grid-area: 2 / 1 / 3 / 2; }
+.quad-4 { grid-area: 2 / 2 / 3 / 3; }
+
 .quad-title {
-  margin: 0 0 10px;
   font-size: 0.95rem;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-}
-
-.quad-title-sm {
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-  text-transform: uppercase;
   letter-spacing: 0.12em;
+  margin: 0 0 3px;
 }
 
-/* QUADRANTE 1 – SEZIONI FARMACIA (3x3) */
-
-.quad1-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  height: calc(100% - 28px);
-}
-
-.section-card {
-  border-radius: 16px;
-  border: none;
-  padding: 8px 10px;
-  text-align: left;
-  color: #fff;
-  box-shadow: var(--shadow-soft);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.section-label {
-  font-size: 0.55rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
-
-.section-title {
+.quad-subtitle {
+  margin: 0 0 10px;
   font-size: 0.8rem;
-  font-weight: 600;
-  margin-top: 4px;
-}
-
-/* QUADRANTE 2 – RIEPILOGO / CONTENUTO CARD */
-
-.quad-2 {
-  overflow-y: auto;
-}
-
-.quad2-content {
-  font-size: 0.88rem;
-  line-height: 1.4;
-}
-
-.quad2-content h3 {
-  margin: 10px 0 4px;
-  font-size: 0.9rem;
-}
-
-.quad2-content ul {
-  margin: 0 0 6px;
-  padding-left: 18px;
-  font-size: 0.85rem;
-}
-
-/* QUADRANTE 3 – OFFERTE + EVENTI */
-
-.quad-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.quad3-col {
-  border-radius: 16px;
-  padding: 10px 12px;
-  background: rgba(6, 35, 70, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.quad3-content {
-  font-size: 0.82rem;
-  line-height: 1.4;
-}
-
-.quad3-content ul {
-  margin: 4px 0 0;
-  padding-left: 16px;
-}
-/* QUADRANTE 4 – AREA IN LAVORAZIONE */
-
-.quad-4 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.quad4-inner {
-  text-align: center;
-  opacity: 0.9;
-}
-
-.quad4-label {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.quad4-subtitle {
-  font-size: 0.9rem;
   color: var(--txt-muted);
 }
 
-/* =========================
-   COLORI CARD (mobile + desktop)
-   ========================= */
-
-.m-card-green,
-.section-card.m-card-green {
-  background: var(--card-green);
-}
-.m-card-blue,
-.section-card.m-card-blue {
-  background: var(--card-blue);
-}
-.m-card-pink,
-.section-card.m-card-pink {
-  background: var(--card-pink);
-}
-.m-card-teal,
-.section-card.m-card-teal {
-  background: var(--card-teal);
-}
-.m-card-yellow,
-.section-card.m-card-yellow {
-  background: var(--card-yellow);
-}
-.m-card-cyan,
-.section-card.m-card-cyan {
-  background: var(--card-cyan);
-}
-.m-card-orange,
-.section-card.m-card-orange {
-  background: var(--card-orange);
-}
-.m-card-green2,
-.section-card.m-card-green2 {
-  background: var(--card-green2);
-}
-.m-card-blue2,
-.section-card.m-card-blue2 {
-  background: var(--card-blue2);
-}
-.m-card-purple,
-.section-card.m-card-purple {
-  background: var(--card-purple);
-}
-.m-card-dark {
-  background: var(--card-dark);
+/* Q1 – griglia card 3×3 */
+.quad-card-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: minmax(70px, 1fr);
+  gap: 8px;
 }
 
-/* =========================
-   MOBILE – CARD STILE PORTALE
-   ========================= */
+.q-card {
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  padding: 8px 10px;
+  text-align: left;
+  color: #fff;
+  font-family: inherit;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.q-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.55);
+}
+.q-card-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Q3 – riepilogo rapido */
+#quick-summary {
+  padding: 8px 10px;
+  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.08), transparent 60%);
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.quick-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+}
+.quick-list li + li {
+  margin-top: 4px;
+}
+
+.detail-panel {
+  flex: 1;
+  background: rgba(2, 9, 26, 0.9);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-top: 6px;
+  overflow-y: auto;
+}
+
+#detail-title {
+  margin: 0 0 4px;
+  font-size: 0.9rem;
+}
+#detail-summary {
+  margin: 0 0 6px;
+  font-size: 0.8rem;
+  color: var(--txt-muted);
+}
+#detail-list {
+  list-style: disc;
+  padding-left: 18px;
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+/* Q2 – offerte / eventi */
+.quad-4-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  flex: 1;
+}
+
+.quad-box {
+  background: rgba(5, 24, 52, 0.9);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+}
+
+.quad-box h3 {
+  margin: 0 0 4px;
+  font-size: 0.85rem;
+}
+
+.quad-box ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+/* Q4 – agenda & documenti */
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tab-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--txt-main);
+  cursor: pointer;
+}
+.tab-btn.active {
+  background: var(--accent-blue);
+}
+
+.tab-content.hidden {
+  display: none;
+}
+
+.calendar-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.cal-view-switch {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.cal-view-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 3px 8px;
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--txt-main);
+  cursor: pointer;
+}
+.cal-view-btn.active {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.cal-add-btn {
+  font-size: 0.75rem;
+}
+
+.agenda-wrapper {
+  flex: 1;
+  background: rgba(2, 9, 26, 0.9);
+  border-radius: 12px;
+  padding: 8px 10px;
+  overflow-y: auto;
+}
+
+/* blocchi agenda */
+.agenda-day {
+  margin-bottom: 8px;
+}
+.agenda-day-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.agenda-slot {
+  border-radius: 10px;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+  color: #fff;
+}
+.slot-ecg { background: rgba(33, 150, 243, 0.5); }
+.slot-holter { background: rgba(255, 193, 7, 0.5); color: #111; }
+.slot-vaccino { background: rgba(76, 175, 80, 0.5); }
+.slot-consulenza { background: rgba(233, 30, 99, 0.5); }
+
+/* documenti */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  flex: 1;
+}
+.doc-card {
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+.doc-icon {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+.doc-title {
+  font-weight: 600;
+}
+.doc-subtitle {
+  font-size: 0.75rem;
+  color: var(--txt-muted);
+}
+.doc-green { background: var(--card-green); }
+.doc-blue { background: var(--card-blue); }
+.doc-pink { background: var(--card-pink); }
+.doc-yellow { background: var(--card-yellow); }
+
+/* bottoni */
+.btn-primary {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  background: var(--accent-blue);
+  color: #fff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 600;
+}
+/* ===== MOBILE ===== */
 
 .m-header {
   padding: 14px 16px 6px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.m-logo-wrap {
-  display: flex;
-  align-items: center;
 }
 
 .m-logo {
@@ -329,7 +388,6 @@ body {
   background: #ffffff;
   position: relative;
 }
-
 .m-hamburger span::before,
 .m-hamburger span::after {
   content: "";
@@ -340,14 +398,8 @@ body {
   background: #ffffff;
   left: 0;
 }
-
-.m-hamburger span::before {
-  top: -5px;
-}
-
-.m-hamburger span::after {
-  top: 5px;
-}
+.m-hamburger span::before { top: -5px; }
+.m-hamburger span::after { top: 5px; }
 
 .m-main {
   padding: 4px 12px 16px;
@@ -372,6 +424,7 @@ body {
   justify-content: space-between;
   min-height: 86px;
   color: #ffffff;
+  background: var(--card-blue);
 }
 
 .m-card-label {
@@ -412,15 +465,79 @@ body {
   grid-column: 1 / -1;
 }
 
-/* =========================
-   RESPONSIVE
-   ========================= */
+/* colori mobile */
+.m-card-green { background: var(--card-green); }
+.m-card-blue { background: var(--card-blue); }
+.m-card-pink { background: var(--card-pink); }
+.m-card-teal { background: var(--card-teal); }
+.m-card-yellow { background: var(--card-yellow); }
+.m-card-cyan { background: var(--card-cyan); }
+.m-card-orange { background: var(--card-orange); }
+.m-card-green2 { background: var(--card-green2); }
+.m-card-blue2 { background: var(--card-blue2); }
+.m-card-purple { background: var(--card-purple); }
+.m-card-dark { background: var(--card-dark); }
+
+/* overlay dettagli mobile */
+.m-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 40;
+}
+
+.m-detail-box {
+  background: #061a33;
+  border-radius: 18px;
+  padding: 14px;
+  max-width: 420px;
+  width: 100%;
+  color: #fff;
+  box-shadow: var(--shadow-soft);
+  position: relative;
+}
+
+.m-detail-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#m-detail-title {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+#m-detail-summary {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+}
+#m-detail-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.8rem;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+  .desktop-main {
+    padding: 10px 16px 24px;
+  }
+}
 
 @media (max-width: 768px) {
   .desktop-dashboard {
     display: none;
   }
-
   .mobile-dashboard {
     display: block;
   }
