@@ -1,1023 +1,581 @@
 // script.js
 
-// =======================
-// STATO GLOBALE
-// =======================
-
-let lastCardInteractionTime = Date.now();
-let q2InactivityTimer = null;
-
-let agendaCurrentDate = new Date();
-let agendaViewMode = "month"; // "month" | "day"
-let agendaSelectedDayISO = null;
-let agendaInactivityTimer = null;
-
-let promoOfferte = [
-  {
-    id: 1,
-    tipo: "offerta",
-    titolo: "Sconto 20% dermocosmesi",
-    data: "2025-11-30",
-    descrizione: "Linea viso idratante e anti-age."
-  }
-];
-
-let promoGiornate = [
-  {
-    id: 1,
-    tipo: "giornata",
-    titolo: "Giornata ECG",
-    data: "2025-12-02",
-    descrizione: "Elettrocardiogramma con referto cardiologo."
-  }
-];
-
-let nextPromoId = 2;
-
-// appuntamenti agenda
-let appuntamenti = [
-  {
-    id: 1,
-    data: "2025-11-29",
-    ora: "09:00",
-    nome: "Mario Rossi",
-    motivo: "ECG controllo",
-    servizio: "ECG"
-  },
-  {
-    id: 2,
-    data: "2025-11-29",
-    ora: "11:00",
-    nome: "Lucia Bianchi",
-    motivo: "Holter pressorio",
-    servizio: "HOLTER"
-  },
-  {
-    id: 3,
-    data: "2025-12-01",
-    ora: "10:30",
-    nome: "Giuseppe Verdi",
-    motivo: "ECG pre-operatorio",
-    servizio: "ECG"
-  }
-];
-let nextAppId = 4;
-
-// demo assenze
-const assenzeDemo = [
-  {
-    nome: "Mario Rossi",
-    dal: "2025-11-29",
-    al: "2025-11-30",
-    tipo: "Ferie",
-    stato: "approvato"
-  },
-  {
-    nome: "Lucia Bianchi",
-    dal: "2025-11-28",
-    al: "2025-11-28",
-    tipo: "Permesso",
-    stato: "approvato"
-  },
-  {
-    nome: "Giuseppe Neri",
-    dal: "2025-12-03",
-    al: "2025-12-05",
-    tipo: "Malattia",
-    stato: "approvato"
-  },
-  {
-    nome: "Mario Rossi",
-    dal: "2025-12-10",
-    al: "2025-12-12",
-    tipo: "Ferie",
-    stato: "approvato"
-  }
-];
-
-// demo turni
-const turniDemo = [
-  {
-    data: "2025-11-28",
-    farmacia: "Farmacia Montesano",
-    orario: "08:00 – 20:00",
-    appoggio: "Farmacia Centrale",
-    note: "Turno ordinario diurno."
-  },
-  {
-    data: "2025-11-29",
-    farmacia: "Farmacia Centrale",
-    orario: "08:00 – 20:00",
-    appoggio: "Farmacia Montesano",
-    note: "Turno di scambio tra farmacie."
-  },
-  {
-    data: "2025-11-30",
-    farmacia: "Farmacia Madonna delle Grazie",
-    orario: "20:00 – 08:00",
-    appoggio: "Farmacia Montesano",
-    note: "Turno notturno."
-  },
-  {
-    data: "2025-12-01",
-    farmacia: "Farmacia Montesano",
-    orario: "00:00 – 24:00",
-    appoggio: "Farmacia Centrale",
-    note: "Turno festivo."
-  }
-];
-
-const oggiISO = (() => {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-})();
-
-// =======================
-// ON DOM READY
-// =======================
-
-document.addEventListener("DOMContentLoaded", () => {
-  // click sulle card (mobile + desktop)
-  setupCardClicks();
-
-  // Q2: default + timer inattività
-  resetQ2Inactivity();
-
-  // Q3: offerte / giornate
-  renderPromozioni();
-
-  // Q4: agenda
-  initAgenda();
-
-  // Chat
-  initChat();
-
-  // Modale generica
-  initModal();
-});
-
-// =======================
-// UTIL DATE
-// =======================
-
-function parseISO(dateStr) {
-  const [y, m, d] = dateStr.split("-");
-  return new Date(Number(y), Number(m) - 1, Number(d));
-}
-
-function formatShortDateIT(iso) {
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}`;
-}
-
-function formatLongDateIT(iso) {
-  const [y, m, d] = iso.split("-");
-  const date = new Date(Number(y), Number(m) - 1, Number(d));
-  const formatter = new Intl.DateTimeFormat("it-IT", {
+// ---------- UTILITÀ DATA ----------
+function formatDateIT(date) {
+  return date.toLocaleDateString("it-IT", {
     weekday: "long",
     day: "2-digit",
-    month: "2-digit"
-  });
-  return formatter.format(date);
-}
-
-function toISODate(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-// =======================
-// CARD → Q2 AREA CONTENUTI
-// =======================
-
-function setupCardClicks() {
-  const clickable = document.querySelectorAll("[data-section]");
-  clickable.forEach((el) => {
-    el.addEventListener("click", () => {
-      const key = el.getAttribute("data-section");
-      if (!key) return;
-      showSectionInQ2(key);
-      registerInteraction();
-    });
+    month: "2-digit",
   });
 }
 
-function registerInteraction() {
-  lastCardInteractionTime = Date.now();
-  resetQ2Inactivity();
+function toISODate(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
 }
 
-function resetQ2Inactivity() {
-  if (q2InactivityTimer) clearTimeout(q2InactivityTimer);
-  q2InactivityTimer = setTimeout(() => {
-    showQ2Default();
-  }, 20000); // 20 secondi
+function fromISO(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d);
 }
 
-function showQ2Default() {
-  const q2 = document.getElementById("q2-content");
-  if (!q2) return;
-  q2.classList.add("fade");
-  q2.innerHTML = `
-    <div class="q2-placeholder">
-      <p class="q2-placeholder-main">Seleziona una funzione dalle card</p>
-      <p class="q2-placeholder-sub">
-        Qui vedrai in grande solo quello che ti interessa davvero:
-        assenze già approvate, turno di oggi, comunicazioni, offerte,
-        scadenze, consegne, giornate in farmacia, ecc.
-      </p>
-    </div>
-  `;
-  setTimeout(() => q2.classList.remove("fade"), 650);
+// ---------- STATO ----------
+let promos = [];
+let giornate = [];
+let agendaEvents = []; // {date, start, end, name, reason, tag}
+let agendaCurrentMonth = new Date();
+agendaCurrentMonth.setDate(1);
+
+let idleContentTimer = null;
+let idleAgendaTimer = null;
+
+// ---------- INIT ----------
+document.addEventListener("DOMContentLoaded", () => {
+  initTopbarDate();
+  seedDemoData();
+  renderPromos();
+  renderGiornate();
+  initAgenda();
+  initContentIdleMonitoring();
+});
+
+// ---------- TOPBAR ----------
+function initTopbarDate() {
+  const el = document.getElementById("topbar-date");
+  const now = new Date();
+  el.textContent = formatDateIT(now);
 }
 
-function showSectionInQ2(key) {
-  const q2 = document.getElementById("q2-content");
-  if (!q2) return;
+// ---------- DEMO DATA ----------
+function seedDemoData() {
+  const todayISO = toISODate(new Date());
 
-  q2.classList.add("fade");
+  promos = [
+    {
+      id: crypto.randomUUID(),
+      tipo: "promo",
+      titolo: "Promo colesterolo",
+      descrizione: "Test + misurazione saturazione. Sconto 20%.",
+      data: todayISO,
+    },
+  ];
 
-  let html = "";
+  giornate = [
+    {
+      id: crypto.randomUUID(),
+      tipo: "giornata",
+      titolo: "Giornata ECO",
+      descrizione: "Elettrocardiogramma con referto cardiologo.",
+      data: todayISO,
+    },
+  ];
 
-  if (key === "assenti") {
-    html = renderAssentiHTML();
-  } else if (key === "turno") {
-    html = renderTurnoHTML();
-  } else if (key === "prodotti") {
-    html = `
-      <h3 class="q2-section-title">Prodotti in scadenza (demo)</h3>
-      <p class="q2-section-sub">Lista rapida dei prossimi articoli da controllare.</p>
-      <ul class="q2-list">
-        <li><strong>Integratore X</strong> – scade il 10/12</li>
-        <li><strong>Crema viso Y</strong> – scade il 15/12</li>
-        <li><strong>Collirio Z</strong> – scade il 20/12</li>
-      </ul>
-    `;
-  } else if (key === "consegne") {
-    html = `
-      <h3 class="q2-section-title">Consegne / ritiri di oggi (demo)</h3>
-      <p class="q2-section-sub">Rapido promemoria di ciò che deve entrare / uscire.</p>
-      <ul class="q2-list">
-        <li>Ore 10:00 – <strong>Corriere ABC</strong> · Ordine grossista</li>
-        <li>Ore 12:30 – <strong>Ritiro cliente</strong> · N. prenotazione 12345</li>
-        <li>Ore 17:00 – <strong>Corriere resi</strong> · scatolone dermocosmesi</li>
-      </ul>
-    `;
-  } else if (key === "cambiocassa") {
-    html = `
-      <h3 class="q2-section-title">Cambio cassa (demo)</h3>
-      <p class="q2-section-sub">Ultimo cambio registrato e note veloci.</p>
-      <ul class="q2-list">
-        <li><strong>Ultimo cambio</strong>: oggi ore 14:22</li>
-        <li>Fondo cassa confermato: 250,00 €</li>
-        <li>Segnalazioni: nessuna anomalia registrata.</li>
-      </ul>
-    `;
-  } else if (key === "comunicazioni") {
-    html = `
-      <h3 class="q2-section-title">Comunicazioni interne (demo)</h3>
-      <p class="q2-section-sub">Messaggi importanti compariranno qui in evidenza.</p>
-      <ul class="q2-list">
-        <li><strong>Oggi</strong> – Aggiornata procedura chiusura cassa.</li>
-        <li><strong>Ieri</strong> – Nuova promo dermocosmesi in vetrina 1.</li>
-      </ul>
-    `;
-  } else if (key === "procedure") {
-    html = `
-      <h3 class="q2-section-title">Procedure rapide (demo)</h3>
-      <p class="q2-section-sub">Le procedure più usate appariranno in questa area.</p>
-      <ul class="q2-list">
-        <li><strong>Chiusura serale</strong> – 3 step principali.</li>
-        <li><strong>Gestione resi</strong> – modulo + foto prodotto.</li>
-      </ul>
-    `;
-  } else if (key === "logistica" || key === "magazziniera") {
-    html = `
-      <h3 class="q2-section-title">Logistica / magazzino (demo)</h3>
-      <p class="q2-section-sub">
-        Controlli veloci su arrivi, resi, inventari e scaffali critici.
-      </p>
-      <ul class="q2-list">
-        <li>Scaffale A3 – prodotti quasi esauriti.</li>
-        <li>Resi da completare: 2 pratiche aperte.</li>
-        <li>Inventario rapido banco automedicazione lunedì mattina.</li>
-      </ul>
-    `;
-  } else if (key === "consumabili") {
-    html = `
-      <h3 class="q2-section-title">Consumabili (demo)</h3>
-      <p class="q2-section-sub">Materiale di uso quotidiano.</p>
-      <ul class="q2-list">
-        <li>Guanti lattice – OK per 2 settimane.</li>
-        <li>Garze sterili – da riordinare entro venerdì.</li>
-        <li>Rotoli scontrini – disponibile per ~15 giorni.</li>
-      </ul>
-    `;
-  } else if (key === "archivio") {
-    html = `
-      <h3 class="q2-section-title">Archivio file (demo)</h3>
-      <p class="q2-section-sub">
-        Qui troverai procedure PDF, contratti, promozioni e documenti interni.
-      </p>
-      <ul class="q2-list">
-        <li>Manuale procedure 2025.pdf</li>
-        <li>Listino servizi aggiornato.xlsx</li>
-      </ul>
-    `;
-  } else {
-    html = `
-      <h3 class="q2-section-title">Sezione in lavorazione</h3>
-      <p class="q2-section-sub">
-        Questa sezione sarà collegata a funzioni più avanzate del portale.
-      </p>
-    `;
-  }
-
-  q2.innerHTML = html;
-
-  setTimeout(() => q2.classList.remove("fade"), 650);
+  agendaEvents = [
+    {
+      id: crypto.randomUUID(),
+      date: todayISO,
+      start: "09:00",
+      end: "09:30",
+      name: "Rossi Maria",
+      reason: "ECG",
+      tag: "ecg",
+    },
+    {
+      id: crypto.randomUUID(),
+      date: todayISO,
+      start: "10:30",
+      end: "11:00",
+      name: "Bianchi Luca",
+      reason: "Holter pressione",
+      tag: "holter",
+    },
+  ];
 }
 
-// Assenti in HTML (per Q2)
-function renderAssentiHTML() {
-  const oggiDate = parseISO(oggiISO);
-  const oggiList = [];
-  const nextList = [];
+// =============== PROMO & GIORNATE ===============
+function renderPromos() {
+  const list = document.getElementById("promoList");
+  list.innerHTML = "";
 
-  const lista = assenzeDemo.filter((a) => a.stato === "approvato");
+  const sorted = [...promos].sort((a, b) => a.data.localeCompare(b.data));
 
-  lista.forEach((a) => {
-    const dal = parseISO(a.dal);
-    const al = parseISO(a.al);
-
-    if (oggiDate >= dal && oggiDate <= al) {
-      oggiList.push(a);
-    } else if (oggiDate < dal) {
-      nextList.push(a);
-    }
-  });
-
-  nextList.sort((a, b) => parseISO(a.dal) - parseISO(b.dal));
-
-  let htmlOggi = "<ul class='q2-list'>";
-  if (oggiList.length === 0) {
-    htmlOggi +=
-      "<li>Nessun assente oggi.</li>";
-  } else {
-    oggiList.forEach((a) => {
-      const range = formatShortDateIT(a.dal) === formatShortDateIT(a.al)
-        ? formatShortDateIT(a.dal)
-        : `${formatShortDateIT(a.dal)} → ${formatShortDateIT(a.al)}`;
-      htmlOggi += `<li><strong>${a.nome}</strong> – ${a.tipo} (${range})</li>`;
-    });
-  }
-  htmlOggi += "</ul>";
-
-  let htmlNext = "<ul class='q2-list'>";
-  if (nextList.length === 0) {
-    htmlNext += "<li>Nessuna assenza approvata nei prossimi giorni.</li>";
-  } else {
-    nextList.forEach((a) => {
-      const range = formatShortDateIT(a.dal) === formatShortDateIT(a.al)
-        ? formatShortDateIT(a.dal)
-        : `${formatShortDateIT(a.dal)} → ${formatShortDateIT(a.al)}`;
-      htmlNext += `<li><strong>${a.nome}</strong> – ${a.tipo} (${range})</li>`;
-    });
-  }
-  htmlNext += "</ul>";
-
-  return `
-    <h3 class="q2-section-title">Assenti / permessi approvati</h3>
-    <p class="q2-section-sub">Vista immediata di oggi e dei prossimi giorni (demo).</p>
-    <h4 style="margin:4px 0 2px; font-size:0.85rem;">Assenti oggi</h4>
-    ${htmlOggi}
-    <h4 style="margin:8px 0 2px; font-size:0.85rem;">Prossimi giorni</h4>
-    ${htmlNext}
-  `;
-}
-
-function renderTurnoHTML() {
-  const oggiDate = parseISO(oggiISO);
-  let turnoOggi = turniDemo.find((t) => t.data === oggiISO);
-  if (!turnoOggi) {
-    const futuri = turniDemo
-      .filter((t) => parseISO(t.data) >= oggiDate)
-      .sort((a, b) => parseISO(a.data) - parseISO(b.data));
-    turnoOggi = futuri[0] || turniDemo[0];
+  if (!sorted.length) {
+    const li = document.createElement("li");
+    li.className = "empty-text";
+    li.textContent = "Nessuna offerta inserita.";
+    list.appendChild(li);
+    return;
   }
 
-  const altri = turniDemo
-    .filter((t) => t !== turnoOggi)
-    .sort((a, b) => parseISO(a.data) - parseISO(b.data));
+  sorted.forEach((p) => {
+    const li = document.createElement("li");
+    li.className = "promo-item promo";
+    li.dataset.id = p.id;
 
-  let htmlNext = "<ul class='q2-list'>";
-  if (altri.length === 0) {
-    htmlNext += "<li>Nessun altro turno in elenco.</li>";
-  } else {
-    altri.forEach((t) => {
-      htmlNext += `<li><strong>${formatShortDateIT(t.data)}</strong> – ${t.farmacia} (${t.orario}) · Appoggio: ${t.appoggio}</li>`;
-    });
-  }
-  htmlNext += "</ul>";
+    const title = document.createElement("div");
+    title.className = "promo-title";
+    title.textContent = `🔥 ${p.titolo}`;
 
-  return `
-    <h3 class="q2-section-title">Farmacia di turno</h3>
-    <p class="q2-section-sub">Turno di oggi in evidenza e prossimi turni (demo).</p>
+    const date = document.createElement("div");
+    date.className = "promo-date";
+    date.textContent = new Date(p.data).toLocaleDateString("it-IT");
 
-    <p style="font-size:0.9rem; margin:0 0 2px;">
-      <strong>${turnoOggi.farmacia}</strong> – ${formatLongDateIT(turnoOggi.data)}
-    </p>
-    <p style="font-size:0.85rem; margin:0 0 2px;">Orario: <strong>${turnoOggi.orario}</strong></p>
-    <p style="font-size:0.85rem; margin:0 0 4px;">Appoggio: <strong>${turnoOggi.appoggio}</strong></p>
-    <p style="font-size:0.8rem; opacity:0.9; margin:0 0 8px;">${turnoOggi.note}</p>
+    const desc = document.createElement("div");
+    desc.className = "promo-desc";
+    desc.textContent = p.descrizione;
 
-    <h4 style="margin:4px 0 2px; font-size:0.85rem;">Prossimi turni</h4>
-    ${htmlNext}
-  `;
-}
+    const tag = document.createElement("div");
+    tag.className = "promo-tag promo";
+    tag.textContent = "Offerta";
 
-// =======================
-// Q3 – PROMOZIONI
-// =======================
-
-function renderPromozioni() {
-  const offerteList = document.getElementById("offerte-list");
-  const giornateList = document.getElementById("giornate-list");
-  if (!offerteList || !giornateList) return;
-
-  // ordina per data
-  promoOfferte.sort((a, b) => parseISO(a.data) - parseISO(b.data));
-  promoGiornate.sort((a, b) => parseISO(a.data) - parseISO(b.data));
-
-  offerteList.innerHTML = "";
-  giornateList.innerHTML = "";
-
-  if (promoOfferte.length === 0) {
-    offerteList.innerHTML =
-      "<li class='promo-item'><span class='promo-desc'>Nessuna offerta inserita.</span></li>";
-  } else {
-    promoOfferte.forEach((p) => {
-      const li = document.createElement("li");
-      li.className = "promo-item";
-      li.innerHTML = `
-        <span class="promo-item-icon">🏷️</span>
-        <div class="promo-title-row">
-          <span class="promo-title">${p.titolo}</span>
-          <span class="promo-date">${formatShortDateIT(p.data)}</span>
-        </div>
-        <p class="promo-desc">${p.descrizione || ""}</p>
-        <span class="promo-delete" data-delete-type="offerta" data-id="${p.id}">🗑️</span>
-      `;
-      offerteList.appendChild(li);
-    });
-  }
-
-  if (promoGiornate.length === 0) {
-    giornateList.innerHTML =
-      "<li class='promo-item'><span class='promo-desc'>Nessuna giornata programmata.</span></li>";
-  } else {
-    promoGiornate.forEach((p) => {
-      const li = document.createElement("li");
-      li.className = "promo-item";
-      li.innerHTML = `
-        <span class="promo-item-icon">📅</span>
-        <div class="promo-title-row">
-          <span class="promo-title">${p.titolo}</span>
-          <span class="promo-date">${formatShortDateIT(p.data)}</span>
-        </div>
-        <p class="promo-desc">${p.descrizione || ""}</p>
-        <span class="promo-delete" data-delete-type="giornata" data-id="${p.id}">🗑️</span>
-      `;
-      giornateList.appendChild(li);
-    });
-  }
-
-  // gestione cestini
-  document.querySelectorAll(".promo-delete").forEach((del) => {
+    const del = document.createElement("button");
+    del.className = "promo-delete";
+    del.textContent = "🗑";
     del.addEventListener("click", (e) => {
       e.stopPropagation();
-      const type = del.getAttribute("data-delete-type");
-      const id = Number(del.getAttribute("data-id"));
-      if (type === "offerta") {
-        promoOfferte = promoOfferte.filter((p) => p.id !== id);
-      } else {
-        promoGiornate = promoGiornate.filter((p) => p.id !== id);
-      }
-      renderPromozioni();
+      promos = promos.filter((x) => x.id !== p.id);
+      renderPromos();
+      updateIdleSummary();
+    });
+
+    li.append(title, date, desc, tag, del);
+    list.appendChild(li);
+  });
+
+  updateIdleSummary();
+}
+
+function renderGiornate() {
+  const list = document.getElementById("giornateList");
+  list.innerHTML = "";
+
+  const sorted = [...giornate].sort((a, b) => a.data.localeCompare(b.data));
+
+  if (!sorted.length) {
+    const li = document.createElement("li");
+    li.className = "empty-text";
+    li.textContent = "Nessuna giornata programmata.";
+    list.appendChild(li);
+    return;
+  }
+
+  sorted.forEach((g) => {
+    const li = document.createElement("li");
+    li.className = "promo-item giornata";
+    li.dataset.id = g.id;
+
+    const title = document.createElement("div");
+    title.className = "promo-title";
+    title.textContent = `📆 ${g.titolo}`;
+
+    const date = document.createElement("div");
+    date.className = "promo-date";
+    date.textContent = new Date(g.data).toLocaleDateString("it-IT");
+
+    const desc = document.createElement("div");
+    desc.className = "promo-desc";
+    desc.textContent = g.descrizione;
+
+    const tag = document.createElement("div");
+    tag.className = "promo-tag giornata";
+    tag.textContent = "Giornata";
+
+    const del = document.createElement("button");
+    del.className = "promo-delete";
+    del.textContent = "🗑";
+    del.addEventListener("click", (e) => {
+      e.stopPropagation();
+      giornate = giornate.filter((x) => x.id !== g.id);
+      renderGiornate();
+      updateIdleSummary();
+      renderAgendaMonth(); // aggiorna pallini
+    });
+
+    li.append(title, date, desc, tag, del);
+    list.appendChild(li);
+  });
+
+  updateIdleSummary();
+  renderAgendaMonth(); // aggiornare i punti sotto i giorni
+}
+
+// popup unico
+function openPromoPopup(tipoPreselezionato) {
+  resetPromoPopup();
+  const modal = document.getElementById("promoPopup");
+  modal.classList.remove("hidden");
+  document.getElementById("promoTypeSelect").value = tipoPreselezionato || "promo";
+  document.getElementById("promoPopupTitle").textContent =
+    tipoPreselezionato === "giornata" ? "Nuova giornata in farmacia" : "Nuova offerta";
+}
+
+function closePromoPopup() {
+  document.getElementById("promoPopup").classList.add("hidden");
+}
+
+function resetPromoPopup() {
+  document.getElementById("promoTitleInput").value = "";
+  document.getElementById("promoDescInput").value = "";
+  document.getElementById("promoDateInput").value = "";
+}
+
+// salva
+function savePromo() {
+  const tipo = document.getElementById("promoTypeSelect").value;
+  const titolo = document.getElementById("promoTitleInput").value.trim();
+  const desc = document.getElementById("promoDescInput").value.trim();
+  const data = document.getElementById("promoDateInput").value;
+
+  if (!titolo || !data) {
+    alert("Inserisci almeno titolo e data.");
+    return;
+  }
+
+  const item = {
+    id: crypto.randomUUID(),
+    tipo,
+    titolo,
+    descrizione: desc,
+    data,
+  };
+
+  if (tipo === "promo") promos.push(item);
+  else giornate.push(item);
+
+  closePromoPopup();
+  renderPromos();
+  renderGiornate();
+}
+
+// ---------- AREA CONTENUTI + IDLE ----------
+function initContentIdleMonitoring() {
+  const reset = () => {
+    hideIdleOverlay();
+    if (idleContentTimer) clearTimeout(idleContentTimer);
+    idleContentTimer = setTimeout(showIdleOverlay, 20000); // 20 secondi
+  };
+
+  document.addEventListener("click", reset);
+  reset();
+
+  // click sulle card Q1
+  document.querySelectorAll(".q1-card").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const section = btn.dataset.section;
+      loadSectionContent(section);
     });
   });
-
-  // pulsanti +
-  document.querySelectorAll("[data-add]").forEach((btn) => {
-    btn.onclick = () => {
-      const tipo = btn.getAttribute("data-add"); // "offerta" | "giornata"
-      openModalForPromo(tipo);
-    };
-  });
 }
-// =======================
-// MODALE GENERICA
-// =======================
 
-let modalType = null; // "offerta" | "giornata" | "appuntamento"
-let modalPreselectedDate = null;
-let modalPreselectedTime = null;
+function loadSectionContent(section) {
+  const area = document.getElementById("contentArea");
+  area.innerHTML = "";
 
-function initModal() {
-  const overlay = document.getElementById("modal-overlay");
-  const closeBtn = document.getElementById("modal-close");
-  const cancelBtn = document.getElementById("modal-cancel");
-  const form = document.getElementById("modal-form");
+  const h = document.createElement("h3");
+  h.textContent = sezioneTitolo(section);
 
-  if (!overlay || !closeBtn || !cancelBtn || !form) return;
+  const p = document.createElement("p");
+  p.textContent = sezioneDescrizione(section);
 
-  function close() {
-    overlay.classList.add("hidden");
-    modalType = null;
-    modalPreselectedDate = null;
-    modalPreselectedTime = null;
-    form.reset();
-    document.getElementById("modal-section-appointment").classList.add("hidden");
+  area.append(h, p);
+}
+
+function sezioneTitolo(section) {
+  switch (section) {
+    case "assenti": return "Assenti / Permessi approvati";
+    case "turno": return "Farmacia di turno oggi";
+    case "comunicazioni": return "Comunicazioni interne";
+    case "procedure": return "Procedure operative";
+    case "logistica": return "Logistica";
+    case "magazzino": return "Magazziniera";
+    case "scadenze": return "Prodotti in scadenza";
+    case "consumabili": return "Consumabili";
+    case "archivio": return "Archivio file";
+    default: return "Dettagli sezione";
   }
-
-  closeBtn.addEventListener("click", close);
-  cancelBtn.addEventListener("click", close);
-  document.getElementById("modal-backdrop")?.addEventListener("click", close);
-
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay || e.target.classList.contains("modal-backdrop")) {
-      close();
-    }
-  });
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (!modalType) return;
-
-    const titleInput = document.getElementById("modal-title-input");
-    const dateInput = document.getElementById("modal-date-input");
-    const descInput = document.getElementById("modal-desc-input");
-
-    const title = titleInput.value.trim();
-    const date = dateInput.value;
-    const desc = descInput.value.trim();
-
-    if (!date) {
-      alert("Seleziona una data.");
-      return;
-    }
-
-    if (modalType === "offerta" || modalType === "giornata") {
-      const obj = {
-        id: nextPromoId++,
-        tipo: modalType,
-        titolo: title || (modalType === "offerta" ? "Offerta" : "Giornata"),
-        data,
-        descrizione: desc
-      };
-      if (modalType === "offerta") {
-        promoOfferte.push(obj);
-      } else {
-        promoGiornate.push(obj);
-      }
-      renderPromozioni();
-    } else if (modalType === "appuntamento") {
-      const timeInput = document.getElementById("modal-time-input");
-      const nameInput = document.getElementById("modal-name-input");
-      const reasonInput = document.getElementById("modal-reason-input");
-
-      const ora = timeInput.value;
-      const nome = nameInput.value.trim();
-      const motivo = reasonInput.value.trim() || desc;
-
-      if (!ora || !nome || !motivo) {
-        alert("Compila ora, nome e motivo.");
-        return;
-      }
-
-      appuntamenti.push({
-        id: nextAppId++,
-        data,
-        ora,
-        nome,
-        motivo,
-        servizio: motivo
-      });
-      renderAgenda(); // aggiorno vista corrente
-    }
-
-    close();
-  });
 }
 
-function openModalForPromo(tipo) {
-  const overlay = document.getElementById("modal-overlay");
-  const titleEl = document.getElementById("modal-title");
-  const sectionBase = document.getElementById("modal-section-base");
-  const sectionApp = document.getElementById("modal-section-appointment");
+function sezioneDescrizione(section) {
+  const base =
+    "Qui in futuro vedrai una tabella dedicata con tutti i dati di questa sezione.";
+  return base;
+}
 
-  if (!overlay || !titleEl || !sectionBase || !sectionApp) return;
+function showIdleOverlay() {
+  const overlay = document.getElementById("contentIdleOverlay");
+  overlay.classList.remove("hidden");
+  updateIdleSummary();
+}
 
-  modalType = tipo;
-  sectionBase.classList.remove("hidden");
-  sectionApp.classList.add("hidden");
+function hideIdleOverlay() {
+  const overlay = document.getElementById("contentIdleOverlay");
+  overlay.classList.add("hidden");
+}
 
-  const today = new Date();
-  const isoToday = toISODate(today);
+// riepilogo overlay
+function updateIdleSummary() {
+  const ul = document.getElementById("idleSummaryList");
+  if (!ul) return;
+  ul.innerHTML = "";
 
-  document.getElementById("modal-date-input").value = isoToday;
-  document.getElementById("modal-title-input").value = "";
-  document.getElementById("modal-desc-input").value = "";
-
-  if (tipo === "offerta") {
-    titleEl.textContent = "Nuova offerta in corso";
-  } else {
-    titleEl.textContent = "Nuova giornata in farmacia";
+  if (promos.length) {
+    const li = document.createElement("li");
+    li.textContent = `Promo attive: ${promos.length}`;
+    ul.appendChild(li);
   }
-
-  overlay.classList.remove("hidden");
+  if (giornate.length) {
+    const li = document.createElement("li");
+    li.textContent = `Giornate in programma: ${giornate.length}`;
+    ul.appendChild(li);
+  }
+  const todayISO = toISODate(new Date());
+  const todayEv = agendaEvents.filter((e) => e.date === todayISO);
+  if (todayEv.length) {
+    const li = document.createElement("li");
+    li.textContent = `Appuntamenti oggi: ${todayEv.length}`;
+    ul.appendChild(li);
+  }
+  if (!ul.children.length) {
+    const li = document.createElement("li");
+    li.textContent = "Nessun dato inserito al momento.";
+    ul.appendChild(li);
+  }
 }
 
-function openModalForAppuntamento(dateISO, time) {
-  const overlay = document.getElementById("modal-overlay");
-  const titleEl = document.getElementById("modal-title");
-  const sectionBase = document.getElementById("modal-section-base");
-  const sectionApp = document.getElementById("modal-section-appointment");
-
-  if (!overlay || !titleEl || !sectionBase || !sectionApp) return;
-
-  modalType = "appuntamento";
-  modalPreselectedDate = dateISO;
-  modalPreselectedTime = time;
-
-  sectionBase.classList.remove("hidden");
-  sectionApp.classList.remove("hidden");
-
-  document.getElementById("modal-title-input").value = "Nuovo appuntamento";
-  document.getElementById("modal-desc-input").value = "";
-  document.getElementById("modal-date-input").value = dateISO;
-  document.getElementById("modal-time-input").value = time || "09:00";
-  document.getElementById("modal-name-input").value = "";
-  document.getElementById("modal-reason-input").value = "";
-
-  titleEl.textContent = "Nuovo appuntamento";
-
-  overlay.classList.remove("hidden");
-}
-
-// =======================
-// Q4 – AGENDA
-// =======================
-
+// ---------- AGENDA ----------
 function initAgenda() {
-  const prev = document.getElementById("agenda-prev-month");
-  const next = document.getElementById("agenda-next-month");
-  const backMonth = document.getElementById("agenda-back-month");
+  document.getElementById("monthPrevBtn").addEventListener("click", () => {
+    agendaCurrentMonth.setMonth(agendaCurrentMonth.getMonth() - 1);
+    renderAgendaMonth();
+  });
+  document.getElementById("monthNextBtn").addEventListener("click", () => {
+    agendaCurrentMonth.setMonth(agendaCurrentMonth.getMonth() + 1);
+    renderAgendaMonth();
+  });
+  document.getElementById("backToMonthBtn").addEventListener("click", () => {
+    showMonthView();
+  });
+  document.getElementById("newAppointmentBtn").addEventListener("click", () => {
+    openAppointmentPopup();
+  });
 
-  if (prev) {
-    prev.addEventListener("click", () => {
-      agendaCurrentDate.setMonth(agendaCurrentDate.getMonth() - 1);
-      agendaViewMode = "month";
-      renderAgenda();
-      resetAgendaInactivity();
-    });
-  }
-
-  if (next) {
-    next.addEventListener("click", () => {
-      agendaCurrentDate.setMonth(agendaCurrentDate.getMonth() + 1);
-      agendaViewMode = "month";
-      renderAgenda();
-      resetAgendaInactivity();
-    });
-  }
-
-  if (backMonth) {
-    backMonth.addEventListener("click", () => {
-      agendaViewMode = "month";
-      renderAgenda();
-    });
-  }
-
-  renderAgenda();
-  resetAgendaInactivity();
+  renderAgendaMonth();
+  initAgendaIdleTimer();
 }
 
-function resetAgendaInactivity() {
-  if (agendaInactivityTimer) clearTimeout(agendaInactivityTimer);
-  agendaInactivityTimer = setTimeout(() => {
-    if (agendaViewMode === "day") {
-      agendaViewMode = "month";
-      renderAgenda();
-    }
-  }, 120000); // 2 minuti
+function initAgendaIdleTimer() {
+  const container = document.querySelector(".panel-q4");
+  const reset = () => {
+    if (idleAgendaTimer) clearTimeout(idleAgendaTimer);
+    idleAgendaTimer = setTimeout(() => {
+      showMonthView();
+    }, 120000); // 2 minuti
+  };
+
+  container.addEventListener("click", reset);
+  reset();
 }
 
-function renderAgenda() {
-  const monthLabel = document.getElementById("agenda-month-label");
-  const monthView = document.getElementById("agenda-month-view");
-  const dayView = document.getElementById("agenda-day-view");
-  const backMonthBtn = document.getElementById("agenda-back-month");
+function renderAgendaMonth() {
+  const monthLabel = document.getElementById("agendaMonthLabel");
+  const view = document.getElementById("agendaMonthView");
+  const dayView = document.getElementById("agendaDayView");
 
-  if (!monthLabel || !monthView || !dayView || !backMonthBtn) return;
-
-  const year = agendaCurrentDate.getFullYear();
-  const monthIndex = agendaCurrentDate.getMonth();
-
-  const monthFormatter = new Intl.DateTimeFormat("it-IT", {
+  const monthName = agendaCurrentMonth.toLocaleDateString("it-IT", {
     month: "long",
-    year: "numeric"
+    year: "numeric",
   });
-  monthLabel.textContent = monthFormatter.format(agendaCurrentDate);
+  monthLabel.textContent = monthName;
 
-  if (agendaViewMode === "month") {
-    backMonthBtn.classList.add("hidden");
-    monthView.classList.remove("hidden");
-    dayView.classList.add("hidden");
-    renderAgendaMonthView(monthView, year, monthIndex);
-  } else {
-    backMonthBtn.classList.remove("hidden");
-    monthView.classList.add("hidden");
-    dayView.classList.remove("hidden");
-    renderAgendaDayView(dayView);
-  }
-}
+  view.innerHTML = "";
+  view.classList.remove("hidden");
+  dayView.classList.add("hidden");
 
-function renderAgendaMonthView(container, year, monthIndex) {
-  container.innerHTML = "";
+  const firstDay = new Date(agendaCurrentMonth);
+  const startWeekday = (firstDay.getDay() + 6) % 7; // lun=0...dom=6
 
-  const grid = document.createElement("div");
-  grid.className = "agenda-month-grid";
+  const daysInMonth = new Date(
+    agendaCurrentMonth.getFullYear(),
+    agendaCurrentMonth.getMonth() + 1,
+    0
+  ).getDate();
 
-  const dayNames = ["lu", "ma", "me", "gi", "ve", "sa", "do"];
-  dayNames.forEach((d) => {
+  // celle vuote prima
+  for (let i = 0; i < startWeekday; i++) {
     const cell = document.createElement("div");
-    cell.className = "agenda-month-grid-header";
-    cell.textContent = d;
-    grid.appendChild(cell);
-  });
-
-  const firstDay = new Date(year, monthIndex, 1);
-  const firstWeekday = (firstDay.getDay() + 6) % 7; // 0=lu ... 6=do
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-
-  for (let i = 0; i < firstWeekday; i++) {
-    const empty = document.createElement("div");
-    empty.className = "agenda-day-cell agenda-day-cell-empty";
-    grid.appendChild(empty);
+    cell.className = "agenda-day-cell";
+    cell.style.visibility = "hidden";
+    view.appendChild(cell);
   }
 
-  for (let day = 1; day <= daysInMonth; day++) {
-    const d = new Date(year, monthIndex, day);
-    const iso = toISODate(d);
+  const todayISO = toISODate(new Date());
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(
+      agendaCurrentMonth.getFullYear(),
+      agendaCurrentMonth.getMonth(),
+      d
+    );
+    const iso = toISODate(date);
 
     const cell = document.createElement("div");
     cell.className = "agenda-day-cell";
+    if (iso === todayISO) cell.classList.add("today");
 
-    const dayNum = document.createElement("div");
-    dayNum.className = "agenda-day-number";
-    dayNum.textContent = String(day);
-    cell.appendChild(dayNum);
+    const num = document.createElement("div");
+    num.className = "day-number";
+    num.textContent = d;
 
-    const apps = appuntamenti.filter((a) => a.data === iso);
-    if (apps.length > 0) {
-      const tipoServizio = apps[0].servizio?.toUpperCase() || "";
-      const badge = document.createElement("div");
-      badge.className = "agenda-day-badge";
+    const dotsRow = document.createElement("div");
+    dotsRow.className = "day-dot-row";
 
-      if (tipoServizio.includes("ECG")) {
-        cell.classList.add("agenda-day-ecg");
-        badge.textContent = "ECG";
-      } else if (tipoServizio.includes("HOLTER")) {
-        cell.classList.add("agenda-day-holter");
-        badge.textContent = "HOLTER";
-      } else {
-        cell.classList.add("agenda-day-altro");
-        badge.textContent = "Servizi";
-      }
-      cell.appendChild(badge);
+    // generare pallini dai giorni e giornate
+    const eventsInDay = agendaEvents.filter((e) => e.date === iso);
+    const hasECG = eventsInDay.some((e) => e.tag === "ecg");
+    const hasHolter = eventsInDay.some((e) => e.tag === "holter");
+    const hasAltro = eventsInDay.some(
+      (e) => e.tag !== "ecg" && e.tag !== "holter"
+    );
+
+    if (hasECG) {
+      const dot = document.createElement("div");
+      dot.className = "day-dot ecg";
+      dotsRow.appendChild(dot);
+    }
+    if (hasHolter) {
+      const dot = document.createElement("div");
+      dot.className = "day-dot holter";
+      dotsRow.appendChild(dot);
+    }
+    if (hasAltro) {
+      const dot = document.createElement("div");
+      dot.className = "day-dot altro";
+      dotsRow.appendChild(dot);
     }
 
-    if (iso === oggiISO) {
-      cell.classList.add("agenda-day-today");
+    const dayGiornate = giornate.filter((g) => g.data === iso);
+    if (dayGiornate.length && !hasAltro) {
+      const dot = document.createElement("div");
+      dot.className = "day-dot altro";
+      dotsRow.appendChild(dot);
     }
 
-    cell.addEventListener("click", () => {
-      agendaSelectedDayISO = iso;
-      agendaViewMode = "day";
-      renderAgenda();
-      resetAgendaInactivity();
-    });
-
-    grid.appendChild(cell);
-  }
-
-  container.appendChild(grid);
-}
-
-function renderAgendaDayView(container) {
-  const label = document.getElementById("agenda-day-label");
-  const slotsWrap = document.getElementById("agenda-slots");
-  if (!label || !slotsWrap) return;
-
-  const iso = agendaSelectedDayISO || toISODate(new Date());
-  label.textContent = formatLongDateIT(iso);
-
-  slotsWrap.innerHTML = "";
-
-  const dayApps = appuntamenti
-    .filter((a) => a.data === iso)
-    .sort((a, b) => a.ora.localeCompare(b.ora));
-
-  const startHour = 8;
-  const endHour = 20;
-
-  for (let h = startHour; h <= endHour; h++) {
-    const hourStr = String(h).padStart(2, "0") + ":00";
-    const row = document.createElement("div");
-    row.className = "agenda-slot-row";
-
-    const timeCell = document.createElement("div");
-    timeCell.className = "agenda-slot-time";
-    timeCell.textContent = hourStr;
-    row.appendChild(timeCell);
-
-    const contentCell = document.createElement("div");
-
-    const app = dayApps.find((a) => a.ora === hourStr);
-    if (app) {
-      row.classList.add("has-app");
-      const chip = document.createElement("span");
-      chip.className = "agenda-slot-chip";
-      const upperServizio = (app.servizio || "").toUpperCase();
-      if (upperServizio.includes("ECG")) {
-        chip.textContent = "ECG";
-      } else if (upperServizio.includes("HOLTER")) {
-        chip.textContent = "HOLTER";
-      } else {
-        chip.textContent = "Servizio";
-      }
-      contentCell.innerHTML = `<strong>${app.nome}</strong> – ${app.motivo} `;
-      contentCell.appendChild(chip);
-    } else {
-      const span = document.createElement("span");
-      span.className = "agenda-slot-content-empty";
-      span.textContent = "Slot libero – clicca per nuovo appuntamento";
-      contentCell.appendChild(span);
-
-      row.addEventListener("click", () => {
-        openModalForAppuntamento(iso, hourStr);
-        resetAgendaInactivity();
-      });
-    }
-
-    row.appendChild(contentCell);
-    slotsWrap.appendChild(row);
+    cell.append(num, dotsRow);
+    cell.addEventListener("click", () => openDayView(iso));
+    view.appendChild(cell);
   }
 }
 
-// =======================
-// CHAT INTERNA
-// =======================
-
-let currentChatAuthor = "titolare";
-let chatMessages = [
-  {
-    id: 1,
-    authorKey: "titolare",
-    autore: "Titolare",
-    testo: "Ricordate di aggiornare la promo dermocosmesi entro oggi.",
-    lato: "right"
-  },
-  {
-    id: 2,
-    authorKey: "dip1",
-    autore: "Farmacista 1",
-    testo: "Ok, mi occupo io della vetrina.",
-    lato: "left"
-  }
-];
-let nextChatId = 3;
-
-function initChat() {
-  const fab = document.getElementById("chat-fab");
-  const overlay = document.getElementById("chat-overlay");
-  const closeBtn = document.getElementById("chat-close");
-  const sendBtn = document.getElementById("chat-send-btn");
-  const input = document.getElementById("chat-input");
-  const attachBtn = document.getElementById("chat-attach-btn");
-  const fileInput = document.getElementById("chat-file-input");
-  const authorBtns = document.querySelectorAll(".chat-author-btn");
-
-  if (!fab || !overlay || !closeBtn || !sendBtn || !input) return;
-
-  function openChat() {
-    overlay.classList.remove("hidden");
-    renderChatMessages();
-    input.focus();
-  }
-
-  function closeChat() {
-    overlay.classList.add("hidden");
-  }
-
-  fab.addEventListener("click", openChat);
-  closeBtn.addEventListener("click", closeChat);
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay || e.target.classList.contains("chat-backdrop")) {
-      closeChat();
-    }
-  });
-
-  authorBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      authorBtns.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      currentChatAuthor = btn.getAttribute("data-author") || "titolare";
-    });
-  });
-
-  function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    let autoreLabel = "Dipendente";
-    let side = "left";
-    if (currentChatAuthor === "titolare") {
-      autoreLabel = "Titolare";
-      side = "right";
-    } else if (currentChatAuthor === "dip1") {
-      autoreLabel = "Farmacista 1";
-    } else if (currentChatAuthor === "dip2") {
-      autoreLabel = "Farmacista 2";
-    }
-
-    chatMessages.push({
-      id: nextChatId++,
-      authorKey: currentChatAuthor,
-      autore: autoreLabel,
-      testo: text,
-      lato: side
-    });
-
-    input.value = "";
-    document.getElementById("chat-attachment-label").classList.add("hidden");
-    renderChatMessages();
-  }
-
-  sendBtn.addEventListener("click", sendMessage);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-
-  if (attachBtn && fileInput) {
-    attachBtn.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", () => {
-      const labelWrap = document.getElementById("chat-attachment-label");
-      const nameSpan = document.getElementById("chat-attachment-name");
-      if (fileInput.files && fileInput.files[0]) {
-        nameSpan.textContent = fileInput.files[0].name;
-        labelWrap.classList.remove("hidden");
-      } else {
-        labelWrap.classList.add("hidden");
-      }
-    });
-  }
+function showMonthView() {
+  document.getElementById("agendaMonthView").classList.remove("hidden");
+  document.getElementById("agendaDayView").classList.add("hidden");
 }
 
-function renderChatMessages() {
-  const container = document.getElementById("chat-messages");
-  if (!container) return;
+function openDayView(isoDate) {
+  const monthView = document.getElementById("agendaMonthView");
+  const dayView = document.getElementById("agendaDayView");
+  monthView.classList.add("hidden");
+  dayView.classList.remove("hidden");
 
-  container.innerHTML = "";
-  chatMessages.forEach((m) => {
-    const row = document.createElement("div");
-    row.className = `chat-msg-row ${m.lato === "right" ? "right" : "left"}`;
+  const label = document.getElementById("agendaDayLabel");
+  label.textContent = formatDateIT(fromISO(isoDate));
 
-    const bubble = document.createElement("div");
-    bubble.className = `chat-bubble ${m.lato === "right" ? "right" : "left"}`;
+  const slotsContainer = document.getElementById("agendaDaySlots");
+  slotsContainer.innerHTML = "";
 
-    const author = document.createElement("div");
-    author.className = "chat-bubble-author";
-    author.textContent = m.autore;
+  const eventsInDay = agendaEvents.filter((e) => e.date === isoDate);
 
-    const text = document.createElement("p");
-    text.className = "chat-bubble-text";
-    text.textContent = m.testo;
+  const hours = [];
+  for (let h = 8; h <= 19; h++) {
+    hours.push(`${String(h).padStart(2, "0")}:00`);
+  }
 
-    bubble.appendChild(author);
-    bubble.appendChild(text);
-    row.appendChild(bubble);
-    container.appendChild(row);
+  hours.forEach((hour) => {
+    const slot = document.createElement("div");
+    slot.className = "agenda-slot";
+
+    const time = document.createElement("div");
+    time.className = "slot-time";
+    time.textContent = hour;
+
+    const body = document.createElement("div");
+    body.className = "slot-body empty";
+    body.textContent = "Tocca per aggiungere";
+
+    const event = eventsInDay.find((e) => e.start === hour);
+    if (event) {
+      body.classList.remove("empty");
+      body.classList.add("has-event", event.tag || "altro");
+      body.innerHTML = `
+        <div class="slot-title">${event.reason}</div>
+        <div class="slot-sub">${event.name} · ${event.start}–${event.end}</div>
+      `;
+    }
+
+    body.addEventListener("click", () => {
+      openAppointmentPopup(isoDate, hour);
+    });
+
+    slot.append(time, body);
+    slotsContainer.appendChild(slot);
+  });
+}
+
+// ---------- POPUP APPUNTAMENTO ----------
+function openAppointmentPopup(dateISO, startTime) {
+  const modal = document.getElementById("appointmentPopup");
+  modal.classList.remove("hidden");
+
+  const todayISO = dateISO || toISODate(new Date());
+  document.getElementById("apptDateInput").value = todayISO;
+  document.getElementById("apptStartInput").value = startTime || "";
+  document.getElementById("apptEndInput").value = "";
+  document.getElementById("apptNameInput").value = "";
+  document.getElementById("apptReasonInput").value = "";
+}
+
+function closeAppointmentPopup() {
+  document.getElementById("appointmentPopup").classList.add("hidden");
+}
+
+function saveAppointment() {
+  const date = document.getElementById("apptDateInput").value;
+  const start = document.getElementById("apptStartInput").value;
+  const end = document.getElementById("apptEndInput").value || start;
+  const name = document.getElementById("apptNameInput").value.trim();
+  const reason = document.getElementById("apptReasonInput").value.trim();
+
+  if (!date || !start || !name || !reason) {
+    alert("Compila data, orario, nome e motivo.");
+    return;
+  }
+
+  const lower = reason.toLowerCase();
+  let tag = "altro";
+  if (lower.includes("ecg")) tag = "ecg";
+  else if (lower.includes("holter")) tag = "holter";
+
+  agendaEvents.push({
+    id: crypto.randomUUID(),
+    date,
+    start,
+    end,
+    name,
+    reason,
+    tag,
   });
 
-  container.scrollTop = container.scrollHeight;
+  closeAppointmentPopup();
+  renderAgendaMonth();
+  openDayView(date);
+}
+
+// ---------- WHATSAPP ----------
+function openWhatsApp() {
+  // metti qui il numero reale della farmacia
+  const phone = "390000000000"; // es. 39 + numero
+  const url = `https://wa.me/${phone}`;
+  window.open(url, "_blank");
 }
