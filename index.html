@@ -2,466 +2,94 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Portale Farmacia Montesano – Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portale Farmacia Montesano</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="app-shell">
 
-    <!-- ========== BLOCCO LOGIN / REGISTRAZIONE DEMO ========== -->
-    <div id="authContainer" class="auth-container">
-      <div class="auth-card">
-        <div class="auth-logo-wrap">
-          <img src="logo.jpg" alt="Farmacia Montesano" class="auth-logo" />
+  <!-- ===== MENU MOBILE ===== -->
+  <div class="menu-holder">
+    <button class="menu-button" onclick="toggleMenu()">☰</button>
+    <div id="sideMenu" class="side-menu hidden">
+      <a href="#" onclick="showSection(assenzePage)">Assenze</a>
+      <a href="#" onclick="showSection(turniPage)">Farmacia di turno</a>
+      <a href="#" onclick="showSection(comunicazioniPage)">Comunicazioni</a>
+      <a href="#" onclick="showSection(procedurePage)">Procedure</a>
+      <a href="#" onclick="showSection(logisticaPage)">Logistica</a>
+      <a href="#" onclick="showSection(magazzinoPage)">Magazziniera</a>
+      <a href="#" onclick="showSection(archivioPage)">Archivio file</a>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="dashboard-header">
+    <div class="dashboard-logo-block">
+      <img src="logo.png" class="dash-logo" alt="Farmacia Montesano">
+    </div>
+  </header>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="dashboard">
+    <div class="dashboard-content">
+      <div class="cards-grid">
+
+        <div class="card card-green" onclick="showSection(assenzePage)">
+          <div class="card-title">NUOVI</div>
+          <h3>Assenze del personale</h3>
+          <span class="badge">2</span>
         </div>
-        <h1>Portale Farmacia Montesano</h1>
-        <p class="auth-subtitle">Accedi scegliendo il tuo ruolo</p>
 
-        <div class="auth-tabs">
-          <button class="auth-tab active" data-role="titolare">Titolare</button>
-          <button class="auth-tab" data-role="dipendente">Dipendente</button>
-          <button class="auth-tab" data-role="cliente">Cliente</button>
+        <div class="card card-blue" onclick="showSection(turniPage)">
+          <div class="card-title">NUOVO</div>
+          <h3>Farmacia di turno</h3>
+          <span class="badge">3</span>
         </div>
 
-        <form id="loginForm" class="auth-form">
-          <div class="auth-role-label">
-            Ruolo selezionato: <span id="loginRoleLabel">Titolare</span>
-          </div>
+        <div class="card card-pink" onclick="showSection(comunicazioniPage)">
+          <div class="card-title">NUOVI</div>
+          <h3>Comunicazioni</h3>
+          <span class="badge">2</span>
+        </div>
 
-          <label class="auth-field">
-            <span>Email</span>
-            <input type="email" id="loginEmail" required placeholder="es. titolare@demo.it" />
-          </label>
+        <div class="card card-teal" onclick="showSection(procedurePage)">
+          <div class="card-title">NUOVO</div>
+          <h3>Procedure</h3>
+          <span class="badge">1</span>
+        </div>
 
-          <label class="auth-field">
-            <span>Password</span>
-            <input type="password" id="loginPassword" required placeholder="••••••••" />
-          </label>
+        <div class="card card-yellow" onclick="showSection(logisticaPage)">
+          <div class="card-title">NUOVO</div>
+          <h3>Logistica</h3>
+          <span class="badge">1</span>
+        </div>
 
-          <button type="submit" class="btn-primary btn-full auth-submit">
-            Entra nel portale
-          </button>
+        <div class="card card-blue2" onclick="showSection(magazzinoPage)">
+          <div class="card-title">NUOVI</div>
+          <h3>Magazziniera</h3>
+          <span class="badge">2</span>
+        </div>
 
-          <p class="auth-hint">
-            Demo credenziali:<br />
-            <strong>Titolare</strong>: titolare@demo.it / titolare123<br />
-            <strong>Dipendente</strong>: dipendente@demo.it / dipendente123<br />
-            <strong>Cliente</strong>: cliente@demo.it / cliente123
-          </p>
+        <div class="card card-dark" onclick="showSection(archivioPage)">
+          <h3>Archivio file</h3>
+          <span class="badge">3</span>
+        </div>
 
-          <p id="loginError" class="auth-error hidden">
-            Credenziali non valide (demo). Controlla email, password e ruolo.
-          </p>
-
-          <p class="auth-note">
-            La registrazione reale e il salvataggio su server verranno aggiunti in seguito.
-          </p>
-        </form>
       </div>
     </div>
+  </div>
 
-    <!-- ========== APP DOPO LOGIN ========== -->
-    <div id="app" class="app-main hidden">
-      <!-- Barra in alto con ruolo e logout -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <span class="topbar-title">Portale Farmacia Montesano</span>
-          <span id="topbarRole" class="topbar-pill">Ruolo: Titolare</span>
-        </div>
-        <button id="logoutBtn" class="btn-secondary">Esci</button>
-      </header>
+  <!-- ===== FLOATING BUTTON ===== -->
+  <div class="fab-container">
+    <button id="fabMain" class="fab-button">+</button>
 
-      <main id="roleViews">
-
-        <!-- ======================
-             VISTA TITOLARE / FARMACIA
-             (dashboard completa che già usi)
-             ====================== -->
-        <div id="view-titolare" class="role-view">
-          <!-- ======================
-               VISTA MOBILE (CARD)
-               ====================== -->
-          <div class="mobile-dashboard">
-            <header class="m-header">
-              <div class="m-logo-wrap">
-                <img src="logo.jpg" alt="Farmacia Montesano" class="m-logo" />
-              </div>
-              <button class="m-hamburger" aria-label="Menu">
-                <span></span>
-              </button>
-            </header>
-
-            <main class="m-main">
-              <section class="m-card-grid">
-
-                <!-- RIGA 1 -->
-                <button class="m-card m-card-green" data-section="assenti">
-                  <div class="m-card-label">NUOVI</div>
-                  <div class="m-card-title">Assenti / Permessi</div>
-                  <div class="m-card-badge">2</div>
-                  <div class="m-card-icon">📅</div>
-                </button>
-
-                <button class="m-card m-card-blue" data-section="turno">
-                  <div class="m-card-label">NUOVO</div>
-                  <div class="m-card-title">Farmacia di turno</div>
-                  <div class="m-card-badge">1</div>
-                  <div class="m-card-icon">⏰</div>
-                </button>
-
-                <!-- RIGA 2 -->
-                <button class="m-card m-card-pink">
-                  <div class="m-card-label">NUOVA</div>
-                  <div class="m-card-title">Comunicazioni</div>
-                  <div class="m-card-badge">1</div>
-                  <div class="m-card-icon">📢</div>
-                </button>
-
-                <button class="m-card m-card-teal">
-                  <div class="m-card-label">NUOVE</div>
-                  <div class="m-card-title">Procedure</div>
-                  <div class="m-card-icon">📚</div>
-                </button>
-
-                <!-- RIGA 3 -->
-                <button class="m-card m-card-yellow">
-                  <div class="m-card-label">NUOVO</div>
-                  <div class="m-card-title">Logistica</div>
-                  <div class="m-card-badge">1</div>
-                  <div class="m-card-icon">📦</div>
-                </button>
-
-                <button class="m-card m-card-cyan">
-                  <div class="m-card-label">NUOVO</div>
-                  <div class="m-card-title">Magazziniera</div>
-                  <div class="m-card-badge">2</div>
-                  <div class="m-card-icon">📋</div>
-                </button>
-
-                <!-- RIGA 4 -->
-                <button class="m-card m-card-orange">
-                  <div class="m-card-label">NUOVI</div>
-                  <div class="m-card-title">Prodotti in scadenza</div>
-                  <div class="m-card-icon">⏳</div>
-                </button>
-
-                <button class="m-card m-card-green2">
-                  <div class="m-card-label">NUOVO</div>
-                  <div class="m-card-title">Consumabili</div>
-                  <div class="m-card-icon">🧪</div>
-                </button>
-
-                <!-- RIGA 5 -->
-                <button class="m-card m-card-blue2">
-                  <div class="m-card-label">NUOVO</div>
-                  <div class="m-card-title">Consegne / Ritiri</div>
-                  <div class="m-card-icon">🚚</div>
-                </button>
-
-                <button class="m-card m-card-purple">
-                  <div class="m-card-label">NUOVO</div>
-                  <div class="m-card-title">Cambio cassa</div>
-                  <div class="m-card-icon">💶</div>
-                </button>
-
-                <!-- RIGA 6: ARCHIVIO -->
-                <button class="m-card m-card-dark m-card-wide">
-                  <div class="m-card-title">Archivio file</div>
-                  <div class="m-card-icon">🗄️</div>
-                </button>
-
-              </section>
-            </main>
-          </div>
-
-          <!-- ======================
-               VISTA DESKTOP (PC)
-               ====================== -->
-          <div class="desktop-dashboard">
-            <header class="app-header">
-              <h1>PORTALE FARMACIA MONTESANO</h1>
-              <span class="app-header__subtitle">Dashboard principale</span>
-            </header>
-
-            <main class="dashboard">
-
-              <!-- COLONNA SINISTRA -->
-              <section class="dashboard-left">
-
-                <!-- LOGO FARMACIA -->
-                <div class="card card-logo">
-                  <div class="card-logo__icon">+</div>
-                  <div class="card-logo__text">
-                    <span class="card-logo__title">FARMACIA MONTESANO</span>
-                    <span class="card-logo__subtitle">Portale interno</span>
-                  </div>
-                </div>
-
-                <!-- CALENDARIO -->
-                <div class="card card-calendar card-calendar-big">
-                  <div class="card-header">
-                    <span class="card-title">Calendario</span>
-                    <span class="card-pill" id="today-pill">Oggi</span>
-                  </div>
-
-                  <div class="calendar-body">
-                    <div class="calendar-month" id="calendar-month">Novembre 2025</div>
-                    <div class="calendar-grid">
-                      <span>lu</span><span>ma</span><span>me</span><span>gi</span><span>ve</span><span>sa</span><span>do</span>
-                      <span></span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span>
-                      <span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span>
-                      <span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span>
-                      <span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span>
-                      <span>28</span><span>29</span><span>30</span><span></span><span></span><span></span><span></span>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- ASSENTI / PERMESSI -->
-                <div class="card card-tall card-tall-big card-assenti" data-section="assenti">
-                  <div class="card-header">
-                    <span class="card-title">Assenti / Permessi</span>
-                  </div>
-                  <ul class="card-list">
-                    <li>Click per vedere assenze approvate.</li>
-                  </ul>
-                  <button class="btn-primary btn-full">Vai alla gestione assenze</button>
-                </div>
-
-              </section>
-
-              <!-- COLONNA DESTRA -->
-              <section class="dashboard-right">
-
-                <!-- TURNO + APPOGGIO -->
-                <div class="card card-wide card-turno-appoggio" data-section="turno">
-                  <div class="turno-appoggio-grid">
-                    <div class="turno-block">
-                      <div class="card-header">
-                        <span class="card-label">Turno</span>
-                        <span class="card-pill pill-success">Farmacia 1</span>
-                      </div>
-                      <p class="card-main-text">
-                        Farmacia di turno oggi – in servizio fino alle <strong>08:00</strong> di domani.
-                      </p>
-                    </div>
-
-                    <div class="appoggio-block">
-                      <div class="card-header">
-                        <span class="card-label">Appoggio</span>
-                        <span class="card-pill pill-info">Farmacia 2</span>
-                      </div>
-                      <p class="card-main-text">
-                        Farmacia di appoggio – attiva fasce <strong>08:30 – 20:30</strong>.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- RIGA 1 -->
-                <div class="card card-big card-consegne">
-                  <div class="card-header">
-                    <span class="card-title">Consegne / Ritiri</span>
-                  </div>
-                  <p class="card-main-text">
-                    <strong>2</strong> consegne e <strong>1</strong> ritiro programmati oggi.
-                  </p>
-                  <button class="btn-link">Apri registro consegne</button>
-                </div>
-
-                <div class="card card-big card-scadenze">
-                  <div class="card-header">
-                    <span class="card-title">Prodotti in scadenza</span>
-                  </div>
-                  <p class="card-main-text">
-                    <strong>6</strong> articoli in scadenza entro <strong>7 giorni</strong>.
-                  </p>
-                  <button class="btn-link">Visualizza elenco completo</button>
-                </div>
-
-                <div class="card card-big card-consumabili">
-                  <div class="card-header">
-                    <span class="card-title">Consumabili</span>
-                  </div>
-                  <p class="card-main-text">
-                    Disponibilità sufficiente per le prossime <strong>2 settimane</strong>.
-                  </p>
-                  <button class="btn-link">Gestisci consumi</button>
-                </div>
-
-                <!-- RIGA 2 -->
-                <div class="card card-big card-cassa">
-                  <div class="card-header">
-                    <span class="card-title">Cambio cassa</span>
-                  </div>
-                  <p class="card-main-text">
-                    Ultimo cambio registrato alle <strong>14:22</strong>.
-                  </p>
-                  <button class="btn-link">Apri modulo cambio cassa</button>
-                </div>
-
-                <div class="card card-big card-magazziniera">
-                  <div class="card-header">
-                    <span class="card-title">Magazziniera</span>
-                  </div>
-                  <p class="card-main-text">
-                    Controlli periodici di scorte, inventari e resi programmati.
-                  </p>
-                  <button class="btn-link">Apri pannello magazzino</button>
-                </div>
-
-                <div class="card card-big card-comunicazioni">
-                  <div class="card-header">
-                    <span class="card-title">Comunicazioni</span>
-                    <span class="badge">1 nuovo</span>
-                  </div>
-                  <p class="card-main-text">
-                    1 comunicazione interna non letta.
-                  </p>
-                  <button class="btn-link">Vai alle comunicazioni</button>
-                </div>
-
-                <!-- RIGA 3 -->
-                <div class="card card-big card-archivio">
-                  <div class="card-header">
-                    <span class="card-title">Archivio file</span>
-                  </div>
-                  <p class="card-main-text">
-                    4 documenti aggiunti questa settimana.
-                  </p>
-                  <button class="btn-link">Apri archivio</button>
-                </div>
-
-              </section>
-            </main>
-          </div>
-
-          <!-- ========== SEZIONI DETTAGLIO COMUNI (Titolare + Dipendente) ========== -->
-
-          <!-- ASSENTI / PERMESSI -->
-          <section id="sezione-assenti" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
-            <div style="max-width:1000px; margin:0 auto;">
-              <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
-                ← Torna alla dashboard
-              </button>
-
-              <h2 style="margin:0 0 4px;">Assenti / Permessi approvati</h2>
-              <p style="margin:0 0 12px; font-size:0.9rem; opacity:0.85;">
-                Vista rapida delle assenze già approvate (dati di esempio).
-              </p>
-
-              <label style="font-size:0.85rem; display:block; margin-bottom:10px;">
-                Ruolo demo:
-                <select id="ruolo-assenti" style="margin-left:8px; padding:4px 8px; border-radius:8px; border:none;">
-                  <option value="farmacia">Farmacia (generico)</option>
-                  <option value="titolare">Titolare</option>
-                  <option value="dipendente">Dipendente</option>
-                </select>
-              </label>
-
-              <div id="assenti-oggi" style="margin-bottom:14px;"></div>
-              <div id="assenti-prossimi"></div>
-            </div>
-          </section>
-
-          <!-- FARMACIA DI TURNO -->
-          <section id="sezione-turno" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
-            <div style="max-width:1000px; margin:0 auto;">
-              <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
-                ← Torna alla dashboard
-              </button>
-
-              <h2 style="margin:0 0 4px;">Farmacia di turno</h2>
-              <p style="margin:0 0 12px; font-size:0.9rem; opacity:0.85;">
-                Turno di oggi in evidenza e prossimi turni programmati (dati demo).
-              </p>
-
-              <div id="turno-oggi" style="margin-bottom:14px;"></div>
-              <div id="turno-prossimi"></div>
-            </div>
-          </section>
-        </div>
-
-        <!-- ======================
-             VISTA DIPENDENTE
-             ====================== -->
-        <div id="view-dipendente" class="role-view hidden">
-          <div class="role-wrapper">
-            <h2 class="role-title">Area dipendenti</h2>
-            <p class="role-subtitle">
-              Qui trovi velocemente le info che ti servono in turno: assenze, farmacia di turno,
-              comunicazioni e procedure essenziali.
-            </p>
-
-            <div class="role-grid">
-              <div class="card card-assenti" data-section="assenti">
-                <div class="card-header">
-                  <span class="card-title">Le mie assenze</span>
-                </div>
-                <p class="card-main-text">
-                  Vedi subito ferie e permessi approvati per oggi e i prossimi giorni.
-                </p>
-                <button class="btn-link">Apri riepilogo assenze</button>
-              </div>
-
-              <div class="card card-turno-appoggio" data-section="turno">
-                <div class="card-header">
-                  <span class="card-title">Farmacia di turno</span>
-                </div>
-                <p class="card-main-text">
-                  Turno attivo oggi, orario e farmacia di appoggio in evidenza.
-                </p>
-                <button class="btn-link">Vedi dettagli turno</button>
-              </div>
-
-              <div class="card card-comunicazioni">
-                <div class="card-header">
-                  <span class="card-title">Comunicazioni interne</span>
-                  <span class="badge">Demo</span>
-                </div>
-                <p class="card-main-text">
-                  Ultime comunicazioni dal titolare (note operative, promozioni, avvisi).
-                </p>
-                <button class="btn-link">Apri bacheca comunicazioni</button>
-              </div>
-
-              <div class="card card-teal">
-                <div class="card-header">
-                  <span class="card-title">Procedure rapide</span>
-                </div>
-                <p class="card-main-text">
-                  In futuro: pulsanti veloci per cambio cassa, resi, servizi, ecc.
-                </p>
-                <button class="btn-link">In lavorazione</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ======================
-             VISTA CLIENTE (IN LAVORAZIONE)
-             ====================== -->
-        <div id="view-cliente" class="role-view hidden">
-          <div class="client-wrapper">
-            <h2>Area clienti</h2>
-            <p>
-              Questa sezione è in lavorazione.<br />
-              In futuro qui i clienti potranno:
-            </p>
-            <ul>
-              <li>prenotare servizi (ECG, autoanalisi, CUP…);</li>
-              <li>inviare richieste alla farmacia;</li>
-              <li>vedere appuntamenti e promemoria.</li>
-            </ul>
-            <p style="margin-top:10px; opacity:0.7;">
-              Per ora il portale clienti non è ancora attivo.  
-              La parte “farmacia / dipendenti” è funzionante in modalità demo.
-            </p>
-          </div>
-        </div>
-
-      </main>
+    <div id="fabMenu" class="fab-menu hidden">
+      <button class="fab-item" data-action="assenza">Nuova assenza / ritardo</button>
+      <button class="fab-item" data-action="comunicazione">Nuova comunicazione</button>
+      <button class="fab-item" data-action="procedura">Nuova procedura</button>
+      <button class="fab-item" data-action="file">Nuovo file</button>
+      <button class="fab-item" data-action="segnalazione">Nuova segnalazione</button>
     </div>
   </div>
 
