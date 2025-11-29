@@ -10,234 +10,12 @@
   <div class="app-shell">
 
     <!-- ======================
-         HEADER DESKTOP
-         ====================== -->
-    <header class="app-header desktop-only">
-      <div class="app-header-left">
-        <span class="app-logo-text">FARMACIA MONTESANO</span>
-        <span class="app-header-subtitle">Portale interno · Dashboard generale</span>
-      </div>
-      <div class="app-header-right">
-        <span id="header-date"></span>
-      </div>
-    </header>
-
-    <!-- ======================
-         DASHBOARD DESKTOP (4 QUADRANTI)
-         ====================== -->
-    <main class="desktop-dashboard desktop-only">
-      <div class="desktop-grid">
-
-        <!-- Q1 – SEZIONI FARMACIA (3×3 CARD) -->
-        <section class="quad quad-q1">
-          <header class="quad-header">
-            <h2>Sezioni farmacia</h2>
-            <p>Accesso rapido alle aree operative.</p>
-          </header>
-
-          <div class="q1-grid">
-            <button class="q1-card m-card-green" data-section="assenti">
-              <span class="q1-label">NUOVI</span>
-              <span class="q1-title">Assenti / Permessi</span>
-            </button>
-
-            <button class="q1-card m-card-blue" data-section="turno">
-              <span class="q1-label">NUOVO</span>
-              <span class="q1-title">Farmacia di turno</span>
-            </button>
-
-            <button class="q1-card m-card-pink" data-section="comunicazioni">
-              <span class="q1-label">NUOVA</span>
-              <span class="q1-title">Comunicazioni</span>
-            </button>
-
-            <button class="q1-card m-card-teal" data-section="procedure">
-              <span class="q1-label">NUOVE</span>
-              <span class="q1-title">Procedure</span>
-            </button>
-
-            <button class="q1-card m-card-yellow" data-section="logistica">
-              <span class="q1-label">NUOVO</span>
-              <span class="q1-title">Logistica</span>
-            </button>
-
-            <button class="q1-card m-card-cyan" data-section="magazzino">
-              <span class="q1-label">NUOVO</span>
-              <span class="q1-title">Magazziniera</span>
-            </button>
-
-            <button class="q1-card m-card-orange" data-section="scadenze">
-              <span class="q1-label">NUOVI</span>
-              <span class="q1-title">Prodotti in scadenza</span>
-            </button>
-
-            <button class="q1-card m-card-green2" data-section="consumabili">
-              <span class="q1-label">NUOVO</span>
-              <span class="q1-title">Consumabili</span>
-            </button>
-
-            <button class="q1-card m-card-blue2" data-section="consegne">
-              <span class="q1-label">NUOVO</span>
-              <span class="q1-title">Consegne / Ritiri</span>
-            </button>
-          </div>
-        </section>
-
-        <!-- Q2 – OFFERTE / EVENTI (BASSO SINISTRA) -->
-        <section class="quad quad-q2">
-          <header class="quad-header">
-            <h2>Servizi & clienti</h2>
-            <p>Cosa stiamo offrendo e cosa c’è in programma.</p>
-          </header>
-
-          <div class="q2-columns">
-            <div class="q2-column">
-              <h3>Offerte in corso</h3>
-              <ul id="offerte-list" class="simple-list">
-                <!-- riempito da JS -->
-              </ul>
-            </div>
-            <div class="q2-column">
-              <h3>Eventi programmati</h3>
-              <ul id="eventi-list" class="simple-list">
-                <!-- riempito da JS -->
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <!-- Q3 – CHAT COMUNICAZIONI (ALTO DESTRA) -->
-        <section class="quad quad-q3">
-          <header class="quad-header quad-header-chat">
-            <div>
-              <h2>Chat comunicazioni interne</h2>
-              <p>Messaggi rapidi tra titolare e collaboratori.</p>
-            </div>
-            <span class="chat-counter" id="chat-counter">0 messaggi</span>
-          </header>
-
-          <div class="chat-panel">
-            <div class="chat-messages" id="chat-messages">
-              <!-- messaggi via JS -->
-            </div>
-
-            <form id="chat-form" class="chat-form">
-              <div class="chat-form-row">
-                <label>
-                  Dipendente
-                  <select id="chat-autore">
-                    <option value="Valerio">Valerio</option>
-                    <option value="Giovanni">Giovanni</option>
-                    <option value="Emanuela">Emanuela</option>
-                    <option value="Annalisa">Annalisa</option>
-                    <option value="Patrizia">Patrizia</option>
-                    <option value="Altro">Altro</option>
-                  </select>
-                </label>
-
-                <label>
-                  Tipo
-                  <select id="chat-badge">
-                    <option value="info">Info</option>
-                    <option value="urgente">Urgente</option>
-                    <option value="tecnico">Tecnico</option>
-                  </select>
-                </label>
-              </div>
-
-              <div class="chat-form-row">
-                <label class="chat-file-label">
-                  Allegato (nome solo demo)
-                  <input type="text" id="chat-file" placeholder="Es: listino_holter.pdf" />
-                </label>
-              </div>
-
-              <div class="chat-form-row">
-                <textarea id="chat-testo" rows="2" placeholder="Scrivi una comunicazione rapida..."></textarea>
-              </div>
-
-              <div class="chat-form-row chat-form-actions">
-                <button type="submit" class="btn-primary">Invia</button>
-                <button type="button" id="chat-clear" class="btn-link">Svuota tutto (demo)</button>
-              </div>
-            </form>
-          </div>
-        </section>
-                <!-- Q4 – AGENDA & DOCUMENTI (BASSO DESTRA) -->
-        <section class="quad quad-q4">
-          <header class="quad-header">
-            <h2>Agenda & documenti</h2>
-            <p>Gestione servizi, appuntamenti e cartelle operative.</p>
-          </header>
-
-          <div class="q4-tabs">
-            <button class="q4-tab q4-tab-active" data-view="calendar" id="tab-calendar">
-              Calendario
-            </button>
-            <button class="q4-tab" data-view="docs" id="tab-docs">
-              Documenti
-            </button>
-            <span class="q4-today" id="q4-today-label"></span>
-          </div>
-
-          <div class="q4-body">
-
-            <!-- Vista calendario -->
-            <div class="q4-view" id="view-calendar">
-              <div class="calendar-toolbar">
-                <div class="calendar-mode">
-                  <button class="mode-btn mode-btn-active" data-mode="day">Giorno</button>
-                  <button class="mode-btn" data-mode="week">Settimana</button>
-                  <button class="mode-btn" data-mode="month">Mese</button>
-                </div>
-                <button class="btn-primary btn-small" id="btn-nuovo-app">
-                  + Nuovo appuntamento
-                </button>
-              </div>
-
-              <div class="calendar-day-wrapper">
-                <div class="calendar-day-info">
-                  <span id="calendar-day-name"></span>
-                  <span id="calendar-service-label" class="service-pill"></span>
-                </div>
-                <div class="calendar-day-slots" id="calendar-slots">
-                  <!-- slot orari via JS -->
-                </div>
-              </div>
-
-              <div class="calendar-note">
-                Vista demo stile planner: blocchi colorati per i servizi della giornata.
-              </div>
-            </div>
-
-            <!-- Vista documenti -->
-            <div class="q4-view" id="view-docs" style="display:none;">
-              <div class="docs-grid" id="docs-grid">
-                <!-- cartelle via JS -->
-              </div>
-              <p class="docs-note">
-                Le cartelle sono solo dimostrative. In futuro qui potrai aprire PDF, protocolli,
-                schede magazzino, ecc.
-              </p>
-            </div>
-
-          </div>
-        </section>
-
-      </div> <!-- /desktop-grid -->
-    </main>
-
-    <!-- ======================
-         VISTA MOBILE (CARD STILE TELEFONO)
+         VISTA MOBILE (CARD)
          ====================== -->
     <div class="mobile-dashboard">
       <header class="m-header">
         <div class="m-logo-wrap">
           <img src="logo.jpg" alt="Farmacia Montesano" class="m-logo" />
-          <div class="m-logo-text">
-            <span>Farmacia Montesano</span>
-            <small>Portale interno</small>
-          </div>
         </div>
         <button class="m-hamburger" aria-label="Menu">
           <span></span>
@@ -246,75 +24,274 @@
 
       <main class="m-main">
         <section class="m-card-grid">
-          <!-- Uso gli stessi nomi card del desktop -->
-          <button class="m-card m-card-green" data-section="assenti">
+
+          <!-- RIGA 1 -->
+          <button class="m-card m-card-green">
             <div class="m-card-label">NUOVI</div>
             <div class="m-card-title">Assenti / Permessi</div>
             <div class="m-card-badge">2</div>
             <div class="m-card-icon">📅</div>
           </button>
 
-          <button class="m-card m-card-blue" data-section="turno">
+          <button class="m-card m-card-blue">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Farmacia di turno</div>
             <div class="m-card-badge">1</div>
             <div class="m-card-icon">⏰</div>
           </button>
 
-          <button class="m-card m-card-pink" data-section="comunicazioni">
+          <!-- RIGA 2 -->
+          <button class="m-card m-card-pink">
             <div class="m-card-label">NUOVA</div>
             <div class="m-card-title">Comunicazioni</div>
             <div class="m-card-badge">1</div>
             <div class="m-card-icon">📢</div>
           </button>
 
-          <button class="m-card m-card-teal" data-section="procedure">
+          <button class="m-card m-card-teal">
             <div class="m-card-label">NUOVE</div>
             <div class="m-card-title">Procedure</div>
             <div class="m-card-icon">📚</div>
           </button>
 
-          <button class="m-card m-card-yellow" data-section="logistica">
+          <!-- RIGA 3 -->
+          <button class="m-card m-card-yellow">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Logistica</div>
             <div class="m-card-badge">1</div>
             <div class="m-card-icon">📦</div>
           </button>
 
-          <button class="m-card m-card-cyan" data-section="magazzino">
+          <button class="m-card m-card-cyan">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Magazziniera</div>
             <div class="m-card-badge">2</div>
             <div class="m-card-icon">📋</div>
           </button>
 
-          <button class="m-card m-card-orange" data-section="scadenze">
+          <!-- RIGA 4 -->
+          <button class="m-card m-card-orange">
             <div class="m-card-label">NUOVI</div>
             <div class="m-card-title">Prodotti in scadenza</div>
             <div class="m-card-icon">⏳</div>
           </button>
 
-          <button class="m-card m-card-green2" data-section="consumabili">
+          <button class="m-card m-card-green2">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Consumabili</div>
             <div class="m-card-icon">🧪</div>
           </button>
 
-          <button class="m-card m-card-blue2" data-section="consegne">
+          <!-- RIGA 5 -->
+          <button class="m-card m-card-blue2">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Consegne / Ritiri</div>
             <div class="m-card-icon">🚚</div>
           </button>
 
-          <button class="m-card m-card-dark m-card-wide" data-section="archivio">
+          <button class="m-card m-card-purple">
+            <div class="m-card-label">NUOVO</div>
+            <div class="m-card-title">Cambio cassa</div>
+            <div class="m-card-icon">💶</div>
+          </button>
+
+          <!-- RIGA 6 -->
+          <button class="m-card m-card-dark m-card-wide">
             <div class="m-card-title">Archivio file</div>
             <div class="m-card-icon">🗄️</div>
           </button>
+
         </section>
       </main>
     </div>
 
-  </div> <!-- /app-shell -->
+    <!-- ======================
+         VISTA DESKTOP
+         ====================== -->
+    <div class="desktop-dashboard">
+      <header class="app-header">
+        <h1>FARMACIA MONTESANO</h1>
+        <span class="app-header__subtitle">Portale interno · Dashboard generale</span>
+        <span class="app-header__date" id="desktop-today"></span>
+      </header>
+
+      <main class="desktop-main">
+        <section class="desktop-grid">
+
+          <!-- Q1 – ALTO SINISTRA: SEZIONI FARMACIA -->
+          <section class="quad quad-1">
+            <div class="quad-header">
+              <h2 class="quad-title">Sezioni farmacia</h2>
+              <p class="quad-subtitle">Accesso rapido alle aree operative.</p>
+            </div>
+
+            <div class="quad-cards-grid">
+              <button class="section-card sc-green">Assenti / Permessi</button>
+              <button class="section-card sc-blue">Farmacia di turno</button>
+              <button class="section-card sc-pink">Comunicazioni</button>
+              <button class="section-card sc-teal">Procedure</button>
+              <button class="section-card sc-yellow">Logistica</button>
+              <button class="section-card sc-cyan">Magazziniera</button>
+              <button class="section-card sc-orange">Prodotti in scadenza</button>
+              <button class="section-card sc-green2">Consumabili</button>
+              <button class="section-card sc-blue2">Consegne / Ritiri</button>
+            </div>
+          </section>
+
+          <!-- Q2 – ALTO DESTRA: CHAT INTERNA -->
+          <section class="quad quad-2">
+            <div class="quad-header">
+              <h2 class="quad-title">Chat comunicazioni interne</h2>
+              <p class="quad-subtitle">
+                Messaggi rapidi tra titolare e collaboratori.
+                <span id="chat-count" class="quad-pill"></span>
+              </p>
+            </div>
+
+            <div class="chat-area">
+              <div class="chat-messages" id="chat-messages">
+                <!-- Messaggi generati da JS -->
+              </div>
+
+              <form class="chat-form" id="chat-form">
+                <div class="chat-form-row">
+                  <label>
+                    Dipendente
+                    <select id="chat-autore">
+                      <option value="Emanuela">Emanuela</option>
+                      <option value="Valerio">Valerio</option>
+                      <option value="Daniela">Daniela</option>
+                      <option value="Annalisa">Annalisa</option>
+                      <option value="Patrizia">Patrizia</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Tipo
+                    <select id="chat-tipo">
+                      <option value="Avviso">Avviso</option>
+                      <option value="Promemoria">Promemoria</option>
+                      <option value="Turni">Turni</option>
+                      <option value="Urgenza">Urgenza</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div class="chat-form-row">
+                  <label class="chat-file-label">
+                    Allegato (nome file)
+                    <input type="text" id="chat-file" placeholder="Es. turni_dicembre.pdf" />
+                  </label>
+                </div>
+
+                <div class="chat-form-row">
+                  <textarea
+                    id="chat-testo"
+                    rows="2"
+                    placeholder="Scrivi una comunicazione rapida..."
+                    required
+                  ></textarea>
+                </div>
+
+                <div class="chat-form-actions">
+                  <button type="submit" class="btn-primary">Invia</button>
+                  <button type="button" id="chat-clear" class="btn-link">
+                    Svuota tutta la chat (demo)
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+                    <!-- Q3 – BASSO SINISTRA: SERVIZI & CLIENTI -->
+          <section class="quad quad-3">
+            <div class="quad-header">
+              <h2 class="quad-title">Servizi & Clienti</h2>
+              <p class="quad-subtitle">
+                Cosa stiamo offrendo e cosa c'è in programma.
+              </p>
+            </div>
+
+            <div class="services-grid">
+              <div class="services-column">
+                <h3 class="services-title">Offerte in corso</h3>
+                <ul class="services-list" id="offerte-list">
+                  <!-- riempito via JS (demo) -->
+                </ul>
+              </div>
+
+              <div class="services-column">
+                <h3 class="services-title">Eventi programmati</h3>
+                <ul class="services-list" id="eventi-list">
+                  <!-- riempito via JS (demo) -->
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Q4 – BASSO DESTRA: AGENDA & DOCUMENTI -->
+          <section class="quad quad-4">
+            <div class="quad-header quad-header-between">
+              <div>
+                <h2 class="quad-title">Agenda & documenti</h2>
+                <p class="quad-subtitle">
+                  Gestione servizi, appuntamenti e cartelle operative.
+                </p>
+              </div>
+              <div class="agenda-tabs" id="agenda-tabs">
+                <button class="agenda-tab agenda-tab-active" data-view="giorno">Calendario</button>
+                <button class="agenda-tab" data-view="documenti">Documenti</button>
+              </div>
+            </div>
+
+            <!-- CONTENUTO CALENDARIO -->
+            <div class="agenda-content agenda-content-active" id="agenda-calendario">
+              <div class="agenda-toolbar">
+                <div class="agenda-view-switch" id="agenda-view-switch">
+                  <button class="view-pill view-pill-active" data-mode="giorno">Giorno</button>
+                  <button class="view-pill" data-mode="settimana">Settimana</button>
+                  <button class="view-pill" data-mode="mese">Mese</button>
+                </div>
+                <button class="btn-primary btn-sm" id="btn-nuovo-app">
+                  + Nuovo appuntamento
+                </button>
+              </div>
+
+              <div class="agenda-body">
+                <div class="agenda-day-label" id="agenda-day-label"></div>
+                <div class="agenda-planner" id="agenda-planner">
+                  <!-- eventi della giornata/sett/settimana via JS -->
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTENUTO DOCUMENTI -->
+            <div class="agenda-content" id="agenda-documenti">
+              <div class="docs-toolbar">
+                <button class="btn-primary btn-sm" id="btn-nuova-cartella">
+                  + Nuova cartella
+                </button>
+                <label class="btn-upload btn-sm">
+                  Carica file
+                  <input type="file" id="input-upload-file" multiple />
+                </label>
+              </div>
+
+              <div class="docs-body">
+                <div class="folder-grid" id="folder-grid">
+                  <!-- Cartelle demo via JS -->
+                </div>
+                <div class="docs-note">
+                  Upload e cartelle solo dimostrativi: nessun file viene salvato davvero
+                  (serve un server / NAS per memorizzare i dati reali).
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </section>
+      </main>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
