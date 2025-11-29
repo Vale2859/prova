@@ -11,6 +11,7 @@
 
     <!-- ======================
          VISTA MOBILE (CARD)
+         (INVARIATA)
          ====================== -->
     <div class="mobile-dashboard">
       <header class="m-header">
@@ -110,15 +111,17 @@
          ====================== -->
     <div class="desktop-dashboard">
       <header class="app-header">
-        <h1>FARMACIA MONTESANO</h1>
-        <span class="app-header__subtitle">Portale interno · Dashboard generale</span>
+        <div>
+          <h1>FARMACIA MONTESANO</h1>
+          <span class="app-header__subtitle">Portale interno · Dashboard generale</span>
+        </div>
         <span class="app-header__date" id="desktop-today"></span>
       </header>
 
       <main class="desktop-main">
         <section class="desktop-grid">
 
-          <!-- Q1 – ALTO SINISTRA: SEZIONI FARMACIA (CARD GRANDI SU TUTTO IL RIQUADRO) -->
+          <!-- Q1 – ALTO SINISTRA: CARD SEZIONI SU TUTTO IL RIQUADRO -->
           <section class="quad quad-1">
             <div class="quad-header">
               <h2 class="quad-title">Sezioni farmacia</h2>
@@ -150,7 +153,7 @@
 
             <div class="chat-area">
               <div class="chat-messages" id="chat-messages">
-                <!-- Messaggi via JS -->
+                <!-- messaggi via JS -->
               </div>
 
               <form class="chat-form" id="chat-form">
@@ -196,4 +199,87 @@
                     <!-- Q3 – BASSO SINISTRA: SERVIZI & CLIENTI -->
           <section class="quad quad-3">
             <div class="quad-header">
-              <h2 class
+              <h2 class="quad-title">Servizi & Clienti</h2>
+              <p class="quad-subtitle">Cosa stiamo offrendo e cosa c’è in programma.</p>
+            </div>
+
+            <div class="services-grid">
+              <div class="services-column">
+                <h3 class="services-title">Offerte in corso</h3>
+                <ul class="services-list" id="offerte-list">
+                  <!-- riempito da JS -->
+                </ul>
+              </div>
+
+              <div class="services-column">
+                <h3 class="services-title">Eventi programmati</h3>
+                <ul class="services-list" id="eventi-list">
+                  <!-- riempito da JS -->
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- Q4 – BASSO DESTRA: AGENDA & DOCUMENTI -->
+          <section class="quad quad-4">
+            <div class="quad-header quad-header-tabs">
+              <div>
+                <h2 class="quad-title">Agenda & Documenti</h2>
+                <p class="quad-subtitle">Gestione servizi, appuntamenti e cartelle operative.</p>
+              </div>
+              <div class="agenda-tabs">
+                <button class="agenda-tab active" data-tab="cal">Calendario</button>
+                <button class="agenda-tab" data-tab="doc">Documenti</button>
+              </div>
+            </div>
+
+            <div class="agenda-body">
+              <!-- CALENDARIO -->
+              <div class="agenda-calendario" id="agenda-cal">
+                <div class="agenda-cal-header">
+                  <div class="agenda-cal-date" id="agenda-date-label"></div>
+                  <div class="agenda-view-switch">
+                    <button class="view-btn active" data-view="day">Giorno</button>
+                    <button class="view-btn" data-view="week">Settimana</button>
+                    <button class="view-btn" data-view="month">Mese</button>
+                  </div>
+                  <button class="btn-primary btn-small" id="btn-nuovo-app">+ Nuovo appuntamento</button>
+                </div>
+
+                <div class="agenda-day-layout">
+                  <div class="agenda-hours" id="agenda-hours"></div>
+                  <div class="agenda-events" id="agenda-events"></div>
+                </div>
+
+                <p class="agenda-hint">
+                  Vista demo stile planner: blocchi colorati per i servizi della giornata.
+                </p>
+              </div>
+
+              <!-- DOCUMENTI -->
+              <div class="agenda-documenti" id="agenda-doc" style="display:none;">
+                <div class="agenda-doc-header">
+                  <button class="btn-primary btn-small" id="btn-nuova-cartella">+ Nuova cartella</button>
+                  <button class="btn-secondary btn-small" id="btn-carica-file">Carica file</button>
+                </div>
+
+                <div class="doc-grid" id="doc-grid">
+                  <!-- cartelle create via JS -->
+                </div>
+
+                <p class="agenda-hint">
+                  Sezione demo: crea cartelle e aggiungi file simbolici per organizzare i documenti.
+                </p>
+              </div>
+            </div>
+          </section>
+
+        </section>
+      </main>
+    </div><!-- desktop-dashboard -->
+
+  </div><!-- app-shell -->
+
+  <script src="script.js"></script>
+</body>
+</html>
