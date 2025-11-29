@@ -1,544 +1,169 @@
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+        <!-- Q3 – ALTO DESTRA: CHAT COMUNICAZIONI -->
+        <section class="quad quad-top-right">
+          <div class="card card-chat">
+            <div class="card-header">
+              <span class="card-title">Comunicazioni interne</span>
+              <span class="card-subtitle">Bacheca rapida per il team</span>
+            </div>
 
-:root {
-  --bg-body: #041427;
-  --txt-main: #f9fbff;
-  --txt-muted: #c3c8d9;
+            <div id="chat-messages" class="chat-messages"></div>
 
-  --accent-blue: #1b78ff;
+            <form id="chat-form" class="chat-form">
+              <div class="chat-form-row">
+                <select id="chat-author" class="chat-select">
+                  <option value="Valerio">Valerio</option>
+                  <option value="Giovanni">Giovanni</option>
+                  <option value="Emanuela">Emanuela</option>
+                  <option value="Team banco">Team banco</option>
+                  <option value="Magazzino">Magazzino</option>
+                </select>
 
-  --radius-lg: 18px;
-  --radius-md: 14px;
-  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.35);
-  --transition-fast: 0.18s ease-out;
-  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Helvetica Neue", Arial, sans-serif;
+                <select id="chat-type" class="chat-select">
+                  <option value="info">Info</option>
+                  <option value="turno">Turni</option>
+                  <option value="servizi">Servizi</option>
+                  <option value="urgente">Urgente</option>
+                </select>
+              </div>
 
-  /* colori card */
-  --card-green: linear-gradient(135deg, #00c853, #00e676);
-  --card-blue: linear-gradient(135deg, #1b78ff, #4dabff);
-  --card-pink: linear-gradient(135deg, #ff3d9a, #ff7bbf);
-  --card-teal: linear-gradient(135deg, #26c6da, #00acc1);
-  --card-yellow: linear-gradient(135deg, #f6a623, #ffca28);
-  --card-cyan: linear-gradient(135deg, #19c1d8, #4dd0e1);
-  --card-orange: linear-gradient(135deg, #ff8a65, #ff7043);
-  --card-green2: linear-gradient(135deg, #43a047, #66bb6a);
-  --card-blue2: linear-gradient(135deg, #3949ab, #5c6bc0);
-  --card-purple: linear-gradient(135deg, #7e57c2, #9575cd);
-  --card-dark: linear-gradient(135deg, #263238, #37474f);
-}
+              <div class="chat-form-row">
+                <input
+                  id="chat-text"
+                  class="chat-input"
+                  type="text"
+                  placeholder="Scrivi una comunicazione per la farmacia..."
+                  required
+                />
+                <label class="chat-attach" title="Allega file (solo nome, nessun upload)">
+                  📎
+                  <input id="chat-file" type="file" multiple style="display:none;" />
+                </label>
+                <button type="submit" class="btn-primary chat-send">Invia</button>
+              </div>
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
+              <div id="chat-file-names" class="chat-file-names"></div>
+            </form>
+          </div>
+        </section>
 
-body {
-  font-family: var(--font-main);
-  background: radial-gradient(circle at 0 0, #115a9c 0, #041427 55%, #020711 100%);
-  color: var(--txt-main);
-}
+        <!-- Q4 – BASSO DESTRA: AGENDA & DOCUMENTI -->
+        <section class="quad quad-bottom-right">
+          <div class="card quad-card">
+            <div class="quad-header">
+              <h2 class="quad-title">Agenda & documenti</h2>
+              <span class="quad-subtitle">
+                Pianifica servizi, appuntamenti e organizza i documenti operativi.
+              </span>
+            </div>
 
-.app-shell {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
+            <div class="agenda-tabs">
+              <button class="agenda-tab active" data-tab="cal">Calendario</button>
+              <button class="agenda-tab" data-tab="docs">Documenti</button>
+            </div>
 
-/* default: desktop */
-.mobile-dashboard {
-  display: none;
-}
-.desktop-dashboard {
-  display: block;
-}
+            <div class="agenda-panels">
+              <!-- Vista calendario -->
+              <div class="agenda-view agenda-view-cal active" id="agenda-cal">
+                <div class="agenda-headline">
+                  <div>
+                    <div id="agenda-day-label" class="agenda-day-label">Oggi</div>
+                    <div id="agenda-date-label" class="agenda-date-label">–</div>
+                  </div>
+                  <div class="agenda-filters">
+                    <button class="small-pill">Oggi</button>
+                    <button class="small-pill">Settimana</button>
+                    <button class="small-pill">Mese</button>
+                    <button class="btn-primary btn-small" id="agenda-new-btn">
+                      + Nuovo appuntamento
+                    </button>
+                  </div>
+                </div>
 
-/* HEADER */
-.app-header {
-  padding: 18px 40px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+                <div id="agenda-events" class="agenda-events">
+                  <!-- righe eventi generate da JS -->
+                </div>
+              </div>
 
-.app-header h1 {
-  font-size: 1.4rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin: 0;
-}
+              <!-- Vista documenti -->
+              <div class="agenda-view agenda-view-docs" id="agenda-docs">
+                <div class="docs-grid">
+                  <div class="doc-folder doc-folder-purple">
+                    <div class="doc-icon">📁</div>
+                    <div class="doc-label">Procedure</div>
+                    <div class="doc-sub">Istruzioni operative, protocolli.</div>
+                  </div>
+                  <div class="doc-folder doc-folder-blue">
+                    <div class="doc-icon">📁</div>
+                    <div class="doc-label">Turni & servizi</div>
+                    <div class="doc-sub">Turni farmacie, calendari ECG/Holter.</div>
+                  </div>
+                  <div class="doc-folder doc-folder-green">
+                    <div class="doc-icon">📁</div>
+                    <div class="doc-label">Documenti clienti</div>
+                    <div class="doc-sub">Consensi, modulistica, report.</div>
+                  </div>
+                  <div class="doc-folder doc-folder-orange">
+                    <div class="doc-icon">📁</div>
+                    <div class="doc-label">Altro</div>
+                    <div class="doc-sub">Tutto il resto, da organizzare.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
 
-.app-header__subtitle {
-  font-size: 0.85rem;
-  color: var(--txt-muted);
-}
+    <!-- ======================
+         SEZIONE DETTAGLIO: ASSENTI / PERMESSI
+         ====================== -->
+    <section id="sezione-assenti" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
+      <div style="max-width:1000px; margin:0 auto;">
+        <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
+          ← Torna alla dashboard
+        </button>
 
-/* ========= GRID 2×2 ========= */
+        <h2 style="margin:0 0 4px;">Assenti / Permessi approvati</h2>
+        <p style="margin:0 0 12px; font-size:0.9rem; opacity:0.85;">
+          Vista rapida delle assenze già approvate (dati di esempio).
+        </p>
 
-.desktop-main {
-  flex: 1;
-  padding: 10px 32px 32px;
-}
+        <label style="font-size:0.85rem; display:block; margin-bottom:10px;">
+          Ruolo demo:
+          <select id="ruolo-assenti" style="margin-left:8px; padding:4px 8px; border-radius:8px; border:none;">
+            <option value="farmacia">Farmacia (generico)</option>
+            <option value="titolare">Titolare</option>
+            <option value="dipendente">Dipendente</option>
+          </select>
+        </label>
 
-.desktop-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 18px;
-  min-height: calc(100vh - 110px);
-}
+        <div id="assenti-oggi" style="margin-bottom:14px;"></div>
+        <div id="assenti-prossimi"></div>
+      </div>
+    </section>
 
-/* quadranti */
-.quad {
-  background: rgba(3, 16, 38, 0.9);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: var(--shadow-soft);
-  padding: 14px 16px 16px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+    <!-- ======================
+         SEZIONE DETTAGLIO: FARMACIA DI TURNO
+         ====================== -->
+    <section id="sezione-turno" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
+      <div style="max-width:1000px; margin:0 auto;">
+        <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
+          ← Torna alla dashboard
+        </button>
 
-/* posizioni:
-   Q1: alto sx
-   Q3: alto dx
-   Q2: basso sx
-   Q4: basso dx */
-.quad-1 { grid-area: 1 / 1 / 2 / 2; }
-.quad-3 { grid-area: 1 / 2 / 2 / 3; }
-.quad-2 { grid-area: 2 / 1 / 3 / 2; }
-.quad-4 { grid-area: 2 / 2 / 3 / 3; }
+        <h2 style="margin:0 0 4px;">Farmacia di turno</h2>
+        <p style="margin:0 0 12px; font-size:0.9rem; opacity:0.85;">
+          Turno di oggi in evidenza e prossimi turni programmati (dati demo).
+        </p>
 
-.quad-title {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  margin: 0 0 3px;
-}
+        <div id="turno-oggi" style="margin-bottom:14px;"></div>
+        <div id="turno-prossimi"></div>
+      </div>
+    </section>
 
-.quad-subtitle {
-  margin: 0 0 10px;
-  font-size: 0.8rem;
-  color: var(--txt-muted);
-}
+  </div>
 
-/* Q1 – griglia card 3×3 */
-.quad-card-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(70px, 1fr);
-  gap: 8px;
-}
-
-.q-card {
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  padding: 8px 10px;
-  text-align: left;
-  color: #fff;
-  font-family: inherit;
-  position: relative;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-.q-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.55);
-}
-.q-card-title {
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-/* Q3 – riepilogo rapido */
-#quick-summary {
-  padding: 8px 10px;
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.08), transparent 60%);
-  border-radius: 12px;
-  margin-bottom: 10px;
-}
-
-.quick-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  font-size: 0.8rem;
-}
-.quick-list li + li {
-  margin-top: 4px;
-}
-
-.detail-panel {
-  flex: 1;
-  background: rgba(2, 9, 26, 0.9);
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-top: 6px;
-  overflow-y: auto;
-}
-
-#detail-title {
-  margin: 0 0 4px;
-  font-size: 0.9rem;
-}
-#detail-summary {
-  margin: 0 0 6px;
-  font-size: 0.8rem;
-  color: var(--txt-muted);
-}
-#detail-list {
-  list-style: disc;
-  padding-left: 18px;
-  margin: 0;
-  font-size: 0.8rem;
-}
-
-/* Q2 – offerte / eventi */
-.quad-4-columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  flex: 1;
-}
-
-.quad-box {
-  background: rgba(5, 24, 52, 0.9);
-  border-radius: 12px;
-  padding: 10px 12px;
-  font-size: 0.8rem;
-}
-
-.quad-box h3 {
-  margin: 0 0 4px;
-  font-size: 0.85rem;
-}
-
-.quad-box ul {
-  margin: 0;
-  padding-left: 16px;
-}
-
-/* Q4 – agenda & documenti */
-.tabs {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 8px;
-}
-
-.tab-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--txt-main);
-  cursor: pointer;
-}
-.tab-btn.active {
-  background: var(--accent-blue);
-}
-
-.tab-content.hidden {
-  display: none;
-}
-
-.calendar-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-
-.cal-view-switch {
-  display: inline-flex;
-  gap: 4px;
-}
-
-.cal-view-btn {
-  border: none;
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 0.75rem;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--txt-main);
-  cursor: pointer;
-}
-.cal-view-btn.active {
-  background: rgba(255, 255, 255, 0.18);
-}
-
-.cal-add-btn {
-  font-size: 0.75rem;
-}
-
-.agenda-wrapper {
-  flex: 1;
-  background: rgba(2, 9, 26, 0.9);
-  border-radius: 12px;
-  padding: 8px 10px;
-  overflow-y: auto;
-}
-
-/* blocchi agenda */
-.agenda-day {
-  margin-bottom: 8px;
-}
-.agenda-day-title {
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-.agenda-slot {
-  border-radius: 10px;
-  padding: 4px 8px;
-  font-size: 0.75rem;
-  margin-bottom: 4px;
-  color: #fff;
-}
-.slot-ecg { background: rgba(33, 150, 243, 0.5); }
-.slot-holter { background: rgba(255, 193, 7, 0.5); color: #111; }
-.slot-vaccino { background: rgba(76, 175, 80, 0.5); }
-.slot-consulenza { background: rgba(233, 30, 99, 0.5); }
-
-/* documenti */
-.docs-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  flex: 1;
-}
-.doc-card {
-  border-radius: 16px;
-  padding: 10px 12px;
-  box-shadow: var(--shadow-soft);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-size: 0.8rem;
-}
-.doc-icon {
-  font-size: 1.4rem;
-  margin-bottom: 4px;
-}
-.doc-title {
-  font-weight: 600;
-}
-.doc-subtitle {
-  font-size: 0.75rem;
-  color: var(--txt-muted);
-}
-.doc-green { background: var(--card-green); }
-.doc-blue { background: var(--card-blue); }
-.doc-pink { background: var(--card-pink); }
-.doc-yellow { background: var(--card-yellow); }
-
-/* bottoni */
-.btn-primary {
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.8rem;
-  background: var(--accent-blue);
-  color: #fff;
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-weight: 600;
-}
-/* ===== MOBILE ===== */
-
-.m-header {
-  padding: 14px 16px 6px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.m-logo {
-  height: 32px;
-  width: auto;
-  border-radius: 8px;
-}
-
-.m-hamburger {
-  border: none;
-  background: rgba(0, 0, 0, 0.35);
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-}
-
-.m-hamburger span {
-  width: 16px;
-  height: 2px;
-  border-radius: 999px;
-  background: #ffffff;
-  position: relative;
-}
-.m-hamburger span::before,
-.m-hamburger span::after {
-  content: "";
-  position: absolute;
-  width: 16px;
-  height: 2px;
-  border-radius: 999px;
-  background: #ffffff;
-  left: 0;
-}
-.m-hamburger span::before { top: -5px; }
-.m-hamburger span::after { top: 5px; }
-
-.m-main {
-  padding: 4px 12px 16px;
-}
-
-.m-card-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.m-card {
-  position: relative;
-  border-radius: 18px;
-  padding: 10px 12px;
-  box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 86px;
-  color: #ffffff;
-  background: var(--card-blue);
-}
-
-.m-card-label {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  opacity: 0.9;
-}
-
-.m-card-title {
-  margin-top: 4px;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.m-card-badge {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  min-width: 20px;
-  padding: 2px 6px;
-  border-radius: 999px;
-  font-size: 0.65rem;
-  font-weight: 600;
-  text-align: center;
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.m-card-icon {
-  position: absolute;
-  right: -6px;
-  bottom: -4px;
-  font-size: 1.8rem;
-  opacity: 0.22;
-}
-
-.m-card-wide {
-  grid-column: 1 / -1;
-}
-
-/* colori mobile */
-.m-card-green { background: var(--card-green); }
-.m-card-blue { background: var(--card-blue); }
-.m-card-pink { background: var(--card-pink); }
-.m-card-teal { background: var(--card-teal); }
-.m-card-yellow { background: var(--card-yellow); }
-.m-card-cyan { background: var(--card-cyan); }
-.m-card-orange { background: var(--card-orange); }
-.m-card-green2 { background: var(--card-green2); }
-.m-card-blue2 { background: var(--card-blue2); }
-.m-card-purple { background: var(--card-purple); }
-.m-card-dark { background: var(--card-dark); }
-
-/* overlay dettagli mobile */
-.m-detail-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 40;
-}
-
-.m-detail-box {
-  background: #061a33;
-  border-radius: 18px;
-  padding: 14px;
-  max-width: 420px;
-  width: 100%;
-  color: #fff;
-  box-shadow: var(--shadow-soft);
-  position: relative;
-}
-
-.m-detail-close {
-  position: absolute;
-  top: 6px;
-  right: 8px;
-  border: none;
-  background: transparent;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-#m-detail-title {
-  margin: 0 0 6px;
-  font-size: 1rem;
-}
-#m-detail-summary {
-  margin: 0 0 6px;
-  font-size: 0.85rem;
-}
-#m-detail-list {
-  margin: 0;
-  padding-left: 16px;
-  font-size: 0.8rem;
-}
-
-/* RESPONSIVE */
-
-@media (max-width: 1100px) {
-  .desktop-main {
-    padding: 10px 16px 24px;
-  }
-}
-
-@media (max-width: 768px) {
-  .desktop-dashboard {
-    display: none;
-  }
-  .mobile-dashboard {
-    display: block;
-  }
-}
+  <script src="script.js"></script>
+</body>
+</html>
