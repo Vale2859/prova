@@ -1,169 +1,745 @@
-        <!-- Q3 – ALTO DESTRA: CHAT COMUNICAZIONI -->
-        <section class="quad quad-top-right">
-          <div class="card card-chat">
-            <div class="card-header">
-              <span class="card-title">Comunicazioni interne</span>
-              <span class="card-subtitle">Bacheca rapida per il team</span>
-            </div>
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-            <div id="chat-messages" class="chat-messages"></div>
+:root {
+  --bg-body: #041427;
+  --bg-panel: #061a33;
+  --bg-card: #0b2340;
+  --txt-main: #f9fbff;
+  --txt-muted: #c3c8d9;
 
-            <form id="chat-form" class="chat-form">
-              <div class="chat-form-row">
-                <select id="chat-author" class="chat-select">
-                  <option value="Valerio">Valerio</option>
-                  <option value="Giovanni">Giovanni</option>
-                  <option value="Emanuela">Emanuela</option>
-                  <option value="Team banco">Team banco</option>
-                  <option value="Magazzino">Magazzino</option>
-                </select>
+  --accent-blue: #1b78ff;
+  --accent-green: #1cc88a;
+  --accent-orange: #f6a623;
+  --accent-pink: #ff3d9a;
+  --accent-purple: #7a5cff;
+  --accent-cyan: #19c1d8;
 
-                <select id="chat-type" class="chat-select">
-                  <option value="info">Info</option>
-                  <option value="turno">Turni</option>
-                  <option value="servizi">Servizi</option>
-                  <option value="urgente">Urgente</option>
-                </select>
-              </div>
+  --radius-lg: 18px;
+  --radius-md: 14px;
+  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.35);
+  --transition-fast: 0.18s ease-out;
+  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", Arial, sans-serif;
 
-              <div class="chat-form-row">
-                <input
-                  id="chat-text"
-                  class="chat-input"
-                  type="text"
-                  placeholder="Scrivi una comunicazione per la farmacia..."
-                  required
-                />
-                <label class="chat-attach" title="Allega file (solo nome, nessun upload)">
-                  📎
-                  <input id="chat-file" type="file" multiple style="display:none;" />
-                </label>
-                <button type="submit" class="btn-primary chat-send">Invia</button>
-              </div>
+  /* palette card condivisa */
+  --card-green: linear-gradient(135deg, #00c853, #00e676);
+  --card-blue: linear-gradient(135deg, #1b78ff, #4dabff);
+  --card-pink: linear-gradient(135deg, #ff3d9a, #ff7bbf);
+  --card-teal: linear-gradient(135deg, #26c6da, #00acc1);
+  --card-yellow: linear-gradient(135deg, #f6a623, #ffca28);
+  --card-cyan: linear-gradient(135deg, #19c1d8, #4dd0e1);
+  --card-orange: linear-gradient(135deg, #ff8a65, #ff7043);
+  --card-green2: linear-gradient(135deg, #43a047, #66bb6a);
+  --card-blue2: linear-gradient(135deg, #3949ab, #5c6bc0);
+  --card-purple: linear-gradient(135deg, #7e57c2, #9575cd);
+  --card-dark: linear-gradient(135deg, #263238, #37474f);
+}
 
-              <div id="chat-file-names" class="chat-file-names"></div>
-            </form>
-          </div>
-        </section>
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
 
-        <!-- Q4 – BASSO DESTRA: AGENDA & DOCUMENTI -->
-        <section class="quad quad-bottom-right">
-          <div class="card quad-card">
-            <div class="quad-header">
-              <h2 class="quad-title">Agenda & documenti</h2>
-              <span class="quad-subtitle">
-                Pianifica servizi, appuntamenti e organizza i documenti operativi.
-              </span>
-            </div>
+body {
+  font-family: var(--font-main);
+  background: radial-gradient(circle at 0 0, #115a9c 0, #041427 55%, #020711 100%);
+  color: var(--txt-main);
+}
 
-            <div class="agenda-tabs">
-              <button class="agenda-tab active" data-tab="cal">Calendario</button>
-              <button class="agenda-tab" data-tab="docs">Documenti</button>
-            </div>
+/* =========================
+   STRUTTURA BASE
+   ========================= */
 
-            <div class="agenda-panels">
-              <!-- Vista calendario -->
-              <div class="agenda-view agenda-view-cal active" id="agenda-cal">
-                <div class="agenda-headline">
-                  <div>
-                    <div id="agenda-day-label" class="agenda-day-label">Oggi</div>
-                    <div id="agenda-date-label" class="agenda-date-label">–</div>
-                  </div>
-                  <div class="agenda-filters">
-                    <button class="small-pill">Oggi</button>
-                    <button class="small-pill">Settimana</button>
-                    <button class="small-pill">Mese</button>
-                    <button class="btn-primary btn-small" id="agenda-new-btn">
-                      + Nuovo appuntamento
-                    </button>
-                  </div>
-                </div>
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-                <div id="agenda-events" class="agenda-events">
-                  <!-- righe eventi generate da JS -->
-                </div>
-              </div>
+.desktop-only {
+  display: block;
+}
 
-              <!-- Vista documenti -->
-              <div class="agenda-view agenda-view-docs" id="agenda-docs">
-                <div class="docs-grid">
-                  <div class="doc-folder doc-folder-purple">
-                    <div class="doc-icon">📁</div>
-                    <div class="doc-label">Procedure</div>
-                    <div class="doc-sub">Istruzioni operative, protocolli.</div>
-                  </div>
-                  <div class="doc-folder doc-folder-blue">
-                    <div class="doc-icon">📁</div>
-                    <div class="doc-label">Turni & servizi</div>
-                    <div class="doc-sub">Turni farmacie, calendari ECG/Holter.</div>
-                  </div>
-                  <div class="doc-folder doc-folder-green">
-                    <div class="doc-icon">📁</div>
-                    <div class="doc-label">Documenti clienti</div>
-                    <div class="doc-sub">Consensi, modulistica, report.</div>
-                  </div>
-                  <div class="doc-folder doc-folder-orange">
-                    <div class="doc-icon">📁</div>
-                    <div class="doc-label">Altro</div>
-                    <div class="doc-sub">Tutto il resto, da organizzare.</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
+/* HEADER */
 
-    <!-- ======================
-         SEZIONE DETTAGLIO: ASSENTI / PERMESSI
-         ====================== -->
-    <section id="sezione-assenti" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
-      <div style="max-width:1000px; margin:0 auto;">
-        <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
-          ← Torna alla dashboard
-        </button>
+.app-header {
+  padding: 14px 32px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-        <h2 style="margin:0 0 4px;">Assenti / Permessi approvati</h2>
-        <p style="margin:0 0 12px; font-size:0.9rem; opacity:0.85;">
-          Vista rapida delle assenze già approvate (dati di esempio).
-        </p>
+.app-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
-        <label style="font-size:0.85rem; display:block; margin-bottom:10px;">
-          Ruolo demo:
-          <select id="ruolo-assenti" style="margin-left:8px; padding:4px 8px; border-radius:8px; border:none;">
-            <option value="farmacia">Farmacia (generico)</option>
-            <option value="titolare">Titolare</option>
-            <option value="dipendente">Dipendente</option>
-          </select>
-        </label>
+.app-logo-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 
-        <div id="assenti-oggi" style="margin-bottom:14px;"></div>
-        <div id="assenti-prossimi"></div>
-      </div>
-    </section>
+.app-header-subtitle {
+  font-size: 0.85rem;
+  color: var(--txt-muted);
+}
 
-    <!-- ======================
-         SEZIONE DETTAGLIO: FARMACIA DI TURNO
-         ====================== -->
-    <section id="sezione-turno" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
-      <div style="max-width:1000px; margin:0 auto;">
-        <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
-          ← Torna alla dashboard
-        </button>
+.app-header-right {
+  font-size: 0.85rem;
+  color: var(--txt-muted);
+}
 
-        <h2 style="margin:0 0 4px;">Farmacia di turno</h2>
-        <p style="margin:0 0 12px; font-size:0.9rem; opacity:0.85;">
-          Turno di oggi in evidenza e prossimi turni programmati (dati demo).
-        </p>
+/* =========================
+   DASHBOARD DESKTOP / 4 QUADRANTI
+   ========================= */
 
-        <div id="turno-oggi" style="margin-bottom:14px;"></div>
-        <div id="turno-prossimi"></div>
-      </div>
-    </section>
+.desktop-dashboard {
+  flex: 1;
+  padding: 4px 24px 24px;
+}
 
-  </div>
+.desktop-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(260px, 1fr) minmax(260px, 1fr);
+  gap: 16px;
+}
 
-  <script src="script.js"></script>
-</body>
-</html>
+/* QUADRANTI */
+
+.quad {
+  background: rgba(4, 20, 39, 0.9);
+  border-radius: var(--radius-lg);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.quad-header {
+  margin-bottom: 10px;
+}
+
+.quad-header h2 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.quad-header p {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: var(--txt-muted);
+}
+
+/* Q1 – grid 3×3 */
+
+.q1-grid {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 82px;
+  gap: 8px;
+}
+
+.q1-card {
+  border: none;
+  border-radius: 14px;
+  padding: 8px 10px;
+  text-align: left;
+  color: #fff;
+  position: relative;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.q1-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.2), transparent 55%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.q1-card:hover::after {
+  opacity: 1;
+}
+
+.q1-label {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.q1-title {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* q1 colori riuso palette mobile */
+
+.m-card-green { background: var(--card-green); }
+.m-card-blue { background: var(--card-blue); }
+.m-card-pink { background: var(--card-pink); }
+.m-card-teal { background: var(--card-teal); }
+.m-card-yellow { background: var(--card-yellow); }
+.m-card-cyan { background: var(--card-cyan); }
+.m-card-orange { background: var(--card-orange); }
+.m-card-green2 { background: var(--card-green2); }
+.m-card-blue2 { background: var(--card-blue2); }
+.m-card-purple { background: var(--card-purple); }
+.m-card-dark { background: var(--card-dark); }
+
+/* Q2 – offerte / eventi */
+
+.q2-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+}
+
+.q2-column h3 {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.simple-list {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 0.8rem;
+  color: var(--txt-muted);
+}
+
+.simple-list li + li {
+  margin-top: 4px;
+}
+
+/* Q3 – CHAT */
+
+.quad-header-chat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.chat-counter {
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.chat-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chat-messages {
+  flex: 1;
+  min-height: 120px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 8px;
+  border-radius: 12px;
+  background: rgba(3, 15, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.chat-message {
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(11, 35, 64, 0.9);
+  font-size: 0.8rem;
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.chat-header-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.chat-author {
+  font-weight: 600;
+}
+
+.chat-time {
+  font-size: 0.7rem;
+  color: var(--txt-muted);
+}
+
+.chat-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.chat-badge-info {
+  background: rgba(25, 193, 216, 0.22);
+}
+
+.chat-badge-urgente {
+  background: rgba(255, 61, 154, 0.28);
+}
+
+.chat-badge-tecnico {
+  background: rgba(122, 92, 255, 0.28);
+}
+
+.chat-text {
+  margin: 0;
+}
+
+.chat-attachment {
+  font-size: 0.7rem;
+  color: #d1e2ff;
+  margin-top: 2px;
+}
+
+.chat-delete {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  border: none;
+  background: transparent;
+  color: #9fb3ff;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.chat-form {
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgba(3, 15, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-form-row {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-form-row label {
+  flex: 1;
+  font-size: 0.75rem;
+}
+
+.chat-form-row select,
+.chat-form-row input,
+.chat-form-row textarea {
+  margin-top: 2px;
+  width: 100%;
+  border-radius: 8px;
+  border: none;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 0.8rem;
+}
+
+.chat-form-row textarea {
+  resize: vertical;
+}
+
+.chat-form-actions {
+  justify-content: flex-end;
+}
+
+.chat-file-label input {
+  font-size: 0.75rem;
+}
+
+/* bottoni generali */
+
+.btn-primary,
+.btn-link {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  color: #fff;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 600;
+}
+
+.btn-small {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+}
+
+.btn-link {
+  background: transparent;
+  color: #e0ecff;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+}
+/* Q4 – AGENDA & DOCUMENTI */
+
+.q4-tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.q4-tab {
+  border-radius: 999px;
+  border: none;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  cursor: pointer;
+  background: rgba(3, 15, 30, 0.9);
+  color: var(--txt-muted);
+}
+
+.q4-tab-active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.q4-today {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--txt-muted);
+}
+
+.q4-body {
+  flex: 1;
+  border-radius: 14px;
+  background: rgba(3, 15, 30, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.calendar-mode {
+  display: flex;
+  gap: 4px;
+}
+
+.mode-btn {
+  border-radius: 999px;
+  border: none;
+  padding: 3px 10px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--txt-muted);
+}
+
+.mode-btn-active {
+  background: var(--accent-blue);
+  color: #fff;
+}
+
+.calendar-day-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.calendar-day-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.service-pill {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: rgba(25, 193, 216, 0.2);
+}
+
+.calendar-day-slots {
+  flex: 1;
+  border-radius: 12px;
+  background: rgba(5, 24, 46, 0.95);
+  padding: 6px 8px;
+  overflow-y: auto;
+  font-size: 0.78rem;
+}
+
+.calendar-slot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  padding: 3px 6px;
+  margin-bottom: 3px;
+}
+
+.slot-time {
+  width: 52px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+
+.slot-block {
+  flex: 1;
+  border-radius: 8px;
+  padding: 3px 6px;
+  color: #051019;
+}
+
+/* colori blocchi per tipo servizio */
+.slot-ecg { background: rgba(76, 175, 80, 0.85); }
+.slot-holter { background: rgba(255, 193, 7, 0.9); }
+.slot-prelievo { background: rgba(33, 150, 243, 0.9); }
+.slot-consulenza { background: rgba(244, 67, 54, 0.9); }
+
+.calendar-note {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  color: var(--txt-muted);
+}
+
+/* DOCUMENTI */
+
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.doc-folder {
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.doc-folder::after {
+  content: "📁";
+  position: absolute;
+  right: 6px;
+  bottom: 4px;
+  font-size: 1.4rem;
+  opacity: 0.18;
+}
+
+.doc-name {
+  font-weight: 600;
+}
+
+.doc-desc {
+  margin-top: 2px;
+  font-size: 0.7rem;
+}
+
+.docs-note {
+  margin-top: 6px;
+  font-size: 0.75rem;
+  color: var(--txt-muted);
+}
+
+/* colori cartelle */
+.doc-green { background: var(--card-green2); }
+.doc-blue { background: var(--card-blue); }
+.doc-pink { background: var(--card-pink); }
+.doc-yellow { background: var(--card-yellow); }
+.doc-purple { background: var(--card-purple); }
+.doc-dark { background: var(--card-dark); }
+
+/* =========================
+   MOBILE – CARD STILE TELEFONO
+   ========================= */
+
+.mobile-dashboard {
+  display: none;
+}
+
+.m-header {
+  padding: 14px 16px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.m-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.m-logo {
+  height: 32px;
+  border-radius: 8px;
+}
+
+.m-logo-text span {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.m-logo-text small {
+  font-size: 0.7rem;
+  color: var(--txt-muted);
+}
+
+.m-hamburger {
+  border: none;
+  background: rgba(0, 0, 0, 0.35);
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.m-hamburger span {
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  position: relative;
+}
+
+.m-hamburger span::before,
+.m-hamburger span::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  left: 0;
+}
+
+.m-hamburger span::before {
+  top: -5px;
+}
+
+.m-hamburger span::after {
+  top: 5px;
+}
+
+.m-main {
+  padding: 4px 12px 16px;
+}
+
+.m-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.m-card {
+  position: relative;
+  border-radius: 18px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 86px;
+  color: #ffffff;
+}
+
+.m-card-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.9;
+}
+
+.m-card-title {
+  margin-top: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.m-card-badge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.m-card-icon {
+  position: absolute;
+  right: -6px;
+  bottom: -4px;
+  font-size: 1.8rem;
+  opacity: 0.22;
+}
+
+.m-card-wide {
+  grid-column: 1 / -1;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 900px) {
+  .desktop-dashboard,
+  .app-header {
+    display: none;
+  }
+
+  .mobile-dashboard {
+    display: block;
+  }
+}
