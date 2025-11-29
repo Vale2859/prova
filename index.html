@@ -26,14 +26,14 @@
         <section class="m-card-grid">
 
           <!-- RIGA 1 -->
-          <button class="m-card m-card-green" data-card="assenti">
+          <button class="m-card m-card-green" data-section="assenti">
             <div class="m-card-label">NUOVI</div>
             <div class="m-card-title">Assenti / Permessi</div>
             <div class="m-card-badge">2</div>
             <div class="m-card-icon">📅</div>
           </button>
 
-          <button class="m-card m-card-blue" data-card="turno">
+          <button class="m-card m-card-blue" data-section="turno">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Farmacia di turno</div>
             <div class="m-card-badge">1</div>
@@ -41,28 +41,28 @@
           </button>
 
           <!-- RIGA 2 -->
-          <button class="m-card m-card-pink" data-card="comunicazioni">
+          <button class="m-card m-card-pink">
             <div class="m-card-label">NUOVA</div>
             <div class="m-card-title">Comunicazioni</div>
             <div class="m-card-badge">1</div>
             <div class="m-card-icon">📢</div>
           </button>
 
-          <button class="m-card m-card-teal" data-card="procedure">
+          <button class="m-card m-card-teal">
             <div class="m-card-label">NUOVE</div>
             <div class="m-card-title">Procedure</div>
             <div class="m-card-icon">📚</div>
           </button>
 
           <!-- RIGA 3 -->
-          <button class="m-card m-card-yellow" data-card="logistica">
+          <button class="m-card m-card-yellow">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Logistica</div>
             <div class="m-card-badge">1</div>
             <div class="m-card-icon">📦</div>
           </button>
 
-          <button class="m-card m-card-cyan" data-card="magazzino">
+          <button class="m-card m-card-cyan">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Magazziniera</div>
             <div class="m-card-badge">2</div>
@@ -70,211 +70,306 @@
           </button>
 
           <!-- RIGA 4 -->
-          <button class="m-card m-card-orange" data-card="scadenze">
+          <button class="m-card m-card-orange">
             <div class="m-card-label">NUOVI</div>
             <div class="m-card-title">Prodotti in scadenza</div>
             <div class="m-card-icon">⏳</div>
           </button>
 
-          <button class="m-card m-card-green2" data-card="consumabili">
+          <button class="m-card m-card-green2">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Consumabili</div>
             <div class="m-card-icon">🧪</div>
           </button>
 
           <!-- RIGA 5 -->
-          <button class="m-card m-card-blue2" data-card="consegne">
+          <button class="m-card m-card-blue2">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Consegne / Ritiri</div>
             <div class="m-card-icon">🚚</div>
           </button>
 
-          <button class="m-card m-card-purple" data-card="cassa">
+          <button class="m-card m-card-purple">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Cambio cassa</div>
             <div class="m-card-icon">💶</div>
           </button>
 
-          <!-- RIGA 6 -->
-          <button class="m-card m-card-dark m-card-wide" data-card="archivio">
+          <!-- RIGA 6: ARCHIVIO A TUTTA LARGHEZZA -->
+          <button class="m-card m-card-dark m-card-wide">
             <div class="m-card-title">Archivio file</div>
             <div class="m-card-icon">🗄️</div>
           </button>
 
         </section>
       </main>
-
-      <!-- Dettaglio per mobile -->
-      <div class="m-detail-overlay" id="m-detail-overlay">
-        <div class="m-detail-box">
-          <button class="m-detail-close" id="m-detail-close">✕</button>
-          <h2 id="m-detail-title"></h2>
-          <p id="m-detail-summary"></p>
-          <ul id="m-detail-list"></ul>
-        </div>
-      </div>
     </div>
-        <!-- ======================
-         VISTA DESKTOP
+
+    <!-- ======================
+         VISTA DESKTOP (QUADRANTI)
          ====================== -->
     <div class="desktop-dashboard">
       <header class="app-header">
-        <h1>FARMACIA MONTESANO</h1>
-        <span class="app-header__subtitle">Portale interno – Dashboard generale</span>
+        <div class="app-header-left">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="desk-logo" />
+          <div>
+            <h1>FARMACIA MONTESANO</h1>
+            <span class="app-header__subtitle">Portale interno · Dashboard generale</span>
+          </div>
+        </div>
       </header>
 
-      <main class="desktop-main">
-        <div class="desktop-grid">
-
-          <!-- Q1 – ALTO SINISTRA: SEZIONI FARMACIA 3×3 -->
-          <section class="quad quad-1">
-            <h2 class="quad-title">Sezioni farmacia</h2>
-            <p class="quad-subtitle">Accesso rapido alle aree operative.</p>
-
-            <div class="quad-card-grid">
-              <button class="q-card m-card-green" data-card="assenti">
-                <span class="q-card-title">Assenti / Permessi</span>
-              </button>
-              <button class="q-card m-card-blue" data-card="turno">
-                <span class="q-card-title">Farmacia di turno</span>
-              </button>
-              <button class="q-card m-card-pink" data-card="comunicazioni">
-                <span class="q-card-title">Comunicazioni</span>
-              </button>
-
-              <button class="q-card m-card-teal" data-card="procedure">
-                <span class="q-card-title">Procedure</span>
-              </button>
-              <button class="q-card m-card-yellow" data-card="logistica">
-                <span class="q-card-title">Logistica</span>
-              </button>
-              <button class="q-card m-card-cyan" data-card="magazzino">
-                <span class="q-card-title">Magazziniera</span>
-              </button>
-
-              <button class="q-card m-card-orange" data-card="scadenze">
-                <span class="q-card-title">Prodotti in scadenza</span>
-              </button>
-              <button class="q-card m-card-green2" data-card="consumabili">
-                <span class="q-card-title">Consumabili</span>
-              </button>
-              <button class="q-card m-card-blue2" data-card="consegne">
-                <span class="q-card-title">Consegne / Ritiri</span>
-              </button>
-            </div>
-          </section>
-
-          <!-- Q3 – ALTO DESTRA: RIEPILOGO RAPIDO (come prima) -->
-          <section class="quad quad-3">
-            <h2 class="quad-title">Riepilogo rapido</h2>
-            <p class="quad-subtitle">
-              Visione d’insieme delle sezioni principali. Dopo inattività torna qui.
-            </p>
-
-            <div id="quick-summary">
-              <ul class="quick-list">
-                <li><strong>Assenti / Permessi:</strong> chi manca oggi e prossimi giorni.</li>
-                <li><strong>Comunicazioni:</strong> ultime note interne non lette.</li>
-                <li><strong>Farmacia di turno:</strong> farmacia attiva oggi + appoggio.</li>
-                <li><strong>Scadenze / Consumabili:</strong> prodotti critici e materiale da riordinare.</li>
-              </ul>
+      <main class="desktop-grid">
+        <!-- Q1 – ALTO SINISTRA: CARD SEZIONI -->
+        <section class="quad quad-top-left">
+          <div class="card quad-card">
+            <div class="quad-header">
+              <h2 class="quad-title">Sezioni farmacia</h2>
+              <span class="quad-subtitle">Accesso rapido alle aree operative</span>
             </div>
 
-            <div class="detail-panel" id="detail-panel">
-              <h3 id="detail-title">Seleziona una card</h3>
-              <p id="detail-summary">
-                Clicca una delle card per vedere qui i dettagli essenziali.
-              </p>
-              <ul id="detail-list"></ul>
+            <div class="desk-grid-cards">
+              <button class="desk-card m-card-green" data-section="assenti">
+                <span class="desk-card-label">NUOVI</span>
+                <span class="desk-card-title">Assenti / Permessi</span>
+              </button>
+
+              <button class="desk-card m-card-blue" data-section="turno">
+                <span class="desk-card-label">NUOVO</span>
+                <span class="desk-card-title">Farmacia di turno</span>
+              </button>
+
+              <button class="desk-card m-card-pink">
+                <span class="desk-card-label">NUOVA</span>
+                <span class="desk-card-title">Comunicazioni</span>
+              </button>
+
+              <button class="desk-card m-card-teal">
+                <span class="desk-card-label">NUOVE</span>
+                <span class="desk-card-title">Procedure</span>
+              </button>
+
+              <button class="desk-card m-card-yellow">
+                <span class="desk-card-label">NUOVO</span>
+                <span class="desk-card-title">Logistica</span>
+              </button>
+
+              <button class="desk-card m-card-cyan">
+                <span class="desk-card-label">NUOVO</span>
+                <span class="desk-card-title">Magazziniera</span>
+              </button>
+
+              <button class="desk-card m-card-orange">
+                <span class="desk-card-label">NUOVI</span>
+                <span class="desk-card-title">Prodotti in scadenza</span>
+              </button>
+
+              <button class="desk-card m-card-green2">
+                <span class="desk-card-label">NUOVO</span>
+                <span class="desk-card-title">Consumabili</span>
+              </button>
+
+              <button class="desk-card m-card-blue2">
+                <span class="desk-card-label">NUOVO</span>
+                <span class="desk-card-title">Consegne / Ritiri</span>
+              </button>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <!-- Q2 – BASSO SINISTRA: OFFERTE / EVENTI -->
-          <section class="quad quad-2">
-            <h2 class="quad-title">Servizi & clienti</h2>
-            <p class="quad-subtitle">Cosa stiamo offrendo ora e cosa c’è in programma.</p>
+        <!-- Q2 – BASSO SINISTRA: OFFERTE / EVENTI -->
+        <section class="quad quad-bottom-left">
+          <div class="card quad-card">
+            <div class="quad-header">
+              <h2 class="quad-title">Servizi & clienti</h2>
+              <span class="quad-subtitle">Cosa stiamo offrendo e cosa c’è in programma</span>
+            </div>
 
-            <div class="quad-4-columns">
-              <div class="quad-box">
-                <h3>Offerte in corso</h3>
-                <ul>
-                  <li><strong>Promo Colesterolo:</strong> -20% su integratori selezionati.</li>
-                  <li><strong>Dermocosmesi:</strong> 3×2 su linea idratante viso.</li>
-                  <li><strong>Piano aderenza:</strong> controllo terapia + reminder.</li>
+            <div class="services-grid">
+              <div class="services-column">
+                <h3 class="services-title">Offerte in corso</h3>
+                <ul class="services-list">
+                  <li><strong>Promo Covidina 20%</strong> su integratori selezionati.</li>
+                  <li>Dermocosmesi – <strong>3×2</strong> su linea idratazione.</li>
+                  <li>Misurazione pressione gratuita il mercoledì mattina.</li>
                 </ul>
               </div>
 
-              <div class="quad-box">
-                <h3>Eventi programmati</h3>
-                <ul>
-                  <li><strong>Lunedì:</strong> Screening pressione e glicemia.</li>
-                  <li><strong>Mercoledì:</strong> Giornata nutrizionale con dietista.</li>
-                  <li><strong>Sabato:</strong> Consulenza cosmetica su appuntamento.</li>
+              <div class="services-column">
+                <h3 class="services-title">Eventi programmati</h3>
+                <ul class="services-list">
+                  <li><strong>Lunedì</strong> – Giornata ECG in farmacia.</li>
+                  <li><strong>Giovedì</strong> – Controllo HOLTER pressorio.</li>
+                  <li><strong>Venerdì</strong> – Consulenza nutrizionale su appuntamento.</li>
                 </ul>
               </div>
             </div>
-          </section>
-
-          <!-- Q4 – BASSO DESTRA: AGENDA & DOCUMENTI -->
-          <section class="quad quad-4">
-            <h2 class="quad-title">Agenda & documenti</h2>
-            <p class="quad-subtitle">
-              Pianifica servizi, appuntamenti e organizza i documenti operativi.
-            </p>
-
-            <div class="tabs">
-              <button class="tab-btn active" data-tab="calendario">Calendario</button>
-              <button class="tab-btn" data-tab="documenti">Documenti</button>
+          </div>
+        </section>
+                <!-- Q3 – ALTO DESTRA: CHAT COMUNICAZIONI -->
+        <section class="quad quad-top-right">
+          <div class="card card-chat">
+            <div class="card-header">
+              <span class="card-title">Comunicazioni interne</span>
+              <span class="card-subtitle">Bacheca rapida per il team</span>
             </div>
 
-            <!-- TAB CALENDARIO -->
-            <div class="tab-content" id="tab-calendario">
-              <div class="calendar-toolbar">
-                <div class="cal-view-switch">
-                  <button class="cal-view-btn active" data-view="giorno">Giorno</button>
-                  <button class="cal-view-btn" data-view="settimana">Settimana</button>
-                  <button class="cal-view-btn" data-view="mese">Mese</button>
-                </div>
-                <button class="btn-primary cal-add-btn">+ Nuovo appuntamento</button>
+            <div id="chat-messages" class="chat-messages"></div>
+
+            <form id="chat-form" class="chat-form">
+              <div class="chat-form-row">
+                <select id="chat-author" class="chat-select">
+                  <option value="Valerio">Valerio</option>
+                  <option value="Giovanni">Giovanni</option>
+                  <option value="Emanuela">Emanuela</option>
+                  <option value="Team banco">Team banco</option>
+                  <option value="Magazzino">Magazzino</option>
+                </select>
+
+                <select id="chat-type" class="chat-select">
+                  <option value="info">Info</option>
+                  <option value="turno">Turni</option>
+                  <option value="servizi">Servizi</option>
+                  <option value="urgente">Urgente</option>
+                </select>
               </div>
 
-              <div class="agenda-wrapper">
-                <div class="agenda-column" id="agenda-column">
-                  <!-- riempito da script.js -->
+              <div class="chat-form-row">
+                <input
+                  id="chat-text"
+                  class="chat-input"
+                  type="text"
+                  placeholder="Scrivi una comunicazione per la farmacia..."
+                  required
+                />
+                <label class="chat-attach" title="Allega file (solo nome, nessun upload)">
+                  📎
+                  <input id="chat-file" type="file" multiple style="display:none;" />
+                </label>
+                <button type="submit" class="btn-primary chat-send">Invia</button>
+              </div>
+
+              <div id="chat-file-names" class="chat-file-names"></div>
+            </form>
+          </div>
+        </section>
+
+        <!-- Q4 – BASSO DESTRA: AGENDA & DOCUMENTI -->
+        <section class="quad quad-bottom-right">
+          <div class="card quad-card">
+            <div class="quad-header">
+              <h2 class="quad-title">Agenda & documenti</h2>
+              <span class="quad-subtitle">
+                Pianifica servizi, appuntamenti e organizza i documenti operativi.
+              </span>
+            </div>
+
+            <div class="agenda-tabs">
+              <button class="agenda-tab active" data-tab="cal">Calendario</button>
+              <button class="agenda-tab" data-tab="docs">Documenti</button>
+            </div>
+
+            <div class="agenda-panels">
+              <!-- Vista calendario -->
+              <div class="agenda-view agenda-view-cal active" id="agenda-cal">
+                <div class="agenda-headline">
+                  <div>
+                    <div id="agenda-day-label" class="agenda-day-label">Oggi</div>
+                    <div id="agenda-date-label" class="agenda-date-label">–</div>
+                  </div>
+                  <div class="agenda-filters">
+                    <button class="small-pill">Oggi</button>
+                    <button class="small-pill">Settimana</button>
+                    <button class="small-pill">Mese</button>
+                    <button class="btn-primary btn-small" id="agenda-new-btn">
+                      + Nuovo appuntamento
+                    </button>
+                  </div>
+                </div>
+
+                <div id="agenda-events" class="agenda-events">
+                  <!-- righe eventi generate da JS -->
+                </div>
+              </div>
+
+              <!-- Vista documenti -->
+              <div class="agenda-view agenda-view-docs" id="agenda-docs">
+                <div class="docs-grid">
+                  <div class="doc-folder doc-folder-purple">
+                    <div class="doc-icon">📁</div>
+                    <div class="doc-label">Procedure</div>
+                    <div class="doc-sub">Istruzioni operative, protocolli.</div>
+                  </div>
+                  <div class="doc-folder doc-folder-blue">
+                    <div class="doc-icon">📁</div>
+                    <div class="doc-label">Turni & servizi</div>
+                    <div class="doc-sub">Turni farmacie, calendari ECG/Holter.</div>
+                  </div>
+                  <div class="doc-folder doc-folder-green">
+                    <div class="doc-icon">📁</div>
+                    <div class="doc-label">Documenti clienti</div>
+                    <div class="doc-sub">Consensi, modulistica, report.</div>
+                  </div>
+                  <div class="doc-folder doc-folder-orange">
+                    <div class="doc-icon">📁</div>
+                    <div class="doc-label">Altro</div>
+                    <div class="doc-sub">Tutto il resto, da organizzare.</div>
+                  </div>
                 </div>
               </div>
             </div>
-
-            <!-- TAB DOCUMENTI -->
-            <div class="tab-content hidden" id="tab-documenti">
-              <div class="docs-grid">
-                <div class="doc-card doc-green">
-                  <div class="doc-icon">📁</div>
-                  <div class="doc-title">Procedure interne</div>
-                  <div class="doc-subtitle">SOP, istruzioni operative e modulistica.</div>
-                </div>
-                <div class="doc-card doc-blue">
-                  <div class="doc-icon">📁</div>
-                  <div class="doc-title">Documenti sicurezza</div>
-                  <div class="doc-subtitle">DVR, formazione, schede sicurezza.</div>
-                </div>
-                <div class="doc-card doc-pink">
-                  <div class="doc-icon">📁</div>
-                  <div class="doc-title">Materiale marketing</div>
-                  <div class="doc-subtitle">Locandine, volantini, social post.</div>
-                </div>
-                <div class="doc-card doc-yellow">
-                  <div class="doc-icon">📁</div>
-                  <div class="doc-title">Archivio clienti</div>
-                  <div class="doc-subtitle">Report servizi e campagne.</div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-        </div>
+          </div>
+        </section>
       </main>
     </div>
+
+    <!-- ======================
+         SEZIONE DETTAGLIO: ASSENTI / PERMESSI
+         ====================== -->
+    <section id="sezione-assenti" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
+      <div style="max-width:1000px; margin:0 auto;">
+        <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
+          ← Torna alla dashboard
+        </button>
+
+        <h2 style="margin:0 0 4px;">Assenti / Permessi approvati</h2>
+        <p style="margin:0 0 12px; font-size:0.9rem; opacity:0.85;">
+          Vista rapida delle assenze già approvate (dati di esempio).
+        </p>
+
+        <label style="font-size:0.85rem; display:block; margin-bottom:10px;">
+          Ruolo demo:
+          <select id="ruolo-assenti" style="margin-left:8px; padding:4px 8px; border-radius:8px; border:none;">
+            <option value="farmacia">Farmacia (generico)</option>
+            <option value="titolare">Titolare</option>
+            <option value="dipendente">Dipendente</option>
+          </select>
+        </label>
+
+        <div id="assenti-oggi" style="margin-bottom:14px;"></div>
+        <div id="assenti-prossimi"></div>
+      </div>
+    </section>
+
+    <!-- ======================
+         SEZIONE DETTAGLIO: FARMACIA DI TURNO
+         ====================== -->
+    <section id="sezione-turno" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
+      <div style="max-width:1000px; margin:0 auto;">
+        <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
+          ← Torna alla dashboard
+        </button>
+
+        <h2 style="margin:0 0 4px;">Farmacia di turno</h2>
+        <p style="margin:0 0 12px; font-size:0.9rem; opacity:0.85;">
+          Turno di oggi in evidenza e prossimi turni programmati (dati demo).
+        </p>
+
+        <div id="turno-oggi" style="margin-bottom:14px;"></div>
+        <div id="turno-prossimi"></div>
+      </div>
+    </section>
+
   </div>
 
   <script src="script.js"></script>
