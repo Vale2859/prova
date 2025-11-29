@@ -1,238 +1,365 @@
 // script.js
 
-let inactivityTimer = null;
+// dopo quanti ms torna al riepilogo / calendario
+const IDLE_TIMEOUT_MS = 30000;
 
-document.addEventListener("DOMContentLoaded", () => {
-  renderRiepilogoRapido();
-  renderOfferte();
-  renderEventi();
-  setupCardClicks();
-  resetInactivityTimer();
-});
+let idleTimer = null;
+let isShowingSummary = true;
 
-// =======================
-// DATI DEMO
-// =======================
-
-const assenzeDemo = [
-  { nome: "Mario Rossi", dal: "2025-11-29", al: "2025-11-30", tipo: "Ferie" },
-  { nome: "Lucia Bianchi", dal: "2025-11-28", al: "2025-11-28", tipo: "Permesso" },
-  { nome: "Giuseppe Neri", dal: "2025-12-03", al: "2025-12-05", tipo: "Malattia" },
-];
-
-const comunicazioniDemo = [
-  { titolo: "Nuova procedura ricetta dematerializzata", data: "28/11", tipo: "Importante" },
-  { titolo: "Aggiornamento orari turno dicembre", data: "27/11", tipo: "Info" },
-];
-
-const turnoOggiDemo = {
-  data: "2025-11-28",
-  farmacia: "Farmacia Montesano",
-  orario: "08:00 – 20:00",
-  appoggio: "Farmacia Centrale",
-  note: "Turno ordinario diurno.",
+// DATI SEZIONI
+const CARD_DATA = {
+  assenti: {
+    title: "Assenti / Permessi",
+    summary: "Vista immediata delle assenze approvate.",
+    items: [
+      "Mostra chi è assente oggi, per tipo di permesso.",
+      "Vedi ferie programmate nei prossimi giorni.",
+      "In futuro: approvazione digitale delle richieste."
+    ]
+  },
+  turno: {
+    title: "Farmacia di turno",
+    summary: "Farmacia attiva oggi e prossimi turni.",
+    items: [
+      "Nome farmacia di turno e fascia oraria.",
+      "Farmacia di appoggio e contatti rapidi.",
+      "In futuro: integrazione con calendario ASL."
+    ]
+  },
+  comunicazioni: {
+    title: "Comunicazioni",
+    summary: "Note interne e messaggi per il team.",
+    items: [
+      "Ultime comunicazioni non lette.",
+      "Messaggi importanti fissati in alto.",
+      "Storico consultabile per data."
+    ]
+  },
+  procedure: {
+    title: "Procedure",
+    summary: "Procedure operative della farmacia.",
+    items: [
+      "SOP per servizi e attività quotidiane.",
+      "Istruzioni rapide per nuove risorse.",
+      "Collegamento diretto alla sezione documenti."
+    ]
+  },
+  logistica: {
+    title: "Logistica",
+    summary: "Gestione arrivi merce e corrieri.",
+    items: [
+      "Monitor corrieri e ritiri programmati.",
+      "Note su colli mancanti o danneggiati.",
+      "In futuro: integrazione con gestionale magazzino."
+    ]
+  },
+  magazzino: {
+    title: "Magazziniera",
+    summary: "Scorte, inventari e resi.",
+    items: [
+      "Controlli periodici di scaffale e cassetti.",
+      "Resi programmati e da confermare.",
+      "Alert su prodotti critici."
+    ]
+  },
+  scadenze: {
+    title: "Prodotti in scadenza",
+    summary: "Prodotti prossimi alla scadenza.",
+    items: [
+      "Lista articoli in scadenza entro 30 giorni.",
+      "Suggerimenti di scontistica o reso.",
+      "Possibilità di esportare un report."
+    ]
+  },
+  consumabili: {
+    title: "Consumabili",
+    summary: "Materiale di lavoro e presidi.",
+    items: [
+      "Stato di guanti, aghi, salviette, modulistica.",
+      "Soglie minime con alert automatici.",
+      "Storico degli ordini di materiale."
+    ]
+  },
+  consegne: {
+    title: "Consegne / Ritiri",
+    summary: "Corrieri e consegne a domicilio.",
+    items: [
+      "Riepilogo consegne previste oggi.",
+      "Conferma avvenuta consegna.",
+      "In futuro: firma digitale del cliente."
+    ]
+  },
+  cassa: {
+    title: "Cambio cassa",
+    summary: "Cambio cassa e controlli veloci.",
+    items: [
+      "Ultimo cambio registrato con orario.",
+      "Differenze segnalate rispetto al teorico.",
+      "Accesso rapido al modulo completo."
+    ]
+  },
+  archivio: {
+    title: "Archivio file",
+    summary: "Documenti e report della farmacia.",
+    items: [
+      "Schede operative, contratti, documenti ASL.",
+      "Ricerca rapida per parola chiave o data.",
+      "Accesso controllato per ruolo."
+    ]
+  }
 };
 
-const turniProssimiDemo = [
-  { data: "29/11", farmacia: "Farmacia Centrale", orario: "08:00 – 20:00", appoggio: "Farmacia Montesano" },
-  { data: "30/11", farmacia: "Farmacia Madonna delle Grazie", orario: "20:00 – 08:00", appoggio: "Farmacia Montesano" },
-];
+// DATI DEMO AGENDA
+const AGENDA_DEMO = {
+  giorno: [
+    {
+      day: "Oggi – Lunedì",
+      slots: [
+        { time: "08:30", label: "ECG", type: "ecg" },
+        { time: "10:00", label: "Holter pressorio", type: "holter" },
+        { time: "12:00", label: "Vaccino influenza", type: "vaccino" },
+        { time: "17:30", label: "Consulenza nutrizionale", type: "consulenza" }
+      ]
+    }
+  ],
+  settimana: [
+    { day: "Lunedì", slots: [
+      { time: "Mattina", label: "ECG", type: "ecg" },
+      { time: "Pomeriggio", label: "Consulenza nutrizionale", type: "consulenza" }
+    ]},
+    { day: "Martedì", slots: [
+      { time: "Tutto il giorno", label: "Holter pressorio", type: "holter" }
+    ]},
+    { day: "Mercoledì", slots: [
+      { time: "Mattina", label: "Vaccini", type: "vaccino" }
+    ]},
+    { day: "Giovedì", slots: [
+      { time: "Pomeriggio", label: "ECG + Holter", type: "ecg" }
+    ]},
+    { day: "Venerdì", slots: [
+      { time: "Mattina", label: "Consulenze dermocosmesi", type: "consulenza" }
+    ]}
+  ],
+  mese: [
+    { day: "Settimana 1", slots: [{ time: "", label: "Focus ECG", type: "ecg" }] },
+    { day: "Settimana 2", slots: [{ time: "", label: "Campagna vaccini", type: "vaccino" }] },
+    { day: "Settimana 3", slots: [{ time: "", label: "Holter pressorio", type: "holter" }] },
+    { day: "Settimana 4", slots: [{ time: "", label: "Consulenze nutrizionali", type: "consulenza" }] }
+  ]
+};
 
-const offerteDemo = [
-  "Promozione Colesterolo – test a 5€ per tutto il mese.",
-  "Linea solari 30% di sconto fino a esaurimento scorte.",
-];
+document.addEventListener("DOMContentLoaded", () => {
+  setupCardClicks();
+  setupMobileDetail();
+  setupTabs();
+  renderAgenda("giorno");
+  startIdleTimer();
+});
 
-const eventiDemo = [
-  "Lun 02/12 – Giornata nutrizionista (solo su appuntamento).",
-  "Gio 05/12 – Misurazione pressione gratuita in orario 09:00–12:30.",
-];
+// ===== RIEPILOGO / TIMER =====
 
-// =======================
-// TIMER INATTIVITÀ
-// =======================
-function resetInactivityTimer() {
-  clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(() => {
-    renderRiepilogoRapido();
-  }, 20000); // 20 secondi
+function startIdleTimer() {
+  clearIdleTimer();
+  idleTimer = setTimeout(() => {
+    showSummary();
+    resetAgendaToCalendar();
+  }, IDLE_TIMEOUT_MS);
 }
 
-// =======================
-// UTILITY PER QUADRANTE 2
-// =======================
-function setQuad2(title, html) {
-  const titleEl = document.getElementById("quad2-title");
-  const contentEl = document.getElementById("quad2-content");
-  if (!titleEl || !contentEl) return;
-  titleEl.textContent = title;
-  contentEl.innerHTML = html;
+function clearIdleTimer() {
+  if (idleTimer) clearTimeout(idleTimer);
 }
 
-// =======================
-// RIEPILOGO RAPIDO
-// =======================
-function renderRiepilogoRapido() {
-  const html = `
-    <div class="riepilogo-rapido">
-      <h3>Assenti oggi</h3>
-      <ul>
-        ${assenzeDemo
-          .map(a => `<li>${a.nome} – ${a.tipo} (${formatShortDateIT(a.dal)} → ${formatShortDateIT(a.al)})</li>`)
-          .join("")}
-      </ul>
-
-      <h3>Comunicazioni non lette</h3>
-      <ul>
-        ${comunicazioniDemo
-          .map(c => `<li><strong>${c.data}</strong> – ${c.titolo} (${c.tipo})</li>`)
-          .join("")}
-      </ul>
-
-      <h3>Farmacia di turno oggi</h3>
-      <p><strong>${turnoOggiDemo.farmacia}</strong> – ${turnoOggiDemo.orario}<br/>
-      Appoggio: ${turnoOggiDemo.appoggio}</p>
-    </div>
-  `;
-  setQuad2("Riepilogo rapido", html);
-}
-// =======================
-// DETTAGLIO SEZIONI
-// =======================
-
-function renderDettaglio(section) {
-  resetInactivityTimer();
-
-  switch (section) {
-    case "assenti":
-      renderDettaglioAssenti();
-      break;
-    case "comunicazioni":
-      renderDettaglioComunicazioni();
-      break;
-    case "turno":
-      renderDettaglioTurno();
-      break;
-    case "procedure":
-      setQuad2("Procedure", "<p>Elenco procedure operative interne (demo).</p>");
-      break;
-    case "logistica":
-      setQuad2("Logistica", "<p>Stato ordini, arrivi e materiale (demo).</p>");
-      break;
-    case "magazziniera":
-      setQuad2("Magazziniera", "<p>Scorte, scadenze e inventari veloci (demo).</p>");
-      break;
-    case "scadenze":
-      setQuad2("Prodotti in scadenza", "<p>Lista prodotti in scadenza nei prossimi giorni (demo).</p>");
-      break;
-    case "consumabili":
-      setQuad2("Consumabili", "<p>Disponibilità consumabili per banco, laboratorio, servizi (demo).</p>");
-      break;
-    case "consegne":
-      setQuad2("Consegne / Ritiri", "<p>Consegne programmate ai clienti e ritiri previsti (demo).</p>");
-      break;
-    case "cassa":
-      setQuad2("Cambio cassa", "<p>Storico cambi cassa e quadrature veloci (demo).</p>");
-      break;
-    case "archivio":
-      setQuad2("Archivio file", "<p>Documenti operativi, procedure firmate, contratti (demo).</p>");
-      break;
-    default:
-      renderRiepilogoRapido();
-  }
+function showSummary() {
+  const quick = document.getElementById("quick-summary");
+  if (!quick) return;
+  quick.style.display = "block";
+  isShowingSummary = true;
 }
 
-function renderDettaglioAssenti() {
-  const html = `
-    <h3>Assenti / Permessi approvati</h3>
-    <ul>
-      ${assenzeDemo
-        .map(a => `<li><strong>${a.nome}</strong> – ${a.tipo} (${formatShortDateIT(a.dal)} → ${formatShortDateIT(a.al)})</li>`)
-        .join("")}
-    </ul>
-    <p style="font-size:0.8rem; opacity:0.8;">
-      (In futuro: filtro per ruolo, stampa riepilogo, invio su WhatsApp al team.)
-    </p>
-  `;
-  setQuad2("Assenti / Permessi", html);
+function showDetail(cardKey) {
+  const data = CARD_DATA[cardKey];
+  const quick = document.getElementById("quick-summary");
+  const title = document.getElementById("detail-title");
+  const summary = document.getElementById("detail-summary");
+  const list = document.getElementById("detail-list");
+
+  if (!data || !quick || !title || !summary || !list) return;
+
+  quick.style.display = "none";
+  isShowingSummary = false;
+
+  title.textContent = data.title;
+  summary.textContent = data.summary;
+  list.innerHTML = "";
+  data.items.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  });
+
+  startIdleTimer();
 }
-
-function renderDettaglioComunicazioni() {
-  const html = `
-    <h3>Comunicazioni interne</h3>
-    <ul>
-      ${comunicazioniDemo
-        .map(c => `<li><strong>${c.data}</strong> – ${c.titolo} <em>(${c.tipo})</em></li>`)
-        .join("")}
-    </ul>
-    <p style="font-size:0.8rem; opacity:0.8;">
-      (In futuro: lettura/da leggere per ogni dipendente, allegati, conferma lettura.)
-    </p>
-  `;
-  setQuad2("Comunicazioni", html);
-}
-
-function renderDettaglioTurno() {
-  const html = `
-    <h3>Turno di oggi</h3>
-    <p><strong>${turnoOggiDemo.farmacia}</strong><br/>
-       Orario: ${turnoOggiDemo.orario}<br/>
-       Appoggio: ${turnoOggiDemo.appoggio}<br/>
-       Note: ${turnoOggiDemo.note}</p>
-
-    <h3>Prossimi turni</h3>
-    <ul>
-      ${turniProssimiDemo
-        .map(t => `<li><strong>${t.data}</strong> – ${t.farmacia} (${t.orario}) · Appoggio: ${t.appoggio}</li>`)
-        .join("")}
-    </ul>
-  `;
-  setQuad2("Farmacia di turno", html);
-}
-
-// =======================
-// OFFERTE & EVENTI (QUADRANTE 3)
-// =======================
-
-function renderOfferte() {
-  const box = document.getElementById("offerte-content");
-  if (!box) return;
-  box.innerHTML = `
-    <ul>
-      ${offerteDemo.map(o => `<li>${o}</li>`).join("")}
-    </ul>
-  `;
-}
-
-function renderEventi() {
-  const box = document.getElementById("eventi-content");
-  if (!box) return;
-  box.innerHTML = `
-    <ul>
-      ${eventiDemo.map(e => `<li>${e}</li>`).join("")}
-    </ul>
-  `;
-}
-
-// =======================
-// CLICK CARD (MOBILE + DESKTOP)
-// =======================
 
 function setupCardClicks() {
-  const buttons = document.querySelectorAll("[data-section]");
-  buttons.forEach(btn => {
+  const allButtons = document.querySelectorAll("[data-card]");
+  allButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const section = btn.getAttribute("data-section");
-      renderDettaglio(section);
+      const key = btn.getAttribute("data-card");
+      if (key && CARD_DATA[key]) {
+        if (window.innerWidth > 768) {
+          showDetail(key);
+        } else {
+          openMobileDetail(key);
+        }
+      }
+    });
+  });
+
+  ["click", "mousemove", "keydown"].forEach((evt) => {
+    document.addEventListener(evt, () => {
+      startIdleTimer();
+    });
+  });
+}
+// ===== MOBILE – DETTAGLIO =====
+
+function setupMobileDetail() {
+  const overlay = document.getElementById("m-detail-overlay");
+  const closeBtn = document.getElementById("m-detail-close");
+  if (!overlay || !closeBtn) return;
+
+  closeBtn.addEventListener("click", () => {
+    overlay.style.display = "none";
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+      overlay.style.display = "none";
+    }
+  });
+}
+
+function openMobileDetail(cardKey) {
+  const data = CARD_DATA[cardKey];
+  const overlay = document.getElementById("m-detail-overlay");
+  const title = document.getElementById("m-detail-title");
+  const summary = document.getElementById("m-detail-summary");
+  const list = document.getElementById("m-detail-list");
+  if (!data || !overlay || !title || !summary || !list) return;
+
+  title.textContent = data.title;
+  summary.textContent = data.summary;
+  list.innerHTML = "";
+  data.items.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    list.appendChild(li);
+  });
+
+  overlay.style.display = "flex";
+}
+
+// ===== TABS Q4 – CALENDARIO / DOCUMENTI =====
+
+function setupTabs() {
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabContents = {
+    calendario: document.getElementById("tab-calendario"),
+    documenti: document.getElementById("tab-documenti")
+  };
+
+  tabButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tab = btn.getAttribute("data-tab");
+      tabButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      Object.keys(tabContents).forEach((key) => {
+        if (key === tab) {
+          tabContents[key].classList.remove("hidden");
+        } else {
+          tabContents[key].classList.add("hidden");
+        }
+      });
+    });
+  });
+
+  // cambio vista (giorno / settimana / mese)
+  const viewButtons = document.querySelectorAll(".cal-view-btn");
+  viewButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const view = btn.getAttribute("data-view");
+      viewButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderAgenda(view);
     });
   });
 }
 
-// =======================
-// UTILITY DATE
-// =======================
+// riportare Q4 in modalità Calendario/Giorno dopo inattività
+function resetAgendaToCalendar() {
+  const calTabBtn = document.querySelector(".tab-btn[data-tab='calendario']");
+  const docTabBtn = document.querySelector(".tab-btn[data-tab='documenti']");
+  const tabCal = document.getElementById("tab-calendario");
+  const tabDoc = document.getElementById("tab-documenti");
 
-function formatShortDateIT(iso) {
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}`;
+  if (calTabBtn && docTabBtn && tabCal && tabDoc) {
+    calTabBtn.classList.add("active");
+    docTabBtn.classList.remove("active");
+    tabCal.classList.remove("hidden");
+    tabDoc.classList.add("hidden");
+  }
+
+  const viewButtons = document.querySelectorAll(".cal-view-btn");
+  viewButtons.forEach((btn) => {
+    const view = btn.getAttribute("data-view");
+    if (view === "giorno") {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  renderAgenda("giorno");
+}
+
+// ===== AGENDA =====
+
+function renderAgenda(view) {
+  const col = document.getElementById("agenda-column");
+  if (!col) return;
+
+  const data = AGENDA_DEMO[view] || [];
+  col.innerHTML = "";
+
+  data.forEach((dayBlock) => {
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "agenda-day";
+
+    const title = document.createElement("div");
+    title.className = "agenda-day-title";
+    title.textContent = dayBlock.day;
+    dayDiv.appendChild(title);
+
+    dayBlock.slots.forEach((s) => {
+      const slot = document.createElement("div");
+      slot.className = "agenda-slot " + slotClassFromType(s.type);
+      const timePart = s.time ? s.time + " – " : "";
+      slot.textContent = timePart + s.label;
+      dayDiv.appendChild(slot);
+    });
+
+    col.appendChild(dayDiv);
+  });
+}
+
+function slotClassFromType(type) {
+  switch (type) {
+    case "ecg": return "slot-ecg";
+    case "holter": return "slot-holter";
+    case "vaccino": return "slot-vaccino";
+    case "consulenza": return "slot-consulenza";
+    default: return "slot-ecg";
+  }
 }
