@@ -55,7 +55,7 @@ function resetInactivityTimer() {
   clearTimeout(inactivityTimer);
   inactivityTimer = setTimeout(() => {
     renderRiepilogoRapido();
-  }, 60000); // 1 minuto
+  }, 20000); // 20 secondi
 }
 
 // =======================
