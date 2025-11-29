@@ -1,501 +1,508 @@
-// script.js
-
 document.addEventListener("DOMContentLoaded", () => {
   setTodayLabel();
-  renderChatInitial();
-  renderServizi();
-  setupAgenda();
-  setupTabs();
-  setupChatForm();
-  setupDocButtons();
-  setupInactivityWatcher();
+  initChat();
+  initServices();
+  initAgenda();
+  setupInactivityToCalendar();
 });
 
-// =======================
-// Data di oggi in header
-// =======================
-function setTodayLabel() {
-  const el = document.getElementById("desktop-today");
-  if (!el) return;
-  const now = new Date();
-  const formatter = new Intl.DateTimeFormat("it-IT", {
+/* ======================
+   DATA / UTILITIES
+   ====================== */
+
+function formatDateLongIT(date) {
+  return new Intl.DateTimeFormat("it-IT", {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+  }).format(date);
+}
+
+function formatTimeHM(date) {
+  return date.toLocaleTimeString("it-IT", {
+    hour: "2-digit",
+    minute: "2-digit",
   });
-  el.textContent = formatter.format(now);
 }
 
-// =======================
-// CHAT DEMO
-// =======================
-
-let chatMessages = [
-  {
-    id: 1,
-    autore: "Emanuela",
-    tipo: "Avviso",
-    testo: "Ricordarsi referti ECG e controllare scorte holter.",
-    file: "referti_ecg_oggi.pdf",
-    timestamp: new Date(),
-  },
-];
-
-function renderChatInitial() {
-  renderChatMessages();
+function setTodayLabel() {
+  const el = document.getElementById("desktop-today");
+  const agendaLabel = document.getElementById("agenda-date-label");
+  const now = new Date();
+  const text = formatDateLongIT(now);
+  if (el) el.textContent = text;
+  if (agendaLabel) agendaLabel.textContent = text;
 }
 
-function renderChatMessages() {
+/* ======================
+   CHAT INTERNA
+   ====================== */
+
+let chatMessages = [];
+
+function initChat() {
+  // demo: un messaggio iniziale
+  chatMessages = [
+    {
+      autore: "Emanuela",
+      tipo: "Promemoria",
+      testo: "Ricordarsi di verificare scorte HOLTER per la prossima settimana.",
+      fileName: "checklist_holter.pdf",
+      timestamp: new Date().toISOString(),
+    },
+  ];
+
+  renderChat();
+
+  const form = document.getElementById("chat-form");
+  const inputFileBtn = document.getElementById("chat-file-btn");
+  const inputFile = document.getElementById("chat-file-input");
+  const fileDisplay = document.getElementById("chat-file-display");
+  const clearBtn = document.getElementById("chat-clear");
+
+  let selectedFileName = "";
+
+  if (inputFileBtn && inputFile && fileDisplay) {
+    inputFileBtn.addEventListener("click", () => inputFile.click());
+    inputFile.addEventListener("change", () => {
+      if (inputFile.files && inputFile.files[0]) {
+        selectedFileName = inputFile.files[0].name;
+        fileDisplay.textContent = selectedFileName;
+      } else {
+        selectedFileName = "";
+        fileDisplay.textContent = "Nessun file";
+      }
+    });
+  }
+
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const autoreSel = document.getElementById("chat-autore");
+      const tipoSel = document.getElementById("chat-tipo");
+      const testoArea = document.getElementById("chat-testo");
+      if (!autoreSel || !tipoSel || !testoArea) return;
+
+      const testo = testoArea.value.trim();
+      if (!testo) return;
+
+      chatMessages.push({
+        autore: autoreSel.value,
+        tipo: tipoSel.value,
+        testo,
+        fileName: selectedFileName || "",
+        timestamp: new Date().toISOString(),
+      });
+
+      testoArea.value = "";
+      selectedFileName = "";
+      fileDisplay.textContent = "Nessun file";
+      inputFile.value = "";
+
+      renderChat();
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (confirm("Svuotare la chat?")) {
+        chatMessages = [];
+        renderChat();
+      }
+    });
+  }
+}
+
+function renderChat() {
   const container = document.getElementById("chat-messages");
-  const countEl = document.getElementById("chat-count");
+  const count = document.getElementById("chat-count");
   if (!container) return;
 
   container.innerHTML = "";
-  if (chatMessages.length === 0) {
-    container.innerHTML =
-      '<p style="font-size:0.8rem; color:#c3c8d9; margin:0;">Nessun messaggio. Scrivi la prima comunicazione.</p>';
-    if (countEl) countEl.textContent = "0 messaggi";
-    return;
-  }
 
   chatMessages.forEach((msg) => {
     const row = document.createElement("div");
-    row.className = "chat-message-row";
+    const isOwner = msg.autore === "Valerio";
+    row.className = "msg-row " + (isOwner ? "right" : "left");
+
+    const wrap = document.createElement("div");
+    wrap.className = "msg-bubble-wrap";
 
     const avatar = document.createElement("div");
-    avatar.className = "chat-avatar";
-    avatar.style.background = avatarColorFor(msg.autore);
-    avatar.textContent = initialsFor(msg.autore);
+    avatar.className = "msg-avatar";
+    avatar.textContent = getInitials(msg.autore);
 
     const bubble = document.createElement("div");
-    bubble.className = "chat-bubble";
+    bubble.className = "msg-bubble";
 
-    const header = document.createElement("div");
-    header.className = "chat-header-line";
+    const meta = document.createElement("div");
+    meta.className = "msg-meta";
 
     const nameSpan = document.createElement("span");
-    nameSpan.className = "chat-name";
     nameSpan.textContent = msg.autore;
 
-    const metaSpan = document.createElement("span");
-    metaSpan.className = "chat-meta";
-    const orario = formatTime(msg.timestamp);
-    metaSpan.textContent = `${msg.tipo} · ${orario}`;
+    const timeSpan = document.createElement("span");
+    timeSpan.textContent = formatTimeHM(new Date(msg.timestamp));
 
-    header.appendChild(nameSpan);
-    header.appendChild(metaSpan);
+    const tagSpan = document.createElement("span");
+    tagSpan.className = "msg-tag " + msg.tipo;
+    tagSpan.textContent = msg.tipo;
+
+    meta.appendChild(nameSpan);
+    meta.appendChild(tagSpan);
+    meta.appendChild(timeSpan);
 
     const textP = document.createElement("p");
-    textP.className = "chat-text";
+    textP.className = "msg-text";
     textP.textContent = msg.testo;
 
-    bubble.appendChild(header);
+    bubble.appendChild(meta);
     bubble.appendChild(textP);
 
-    if (msg.file && msg.file.trim() !== "") {
-      const fileP = document.createElement("p");
-      fileP.className = "chat-attachment";
-      fileP.textContent = `📎 Allegato: ${msg.file}`;
+    if (msg.fileName) {
+      const fileP = document.createElement("div");
+      fileP.className = "msg-file";
+      fileP.textContent = "📎 " + msg.fileName;
       bubble.appendChild(fileP);
     }
 
-    row.appendChild(avatar);
-    row.appendChild(bubble);
+    if (isOwner) {
+      wrap.appendChild(bubble);
+      wrap.appendChild(avatar);
+    } else {
+      wrap.appendChild(avatar);
+      wrap.appendChild(bubble);
+    }
+
+    row.appendChild(wrap);
     container.appendChild(row);
   });
 
   container.scrollTop = container.scrollHeight;
 
-  if (countEl) {
-    countEl.textContent =
-      chatMessages.length === 1
-        ? "1 messaggio"
-        : `${chatMessages.length} messaggi`;
+  if (count) {
+    count.textContent = chatMessages.length
+      ? chatMessages.length + " messaggi"
+      : "Nessun messaggio";
   }
 }
 
-function setupChatForm() {
-  const form = document.getElementById("chat-form");
-  const clearBtn = document.getElementById("chat-clear");
-  if (!form) return;
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const autore = document.getElementById("chat-autore").value;
-    const tipo = document.getElementById("chat-tipo").value;
-    const testo = document.getElementById("chat-testo").value.trim();
-    const file = document.getElementById("chat-file").value.trim();
-
-    if (!testo) return;
-
-    chatMessages.push({
-      id: Date.now(),
-      autore,
-      tipo,
-      testo,
-      file,
-      timestamp: new Date(),
-    });
-
-    document.getElementById("chat-testo").value = "";
-    document.getElementById("chat-file").value = "";
-
-    renderChatMessages();
-  });
-
-  if (clearBtn) {
-    clearBtn.addEventListener("click", () => {
-      if (
-        confirm(
-          "Svuotare tutta la chat? (Solo demo, non vengono salvati messaggi reali.)"
-        )
-      ) {
-        chatMessages = [];
-        renderChatMessages();
-      }
-    });
-  }
-}
-
-function initialsFor(name) {
-  if (!name) return "?";
+function getInitials(name) {
   return name
     .split(" ")
-    .map((p) => p[0])
+    .map((n) => n[0])
     .join("")
     .toUpperCase()
     .slice(0, 2);
 }
 
-function avatarColorFor(name) {
-  const colors = [
-    "#42a5f5",
-    "#ab47bc",
-    "#26a69a",
-    "#ffa726",
-    "#ef5350",
-    "#7e57c2",
-  ];
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = (hash + name.charCodeAt(i) * 17) % 997;
-  }
-  return colors[hash % colors.length];
-}
-
-function formatTime(date) {
-  const d = date instanceof Date ? date : new Date(date);
-  const h = String(d.getHours()).padStart(2, "0");
-  const m = String(d.getMinutes()).padStart(2, "0");
-  return `${h}:${m}`;
-}
-
-// =======================
-// SERVIZI & CLIENTI (demo)
-// =======================
+/* ======================
+   SERVIZI & CLIENTI
+   ====================== */
 
 const offerteDemo = [
-  "Promo Colestid 2025: test + misurazioni saturazione.",
-  "Sconto 20% prodotti stagionali (linea influenze).",
-  "Pacchetto \"Cuore sereno\": ECG a prezzo dedicato.",
+  {
+    icon: "💊",
+    titolo: "Promo colesterolo 2025",
+    testo: "- test + misurazioni saturazione.",
+    chip: "Check-up",
+  },
+  {
+    icon: "💉",
+    titolo: "Vaccini influenza",
+    testo: "Sconto 20% prodotti stagionali.",
+    chip: "Stagionale",
+  },
+  {
+    icon: "❤️",
+    titolo: "Pacchetto ‘Cuore sereno’",
+    testo: "ECG + controllo pressione dedicato.",
+    chip: "Cardio",
+  },
 ];
 
 const eventiDemo = [
-  "Lunedì: giornata misurazione pressione e glicemia.",
-  "Mercoledì: giornata HOLTER pressorio.",
-  "Venerdì: consulenza nutrizionale con dietista.",
-];
-
-function renderServizi() {
-  const off = document.getElementById("offerte-list");
-  const ev = document.getElementById("eventi-list");
-  if (off) {
-    off.innerHTML = offerteDemo.map((t) => `<li>• ${t}</li>`).join("");
-  }
-  if (ev) {
-    ev.innerHTML = eventiDemo.map((t) => `<li>• ${t}</li>`).join("");
-  }
-}
-// =======================
-// AGENDA & DOCUMENTI
-// =======================
-
-let agendaMode = "giorno"; // giorno | settimana | mese
-
-const agendaEventsDemo = [
   {
-    time: "09:00 – 10:00",
-    label: "ECG – Rossi Maria",
-    type: "ecg",
+    icon: "🩺",
+    titolo: "Lunedì – Giornata misurazione pressione",
+    testo: "Mattina e pomeriggio, su prenotazione.",
+    chip: "Servizio",
   },
   {
-    time: "10:30 – 12:30",
-    label: "Holter pressorio – Bianchi Luca",
-    type: "holter",
+    icon: "📊",
+    titolo: "Martedì – Giornata HOLTER pressorio",
+    testo: "Installazione e riconsegna dispositivi.",
+    chip: "Holter",
   },
   {
-    time: "15:00 – 16:00",
-    label: "Misurazione pressione continua",
-    type: "press",
-  },
-  {
-    time: "17:30 – 18:00",
-    label: "Consulenza nutrizionale",
-    type: "consul",
+    icon: "🥗",
+    titolo: "Venerdì – Consulenza nutrizionale",
+    testo: "Valutazione piano alimentare.",
+    chip: "Nutrizione",
   },
 ];
 
-const folderDemo = [
-  { name: "Servizi e referti", meta: "ECG, holter, consulenze" },
-  { name: "Personale", meta: "Turni, ferie, permessi" },
-  { name: "Promozioni", meta: "Volantini e materiali marketing" },
+function initServices() {
+  const offerteUl = document.getElementById("offerte-list");
+  const eventiUl = document.getElementById("eventi-list");
+  if (offerteUl) {
+    offerteDemo.forEach((o) => {
+      offerteUl.appendChild(createServiceLi(o, "offerta"));
+    });
+  }
+  if (eventiUl) {
+    eventiDemo.forEach((e) => {
+      eventiUl.appendChild(createServiceLi(e, "evento"));
+    });
+  }
+}
+
+function createServiceLi(item, tipo) {
+  const li = document.createElement("li");
+
+  const iconSpan = document.createElement("span");
+  iconSpan.className = "service-icon";
+  iconSpan.textContent = item.icon;
+
+  const textWrap = document.createElement("div");
+
+  const main = document.createElement("div");
+  main.className = "service-text-main";
+  main.textContent = item.titolo;
+
+  const sub = document.createElement("div");
+  sub.className = "service-tagline";
+  sub.textContent = item.testo;
+
+  const chip = document.createElement("span");
+  chip.className = "service-chip " + tipo;
+  chip.textContent = item.chip;
+
+  textWrap.appendChild(main);
+  textWrap.appendChild(sub);
+  textWrap.appendChild(chip);
+
+  li.appendChild(iconSpan);
+  li.appendChild(textWrap);
+  return li;
+}
+/* ======================
+   AGENDA & DOCUMENTI
+   ====================== */
+
+const agendaHoursRange = { start: 8, end: 20 }; // 8–20
+
+const eventiGiornoDemo = [
+  {
+    oraInizio: "09:00",
+    oraFine: "10:30",
+    titolo: "ECG – Rossi Maria",
+    tipo: "eco",
+  },
+  {
+    oraInizio: "11:00",
+    oraFine: "12:30",
+    titolo: "Holter pressorio – Bianchi Luca",
+    tipo: "holter",
+  },
+  {
+    oraInizio: "15:00",
+    oraFine: "16:00",
+    titolo: "Prelievo profilo lipidico",
+    tipo: "prelievo",
+  },
+  {
+    oraInizio: "17:30",
+    oraFine: "18:00",
+    titolo: "Consulenza nutrizionale",
+    tipo: "consulenza",
+  },
 ];
 
-function setupAgenda() {
-  const viewSwitch = document.getElementById("agenda-view-switch");
-  const dayLabel = document.getElementById("agenda-day-label");
+let docFolders = [
+  { name: "Servizi cardio", meta: "3 file · aggiornato ieri" },
+  { name: "Documenti dipendenti", meta: "5 file · HR" },
+];
 
-  if (dayLabel) {
-    const now = new Date();
-    const fmt = new Intl.DateTimeFormat("it-IT", {
-      weekday: "long",
-      day: "2-digit",
-      month: "2-digit",
-    });
-      dayLabel.textContent = fmt.format(now);
-  }
-
-  if (viewSwitch) {
-    viewSwitch.addEventListener("click", (e) => {
-      const btn = e.target.closest(".view-pill");
-      if (!btn) return;
-      const mode = btn.dataset.mode;
-      if (!mode) return;
-      agendaMode = mode;
-      document
-        .querySelectorAll(".view-pill")
-        .forEach((b) => b.classList.remove("view-pill-active"));
-      btn.classList.add("view-pill-active");
-      renderAgenda();
-    });
-  }
-
-  const newAppBtn = document.getElementById("btn-nuovo-app");
-  if (newAppBtn) {
-    newAppBtn.addEventListener("click", () => {
-      alert(
-        "Demo: qui in futuro potrai inserire un nuovo appuntamento/servizio."
-      );
-    });
-  }
-
-  renderAgenda();
-  renderFolders();
+function initAgenda() {
+  buildHoursColumn();
+  renderDayEvents();
+  renderDocGrid();
+  setupAgendaTabs();
 }
 
-function renderAgenda() {
-  const planner = document.getElementById("agenda-planner");
-  const dayLabel = document.getElementById("agenda-day-label");
-  if (!planner) return;
-
-  planner.innerHTML = "";
-
-  if (agendaMode === "giorno") {
-    agendaEventsDemo.forEach((ev) => {
-      const div = document.createElement("div");
-      div.className = `agenda-event ev-${ev.type}`;
-      const left = document.createElement("span");
-      left.textContent = ev.time;
-      const right = document.createElement("span");
-      right.textContent = ev.label;
-      div.appendChild(left);
-      div.appendChild(right);
-      planner.appendChild(div);
-    });
-  } else if (agendaMode === "settimana") {
-    // vista super semplice: 7 giorni con etichetta colori del servizio principale
-    const weekWrap = document.createElement("div");
-    weekWrap.style.display = "grid";
-    weekWrap.style.gridTemplateColumns = "repeat(7, 1fr)";
-    weekWrap.style.gap = "4px";
-    const giorni = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
-
-    giorni.forEach((g, idx) => {
-      const box = document.createElement("div");
-      box.style.borderRadius = "10px";
-      box.style.padding = "4px 6px";
-      box.style.fontSize = "0.75rem";
-      box.style.background =
-        idx === 0 ? "rgba(66,165,245,0.25)" : "rgba(255,255,255,0.04)";
-      box.innerHTML = `<strong>${g}</strong><br><span style="opacity:0.9;">${
-        idx === 0 ? "Giornata ECG" : "—"
-      }</span>`;
-      weekWrap.appendChild(box);
-    });
-
-    planner.appendChild(weekWrap);
-
-    if (dayLabel) {
-      dayLabel.textContent = "Settimana – vista demo rapida";
-    }
-  } else if (agendaMode === "mese") {
-    const p = document.createElement("p");
-    p.style.fontSize = "0.8rem";
-    p.style.color = "#c3c8d9";
-    p.style.margin = "0";
-    p.textContent =
-      "Vista mensile in lavorazione (qui in futuro potrai vedere il calendario completo del mese).";
-    planner.appendChild(p);
-
-    if (dayLabel) {
-      dayLabel.textContent = "Mese – panoramica (demo)";
-    }
+function buildHoursColumn() {
+  const col = document.getElementById("agenda-hours");
+  if (!col) return;
+  col.innerHTML = "";
+  for (let h = agendaHoursRange.start; h <= agendaHoursRange.end; h++) {
+    const row = document.createElement("div");
+    row.className = "agenda-hour-row";
+    const label = String(h).padStart(2, "0") + ":00";
+    row.textContent = label;
+    col.appendChild(row);
   }
 }
 
-// =======================
-// Documenti
-// =======================
+function renderDayEvents() {
+  const container = document.getElementById("agenda-events");
+  if (!container) return;
+  container.innerHTML = "";
 
-let folders = [...folderDemo];
+  eventiGiornoDemo.forEach((ev) => {
+    const block = document.createElement("div");
+    block.className = "event-block " + getEventClass(ev.tipo);
 
-function renderFolders() {
-  const grid = document.getElementById("folder-grid");
+    const main = document.createElement("div");
+    main.className = "event-main";
+    main.textContent = ev.titolo;
+
+    const time = document.createElement("div");
+    time.className = "event-time";
+    time.textContent = ev.oraInizio + " – " + ev.oraFine;
+
+    block.appendChild(main);
+    block.appendChild(time);
+    container.appendChild(block);
+  });
+
+  const btnNuovo = document.getElementById("btn-nuovo-app");
+  if (btnNuovo) {
+    btnNuovo.addEventListener("click", () => {
+      const titolo = prompt("Titolo appuntamento / servizio:");
+      if (!titolo) return;
+      const ora = prompt("Orario (es. 16:00 – 16:30):", "16:00 – 16:30");
+      if (!ora) return;
+      const [start, end] = ora.split("–").map((s) => s.trim());
+      eventiGiornoDemo.push({
+        oraInizio: start || "09:00",
+        oraFine: end || "09:30",
+        titolo,
+        tipo: "eco",
+      });
+      renderDayEvents();
+    });
+  }
+}
+
+function getEventClass(tipo) {
+  switch (tipo) {
+    case "eco":
+      return "event-eco";
+    case "holter":
+      return "event-holter";
+    case "prelievo":
+      return "event-prelievo";
+    case "consulenza":
+      return "event-consulenza";
+    default:
+      return "event-eco";
+  }
+}
+
+/* DOCUMENTI */
+function renderDocGrid() {
+  const grid = document.getElementById("doc-grid");
   if (!grid) return;
-
   grid.innerHTML = "";
-  if (folders.length === 0) {
-    grid.innerHTML =
-      '<p style="font-size:0.8rem; color:#c3c8d9; margin:0;">Nessuna cartella. Usa "Nuova cartella" per crearne una.</p>';
-    return;
-  }
-
-  folders.forEach((f, index) => {
+  docFolders.forEach((f) => {
     const card = document.createElement("div");
-    card.className = "folder-card";
-    card.style.background = folderColor(index);
+    card.className = "doc-card";
+
+    const icon = document.createElement("div");
+    icon.className = "doc-icon";
+    icon.textContent = "📁";
 
     const name = document.createElement("div");
-    name.className = "folder-name";
-    name.textContent = `📁 ${f.name}`;
+    name.className = "doc-name";
+    name.textContent = f.name;
 
     const meta = document.createElement("div");
-    meta.className = "folder-meta";
-    meta.textContent = f.meta || "Cartella vuota (demo)";
+    meta.className = "doc-meta";
+    meta.textContent = f.meta;
 
+    card.appendChild(icon);
     card.appendChild(name);
     card.appendChild(meta);
-
     grid.appendChild(card);
   });
-}
 
-function folderColor(index) {
-  const colors = [
-    "#42a5f5",
-    "#ab47bc",
-    "#26a69a",
-    "#ffa726",
-    "#ef5350",
-    "#7e57c2",
-    "#66bb6a",
-  ];
-  return colors[index % colors.length];
-}
-
-function setupDocButtons() {
   const btnCartella = document.getElementById("btn-nuova-cartella");
-  const inputFile = document.getElementById("input-upload-file");
+  const btnFile = document.getElementById("btn-carica-file");
 
   if (btnCartella) {
-    btnCartella.addEventListener("click", () => {
+    btnCartella.onclick = () => {
       const nome = prompt("Nome nuova cartella:");
       if (!nome) return;
-      folders.push({ name: nome, meta: "Cartella creata (demo)" });
-      renderFolders();
-    });
+      docFolders.push({ name: nome, meta: "Cartella vuota" });
+      renderDocGrid();
+    };
   }
 
-  if (inputFile) {
-    inputFile.addEventListener("change", (e) => {
-      if (!e.target.files || e.target.files.length === 0) return;
-      const first = e.target.files[0];
-      alert(
-        `Demo upload: hai selezionato "${first.name}". In produzione qui salveremmo il file nel NAS/server.`
-      );
-      e.target.value = "";
-    });
-  }
-}
-
-// =======================
-// Tab Agenda / Documenti + inattività
-// =======================
-
-let inactivityTimer = null;
-const INACTIVITY_MS = 30000; // 30 secondi
-
-function setupTabs() {
-  const tabs = document.getElementById("agenda-tabs");
-  if (!tabs) return;
-
-  tabs.addEventListener("click", (e) => {
-    const btn = e.target.closest(".agenda-tab");
-    if (!btn) return;
-    const view = btn.dataset.view;
-    if (!view) return;
-
-    document
-      .querySelectorAll(".agenda-tab")
-      .forEach((b) => b.classList.remove("agenda-tab-active"));
-    btn.classList.add("agenda-tab-active");
-
-    if (view === "giorno") {
-      showAgendaCalendario();
-    } else if (view === "documenti") {
-      showAgendaDocumenti();
-    }
-  });
-}
-
-function showAgendaCalendario() {
-  document
-    .querySelectorAll(".agenda-content")
-    .forEach((c) => c.classList.remove("agenda-content-active"));
-  const cal = document.getElementById("agenda-calendario");
-  if (cal) cal.classList.add("agenda-content-active");
-}
-
-function showAgendaDocumenti() {
-  document
-    .querySelectorAll(".agenda-content")
-    .forEach((c) => c.classList.remove("agenda-content-active"));
-  const docs = document.getElementById("agenda-documenti");
-  if (docs) docs.classList.add("agenda-content-active");
-}
-
-function setupInactivityWatcher() {
-  const reset = () => {
-    if (inactivityTimer) clearTimeout(inactivityTimer);
-    inactivityTimer = setTimeout(() => {
-      // torna automaticamente alla tab "Calendario"
-      const tabCal = document.querySelector(
-        ".agenda-tab[data-view='giorno']"
-      );
-      if (tabCal) {
-        document
-          .querySelectorAll(".agenda-tab")
-          .forEach((b) => b.classList.remove("agenda-tab-active"));
-        tabCal.classList.add("agenda-tab-active");
+  if (btnFile) {
+    btnFile.onclick = () => {
+      const nome = prompt("Nome file da aggiungere (demo):", "documento.pdf");
+      if (!nome) return;
+      if (!docFolders.length) {
+        docFolders.push({ name: "Nuova cartella", meta: nome });
+      } else {
+        // aggiorno la prima cartella come esempio
+        const first = docFolders[0];
+        first.meta = "Contiene anche: " + nome;
       }
-      showAgendaCalendario();
-    }, INACTIVITY_MS);
-  };
+      renderDocGrid();
+    };
+  }
+}
 
-  ["click", "mousemove", "keydown"].forEach((ev) => {
-    document.addEventListener(ev, reset);
+/* TABS AGENDA (Calendario / Documenti) */
+function setupAgendaTabs() {
+  const tabs = document.querySelectorAll(".agenda-tab");
+  const cal = document.getElementById("agenda-cal");
+  const doc = document.getElementById("agenda-doc");
+  if (!tabs.length || !cal || !doc) return;
+
+  tabs.forEach((t) => {
+    t.addEventListener("click", () => {
+      tabs.forEach((x) => x.classList.remove("active"));
+      t.classList.add("active");
+
+      const tab = t.dataset.tab;
+      if (tab === "cal") {
+        cal.style.display = "flex";
+        doc.style.display = "none";
+      } else {
+        cal.style.display = "none";
+        doc.style.display = "flex";
+      }
+    });
+  });
+}
+
+/* ======================
+   INATTIVITÀ → CALENDARIO
+   (30 secondi)
+   ====================== */
+
+function setupInactivityToCalendar() {
+  let timer = null;
+  const delay = 30000; // 30s
+
+  function resetTimer() {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      const calTab = document.querySelector(".agenda-tab[data-tab='cal']");
+      if (!calTab) return;
+      if (!calTab.classList.contains("active")) {
+        calTab.click();
+      }
+    }, delay);
+  }
+
+  ["mousemove", "keydown", "click", "touchstart"].forEach((ev) => {
+    document.addEventListener(ev, resetTimer);
   });
 
-  reset();
+  resetTimer();
 }
