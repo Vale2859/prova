@@ -1,365 +1,439 @@
 // script.js
 
-// dopo quanti ms torna al riepilogo / calendario
-const IDLE_TIMEOUT_MS = 30000;
-
-let idleTimer = null;
-let isShowingSummary = true;
-
-// DATI SEZIONI
-const CARD_DATA = {
-  assenti: {
-    title: "Assenti / Permessi",
-    summary: "Vista immediata delle assenze approvate.",
-    items: [
-      "Mostra chi è assente oggi, per tipo di permesso.",
-      "Vedi ferie programmate nei prossimi giorni.",
-      "In futuro: approvazione digitale delle richieste."
-    ]
-  },
-  turno: {
-    title: "Farmacia di turno",
-    summary: "Farmacia attiva oggi e prossimi turni.",
-    items: [
-      "Nome farmacia di turno e fascia oraria.",
-      "Farmacia di appoggio e contatti rapidi.",
-      "In futuro: integrazione con calendario ASL."
-    ]
-  },
-  comunicazioni: {
-    title: "Comunicazioni",
-    summary: "Note interne e messaggi per il team.",
-    items: [
-      "Ultime comunicazioni non lette.",
-      "Messaggi importanti fissati in alto.",
-      "Storico consultabile per data."
-    ]
-  },
-  procedure: {
-    title: "Procedure",
-    summary: "Procedure operative della farmacia.",
-    items: [
-      "SOP per servizi e attività quotidiane.",
-      "Istruzioni rapide per nuove risorse.",
-      "Collegamento diretto alla sezione documenti."
-    ]
-  },
-  logistica: {
-    title: "Logistica",
-    summary: "Gestione arrivi merce e corrieri.",
-    items: [
-      "Monitor corrieri e ritiri programmati.",
-      "Note su colli mancanti o danneggiati.",
-      "In futuro: integrazione con gestionale magazzino."
-    ]
-  },
-  magazzino: {
-    title: "Magazziniera",
-    summary: "Scorte, inventari e resi.",
-    items: [
-      "Controlli periodici di scaffale e cassetti.",
-      "Resi programmati e da confermare.",
-      "Alert su prodotti critici."
-    ]
-  },
-  scadenze: {
-    title: "Prodotti in scadenza",
-    summary: "Prodotti prossimi alla scadenza.",
-    items: [
-      "Lista articoli in scadenza entro 30 giorni.",
-      "Suggerimenti di scontistica o reso.",
-      "Possibilità di esportare un report."
-    ]
-  },
-  consumabili: {
-    title: "Consumabili",
-    summary: "Materiale di lavoro e presidi.",
-    items: [
-      "Stato di guanti, aghi, salviette, modulistica.",
-      "Soglie minime con alert automatici.",
-      "Storico degli ordini di materiale."
-    ]
-  },
-  consegne: {
-    title: "Consegne / Ritiri",
-    summary: "Corrieri e consegne a domicilio.",
-    items: [
-      "Riepilogo consegne previste oggi.",
-      "Conferma avvenuta consegna.",
-      "In futuro: firma digitale del cliente."
-    ]
-  },
-  cassa: {
-    title: "Cambio cassa",
-    summary: "Cambio cassa e controlli veloci.",
-    items: [
-      "Ultimo cambio registrato con orario.",
-      "Differenze segnalate rispetto al teorico.",
-      "Accesso rapido al modulo completo."
-    ]
-  },
-  archivio: {
-    title: "Archivio file",
-    summary: "Documenti e report della farmacia.",
-    items: [
-      "Schede operative, contratti, documenti ASL.",
-      "Ricerca rapida per parola chiave o data.",
-      "Accesso controllato per ruolo."
-    ]
-  }
-};
-
-// DATI DEMO AGENDA
-const AGENDA_DEMO = {
-  giorno: [
-    {
-      day: "Oggi – Lunedì",
-      slots: [
-        { time: "08:30", label: "ECG", type: "ecg" },
-        { time: "10:00", label: "Holter pressorio", type: "holter" },
-        { time: "12:00", label: "Vaccino influenza", type: "vaccino" },
-        { time: "17:30", label: "Consulenza nutrizionale", type: "consulenza" }
-      ]
-    }
-  ],
-  settimana: [
-    { day: "Lunedì", slots: [
-      { time: "Mattina", label: "ECG", type: "ecg" },
-      { time: "Pomeriggio", label: "Consulenza nutrizionale", type: "consulenza" }
-    ]},
-    { day: "Martedì", slots: [
-      { time: "Tutto il giorno", label: "Holter pressorio", type: "holter" }
-    ]},
-    { day: "Mercoledì", slots: [
-      { time: "Mattina", label: "Vaccini", type: "vaccino" }
-    ]},
-    { day: "Giovedì", slots: [
-      { time: "Pomeriggio", label: "ECG + Holter", type: "ecg" }
-    ]},
-    { day: "Venerdì", slots: [
-      { time: "Mattina", label: "Consulenze dermocosmesi", type: "consulenza" }
-    ]}
-  ],
-  mese: [
-    { day: "Settimana 1", slots: [{ time: "", label: "Focus ECG", type: "ecg" }] },
-    { day: "Settimana 2", slots: [{ time: "", label: "Campagna vaccini", type: "vaccino" }] },
-    { day: "Settimana 3", slots: [{ time: "", label: "Holter pressorio", type: "holter" }] },
-    { day: "Settimana 4", slots: [{ time: "", label: "Consulenze nutrizionali", type: "consulenza" }] }
-  ]
-};
-
 document.addEventListener("DOMContentLoaded", () => {
-  setupCardClicks();
-  setupMobileDetail();
-  setupTabs();
-  renderAgenda("giorno");
-  startIdleTimer();
+  aggiornaDataHeader();
+  popolaOfferteEventi();
+  inizializzaChat();
+  inizializzaAgendaDocumenti();
+  setupInactivityTimer();
 });
 
-// ===== RIEPILOGO / TIMER =====
+// ==========================
+// HEADER DATA
+// ==========================
 
-function startIdleTimer() {
-  clearIdleTimer();
-  idleTimer = setTimeout(() => {
-    showSummary();
-    resetAgendaToCalendar();
-  }, IDLE_TIMEOUT_MS);
-}
-
-function clearIdleTimer() {
-  if (idleTimer) clearTimeout(idleTimer);
-}
-
-function showSummary() {
-  const quick = document.getElementById("quick-summary");
-  if (!quick) return;
-  quick.style.display = "block";
-  isShowingSummary = true;
-}
-
-function showDetail(cardKey) {
-  const data = CARD_DATA[cardKey];
-  const quick = document.getElementById("quick-summary");
-  const title = document.getElementById("detail-title");
-  const summary = document.getElementById("detail-summary");
-  const list = document.getElementById("detail-list");
-
-  if (!data || !quick || !title || !summary || !list) return;
-
-  quick.style.display = "none";
-  isShowingSummary = false;
-
-  title.textContent = data.title;
-  summary.textContent = data.summary;
-  list.innerHTML = "";
-  data.items.forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    list.appendChild(li);
+function aggiornaDataHeader() {
+  const el = document.getElementById("header-date");
+  const q4Today = document.getElementById("q4-today-label");
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat("it-IT", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
   });
-
-  startIdleTimer();
+  const shortFormatter = new Intl.DateTimeFormat("it-IT", {
+    weekday: "short",
+    day: "2-digit",
+    month: "2-digit",
+  });
+  if (el) el.textContent = formatter.format(now);
+  if (q4Today) q4Today.textContent = shortFormatter.format(now);
 }
 
-function setupCardClicks() {
-  const allButtons = document.querySelectorAll("[data-card]");
-  allButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const key = btn.getAttribute("data-card");
-      if (key && CARD_DATA[key]) {
-        if (window.innerWidth > 768) {
-          showDetail(key);
-        } else {
-          openMobileDetail(key);
-        }
+// ==========================
+// DEMO OFFERTE / EVENTI
+// ==========================
+
+const offerteDemo = [
+  "Promo CovidBox 2025: test + misuratori saturazione.",
+  "Sconto 20% su prodotti stagionali (linea influenza).",
+  "Pacchetto 'Cuore sereno': ECG + profilo lipidico.",
+];
+
+const eventiDemo = [
+  "Lunedì: Giornata misurazione pressione e glicemia.",
+  "Mercoledì: Giornata HOLTER pressorio.",
+  "Venerdì: Giornata ECG + consulenza cardiologica.",
+];
+
+function popolaOfferteEventi() {
+  const ulOfferte = document.getElementById("offerte-list");
+  const ulEventi = document.getElementById("eventi-list");
+
+  if (ulOfferte) {
+    ulOfferte.innerHTML = offerteDemo
+      .map((t) => `<li>${t}</li>`)
+      .join("");
+  }
+  if (ulEventi) {
+    ulEventi.innerHTML = eventiDemo
+      .map((t) => `<li>${t}</li>`)
+      .join("");
+  }
+}
+
+// ==========================
+// CHAT COMUNICAZIONI
+// ==========================
+
+let chatMessages = [];
+
+function inizializzaChat() {
+  // carica da localStorage se presente
+  try {
+    const stored = localStorage.getItem("fm_chat_messages");
+    if (stored) {
+      chatMessages = JSON.parse(stored);
+    } else {
+      // qualche messaggio demo
+      chatMessages = [
+        {
+          id: 1,
+          autore: "Valerio",
+          badge: "info",
+          testo: "Ricordarsi di aggiornare il cartello turni in vetrina.",
+          file: "",
+          timestamp: Date.now() - 1000 * 60 * 45,
+        },
+        {
+          id: 2,
+          autore: "Emanuela",
+          badge: "urgente",
+          testo: "Mancano copri termometro al banco 2, verificare ordine.",
+          file: "",
+          timestamp: Date.now() - 1000 * 60 * 10,
+        },
+      ];
+    }
+  } catch (e) {
+    chatMessages = [];
+  }
+
+  renderChat();
+
+  const form = document.getElementById("chat-form");
+  const clearBtn = document.getElementById("chat-clear");
+
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      aggiungiMessaggioDaForm();
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (confirm("Svuotare tutte le comunicazioni (solo demo)?")) {
+        chatMessages = [];
+        salvaChat();
+        renderChat();
       }
     });
-  });
-
-  ["click", "mousemove", "keydown"].forEach((evt) => {
-    document.addEventListener(evt, () => {
-      startIdleTimer();
-    });
-  });
-}
-// ===== MOBILE – DETTAGLIO =====
-
-function setupMobileDetail() {
-  const overlay = document.getElementById("m-detail-overlay");
-  const closeBtn = document.getElementById("m-detail-close");
-  if (!overlay || !closeBtn) return;
-
-  closeBtn.addEventListener("click", () => {
-    overlay.style.display = "none";
-  });
-
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) {
-      overlay.style.display = "none";
-    }
-  });
+  }
 }
 
-function openMobileDetail(cardKey) {
-  const data = CARD_DATA[cardKey];
-  const overlay = document.getElementById("m-detail-overlay");
-  const title = document.getElementById("m-detail-title");
-  const summary = document.getElementById("m-detail-summary");
-  const list = document.getElementById("m-detail-list");
-  if (!data || !overlay || !title || !summary || !list) return;
+function aggiungiMessaggioDaForm() {
+  const autoreEl = document.getElementById("chat-autore");
+  const badgeEl = document.getElementById("chat-badge");
+  const fileEl = document.getElementById("chat-file");
+  const testoEl = document.getElementById("chat-testo");
 
-  title.textContent = data.title;
-  summary.textContent = data.summary;
-  list.innerHTML = "";
-  data.items.forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = item;
-    list.appendChild(li);
-  });
+  if (!autoreEl || !badgeEl || !testoEl) return;
 
-  overlay.style.display = "flex";
-}
+  const testo = testoEl.value.trim();
+  if (!testo) return;
 
-// ===== TABS Q4 – CALENDARIO / DOCUMENTI =====
-
-function setupTabs() {
-  const tabButtons = document.querySelectorAll(".tab-btn");
-  const tabContents = {
-    calendario: document.getElementById("tab-calendario"),
-    documenti: document.getElementById("tab-documenti")
+  const msg = {
+    id: Date.now(),
+    autore: autoreEl.value || "Anonimo",
+    badge: badgeEl.value || "info",
+    testo,
+    file: fileEl ? fileEl.value.trim() : "",
+    timestamp: Date.now(),
   };
 
-  tabButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const tab = btn.getAttribute("data-tab");
-      tabButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
+  chatMessages.push(msg);
+  salvaChat();
+  renderChat();
 
-      Object.keys(tabContents).forEach((key) => {
-        if (key === tab) {
-          tabContents[key].classList.remove("hidden");
-        } else {
-          tabContents[key].classList.add("hidden");
-        }
+  testoEl.value = "";
+  if (fileEl) fileEl.value = "";
+}
+
+function salvaChat() {
+  try {
+    localStorage.setItem("fm_chat_messages", JSON.stringify(chatMessages));
+  } catch (e) {
+    // ignoriamo errori quota
+  }
+}
+
+function renderChat() {
+  const container = document.getElementById("chat-messages");
+  const counter = document.getElementById("chat-counter");
+  if (!container) return;
+
+  if (!Array.isArray(chatMessages)) chatMessages = [];
+  // ordina per timestamp
+  chatMessages.sort((a, b) => a.timestamp - b.timestamp);
+
+  if (counter) {
+    counter.textContent =
+      chatMessages.length === 1
+        ? "1 messaggio"
+        : `${chatMessages.length} messaggi`;
+  }
+
+  if (chatMessages.length === 0) {
+    container.innerHTML =
+      '<p style="font-size:0.8rem; color:var(--txt-muted); margin:0;">Nessuna comunicazione. Scrivi il primo messaggio.</p>';
+    return;
+  }
+
+  const fmt = new Intl.DateTimeFormat("it-IT", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  container.innerHTML = chatMessages
+    .map((m) => {
+      let badgeClass = "chat-badge-info";
+      if (m.badge === "urgente") badgeClass = "chat-badge-urgente";
+      else if (m.badge === "tecnico") badgeClass = "chat-badge-tecnico";
+      const time = fmt.format(new Date(m.timestamp));
+      const fileLine = m.file
+        ? `<div class="chat-attachment">📎 ${m.file}</div>`
+        : "";
+      return `
+      <div class="chat-message" data-id="${m.id}">
+        <button class="chat-delete" title="Elimina">×</button>
+        <div class="chat-header-line">
+          <span class="chat-author">${escapeHtml(m.autore)}</span>
+          <span class="chat-time">${time}</span>
+          <span class="chat-badge ${badgeClass}">${m.badge}</span>
+        </div>
+        <p class="chat-text">${escapeHtml(m.testo)}</p>
+        ${fileLine}
+      </div>`;
+    })
+    .join("");
+
+  // collego i bottoni elimina
+  container.querySelectorAll(".chat-delete").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const parent = btn.closest(".chat-message");
+      if (!parent) return;
+      const id = Number(parent.dataset.id);
+      chatMessages = chatMessages.filter((m) => m.id !== id);
+      salvaChat();
+      renderChat();
+    });
+  });
+
+  // scroll in fondo
+  container.scrollTop = container.scrollHeight;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+// ==========================
+// AGENDA & DOCUMENTI
+// ==========================
+
+const serviziColor = {
+  ECG: "slot-ecg",
+  HOLTER: "slot-holter",
+  PRELIEVO: "slot-prelievo",
+  CONSULENZA: "slot-consulenza",
+};
+
+let agendaMode = "day"; // day / week / month
+let inactivityTimer = null;
+
+// demo appuntamenti di oggi
+let appuntamentiOggi = [
+  { ora: "08:30", desc: "ECG – Rossi Mario", tipo: "ECG" },
+  { ora: "10:00", desc: "Holter pressorio – Bianchi Luca", tipo: "HOLTER" },
+  { ora: "16:00", desc: "Prelievo + profilo lipidico", tipo: "PRELIEVO" },
+  { ora: "17:30", desc: "Consulenza nutrizionale", tipo: "CONSULENZA" },
+];
+
+const cartelleDemo = [
+  {
+    name: "Procedure farmacia",
+    desc: "Standard operativi, protocolli, check-list.",
+    cls: "doc-blue",
+  },
+  {
+    name: "Magazzino & resi",
+    desc: "Excel rotazione, inventari, resi fornitori.",
+    cls: "doc-green",
+  },
+  {
+    name: "Servizi al cittadino",
+    desc: "ECG, Holter, autoanalisi, test rapidi.",
+    cls: "doc-yellow",
+  },
+  {
+    name: "Formazione interna",
+    desc: "Slide corsi, linee guida, note ECM.",
+    cls: "doc-purple",
+  },
+  {
+    name: "Comunicazioni ASL",
+    desc: "Circolari, note ufficiali, delibere.",
+    cls: "doc-pink",
+  },
+  {
+    name: "Archivio generale",
+    desc: "Documenti vari, backup PDF importanti.",
+    cls: "doc-dark",
+  },
+];
+
+function inizializzaAgendaDocumenti() {
+  const tabs = document.querySelectorAll(".q4-tab");
+  const modeBtns = document.querySelectorAll(".mode-btn");
+  const btnNuovo = document.getElementById("btn-nuovo-app");
+
+  tabs.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      attivaVistaQ4(btn.dataset.view);
+    });
+  });
+
+  modeBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      agendaMode = btn.dataset.mode || "day";
+      modeBtns.forEach((b) => b.classList.remove("mode-btn-active"));
+      btn.classList.add("mode-btn-active");
+      renderCalendar();
+    });
+  });
+
+  if (btnNuovo) {
+    btnNuovo.addEventListener("click", () => {
+      const ora = prompt("Orario (es. 09:30):");
+      if (!ora) return;
+      const desc = prompt("Descrizione appuntamento:");
+      if (!desc) return;
+      const tipo = prompt(
+        "Tipo servizio (ECG, HOLTER, PRELIEVO, CONSULENZA):",
+        "ECG"
+      );
+      appuntamentiOggi.push({
+        ora,
+        desc,
+        tipo: (tipo || "ECG").toUpperCase(),
       });
+      renderCalendar();
     });
-  });
-
-  // cambio vista (giorno / settimana / mese)
-  const viewButtons = document.querySelectorAll(".cal-view-btn");
-  viewButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const view = btn.getAttribute("data-view");
-      viewButtons.forEach((b) => b.classList.remove("active"));
-      btn.classList.add("active");
-      renderAgenda(view);
-    });
-  });
-}
-
-// riportare Q4 in modalità Calendario/Giorno dopo inattività
-function resetAgendaToCalendar() {
-  const calTabBtn = document.querySelector(".tab-btn[data-tab='calendario']");
-  const docTabBtn = document.querySelector(".tab-btn[data-tab='documenti']");
-  const tabCal = document.getElementById("tab-calendario");
-  const tabDoc = document.getElementById("tab-documenti");
-
-  if (calTabBtn && docTabBtn && tabCal && tabDoc) {
-    calTabBtn.classList.add("active");
-    docTabBtn.classList.remove("active");
-    tabCal.classList.remove("hidden");
-    tabDoc.classList.add("hidden");
   }
 
-  const viewButtons = document.querySelectorAll(".cal-view-btn");
-  viewButtons.forEach((btn) => {
-    const view = btn.getAttribute("data-view");
-    if (view === "giorno") {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
-  });
-
-  renderAgenda("giorno");
+  renderCalendar();
+  renderDocs();
 }
 
-// ===== AGENDA =====
+function attivaVistaQ4(view) {
+  const calView = document.getElementById("view-calendar");
+  const docsView = document.getElementById("view-docs");
+  const tabCal = document.getElementById("tab-calendar");
+  const tabDocs = document.getElementById("tab-docs");
 
-function renderAgenda(view) {
-  const col = document.getElementById("agenda-column");
-  if (!col) return;
+  if (!calView || !docsView || !tabCal || !tabDocs) return;
 
-  const data = AGENDA_DEMO[view] || [];
-  col.innerHTML = "";
-
-  data.forEach((dayBlock) => {
-    const dayDiv = document.createElement("div");
-    dayDiv.className = "agenda-day";
-
-    const title = document.createElement("div");
-    title.className = "agenda-day-title";
-    title.textContent = dayBlock.day;
-    dayDiv.appendChild(title);
-
-    dayBlock.slots.forEach((s) => {
-      const slot = document.createElement("div");
-      slot.className = "agenda-slot " + slotClassFromType(s.type);
-      const timePart = s.time ? s.time + " – " : "";
-      slot.textContent = timePart + s.label;
-      dayDiv.appendChild(slot);
-    });
-
-    col.appendChild(dayDiv);
-  });
-}
-
-function slotClassFromType(type) {
-  switch (type) {
-    case "ecg": return "slot-ecg";
-    case "holter": return "slot-holter";
-    case "vaccino": return "slot-vaccino";
-    case "consulenza": return "slot-consulenza";
-    default: return "slot-ecg";
+  if (view === "docs") {
+    calView.style.display = "none";
+    docsView.style.display = "block";
+    tabCal.classList.remove("q4-tab-active");
+    tabDocs.classList.add("q4-tab-active");
+  } else {
+    calView.style.display = "block";
+    docsView.style.display = "none";
+    tabCal.classList.add("q4-tab-active");
+    tabDocs.classList.remove("q4-tab-active");
   }
+}
+
+function renderCalendar() {
+  const dayNameEl = document.getElementById("calendar-day-name");
+  const serviceLabel = document.getElementById("calendar-service-label");
+  const slotsContainer = document.getElementById("calendar-slots");
+  if (!dayNameEl || !serviceLabel || !slotsContainer) return;
+
+  const today = new Date();
+  const dayFmt = new Intl.DateTimeFormat("it-IT", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+  });
+
+  dayNameEl.textContent = dayFmt.format(today);
+
+  // servizio principale della giornata (in base al primo appuntamento)
+  if (appuntamentiOggi.length > 0) {
+    const tipo = appuntamentiOggi[0].tipo.toUpperCase();
+    let label = "Servizi vari";
+    if (tipo === "ECG") label = "Giornata ECG";
+    else if (tipo === "HOLTER") label = "Giornata Holter";
+    else if (tipo === "PRELIEVO") label = "Prelievi";
+    else if (tipo === "CONSULENZA") label = "Consulenze";
+    serviceLabel.textContent = label;
+  } else {
+    serviceLabel.textContent = "Nessun servizio programmato";
+  }
+
+  if (agendaMode !== "day") {
+    slotsContainer.innerHTML =
+      '<p style="margin:0; font-size:0.8rem; color:var(--txt-muted);">Per ora la vista "' +
+      agendaMode +
+      '" è solo dimostrativa. Usa la vista Giorno per i dettagli degli orari.</p>';
+    return;
+  }
+
+  // ordina per ora
+  appuntamentiOggi.sort((a, b) => (a.ora > b.ora ? 1 : -1));
+
+  slotsContainer.innerHTML = appuntamentiOggi
+    .map((app) => {
+      const cls =
+        serviziColor[app.tipo?.toUpperCase()] || serviziColor.ECG;
+      return `
+      <div class="calendar-slot">
+        <span class="slot-time">${app.ora}</span>
+        <div class="slot-block ${cls}">
+          ${escapeHtml(app.desc)}
+        </div>
+      </div>`;
+    })
+    .join("");
+}
+
+function renderDocs() {
+  const grid = document.getElementById("docs-grid");
+  if (!grid) return;
+  grid.innerHTML = cartelleDemo
+    .map(
+      (c) => `
+    <div class="doc-folder ${c.cls}">
+      <div class="doc-name">${c.name}</div>
+      <div class="doc-desc">${c.desc}</div>
+    </div>`
+    )
+    .join("");
+}
+
+// ==========================
+// INACTIVITY TIMER
+// dopo 30s torna automaticamente alla vista Calendario
+// ==========================
+
+function setupInactivityTimer() {
+  const reset = () => {
+    if (inactivityTimer) clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      attivaVistaQ4("calendar");
+    }, 30000); // 30 secondi
+  };
+
+  ["click", "keydown", "mousemove", "touchstart"].forEach((ev) => {
+    window.addEventListener(ev, reset);
+  });
+
+  reset();
 }
