@@ -41,28 +41,28 @@
           </button>
 
           <!-- RIGA 2 -->
-          <button class="m-card m-card-pink">
+          <button class="m-card m-card-pink" data-section="comunicazioni">
             <div class="m-card-label">NUOVA</div>
             <div class="m-card-title">Comunicazioni</div>
             <div class="m-card-badge">1</div>
             <div class="m-card-icon">📢</div>
           </button>
 
-          <button class="m-card m-card-teal">
+          <button class="m-card m-card-teal" data-section="procedure">
             <div class="m-card-label">NUOVE</div>
             <div class="m-card-title">Procedure</div>
             <div class="m-card-icon">📚</div>
           </button>
 
           <!-- RIGA 3 -->
-          <button class="m-card m-card-yellow">
+          <button class="m-card m-card-yellow" data-section="logistica">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Logistica</div>
             <div class="m-card-badge">1</div>
             <div class="m-card-icon">📦</div>
           </button>
 
-          <button class="m-card m-card-cyan">
+          <button class="m-card m-card-cyan" data-section="magazziniera">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Magazziniera</div>
             <div class="m-card-badge">2</div>
@@ -70,33 +70,33 @@
           </button>
 
           <!-- RIGA 4 -->
-          <button class="m-card m-card-orange">
+          <button class="m-card m-card-orange" data-section="scadenze">
             <div class="m-card-label">NUOVI</div>
             <div class="m-card-title">Prodotti in scadenza</div>
             <div class="m-card-icon">⏳</div>
           </button>
 
-          <button class="m-card m-card-green2">
+          <button class="m-card m-card-green2" data-section="consumabili">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Consumabili</div>
             <div class="m-card-icon">🧪</div>
           </button>
 
           <!-- RIGA 5 -->
-          <button class="m-card m-card-blue2">
+          <button class="m-card m-card-blue2" data-section="consegne">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Consegne / Ritiri</div>
             <div class="m-card-icon">🚚</div>
           </button>
 
-          <button class="m-card m-card-purple">
+          <button class="m-card m-card-purple" data-section="cassa">
             <div class="m-card-label">NUOVO</div>
             <div class="m-card-title">Cambio cassa</div>
             <div class="m-card-icon">💶</div>
           </button>
 
-          <!-- RIGA 6 -->
-          <button class="m-card m-card-dark m-card-wide">
+          <!-- RIGA 6: ARCHIVIO A TUTTA LARGHEZZA -->
+          <button class="m-card m-card-dark m-card-wide" data-section="archivio">
             <div class="m-card-title">Archivio file</div>
             <div class="m-card-icon">🗄️</div>
           </button>
@@ -109,123 +109,131 @@
          VISTA DESKTOP (PC)
          ====================== -->
     <div class="desktop-dashboard">
-      <header class="desk-header">
-        <div class="desk-header-left">
-          <img src="logo.jpg" alt="Farmacia Montesano" class="desk-logo" />
+      <header class="app-header">
+        <div class="app-header-left">
+          <img src="logo.jpg" alt="Farmacia Montesano" class="header-logo" />
           <div>
             <h1>FARMACIA MONTESANO</h1>
-            <p class="desk-subtitle">Portale interno · Dashboard operativa</p>
+            <span class="app-header__subtitle">Portale interno – Dashboard generale</span>
           </div>
-        </div>
-        <div class="desk-header-right">
-          <span id="desk-today-label" class="desk-today-label"></span>
         </div>
       </header>
 
-      <main class="desk-layout">
-
+      <main class="desktop-main">
         <!-- COLONNA SINISTRA (2 riquadri) -->
-        <section class="desk-left">
+        <section class="desktop-left">
 
-          <!-- Riquadro alto: CARD 3x3 -->
-          <div class="panel panel-cards">
+          <!-- PANEL TOP: CARD 3×3 -->
+          <div class="panel panel-top">
             <div class="panel-header">
-              <div>
-                <h2>Area farmacia</h2>
-                <p>Operazioni rapide da fare in meno di 1 minuto.</p>
-              </div>
+              <h2>Sezioni farmacia</h2>
+              <p>Accesso rapido alle aree operative.</p>
             </div>
 
-            <div class="desk-card-grid">
-              <!-- Uso le stesse card del mobile, ma versione desktop -->
-              <button class="desk-card m-card m-card-green" data-card-key="assenti">
-                <div class="m-card-label">NUOVI</div>
-                <div class="m-card-title">Assenti / Permessi</div>
-                <div class="m-card-badge">2</div>
-                <div class="m-card-icon">📅</div>
+            <div class="desktop-card-grid">
+              <!-- 9 card 3×3 -->
+              <button class="d-card d-card-green" data-section="assenti">
+                <span class="d-card-label">NUOVI</span>
+                <span class="d-card-title">Assenti / Permessi</span>
               </button>
 
-              <button class="desk-card m-card m-card-blue" data-card-key="turno">
-                <div class="m-card-label">NUOVO</div>
-                <div class="m-card-title">Farmacia di turno</div>
-                <div class="m-card-badge">1</div>
-                <div class="m-card-icon">⏰</div>
+              <button class="d-card d-card-blue" data-section="turno">
+                <span class="d-card-label">NUOVO</span>
+                <span class="d-card-title">Farmacia di turno</span>
               </button>
 
-              <button class="desk-card m-card m-card-pink" data-card-key="comunicazioni">
-                <div class="m-card-label">NUOVA</div>
-                <div class="m-card-title">Comunicazioni</div>
-                <div class="m-card-badge">2</div>
-                <div class="m-card-icon">📢</div>
+              <button class="d-card d-card-pink" data-section="comunicazioni">
+                <span class="d-card-label">NUOVA</span>
+                <span class="d-card-title">Comunicazioni</span>
               </button>
 
-              <button class="desk-card m-card m-card-teal" data-card-key="procedure">
-                <div class="m-card-label">NUOVE</div>
-                <div class="m-card-title">Procedure</div>
-                <div class="m-card-icon">📚</div>
+              <button class="d-card d-card-teal" data-section="procedure">
+                <span class="d-card-label">NUOVE</span>
+                <span class="d-card-title">Procedure</span>
               </button>
 
-              <button class="desk-card m-card m-card-yellow" data-card-key="logistica">
-                <div class="m-card-label">NUOVO</div>
-                <div class="m-card-title">Logistica</div>
-                <div class="m-card-badge">1</div>
-                <div class="m-card-icon">📦</div>
+              <button class="d-card d-card-yellow" data-section="logistica">
+                <span class="d-card-label">NUOVO</span>
+                <span class="d-card-title">Logistica</span>
               </button>
 
-              <button class="desk-card m-card m-card-cyan" data-card-key="magazzino">
-                <div class="m-card-label">NUOVO</div>
-                <div class="m-card-title">Magazziniera</div>
-                <div class="m-card-badge">2</div>
-                <div class="m-card-icon">📋</div>
+              <button class="d-card d-card-cyan" data-section="magazziniera">
+                <span class="d-card-label">NUOVO</span>
+                <span class="d-card-title">Magazziniera</span>
               </button>
 
-              <button class="desk-card m-card m-card-orange" data-card-key="scadenze">
-                <div class="m-card-label">NUOVI</div>
-                <div class="m-card-title">Prodotti in scadenza</div>
-                <div class="m-card-icon">⏳</div>
+              <button class="d-card d-card-orange" data-section="scadenze">
+                <span class="d-card-label">NUOVI</span>
+                <span class="d-card-title">Prodotti in scadenza</span>
               </button>
 
-              <button class="desk-card m-card m-card-green2" data-card-key="consumabili">
-                <div class="m-card-label">NUOVO</div>
-                <div class="m-card-title">Consumabili</div>
-                <div class="m-card-icon">🧪</div>
+              <button class="d-card d-card-green2" data-section="consumabili">
+                <span class="d-card-label">NUOVO</span>
+                <span class="d-card-title">Consumabili</span>
               </button>
 
-              <button class="desk-card m-card m-card-blue2" data-card-key="consegne">
-                <div class="m-card-label">NUOVO</div>
-                <div class="m-card-title">Consegne / Ritiri</div>
-                <div class="m-card-icon">🚚</div>
+              <button class="d-card d-card-blue2" data-section="consegne">
+                <span class="d-card-label">NUOVO</span>
+                <span class="d-card-title">Consegne / Ritiri</span>
               </button>
             </div>
           </div>
-
-          <!-- Riquadro basso: vuoto, pronto per futuro -->
+                    <!-- PANEL BOTTOM: OFFERTE / EVENTI -->
           <div class="panel panel-bottom">
             <div class="panel-header">
-              <h2>Area extra (in lavorazione)</h2>
+              <h2>Servizi & clienti</h2>
+              <p>Offerte attive e prossimi eventi in farmacia.</p>
             </div>
-            <p class="panel-empty">
-              Qui potrai aggiungere in futuro una sezione per servizi, clienti, campagne, ecc.
+
+            <div class="panel-bottom-inner">
+              <!-- COLONNA SINISTRA: OFFERTE IN CORSO -->
+              <div class="panel-col">
+                <h3 class="detail-section-title">Offerte in corso</h3>
+                <ul class="detail-list">
+                  <li><strong>Promo Caudalie</strong> – 1+1 su selezione viso (demo).</li>
+                  <li><strong>Yovis</strong> – sconto 20% sui flaconcini (demo).</li>
+                  <li><strong>Linea solari</strong> – prezzo speciale weekend (demo).</li>
+                </ul>
+                <p class="panel-note">
+                  In futuro qui potrai caricare le promozioni reali della settimana.
+                </p>
+              </div>
+
+              <!-- COLONNA DESTRA: EVENTI PROGRAMMATI -->
+              <div class="panel-col">
+                <h3 class="detail-section-title">Eventi programmati</h3>
+                <ul class="detail-list">
+                  <li><strong>Martedì</strong> – Giornata nutrizionista, 09:00–13:00 (demo).</li>
+                  <li><strong>Giovedì</strong> – Check-up pelle con consulente (demo).</li>
+                  <li><strong>Sabato</strong> – Open day autoanalisi e pressione (demo).</li>
+                </ul>
+                <p class="panel-note">
+                  Se non ci sono eventi, questa colonna resterà vuota o con un messaggio.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- COLONNA DESTRA: PANNELLO DETTAGLIO -->
+        <aside class="detail-panel">
+          <div class="detail-panel-header">
+            <h2 id="detail-title">Riepilogo rapido</h2>
+            <p id="detail-subtitle">
+              Seleziona una card a sinistra per vedere i dettagli.  
+              Dopo 1 minuto di inattività appare di nuovo questo riepilogo.
             </p>
           </div>
-
-        </section>
-
-        <!-- COLONNA DESTRA (dettaglio card / riepilogo) -->
-        <section class="dashboard-detail">
-          <div id="detail-panel" class="detail-panel">
-            <!-- Il contenuto viene inserito da script.js -->
+          <div class="detail-panel-body" id="detail-body">
+            <!-- riempito da script.js -->
           </div>
-        </section>
-
+        </aside>
       </main>
     </div>
 
     <!-- ======================
-         SEZIONI DETTAGLIO MOBILE
+         SEZIONE DETTAGLIO MOBILE: ASSENTI
          ====================== -->
-
-    <!-- ASSENTI / PERMESSI -->
     <section id="sezione-assenti" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
       <div style="max-width:1000px; margin:0 auto;">
         <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
@@ -246,12 +254,13 @@
           </select>
         </label>
 
-        <div id="assenti-oggi" style="margin-bottom:14px;"></div>
-        <div id="assenti-prossimi"></div>
+        <div id="assenti-wrapper"></div>
       </div>
     </section>
 
-    <!-- FARMACIA DI TURNO -->
+    <!-- ======================
+         SEZIONE DETTAGLIO MOBILE: FARMACIA DI TURNO
+         ====================== -->
     <section id="sezione-turno" class="sezione-dettaglio" style="display:none; padding:16px 16px 32px;">
       <div style="max-width:1000px; margin:0 auto;">
         <button class="btn-primary" data-close="sezione" style="margin-bottom:14px;">
@@ -263,8 +272,7 @@
           Turno di oggi in evidenza e prossimi turni programmati (dati demo).
         </p>
 
-        <div id="turno-oggi" style="margin-bottom:14px;"></div>
-        <div id="turno-prossimi"></div>
+        <div id="turno-wrapper"></div>
       </div>
     </section>
 
