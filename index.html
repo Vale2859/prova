@@ -118,14 +118,14 @@
       <main class="desktop-main">
         <section class="desktop-grid">
 
-          <!-- Q1 – ALTO SINISTRA: SEZIONI FARMACIA -->
+          <!-- Q1 – ALTO SINISTRA: SEZIONI FARMACIA (CARD GRANDI SU TUTTO IL RIQUADRO) -->
           <section class="quad quad-1">
             <div class="quad-header">
               <h2 class="quad-title">Sezioni farmacia</h2>
               <p class="quad-subtitle">Accesso rapido alle aree operative.</p>
             </div>
 
-            <div class="quad-cards-grid">
+            <div class="quad-cards-grid quad-cards-full">
               <button class="section-card sc-green">Assenti / Permessi</button>
               <button class="section-card sc-blue">Farmacia di turno</button>
               <button class="section-card sc-pink">Comunicazioni</button>
@@ -138,7 +138,7 @@
             </div>
           </section>
 
-          <!-- Q2 – ALTO DESTRA: CHAT INTERNA -->
+          <!-- Q2 – ALTO DESTRA: CHAT INTERNA STILE WHATSAPP -->
           <section class="quad quad-2">
             <div class="quad-header">
               <h2 class="quad-title">Chat comunicazioni interne</h2>
@@ -150,149 +150,50 @@
 
             <div class="chat-area">
               <div class="chat-messages" id="chat-messages">
-                <!-- Messaggi generati da JS -->
+                <!-- Messaggi via JS -->
               </div>
 
               <form class="chat-form" id="chat-form">
-                <div class="chat-form-row">
-                  <label>
-                    Dipendente
-                    <select id="chat-autore">
-                      <option value="Emanuela">Emanuela</option>
-                      <option value="Valerio">Valerio</option>
-                      <option value="Daniela">Daniela</option>
-                      <option value="Annalisa">Annalisa</option>
-                      <option value="Patrizia">Patrizia</option>
-                    </select>
-                  </label>
+                <div class="chat-controls-top">
+                  <select id="chat-autore" class="chat-select">
+                    <option value="Valerio">Valerio (titolare)</option>
+                    <option value="Emanuela">Emanuela</option>
+                    <option value="Daniela">Daniela</option>
+                    <option value="Annalisa">Annalisa</option>
+                    <option value="Patrizia">Patrizia</option>
+                  </select>
 
-                  <label>
-                    Tipo
-                    <select id="chat-tipo">
-                      <option value="Avviso">Avviso</option>
-                      <option value="Promemoria">Promemoria</option>
-                      <option value="Turni">Turni</option>
-                      <option value="Urgenza">Urgenza</option>
-                    </select>
-                  </label>
+                  <select id="chat-tipo" class="chat-select">
+                    <option value="Avviso">Avviso</option>
+                    <option value="Promemoria">Promemoria</option>
+                    <option value="Turni">Turni</option>
+                    <option value="Urgenza">Urgenza</option>
+                  </select>
+
+                  <button type="button" id="chat-file-btn" class="chat-icon-btn" title="Allega file">
+                    📎
+                  </button>
+                  <span id="chat-file-display" class="chat-file-display">Nessun file</span>
+                  <input type="file" id="chat-file-input" style="display:none" />
                 </div>
 
-                <div class="chat-form-row">
-                  <label class="chat-file-label">
-                    Allegato (nome file)
-                    <input type="text" id="chat-file" placeholder="Es. turni_dicembre.pdf" />
-                  </label>
-                </div>
-
-                <div class="chat-form-row">
+                <div class="chat-controls-bottom">
                   <textarea
                     id="chat-testo"
-                    rows="2"
-                    placeholder="Scrivi una comunicazione rapida..."
+                    rows="1"
+                    placeholder="Scrivi una comunicazione..."
                     required
                   ></textarea>
+                  <button type="submit" class="btn-primary chat-send-btn">Invia</button>
                 </div>
 
-                <div class="chat-form-actions">
-                  <button type="submit" class="btn-primary">Invia</button>
-                  <button type="button" id="chat-clear" class="btn-link">
-                    Svuota tutta la chat (demo)
-                  </button>
-                </div>
+                <button type="button" id="chat-clear" class="btn-link chat-clear-btn">
+                  Svuota chat (demo)
+                </button>
               </form>
             </div>
           </section>
                     <!-- Q3 – BASSO SINISTRA: SERVIZI & CLIENTI -->
           <section class="quad quad-3">
             <div class="quad-header">
-              <h2 class="quad-title">Servizi & Clienti</h2>
-              <p class="quad-subtitle">
-                Cosa stiamo offrendo e cosa c'è in programma.
-              </p>
-            </div>
-
-            <div class="services-grid">
-              <div class="services-column">
-                <h3 class="services-title">Offerte in corso</h3>
-                <ul class="services-list" id="offerte-list">
-                  <!-- riempito via JS (demo) -->
-                </ul>
-              </div>
-
-              <div class="services-column">
-                <h3 class="services-title">Eventi programmati</h3>
-                <ul class="services-list" id="eventi-list">
-                  <!-- riempito via JS (demo) -->
-                </ul>
-              </div>
-            </div>
-          </section>
-
-          <!-- Q4 – BASSO DESTRA: AGENDA & DOCUMENTI -->
-          <section class="quad quad-4">
-            <div class="quad-header quad-header-between">
-              <div>
-                <h2 class="quad-title">Agenda & documenti</h2>
-                <p class="quad-subtitle">
-                  Gestione servizi, appuntamenti e cartelle operative.
-                </p>
-              </div>
-              <div class="agenda-tabs" id="agenda-tabs">
-                <button class="agenda-tab agenda-tab-active" data-view="giorno">Calendario</button>
-                <button class="agenda-tab" data-view="documenti">Documenti</button>
-              </div>
-            </div>
-
-            <!-- CONTENUTO CALENDARIO -->
-            <div class="agenda-content agenda-content-active" id="agenda-calendario">
-              <div class="agenda-toolbar">
-                <div class="agenda-view-switch" id="agenda-view-switch">
-                  <button class="view-pill view-pill-active" data-mode="giorno">Giorno</button>
-                  <button class="view-pill" data-mode="settimana">Settimana</button>
-                  <button class="view-pill" data-mode="mese">Mese</button>
-                </div>
-                <button class="btn-primary btn-sm" id="btn-nuovo-app">
-                  + Nuovo appuntamento
-                </button>
-              </div>
-
-              <div class="agenda-body">
-                <div class="agenda-day-label" id="agenda-day-label"></div>
-                <div class="agenda-planner" id="agenda-planner">
-                  <!-- eventi della giornata/sett/settimana via JS -->
-                </div>
-              </div>
-            </div>
-
-            <!-- CONTENUTO DOCUMENTI -->
-            <div class="agenda-content" id="agenda-documenti">
-              <div class="docs-toolbar">
-                <button class="btn-primary btn-sm" id="btn-nuova-cartella">
-                  + Nuova cartella
-                </button>
-                <label class="btn-upload btn-sm">
-                  Carica file
-                  <input type="file" id="input-upload-file" multiple />
-                </label>
-              </div>
-
-              <div class="docs-body">
-                <div class="folder-grid" id="folder-grid">
-                  <!-- Cartelle demo via JS -->
-                </div>
-                <div class="docs-note">
-                  Upload e cartelle solo dimostrativi: nessun file viene salvato davvero
-                  (serve un server / NAS per memorizzare i dati reali).
-                </div>
-              </div>
-            </div>
-          </section>
-
-        </section>
-      </main>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-</html>
+              <h2 class
