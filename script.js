@@ -1,15 +1,15 @@
 // script.js
 
 document.addEventListener("DOMContentLoaded", function () {
+  setupMobileSections();
   setupDesktopDetail();
-  setupMobileNavigation();
-  renderSummaryInDetail(); // riepilogo iniziale
+  resetInactivityTimer();
+  setupInactivityListeners();
 });
 
 // =======================
 // DATI DEMO
 // =======================
-
 const assenzeDemo = [
   {
     nome: "Mario Rossi",
@@ -38,6 +38,13 @@ const assenzeDemo = [
     al: "2025-12-12",
     tipo: "Ferie",
     stato: "approvato",
+  },
+  {
+    nome: "Test in attesa",
+    dal: "2025-12-01",
+    al: "2025-12-01",
+    tipo: "Permesso",
+    stato: "in attesa", // NON deve comparire
   },
 ];
 
@@ -81,9 +88,309 @@ const oggiISO = (function () {
 })();
 
 // =======================
-// UTIL PER DATE
+// MOBILE: NAVIGAZIONE SEZIONI
 // =======================
+function setupMobileSections() {
+  const dashboards = document.querySelectorAll(".mobile-dashboard");
+  const sezioni = document.querySelectorAll(".sezione-dettaglio");
 
+  dashboards.forEach((d) => {
+    const computed = window.getComputedStyle(d);
+    d.dataset.displayOriginal = computed.display || "block";
+  });
+
+  function mostraDashboardMobile() {
+    sezioni.forEach((sec) => {
+      sec.style.display = "none";
+    });
+    dashboards.forEach((d) => {
+      d.style.display = d.dataset.displayOriginal || "block";
+    });
+    window.scrollTo(0, 0);
+  }
+
+  function mostraSezioneMobile(id) {
+    dashboards.forEach((d) => {
+      d.style.display = "none";
+    });
+
+    sezioni.forEach((sec) => {
+      if (sec.id === "sezione-" + id) {
+        sec.style.display = "block";
+      } else {
+        sec.style.display = "none";
+      }
+    });
+
+    if (id === "assenti") {
+      renderAssentiMobile();
+    } else if (id === "turno") {
+      renderTurnoMobile();
+    }
+
+    window.scrollTo(0, 0);
+  }
+
+  const sectionButtons = document.querySelectorAll(
+    ".mobile-dashboard [data-section]"
+  );
+  sectionButtons.forEach((btn) => {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      const id = btn.getAttribute("data-section");
+      if (id) {
+        mostraSezioneMobile(id);
+      }
+    });
+  });
+
+  const closeButtons = document.querySelectorAll("[data-close='sezione']");
+  closeButtons.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      mostraDashboardMobile();
+    });
+  });
+
+  const ruoloAssSelect = document.getElementById("ruolo-assenti");
+  if (ruoloAssSelect) {
+    ruoloAssSelect.addEventListener("change", renderAssentiMobile);
+  }
+}
+// =======================
+// DESKTOP: DETTAGLIO A DESTRA
+// =======================
+let inactivityTimer = null;
+
+function setupDesktopDetail() {
+  const cards = document.querySelectorAll(".desk-card");
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const detail = card.getAttribute("data-detail");
+      mostraDettaglioDesktop(detail);
+      resetInactivityTimer();
+    });
+  });
+
+  // all'avvio mostro subito il riepilogo
+  mostraRiepilogoDesktop();
+}
+
+function mostraDettaglioDesktop(key) {
+  const titleEl = document.getElementById("desktop-detail-title");
+  const bodyEl = document.getElementById("desktop-detail-body");
+  if (!titleEl || !bodyEl) return;
+
+  switch (key) {
+    case "assenti":
+      titleEl.textContent = "Assenti / Permessi (oggi e prossimi giorni)";
+      bodyEl.innerHTML = buildAssentiHTML();
+      break;
+    case "turno":
+      titleEl.textContent = "Farmacia di turno";
+      bodyEl.innerHTML = buildTurnoHTML();
+      break;
+    case "comunicazioni":
+      titleEl.textContent = "Comunicazioni interne";
+      bodyEl.innerHTML =
+        "<p><strong>Comunicazioni interne</strong></p><p>Nuove procedure, note operative e messaggi importanti per il team compariranno qui in modo sintetico.</p>";
+      break;
+    case "procedure":
+      titleEl.textContent = "Procedure";
+      bodyEl.innerHTML =
+        "<p><strong>Procedure interne</strong></p><p>Accesso rapido alle procedure più usate: ricette dematerializzate, gestione DPC, resi, carico magazzino, gestione scadenze.</p>";
+      break;
+    case "logistica":
+      titleEl.textContent = "Logistica";
+      bodyEl.innerHTML =
+        "<p><strong>Logistica</strong></p><p>Stato arrivi corrieri, giacenze critiche, note su spedizioni in arrivo o in ritardo.</p>";
+      break;
+    case "magazziniera":
+      titleEl.textContent = "Magazziniera";
+      bodyEl.innerHTML =
+        "<p><strong>Magazziniera</strong></p><p>Inventari veloci, controlli periodici e resi programmati. Qui vedrai le attività più urgenti da fare in magazzino.</p>";
+      break;
+    case "scadenze":
+      titleEl.textContent = "Prodotti in scadenza";
+      bodyEl.innerHTML =
+        "<p><strong>Prodotti in scadenza</strong></p><p>Elenco sintetico degli articoli che scadono nei prossimi giorni, con priorità altissima per quelli a rischio perdita.</p>";
+      break;
+    case "consumabili":
+      titleEl.textContent = "Consumabili";
+      bodyEl.innerHTML =
+        "<p><strong>Consumabili</strong></p><p>Stato di guanti, garze, sacchetti, carta, toner, ecc. Obiettivo: non rimanere mai senza materiale.</p>";
+      break;
+    case "consegne":
+      titleEl.textContent = "Consegne / Ritiri";
+      bodyEl.innerHTML =
+        "<p><strong>Consegne / Ritiri</strong></p><p>Qui compariranno i ritiri conto-terzi (SDA, Bartolini, ecc.) e le consegne da preparare per i clienti.</p>";
+      break;
+    default:
+      mostraRiepilogoDesktop();
+  }
+}
+
+function mostraRiepilogoDesktop() {
+  const titleEl = document.getElementById("desktop-detail-title");
+  const bodyEl = document.getElementById("desktop-detail-body");
+  if (!titleEl || !bodyEl) return;
+
+  titleEl.textContent = "Riepilogo rapido";
+  bodyEl.innerHTML = `
+    <p><strong>RIEPILOGO RAPIDO</strong></p>
+    <p>
+      • <strong>Assenti / Permessi:</strong> mostra solo le assenze già approvate.<br />
+      • <strong>Comunicazioni:</strong> ultime note interne per il personale.<br />
+      • <strong>Farmacia di turno:</strong> chi è di turno oggi e prossimi giorni.<br />
+      • <strong>Prodotti in scadenza:</strong> articoli critici da svuotare subito.<br />
+      • <strong>Consumabili, logistica, magazzino:</strong> stato operativo della farmacia.
+    </p>
+    <p style="margin-top:10px; font-size:0.85rem; opacity:0.85;">
+      Clicca una card a sinistra per vedere il dettaglio. Se non tocchi nulla per 1 minuto,
+      il sistema torna automaticamente a questo riepilogo.
+    </p>
+  `;
+}
+
+// =======================
+// TIMER INATTIVITÀ (1 MINUTO)
+// =======================
+function resetInactivityTimer() {
+  if (inactivityTimer) clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    mostraRiepilogoDesktop();
+  }, 60 * 1000);
+}
+
+function setupInactivityListeners() {
+  ["mousemove", "keydown", "click", "touchstart"].forEach((evt) => {
+    document.addEventListener(evt, () => {
+      resetInactivityTimer();
+    });
+  });
+}
+
+// =======================
+// FUNZIONI MOBILE – ASSENTI
+// =======================
+function renderAssentiMobile() {
+  const containerOggi = document.getElementById("assenti-oggi");
+  const containerNext = document.getElementById("assenti-prossimi");
+  if (!containerOggi || !containerNext) return;
+
+  const ruoloSelect = document.getElementById("ruolo-assenti");
+  const ruolo = ruoloSelect ? ruoloSelect.value : "farmacia";
+
+  let lista = assenzeDemo.filter((a) => a.stato === "approvato");
+
+  if (ruolo === "dipendente") {
+    const mioNome = "Mario Rossi";
+    lista = lista.filter((a) => a.nome === mioNome);
+  }
+
+  const oggiDate = parseISO(oggiISO);
+  const oggiList = [];
+  const nextList = [];
+
+  lista.forEach((a) => {
+    const dal = parseISO(a.dal);
+    const al = parseISO(a.al);
+
+    if (oggiDate >= dal && oggiDate <= al) {
+      oggiList.push(a);
+    } else if (oggiDate < dal) {
+      nextList.push(a);
+    }
+  });
+
+  nextList.sort((a, b) => parseISO(a.dal) - parseISO(b.dal));
+
+  let htmlOggi = '<h3 style="margin:0 0 6px;">Assenti oggi</h3>';
+  if (oggiList.length === 0) {
+    htmlOggi +=
+      '<p style="margin:0; font-size:0.9rem; opacity:0.8;">Nessuno assente oggi.</p>';
+  } else {
+    htmlOggi += '<ul style="list-style:none; padding:0; margin:0;">';
+    oggiList.forEach((a) => {
+      const range = formatRangeIT(a.dal, a.al);
+      htmlOggi += `<li style="margin-bottom:4px; font-size:0.9rem;">
+        <strong>${a.nome}</strong> – ${a.tipo} (${range})
+      </li>`;
+    });
+    htmlOggi += "</ul>";
+  }
+
+  let htmlNext = '<h3 style="margin:12px 0 6px;">Assenze prossimi giorni</h3>';
+  if (nextList.length === 0) {
+    htmlNext +=
+      '<p style="margin:0; font-size:0.9rem; opacity:0.8;">Non ci sono altre assenze approvate nei prossimi giorni.</p>';
+  } else {
+    htmlNext += '<ul style="list-style:none; padding:0; margin:0;">';
+    nextList.forEach((a) => {
+      const range = formatRangeIT(a.dal, a.al);
+      htmlNext += `<li style="margin-bottom:4px; font-size:0.9rem;">
+        <strong>${a.nome}</strong> – ${a.tipo} (${range})
+      </li>`;
+    });
+    htmlNext += "</ul>";
+  }
+
+  containerOggi.innerHTML = htmlOggi;
+  containerNext.innerHTML = htmlNext;
+}
+
+// =======================
+// FUNZIONI MOBILE – TURNO
+// =======================
+function renderTurnoMobile() {
+  const boxOggi = document.getElementById("turno-oggi");
+  const boxNext = document.getElementById("turno-prossimi");
+  if (!boxOggi || !boxNext) return;
+
+  const oggiDate = parseISO(oggiISO);
+
+  let turnoOggi = turniDemo.find((t) => t.data === oggiISO);
+  if (!turnoOggi) {
+    const futuri = turniDemo
+      .filter((t) => parseISO(t.data) >= oggiDate)
+      .sort((a, b) => parseISO(a.data) - parseISO(b.data));
+    turnoOggi = futuri[0] || turniDemo[0];
+  }
+
+  const altri = turniDemo
+    .filter((t) => t !== turnoOggi)
+    .sort((a, b) => parseISO(a.data) - parseISO(b.data));
+
+  const labelDataOggi = formatLongDateIT(turnoOggi.data);
+
+  boxOggi.innerHTML = `
+    <h3 style="margin:0 0 6px;">Turno di oggi</h3>
+    <p style="margin:0 0 4px; font-size:0.9rem;">
+      <strong>${turnoOggi.farmacia}</strong> – ${labelDataOggi}
+    </p>
+    <p style="margin:0 0 4px; font-size:0.9rem;">Orario: <strong>${turnoOggi.orario}</strong></p>
+    <p style="margin:0 0 4px; font-size:0.9rem;">Appoggio: <strong>${turnoOggi.appoggio}</strong></p>
+    <p style="margin:0; font-size:0.9rem; opacity:0.85;">${turnoOggi.note}</p>
+  `;
+
+  let htmlNext = '<h3 style="margin:12px 0 6px;">Prossimi turni</h3>';
+  if (altri.length === 0) {
+    htmlNext +=
+      '<p style="margin:0; font-size:0.9rem; opacity:0.8;">Non ci sono altri turni in elenco.</p>';
+  } else {
+    htmlNext += '<ul style="list-style:none; padding:0; margin:0;">';
+    altri.forEach((t) => {
+      htmlNext += `<li style="margin-bottom:4px; font-size:0.9rem;">
+        <strong>${formatShortDateIT(t.data)}</strong> – ${t.farmacia} (${t.orario}) · Appoggio: ${t.appoggio}
+      </li>`;
+    });
+    htmlNext += "</ul>";
+  }
+  boxNext.innerHTML = htmlNext;
+}
+
+// =======================
+// SUPPORTO DATE + HTML DESKTOP
+// =======================
 function parseISO(dateStr) {
   const [y, m, d] = dateStr.split("-");
   return new Date(Number(y), Number(m) - 1, Number(d));
@@ -111,19 +418,17 @@ function formatLongDateIT(iso) {
   });
   return formatter.format(date);
 }
-// =======================
-// CONTENUTI PER IL PANNELLO DESTRO
-// =======================
 
+// HTML per assenti / turno in versione desktop
 function buildAssentiHTML() {
   const oggiDate = parseISO(oggiISO);
+  let lista = assenzeDemo.filter((a) => a.stato === "approvato");
   const oggiList = [];
   const nextList = [];
 
-  assenzeDemo.forEach((a) => {
+  lista.forEach((a) => {
     const dal = parseISO(a.dal);
     const al = parseISO(a.al);
-
     if (oggiDate >= dal && oggiDate <= al) {
       oggiList.push(a);
     } else if (oggiDate < dal) {
@@ -133,26 +438,30 @@ function buildAssentiHTML() {
 
   nextList.sort((a, b) => parseISO(a.dal) - parseISO(b.dal));
 
-  let html = '<h3 class="detail-section-title">Assenti oggi</h3>';
+  let html = "<p><strong>Assenti oggi</strong></p>";
   if (oggiList.length === 0) {
-    html += '<p class="panel-note">Nessuno assente oggi.</p>';
+    html += "<p>Nessuno assente oggi.</p>";
   } else {
-    html += '<ul class="detail-list">';
+    html += "<ul>";
     oggiList.forEach((a) => {
-      const range = formatRangeIT(a.dal, a.al);
-      html += `<li><strong>${a.nome}</strong> – ${a.tipo} (${range})</li>`;
+      html += `<li><strong>${a.nome}</strong> – ${a.tipo} (${formatRangeIT(
+        a.dal,
+        a.al
+      )})</li>`;
     });
     html += "</ul>";
   }
 
-  html += '<h3 class="detail-section-title" style="margin-top:10px;">Prossimi giorni</h3>';
+  html += "<p style='margin-top:10px;'><strong>Assenze prossimi giorni</strong></p>";
   if (nextList.length === 0) {
-    html += '<p class="panel-note">Nessuna assenza approvata nei prossimi giorni.</p>';
+    html += "<p>Non ci sono altre assenze approvate nei prossimi giorni.</p>";
   } else {
-    html += '<ul class="detail-list">';
+    html += "<ul>";
     nextList.forEach((a) => {
-      const range = formatRangeIT(a.dal, a.al);
-      html += `<li><strong>${a.nome}</strong> – ${a.tipo} (${range})</li>`;
+      html += `<li><strong>${a.nome}</strong> – ${a.tipo} (${formatRangeIT(
+        a.dal,
+        a.al
+      )})</li>`;
     });
     html += "</ul>";
   }
@@ -175,196 +484,26 @@ function buildTurnoHTML() {
     .filter((t) => t !== turnoOggi)
     .sort((a, b) => parseISO(a.data) - parseISO(b.data));
 
-  let html = '<h3 class="detail-section-title">Turno di oggi</h3>';
-  html += `<p><strong>${turnoOggi.farmacia}</strong> – ${formatLongDateIT(
-    turnoOggi.data
-  )}</p>`;
+  let html = "<p><strong>Turno di oggi</strong></p>";
+  html += `<p>${formatLongDateIT(turnoOggi.data)} – <strong>${
+    turnoOggi.farmacia
+  }</strong></p>`;
   html += `<p>Orario: <strong>${turnoOggi.orario}</strong></p>`;
   html += `<p>Appoggio: <strong>${turnoOggi.appoggio}</strong></p>`;
-  html += `<p class="panel-note">${turnoOggi.note}</p>`;
+  html += `<p style="opacity:0.85;">${turnoOggi.note}</p>`;
 
-  html += '<h3 class="detail-section-title" style="margin-top:10px;">Prossimi turni</h3>';
+  html += "<p style='margin-top:10px;'><strong>Prossimi turni</strong></p>";
   if (altri.length === 0) {
-    html += '<p class="panel-note">Nessun altro turno in elenco.</p>';
+    html += "<p>Non ci sono altri turni in elenco.</p>";
   } else {
-    html += '<ul class="detail-list">';
+    html += "<ul>";
     altri.forEach((t) => {
-      html += `<li><strong>${formatShortDateIT(t.data)}</strong> – ${t.farmacia} (${t.orario}) · Appoggio: ${t.appoggio}</li>`;
+      html += `<li><strong>${formatShortDateIT(
+        t.data
+      )}</strong> – ${t.farmacia} (${t.orario}) · Appoggio: ${t.appoggio}</li>`;
     });
     html += "</ul>";
   }
 
   return html;
-}
-
-function buildPlaceholderHTML(sectionId) {
-  const nomi = {
-    comunicazioni: "Comunicazioni interne",
-    procedure: "Procedure",
-    logistica: "Logistica",
-    magazziniera: "Magazziniera",
-    scadenze: "Prodotti in scadenza",
-    consumabili: "Consumabili",
-    consegne: "Consegne / Ritiri",
-    cassa: "Cambio cassa",
-    archivio: "Archivio file",
-  };
-  const nome = nomi[sectionId] || "Sezione";
-
-  return `
-    <h3 class="detail-section-title">${nome}</h3>
-    <p class="panel-note">
-      Contenuto demo: in futuro qui vedrai i dati reali della sezione
-      <strong>${nome}</strong> (liste, riepiloghi, pulsanti azione veloci).
-    </p>
-  `;
-}
-
-// =======================
-// GESTIONE PANNELLO DESTRO + TIMER
-// =======================
-
-let inactivityTimer = null;
-
-function resetInactivityTimer() {
-  if (inactivityTimer) clearTimeout(inactivityTimer);
-  inactivityTimer = setTimeout(() => {
-    renderSummaryInDetail();
-  }, 60 * 1000); // 1 minuto
-}
-
-function setDetailContent(title, subtitle, html) {
-  const titleEl = document.getElementById("detail-title");
-  const subEl = document.getElementById("detail-subtitle");
-  const bodyEl = document.getElementById("detail-body");
-  if (!titleEl || !subEl || !bodyEl) return;
-
-  titleEl.textContent = title;
-  subEl.textContent = subtitle;
-  bodyEl.innerHTML = html;
-  resetInactivityTimer();
-}
-
-function renderSummaryInDetail() {
-  const html = `
-    <h3 class="detail-section-title">Riepilogo rapido</h3>
-    <ul class="detail-list">
-      <li><strong>Assenti / Permessi</strong> – mostra chi manca oggi e i prossimi giorni.</li>
-      <li><strong>Farmacia di turno</strong> – turno attivo e turni successivi.</li>
-      <li><strong>Comunicazioni</strong> – messaggi importanti per il personale.</li>
-      <li><strong>Procedure</strong> – istruzioni operative veloci.</li>
-      <li><strong>Logistica / Magazziniera</strong> – arrivi, espositori, inventari.</li>
-      <li><strong>Prodotti in scadenza / Consumabili</strong> – controllo scorte.</li>
-      <li><strong>Consegne / Ritiri</strong> – movimenti giornalieri.</li>
-      <li><strong>Cambio cassa</strong> – ultimo cambio registrato.</li>
-      <li><strong>Archivio file</strong> – documenti operativi e moduli.</li>
-    </ul>
-  `;
-  setDetailContent(
-    "Riepilogo rapido",
-    "Seleziona una card a sinistra per entrare nel dettaglio.",
-    html
-  );
-}
-
-function setupDesktopDetail() {
-  const isDesktop = window.matchMedia("(min-width: 769px)").matches;
-  if (!isDesktop) return;
-
-  const buttons = document.querySelectorAll(
-    ".desktop-dashboard [data-section]"
-  );
-  buttons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-section");
-      if (!id) return;
-
-      if (id === "assenti") {
-        setDetailContent(
-          "Assenti / Permessi",
-          "Vedi subito chi manca oggi e nei prossimi giorni.",
-          buildAssentiHTML()
-        );
-      } else if (id === "turno") {
-        setDetailContent(
-          "Farmacia di turno",
-          "Turno di oggi e prossimi turni programmati.",
-          buildTurnoHTML()
-        );
-      } else {
-        setDetailContent(
-          "Sezione " + id,
-          "Contenuto demo della sezione. In futuro sarà collegata al gestionale.",
-          buildPlaceholderHTML(id)
-        );
-      }
-    });
-  });
-
-  // avvio il timer per il riepilogo
-  resetInactivityTimer();
-}
-
-// =======================
-// NAVIGAZIONE MOBILE (schermate intere)
-// =======================
-
-function setupMobileNavigation() {
-  const mobileDash = document.querySelector(".mobile-dashboard");
-  const desktopDash = document.querySelector(".desktop-dashboard");
-  const sezioni = document.querySelectorAll(".sezione-dettaglio");
-
-  function mostraDashboardMobile() {
-    if (mobileDash) mobileDash.style.display = "block";
-    if (desktopDash) desktopDash.style.display = "none";
-    sezioni.forEach((s) => (s.style.display = "none"));
-    window.scrollTo(0, 0);
-  }
-
-  function mostraSezioneMobile(id) {
-    if (mobileDash) mobileDash.style.display = "none";
-    if (desktopDash) desktopDash.style.display = "none";
-    sezioni.forEach((s) => {
-      s.style.display = s.id === "sezione-" + id ? "block" : "none";
-    });
-
-    if (id === "assenti") {
-      const wrap = document.getElementById("assenti-wrapper");
-      if (wrap) wrap.innerHTML = buildAssentiHTML();
-    } else if (id === "turno") {
-      const wrap = document.getElementById("turno-wrapper");
-      if (wrap) wrap.innerHTML = buildTurnoHTML();
-    }
-    window.scrollTo(0, 0);
-  }
-
-  // click card mobile
-  const mobileButtons = document.querySelectorAll(".mobile-dashboard [data-section]");
-  mobileButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-section");
-      if (!id) return;
-
-      if (id === "assenti" || id === "turno") {
-        mostraSezioneMobile(id);
-      } else {
-        // per ora le altre solo messaggio rapido
-        alert("Sezione '" + id + "' in lavorazione (demo).");
-      }
-    });
-  });
-
-  // pulsanti "torna alla dashboard"
-  const closeButtons = document.querySelectorAll("[data-close='sezione']");
-  closeButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      mostraDashboardMobile();
-    });
-  });
-
-  // se siamo su mobile all'avvio, mostro dashboard mobile
-  if (window.matchMedia("(max-width: 768px)").matches) {
-    if (mobileDash) mobileDash.style.display = "block";
-    if (desktopDash) desktopDash.style.display = "none";
-  }
 }
