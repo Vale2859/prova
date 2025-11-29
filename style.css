@@ -1,575 +1,679 @@
+/* RESET BASE */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-:root {
-  --bg-body: #041427;
-  --bg-panel: #061a33;
-  --bg-card: #0b2340;
-  --txt-main: #f9fbff;
-  --txt-muted: #c3c8d9;
-
-  --accent-blue: #1b78ff;
-  --accent-green: #1cc88a;
-  --accent-orange: #f6a623;
-  --accent-pink: #ff3d9a;
-  --accent-purple: #7a5cff;
-  --accent-cyan: #19c1d8;
-
-  --radius-lg: 18px;
-  --radius-md: 14px;
-  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.35);
-  --transition-fast: 0.18s ease-out;
-  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-    "Helvetica Neue", Arial, sans-serif;
-
-  /* PALETTE CARD – stessa per MOBILE e DESKTOP */
-  --card-green: linear-gradient(135deg, #00c853, #00e676);
-  --card-blue: linear-gradient(135deg, #1b78ff, #4dabff);
-  --card-pink: linear-gradient(135deg, #ff3d9a, #ff7bbf);
-  --card-teal: linear-gradient(135deg, #26c6da, #00acc1);
-  --card-yellow: linear-gradient(135deg, #f6a623, #ffca28);
-  --card-cyan: linear-gradient(135deg, #19c1d8, #4dd0e1);
-  --card-orange: linear-gradient(135deg, #ff8a65, #ff7043);
-  --card-green2: linear-gradient(135deg, #43a047, #66bb6a);
-  --card-blue2: linear-gradient(135deg, #3949ab, #5c6bc0);
-  --card-purple: linear-gradient(135deg, #7e57c2, #9575cd);
-  --card-dark: linear-gradient(135deg, #263238, #37474f);
-
-  /* Agenda colori servizi */
-  --agenda-ecg: rgba(33, 150, 243, 0.22);
-  --agenda-holter: rgba(255, 193, 7, 0.28);
-  --agenda-altro: rgba(76, 175, 80, 0.22);
-}
-
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   height: 100%;
 }
 
-body {
-  font-family: var(--font-main);
-  background: radial-gradient(circle at 0 0, #115a9c 0, #041427 55%, #020711 100%);
-  color: var(--txt-main);
+/* VARIABILI */
+:root {
+  --bg-main: radial-gradient(circle at 0 0, #46a4ff 0, #0a1a3a 40%, #020715 100%);
+  --bg-panel: rgba(6, 25, 60, 0.9);
+  --bg-panel-light: rgba(13, 38, 90, 0.9);
+
+  --txt-main: #fdfdfd;
+  --txt-muted: #d0d4e3;
+  --txt-strong: #ffffff;
+
+  --radius-xl: 26px;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+
+  --shadow-soft: 0 14px 40px rgba(0, 0, 0, 0.5);
+  --transition-fast: 0.18s ease-out;
+
+  /* card colors */
+  --card-green: linear-gradient(135deg, #7ae27a, #00c853);
+  --card-blue: linear-gradient(135deg, #64b5ff, #1b78ff);
+  --card-pink: linear-gradient(135deg, #ff77b5, #ff3d9a);
+  --card-teal: linear-gradient(135deg, #4dd0e1, #00acc1);
+  --card-yellow: linear-gradient(135deg, #ffd54f, #ffaa00);
+  --card-cyan: linear-gradient(135deg, #4dd0e1, #19c1d8);
+  --card-orange: linear-gradient(135deg, #ffb74d, #ff7043);
+  --card-green2: linear-gradient(135deg, #a5d66b, #66bb6a);
+  --card-blue2: linear-gradient(135deg, #7e8bff, #3949ab);
+  --card-purple: linear-gradient(135deg, #ba68c8, #7e57c2);
+  --card-dark: linear-gradient(135deg, #263238, #37474f);
+
+  --accent-blue: #4dabff;
+  --accent-green: #00e676;
+  --accent-red: #ff5252;
 }
 
-/* =========================================
-   STRUTTURA BASE
-   ========================================= */
+/* BODY */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Helvetica Neue", Arial, sans-serif;
+  color: var(--txt-main);
+  background: var(--bg-main);
+}
 
+/* APP SHELL */
 .app-shell {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
-/* Di default mostro desktop, nascondo mobile.
-   Poi con le media query invertiamo sui telefoni. */
-.mobile-dashboard {
-  display: none;
-}
-
-.desktop-dashboard {
-  display: block;
-}
-
-/* =========================================
-   HEADER DESKTOP
-   ========================================= */
-
-.app-header {
-  padding: 12px 32px 6px;
+/* TOPBAR */
+.topbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  padding: 10px 26px;
+  color: var(--txt-main);
 }
 
-.desk-hamburger {
+.topbar-hamburger {
   border: none;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
   border-radius: 999px;
-  width: 36px;
-  height: 36px;
-  background: rgba(0, 0, 0, 0.45);
-  color: #ffffff;
-  font-size: 18px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
   cursor: pointer;
 }
 
-.app-header-text h1 {
-  font-size: 1.2rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  margin: 0 0 2px;
+.topbar-center {
+  text-align: center;
+  flex: 1;
 }
 
-.app-header__subtitle {
+.topbar-logo-text {
+  display: block;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  font-size: 0.9rem;
+}
+
+.topbar-subtitle {
   font-size: 0.8rem;
   color: var(--txt-muted);
 }
 
-/* =========================================
-   GRIGLIA QUADRANTI DESKTOP (2x2)
-   ========================================= */
+.topbar-date {
+  min-width: 120px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* ==========================
+   DESKTOP LAYOUT
+   ========================== */
+.desktop-dashboard {
+  display: block;
+  flex: 1;
+}
 
 .desktop-grid {
-  flex: 1;
-  padding: 10px 22px 22px;
+  padding: 8px 26px 24px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 14px;
-  min-height: 0;
+  grid-template-columns: 1.3fr 1.7fr;
+  grid-template-rows: 1.2fr 1fr;
+  gap: 16px;
 }
 
-.quad {
-  background: linear-gradient(145deg, var(--bg-card), #061932);
-  border-radius: var(--radius-lg);
-  padding: 12px 14px;
+/* pannelli quadranti */
+.panel {
+  background: var(--bg-panel-light);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-soft);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 14px 18px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* leggero pattern */
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.04), transparent 60%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.panel-subtitle {
+  margin: 4px 0 10px;
+  font-size: 0.9rem;
+  color: var(--txt-muted);
+}
+
+/* QUADRANTE SPECIFICI */
+.panel-q1,
+.panel-q2,
+.panel-q3,
+.panel-q4 {
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
-.quad-title {
-  margin: 0 0 4px;
-  font-size: 0.9rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-
-/* =======================
-   Q1 – CARD SEZIONI DESKTOP
-   ======================= */
-
+/* Q1 – CARD SEZIONI */
 .q1-card-grid {
-  margin-top: 6px;
+  margin-top: 8px;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(70px, 1fr);
-  gap: 8px;
+  grid-auto-rows: 90px;
+  gap: 10px;
 }
 
-.q-card {
-  position: relative;
-  border-radius: 16px;
-  padding: 8px 9px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow-soft);
-  cursor: pointer;
-  overflow: hidden;
-  color: #ffffff;
+.q1-card {
+  border-radius: 20px;
+  border: none;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 6px;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.q-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.7);
+.q1-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.7);
 }
 
-.q-card-label {
-  font-size: 0.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  opacity: 0.9;
+/* colori card */
+.card-assenti { background: var(--card-green); }
+.card-turno { background: var(--card-blue); }
+.card-comunicazioni { background: var(--card-pink); }
+.card-procedure { background: var(--card-teal); }
+.card-logistica { background: var(--card-yellow); }
+.card-magazzino { background: var(--card-cyan); }
+.card-scadenze { background: var(--card-orange); }
+.card-consumabili { background: var(--card-green2); }
+.card-archivio { background: var(--card-purple); }
+
+/* Q2 – PROMOZIONI & GIORNATE */
+.panel-q2 {
+  background: rgba(9, 32, 82, 0.95);
 }
 
-.q-card-title {
-  margin-top: 3px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.q-card-icon {
-  position: absolute;
-  right: -4px;
-  bottom: -4px;
-  font-size: 1.6rem;
-  opacity: 0.18;
-}
-
-/* Colori card Q1 = mobile */
-.q-card-green { background: var(--card-green); }
-.q-card-blue { background: var(--card-blue); }
-.q-card-pink { background: var(--card-pink); }
-.q-card-teal { background: var(--card-teal); }
-.q-card-yellow { background: var(--card-yellow); }
-.q-card-cyan { background: var(--card-cyan); }
-.q-card-orange { background: var(--card-orange); }
-.q-card-green2 { background: var(--card-green2); }
-.q-card-purple { background: var(--card-purple); }
-
-/* =======================
-   Q2 – AREA CONTENUTI
-   ======================= */
-
-.q2-content {
-  margin-top: 4px;
-  flex: 1;
-  border-radius: 14px;
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.04), transparent 60%);
-  padding: 10px 12px;
-  overflow: auto;
-  position: relative;
-}
-
-.q2-placeholder {
-  text-align: left;
-  max-width: 420px;
-}
-
-.q2-placeholder-main {
-  margin: 0 0 4px;
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.q2-placeholder-sub {
-  margin: 0;
-  font-size: 0.85rem;
-  opacity: 0.9;
-}
-
-/* Piccolo effetto “fade” quando torna allo stato iniziale */
-.q2-content.fade {
-  animation: q2Fade 0.6s ease-out;
-}
-
-@keyframes q2Fade {
-  from { opacity: 0; transform: translateY(3px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Blocchi sezione dentro Q2 */
-.q2-section-title {
-  font-size: 0.95rem;
-  margin: 0 0 4px;
-  font-weight: 600;
-}
-
-.q2-section-sub {
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-  opacity: 0.8;
-}
-
-.q2-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 0.85rem;
-}
-
-.q2-list li + li {
-  margin-top: 4px;
-}
-
-/* =======================
-   Q3 – OFFERTE / GIORNATE
-   ======================= */
-
-.q3-columns {
-  margin-top: 6px;
+.q2-columns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  flex: 1;
-  min-height: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 6px;
 }
 
-.q3-column {
-  background: rgba(0, 0, 0, 0.28);
-  border-radius: 12px;
-  padding: 8px 9px;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+.q2-column {
+  background: rgba(6, 22, 60, 0.9);
+  border-radius: var(--radius-lg);
+  padding: 10px 12px;
 }
 
-.q3-header-row {
+.q2-column-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin-bottom: 4px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
 }
 
-.q3-header-row h3 {
-  margin: 0;
-  font-size: 0.85rem;
-}
-
-.btn-pill {
+.pill-btn {
   border-radius: 999px;
   border: none;
   padding: 4px 10px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
   background: var(--accent-blue);
-  color: #ffffff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.pill-btn:hover {
+  filter: brightness(1.1);
 }
 
 .promo-list {
   list-style: none;
-  padding: 0;
   margin: 0;
-  font-size: 0.8rem;
-  flex: 1;
-  overflow: auto;
+  padding: 0;
+  max-height: 190px;
+  overflow-y: auto;
 }
 
 .promo-item {
+  background: rgba(14, 47, 115, 0.9);
+  border-radius: 12px;
+  padding: 6px 8px;
+  margin-bottom: 6px;
   position: relative;
-  border-radius: 10px;
-  padding: 6px 8px 6px 26px;
-  margin-bottom: 4px;
-  background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.09), rgba(0, 0, 0, 0.45));
-  display: flex;
-  flex-direction: column;
+  border-left: 4px solid var(--accent-green);
 }
 
-.promo-item-icon {
-  position: absolute;
-  left: 6px;
-  top: 7px;
-  font-size: 0.9rem;
-}
-
-.promo-title-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 4px;
-  margin-bottom: 2px;
+.promo-item.giornata {
+  border-left-color: #ffca28;
 }
 
 .promo-title {
-  font-weight: 600;
+  font-weight: 800;
+  font-size: 0.9rem;
 }
 
 .promo-date {
   font-size: 0.75rem;
-  opacity: 0.85;
+  color: var(--txt-muted);
 }
 
 .promo-desc {
-  margin: 0;
-  font-size: 0.75rem;
-  opacity: 0.9;
+  font-size: 0.8rem;
+  margin-top: 2px;
 }
 
-/* Cestino in hover */
+.promo-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-top: 3px;
+}
+
+.promo-tag.promo {
+  background: rgba(0, 230, 118, 0.2);
+  color: #b9ffcf;
+}
+
+.promo-tag.giornata {
+  background: rgba(255, 234, 0, 0.2);
+  color: #fff59d;
+}
+
 .promo-delete {
   position: absolute;
   right: 6px;
-  bottom: 4px;
-  font-size: 0.8rem;
-  color: #ff8a80;
+  top: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--accent-red);
+  font-size: 0.75rem;
+  display: none;
   cursor: pointer;
-  opacity: 0;
-  transform: translateY(2px);
-  transition: opacity 0.15s ease-out, transform 0.15s ease-out;
 }
 
 .promo-item:hover .promo-delete {
-  opacity: 1;
-  transform: translateY(0);
+  display: block;
 }
 
-/* =======================
-   Q4 – AGENDA SERVIZI
-   ======================= */
+.empty-text {
+  font-size: 0.8rem;
+  color: var(--txt-muted);
+}
 
-.agenda-header {
+/* Q3 – AREA CONTENUTI */
+.panel-q3 {
+  background: rgba(9, 35, 94, 0.9);
+}
+
+.content-area {
+  flex: 1;
+  margin-top: 8px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(19, 54, 130, 0.9), rgba(39, 65, 145, 0.9));
+  padding: 12px 14px;
+  overflow-y: auto;
+}
+
+.content-area h3 {
+  margin-top: 0;
+}
+
+.content-placeholder {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--txt-muted);
+}
+
+/* overlay inattività */
+.content-idle {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.65));
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-top: 4px;
-  margin-bottom: 6px;
+  justify-content: center;
 }
 
-.agenda-month-label {
-  flex: 1;
+.idle-inner {
+  max-width: 420px;
   text-align: center;
-  font-weight: 600;
-  font-size: 0.9rem;
+  padding: 10px 14px;
 }
 
-.agenda-nav-btn,
-.agenda-back-month {
-  border-radius: 999px;
-  border: none;
-  padding: 4px 9px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.45);
-  color: #fff;
+.idle-inner h3 {
+  margin-top: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
 }
 
-.agenda-back-month.hidden {
-  display: none;
+#idleSummaryList {
+  list-style: disc;
+  text-align: left;
+  margin: 8px 0 0 20px;
+  font-size: 0.85rem;
 }
 
-.agenda-month-view {
-  flex: 1;
-  overflow: auto;
-}
-
-.agenda-month-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-  font-size: 0.75rem;
-}
-
-.agenda-month-grid-header {
-  font-weight: 600;
-  text-align: center;
-  padding: 4px 0;
-  opacity: 0.8;
-}
-
-.agenda-day-cell {
-  min-height: 42px;
-  border-radius: 8px;
-  padding: 2px 4px;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.25);
-  position: relative;
+/* Q4 – AGENDA */
+.panel-q4 {
+  background: rgba(8, 31, 84, 0.95);
   display: flex;
   flex-direction: column;
 }
 
-.agenda-day-cell-empty {
-  background: transparent;
-  cursor: default;
+.agenda-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
-.agenda-day-number {
-  font-size: 0.75rem;
-  font-weight: 600;
+.agenda-month-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.agenda-day-badge {
-  margin-top: 2px;
-  font-size: 0.7rem;
+.circle-btn {
   border-radius: 999px;
-  padding: 1px 6px;
-  align-self: flex-start;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.agenda-day-ecg {
-  background: var(--agenda-ecg);
-}
-
-.agenda-day-holter {
-  background: var(--agenda-holter);
-}
-
-.agenda-day-altro {
-  background: var(--agenda-altro);
-}
-
-.agenda-day-today {
-  outline: 2px solid rgba(255, 255, 255, 0.7);
-}
-
-/* Vista giornaliera */
-.agenda-day-view {
-  flex: 1;
-  overflow: auto;
-}
-
-.agenda-day-label {
+  border: none;
+  width: 34px;
+  height: 34px;
   font-size: 0.9rem;
-  font-weight: 600;
+  cursor: pointer;
+  background: rgba(19, 42, 99, 0.95);
+  color: #fff;
+}
+
+#agendaMonthLabel {
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+/* vista mensile */
+.agenda-month-view {
+  flex: 1;
+  border-radius: var(--radius-lg);
+  background: rgba(8, 31, 78, 0.95);
+  padding: 8px 10px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: 60px;
+  gap: 4px;
+}
+
+.agenda-day-cell {
+  border-radius: 10px;
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: rgba(20, 49, 110, 0.95);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.agenda-day-cell .day-number {
+  font-weight: 800;
+}
+
+.agenda-day-cell .day-dot-row {
+  display: flex;
+  gap: 3px;
+  margin-top: 2px;
+}
+
+.day-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+}
+
+.day-dot.ecg { background: #66ff66; }
+.day-dot.holter { background: #ffca28; }
+.day-dot.altro { background: #ff5252; }
+
+.agenda-day-cell.today {
+  outline: 2px solid var(--accent-blue);
+}
+
+.agenda-day-cell:hover {
+  filter: brightness(1.1);
+}
+
+/* vista giornaliera */
+.agenda-day-view {
+  border-radius: var(--radius-lg);
+  background: rgba(8, 31, 78, 0.95);
+  padding: 8px 10px 10px;
+  flex: 1;
+}
+
+.agenda-day-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+#agendaDayLabel {
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.agenda-day-slots {
+  max-height: 210px;
+  overflow-y: auto;
+}
+
+.agenda-slot {
+  display: grid;
+  grid-template-columns: 60px minmax(0, 1fr);
+  align-items: stretch;
+  font-size: 0.8rem;
   margin-bottom: 4px;
 }
 
-.agenda-slots {
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.25);
-  padding: 6px;
-  max-height: 100%;
-  overflow: auto;
+.slot-time {
+  padding: 4px 4px;
+  color: var(--txt-muted);
 }
 
-.agenda-slot-row {
-  display: grid;
-  grid-template-columns: 60px minmax(0, 1fr);
-  gap: 6px;
-  align-items: flex-start;
-  font-size: 0.8rem;
-  padding: 4px 4px;
-  border-radius: 8px;
+.slot-body {
+  border-radius: 10px;
+  padding: 4px 8px;
+  background: rgba(18, 46, 110, 0.9);
   cursor: pointer;
 }
 
-.agenda-slot-row:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.agenda-slot-row.has-app {
-  background: rgba(0, 0, 0, 0.55);
-}
-
-.agenda-slot-time {
-  font-weight: 600;
-}
-
-.agenda-slot-content-empty {
+.slot-body.empty {
+  opacity: 0.5;
   font-style: italic;
-  opacity: 0.75;
 }
 
-.agenda-slot-chip {
-  display: inline-block;
+.slot-body.has-event {
+  background: linear-gradient(135deg, #66bb6a, #26a69a);
+}
+
+.slot-body.has-event.ecg {
+  background: linear-gradient(135deg, #76ff03, #00c853);
+}
+
+.slot-body.has-event.holter {
+  background: linear-gradient(135deg, #ffd54f, #ffb300);
+}
+
+.slot-body.has-event.altro {
+  background: linear-gradient(135deg, #ff8a80, #ff5252);
+}
+
+.slot-title {
+  font-weight: 800;
+}
+
+.slot-sub {
+  font-size: 0.75rem;
+}
+
+/* FAB WHATSAPP */
+.fab-whatsapp {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 50px;
+  height: 50px;
   border-radius: 999px;
-  padding: 1px 6px;
-  font-size: 0.7rem;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  background: radial-gradient(circle at 0 0, #a5ffce, #00c853);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
 }
 
-/* =======================
-   BOTTONI GLOBALI
-   ======================= */
+/* MODALI */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-dialog {
+  background: #071426;
+  border-radius: 18px;
+  padding: 12px 14px 14px;
+  min-width: 280px;
+  max-width: 380px;
+  color: var(--txt-main);
+  box-shadow: var(--shadow-soft);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.modal-close {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  margin-top: 8px;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+
+.field-label input,
+.field-label textarea,
+.field-label select {
+  width: 100%;
+  margin-top: 3px;
+  border-radius: 10px;
+  border: none;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  background: #0b223f;
+  color: #fff;
+}
+
+.field-label textarea {
+  resize: vertical;
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
 
 .btn-primary,
 .btn-secondary {
   border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
   cursor: pointer;
-  font-family: inherit;
-  font-size: 0.8rem;
 }
 
 .btn-primary {
   background: var(--accent-blue);
   color: #fff;
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-weight: 600;
 }
 
 .btn-secondary {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.08);
   color: #fff;
-  border-radius: 999px;
-  padding: 6px 12px;
 }
 
-/* =========================================
-   MOBILE DASHBOARD – CARD STILE PORTALE
-   ========================================= */
+/* COMMON */
+.hidden {
+  display: none;
+}
 
+/* ==========================
+   MOBILE LAYOUT
+   ========================== */
+.mobile-dashboard {
+  display: none;
+}
+
+/* card stile telefono */
 .m-header {
   padding: 14px 16px 6px;
   display: flex;
@@ -619,13 +723,8 @@ body {
   left: 0;
 }
 
-.m-hamburger span::before {
-  top: -5px;
-}
-
-.m-hamburger span::after {
-  top: 5px;
-}
+.m-hamburger span::before { top: -5px; }
+.m-hamburger span::after { top: 5px; }
 
 .m-main {
   padding: 4px 12px 16px;
@@ -637,7 +736,6 @@ body {
   gap: 10px;
 }
 
-/* Card base mobile */
 .m-card {
   position: relative;
   border-radius: 18px;
@@ -687,12 +785,8 @@ body {
   opacity: 0.22;
 }
 
-/* Card larga mobile (Archivio file) */
-.m-card-wide {
-  grid-column: 1 / -1;
-}
+.m-card-wide { grid-column: 1 / -1; }
 
-/* COLORI CARD MOBILE – agganciati alle variabili usate anche su desktop */
 .m-card-green { background: var(--card-green); }
 .m-card-blue { background: var(--card-blue); }
 .m-card-pink { background: var(--card-pink); }
@@ -704,321 +798,16 @@ body {
 .m-card-blue2 { background: var(--card-blue2); }
 .m-card-purple { background: var(--card-purple); }
 .m-card-dark { background: var(--card-dark); }
-/* =========================================
-   CHAT INTERNA (FAB + MODALE)
-   ========================================= */
 
-.chat-fab {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  width: 46px;
-  height: 46px;
-  border-radius: 999px;
-  border: none;
-  background: radial-gradient(circle at 30% 20%, #ffffff, #00c853);
-  color: #001015;
-  font-size: 22px;
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85);
-  cursor: pointer;
-  z-index: 60;
-}
-
-.chat-overlay.hidden {
-  display: none;
-}
-
-.chat-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-}
-
-.chat-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-}
-
-.chat-modal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(640px, 95vw);
-  height: min(520px, 90vh);
-  background: linear-gradient(145deg, #041a30, #020d19);
-  border-radius: 20px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
-  display: flex;
-  flex-direction: column;
-  padding: 10px 10px 8px;
-  color: #ffffff;
-}
-
-.chat-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-inline: 4px;
-  margin-bottom: 4px;
-}
-
-.chat-header h2 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.chat-close-btn {
-  border: none;
-  background: transparent;
-  color: #fff;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 4px 4px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.chat-msg-row {
-  display: flex;
-}
-
-.chat-msg-row.left {
-  justify-content: flex-start;
-}
-
-.chat-msg-row.right {
-  justify-content: flex-end;
-}
-
-.chat-bubble {
-  max-width: 70%;
-  padding: 6px 9px;
-  border-radius: 14px;
-  font-size: 0.85rem;
-  position: relative;
-}
-
-.chat-bubble.left {
-  background: rgba(0, 0, 0, 0.6);
-  border-bottom-left-radius: 4px;
-}
-
-.chat-bubble.right {
-  background: #1b78ff;
-  border-bottom-right-radius: 4px;
-}
-
-.chat-bubble-author {
-  font-size: 0.7rem;
-  opacity: 0.85;
-  margin-bottom: 2px;
-}
-
-.chat-bubble-text {
-  margin: 0;
-}
-
-.chat-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
-  padding-top: 4px;
-}
-
-.chat-authors {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 4px;
-}
-
-.chat-author-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: none;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.chat-author-btn.active {
-  background: #1b78ff;
-}
-
-.chat-input-row {
-  display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) 70px;
-  gap: 6px;
-  align-items: center;
-  margin-bottom: 2px;
-}
-
-.chat-icon-btn {
-  border-radius: 999px;
-  border: none;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  font-size: 16px;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-}
-
-.chat-input {
-  border-radius: 999px;
-  border: none;
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  outline: none;
-  background: rgba(0, 0, 0, 0.65);
-  color: #fff;
-}
-
-.chat-send-btn {
-  border-radius: 999px;
-  border: none;
-  padding: 6px 10px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  background: var(--accent-green);
-  color: #001015;
-  cursor: pointer;
-}
-
-.chat-attachment-label {
-  font-size: 0.75rem;
-  opacity: 0.9;
-  padding-left: 40px;
-}
-
-/* =========================================
-   MODALE UNICA (OFFERTA / GIORNATA / APPUNTAMENTO)
-   ========================================= */
-
-.modal-overlay.hidden {
-  display: none;
-}
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-}
-
-.modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-}
-
-.modal-card {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: min(420px, 95vw);
-  background: linear-gradient(145deg, #061a33, #030e19);
-  border-radius: 18px;
-  padding: 10px 14px 12px;
-  color: #ffffff;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 6px;
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.modal-close-btn {
-  border: none;
-  background: transparent;
-  color: #fff;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.modal-section label {
-  display: block;
-  font-size: 0.8rem;
-  margin-bottom: 4px;
-}
-
-.modal-section input,
-.modal-section textarea {
-  width: 100%;
-  border-radius: 10px;
-  border: none;
-  padding: 6px 8px;
-  font-size: 0.8rem;
-  font-family: inherit;
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-}
-
-.modal-section textarea {
-  resize: vertical;
-  min-height: 60px;
-}
-
-.modal-section.hidden {
-  display: none;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-/* =========================================
-   RESPONSIVE
-   ========================================= */
-
-/* Tablet: layout quadranti più morbido se lo schermo è stretto */
-@media (max-width: 1100px) {
-  .desktop-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-  }
-}
-
-/* Mobile: nascondo desktop, mostro mobile */
-@media (max-width: 768px) {
+/* RESPONSIVE SWITCH */
+@media (max-width: 900px) {
   .desktop-dashboard {
     display: none;
   }
-
   .mobile-dashboard {
     display: block;
   }
-
-  .chat-fab {
-    right: 14px;
-    bottom: 14px;
-    width: 40px;
-    height: 40px;
-    font-size: 19px;
+  body {
+    background: radial-gradient(circle at 0 0, #46a4ff 0, #041427 55%, #020711 100%);
   }
 }
