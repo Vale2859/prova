@@ -5,36 +5,6 @@
   box-sizing: border-box;
 }
 
-:root {
-  --bg-page: #f4f5fb;          /* sfondo chiaro */
-  --bg-quad: #ffffff;
-  --bg-quad-soft: #f0f3ff;
-  --border-quad: #d3d8f2;
-  --txt-main: #1d2333;
-  --txt-muted: #6c7694;
-
-  --accent-primary: #189a6b;   /* verde farmacia */
-  --accent-secondary: #2563eb; /* blu */
-  --accent-warning: #f59e0b;
-
-  --radius-lg: 20px;
-  --radius-md: 14px;
-  --shadow-soft: 0 12px 30px rgba(15, 23, 42, 0.16);
-  --transition-fast: 0.18s ease-out;
-
-  /* palette cards */
-  --card-green: linear-gradient(135deg, #22c55e, #4ade80);
-  --card-blue: linear-gradient(135deg, #3b82f6, #60a5fa);
-  --card-pink: linear-gradient(135deg, #ec4899, #f472b6);
-  --card-teal: linear-gradient(135deg, #06b6d4, #22d3ee);
-  --card-yellow: linear-gradient(135deg, #f59e0b, #facc15);
-  --card-cyan: linear-gradient(135deg, #0ea5e9, #38bdf8);
-  --card-orange: linear-gradient(135deg, #fb923c, #f97316);
-  --card-green2: linear-gradient(135deg, #16a34a, #22c55e);
-  --card-purple: linear-gradient(135deg, #8b5cf6, #a855f7);
-  --card-dark: linear-gradient(135deg, #111827, #020617);
-}
-
 html,
 body {
   margin: 0;
@@ -42,10 +12,49 @@ body {
   height: 100%;
 }
 
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+:root {
+  --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Helvetica Neue", Arial, sans-serif;
-  background: radial-gradient(circle at top left, #e0f2fe 0, #fef3c7 45%, #f4f5fb 100%);
+
+  /* Palette chiara farmacia */
+  --bg-page-top: #f5f3ea;
+  --bg-page-bottom: #dde8f5;
+  --bg-card: #ffffff;
+  --bg-card-soft: #f8f7f2;
+  --border-soft: rgba(0, 0, 0, 0.06);
+  --shadow-soft: 0 14px 35px rgba(0, 0, 0, 0.12);
+
+  --txt-main: #22252b;
+  --txt-muted: #666b76;
+  --txt-light: #f9fafc;
+
+  --accent-blue: #1b78ff;
+  --accent-green: #00c853;
+  --accent-orange: #ff9800;
+  --accent-pink: #ff3d9a;
+  --accent-purple: #7e57c2;
+  --accent-cyan: #00bcd4;
+
+  --radius-lg: 22px;
+  --radius-md: 14px;
+
+  /* Gradients card colorate (stessa palette mobile/desktop) */
+  --card-green: linear-gradient(135deg, #00c853, #00e676);
+  --card-blue: linear-gradient(135deg, #1b78ff, #4dabff);
+  --card-pink: linear-gradient(135deg, #ff3d9a, #ff7bbf);
+  --card-teal: linear-gradient(135deg, #26c6da, #00acc1);
+  --card-yellow: linear-gradient(135deg, #f6a623, #ffca28);
+  --card-cyan: linear-gradient(135deg, #19c1d8, #4dd0e1);
+  --card-orange: linear-gradient(135deg, #ff8a65, #ff7043);
+  --card-green2: linear-gradient(135deg, #43a047, #66bb6a);
+  --card-blue2: linear-gradient(135deg, #3949ab, #5c6bc0);
+  --card-purple: linear-gradient(135deg, #7e57c2, #9575cd);
+  --card-dark: linear-gradient(135deg, #263238, #37474f);
+}
+
+body {
+  font-family: var(--font-main);
+  background: radial-gradient(circle at top left, #fdfbf5 0, #f5f3ea 40%, #dde8f5 100%);
   color: var(--txt-main);
 }
 
@@ -54,255 +63,183 @@ body {
   min-height: 100vh;
 }
 
+/* MOBILE DI DEFAULT NASCOSTO SU DESKTOP */
 .mobile-dashboard {
   display: none;
 }
 
+/* DESKTOP HEADER */
 .desktop-dashboard {
   display: block;
 }
 
-/* HEADER DESKTOP */
-.app-header {
-  display: flex;
+.desk-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
+  padding: 10px 32px 4px;
   gap: 12px;
-  padding: 12px 32px 8px;
 }
 
-.app-header__title-block h1 {
-  margin: 0;
-  font-size: 1.4rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.app-header__subtitle {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--txt-muted);
-  margin-top: 3px;
-}
-
-.app-header__right {
-  font-size: 0.9rem;
-  color: var(--txt-muted);
-}
-
-/* Hamburger desktop */
-.app-hamburger {
-  border: none;
-  background: rgba(15, 23, 42, 0.06);
-  width: 34px;
-  height: 34px;
+.desk-hamburger {
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
-  display: inline-flex;
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
 }
 
-.app-hamburger span,
-.app-hamburger span::before,
-.app-hamburger span::after {
-  content: "";
-  display: block;
+.desk-hamburger span {
   width: 16px;
   height: 2px;
   border-radius: 999px;
-  background: #0f172a;
+  background: #333;
   position: relative;
 }
-
-.app-hamburger span::before {
+.desk-hamburger span::before,
+.desk-hamburger span::after {
+  content: "";
   position: absolute;
+  left: 0;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: #333;
+}
+.desk-hamburger span::before {
   top: -5px;
 }
-
-.app-hamburger span::after {
-  position: absolute;
+.desk-hamburger span::after {
   top: 5px;
 }
 
-/* GRID 2x2 QUADRANTI */
-.desktop-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 16px;
-  padding: 8px 24px 24px;
-  height: calc(100vh - 64px);
-}
-
-/* Quadrante base */
-.quad {
-  background: var(--bg-quad);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border-quad);
-  padding: 14px 18px 16px;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.quad-header h2 {
-  margin: 0;
-  font-size: 1.1rem;
+.desk-header-center h1 {
+  font-size: 1.2rem;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  text-align: center;
+  margin: 0;
 }
 
-.quad-header p {
-  margin: 4px 0 8px;
+.desk-subtitle {
+  text-align: center;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--txt-muted);
+}
+
+.desk-header-right {
+  text-align: right;
   font-size: 0.85rem;
   color: var(--txt-muted);
 }
 
-.quad-header-row {
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-/* Q1 – SEZIONI FARMACIA */
-.sezioni-grid {
-  margin-top: 6px;
+/* GRID QUADRANTI */
+.desk-grid {
+  padding: 10px 32px 28px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(80px, 1fr);
-  gap: 10px;
+  grid-template-columns: 1.05fr 1.05fr;
+  grid-template-rows: minmax(260px, 1fr) minmax(260px, 1fr);
+  gap: 18px;
 }
 
-.section-card {
-  border-radius: 16px;
-  border: none;
-  color: #ffffff;
-  padding: 10px 14px;
-  text-align: left;
-  font-size: 0.95rem;
-  font-weight: 600;
-  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.35);
-  cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-}
-
-.section-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.5);
-}
-
-.section-label {
-  display: block;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  opacity: 0.9;
-}
-
-.section-title {
-  display: block;
-  margin-top: 4px;
-  font-size: 0.98rem;
-}
-
-/* gradient card colors */
-.card-green  { background: var(--card-green); }
-.card-blue   { background: var(--card-blue); }
-.card-pink   { background: var(--card-pink); }
-.card-teal   { background: var(--card-teal); }
-.card-yellow { background: var(--card-yellow); }
-.card-cyan   { background: var(--card-cyan); }
-.card-orange { background: var(--card-orange); }
-.card-green2 { background: var(--card-green2); }
-.card-purple { background: var(--card-purple); }
-
-/* Q2 – AREA CONTENUTI */
-.area-contenuti-inner {
-  margin-top: 6px;
-  background: radial-gradient(circle at top left, #e0f2fe 0, #e5f9f0 40%, #eef2ff 100%);
-  border-radius: 16px;
-  padding: 14px 16px 16px;
-  overflow-y: auto;
-  flex: 1;
-}
-
-/* Panoramica rapida – tiles */
-.panorama-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.panorama-tile {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 14px;
-  padding: 10px 12px;
+/* CARD BASE */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border-soft);
+  padding: 14px 18px 16px;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
+  flex-direction: column;
 }
 
-.panorama-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
+/* Titoli card */
+.card-title-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.3rem;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
 }
 
-.panorama-text h3 {
+.card-title-row h2 {
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
 }
 
-.panorama-text p {
-  margin: 2px 0 0;
+.card-subtitle {
+  margin: 0;
   font-size: 0.8rem;
   color: var(--txt-muted);
 }
 
-.panorama-small {
-  margin-top: 10px;
-  font-size: 0.8rem;
+/* Q1 – SEZIONI FARMACIA */
+.q1-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-rows: 84px;
+  gap: 10px;
 }
 
-/* contenuto sezione */
-.area-section-title {
-  font-size: 1rem;
-  margin: 0 0 4px;
+.section-pill {
+  border-radius: 18px;
+  border: none;
+  color: #fff;
+  padding: 10px 12px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+  font-size: 0.9rem;
+}
+.section-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.2);
 }
 
-.area-section-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 10px;
-  border-radius: 999px;
-  font-size: 0.75rem;
+.pill-label {
+  font-size: 0.65rem;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  background: rgba(15, 23, 42, 0.1);
-  margin-bottom: 8px;
+  letter-spacing: 0.16em;
+  opacity: 0.95;
+}
+.pill-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 3px;
 }
 
-/* Q3 – PROMOZIONI & GIORNATE */
+.section-green { background: var(--card-green); }
+.section-blue { background: var(--card-blue); }
+.section-pink { background: var(--card-pink); }
+.section-teal { background: var(--card-teal); }
+.section-yellow { background: var(--card-yellow); }
+.section-cyan { background: var(--card-cyan); }
+.section-orange { background: var(--card-orange); }
+.section-green2 { background: var(--card-green2); }
+.section-purple { background: var(--card-purple); }
+
+/* Q2 – PROMOZIONI & GIORNATE */
 .promo-grid {
-  margin-top: 4px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 14px;
   flex: 1;
-  min-height: 0;
 }
 
 .promo-column {
-  background: var(--bg-quad-soft);
-  border-radius: 14px;
-  padding: 10px 12px;
+  background: var(--bg-card-soft);
+  border-radius: 16px;
+  padding: 10px 10px 8px;
   display: flex;
   flex-direction: column;
 }
@@ -312,350 +249,374 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
-.promo-header h3 {
-  margin: 0;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+.btn-small {
+  border: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--accent-blue);
+  color: #fff;
 }
 
 .promo-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: var(--txt-main);
-  overflow-y: auto;
 }
 
 .promo-item {
-  position: relative;
   background: #ffffff;
   border-radius: 10px;
-  padding: 7px 28px 7px 9px;
+  padding: 6px 7px;
   margin-bottom: 6px;
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.promo-item strong {
-  display: block;
-  font-size: 0.86rem;
+.promo-item-title {
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
 }
 
-.promo-meta {
+.promo-item-meta {
+  font-size: 0.7rem;
+  color: var(--txt-muted);
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.promo-tag {
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.promo-delete {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: none;
+  background: #f44336;
+  color: #fff;
+  font-size: 0.7rem;
+  display: none;
+  cursor: pointer;
+}
+.promo-item:hover .promo-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Q3 – AREA CONTENUTI */
+.content-area {
+  flex: 1;
+  margin-top: 4px;
+}
+
+.content-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 92px;
+  gap: 10px;
+}
+
+.content-panel {
+  background: var(--bg-card-soft);
+  border-radius: 14px;
+  padding: 8px 10px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.content-panel-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+
+.content-panel-body h3 {
+  margin: 0;
+  font-size: 0.85rem;
+}
+.content-panel-body p {
+  margin: 2px 0 0;
   font-size: 0.75rem;
   color: var(--txt-muted);
 }
 
-.promo-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  margin-top: 3px;
+/* Dettaglio sezione */
+.section-detail-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 6px;
 }
-
-.promo-tag.offerta {
-  background: rgba(245, 158, 11, 0.16);
-  color: #92400e;
-}
-
-.promo-tag.giornata {
-  background: rgba(37, 99, 235, 0.18);
-  color: #1d4ed8;
-}
-
-/* cestino */
-.promo-delete {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: transparent;
-  border: none;
+.section-detail-text {
   font-size: 0.8rem;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
+  color: var(--txt-muted);
+  margin: 0;
 }
 
-.promo-item:hover .promo-delete {
-  opacity: 1;
-}
-
-/* bottoni base */
-.btn-pill,
-.btn-primary,
-.btn-secondary {
-  border-radius: 999px;
-  border: none;
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 6px 14px;
-}
-
-.btn-pill {
-  background: var(--accent-secondary);
-  color: #ffffff;
+/* Q4 – AGENDA */
+.agenda-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
 }
 
 .btn-primary {
-  background: var(--accent-primary);
-  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--accent-blue);
+  color: #fff;
 }
 
-.btn-secondary {
-  background: #e5e7eb;
-  color: #111827;
-}
-/* Q4 – AGENDA */
-.agenda-wrapper {
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  flex: 1;
-  min-height: 0;
+.btn-full {
+  width: 100%;
 }
 
-.agenda-month-header {
+.agenda-month-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 18px;
+  gap: 8px;
+  font-size: 0.85rem;
 }
 
-.agenda-month-label {
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
-.month-nav {
+.icon-btn {
   border-radius: 999px;
   border: none;
-  width: 26px;
-  height: 26px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  width: 22px;
+  height: 22px;
   cursor: pointer;
-  background: #e5e7eb;
+  background: rgba(0, 0, 0, 0.06);
 }
 
-.agenda-month-grid {
-  margin-top: 4px;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 6px 8px 10px;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+#agenda-month-label {
+  min-width: 130px;
+  text-align: center;
+}
+
+/* Calendario mensile stile planner */
+.agenda-calendar {
+  background: var(--bg-card-soft);
+  border-radius: 16px;
+  padding: 8px 10px 10px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.agenda-weekdays {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
-  font-size: 0.78rem;
-}
-
-.agenda-day-name {
-  font-weight: 600;
+  font-size: 0.7rem;
   text-align: center;
-  padding-bottom: 2px;
   color: var(--txt-muted);
+  margin-bottom: 4px;
 }
 
-.agenda-day-cell {
-  min-height: 34px;
-  border-radius: 9px;
-  padding: 2px 4px;
-  text-align: right;
-  position: relative;
-  cursor: pointer;
-}
-
-.agenda-day-cell span {
+.agenda-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: 54px;
+  gap: 3px;
   font-size: 0.8rem;
 }
 
-.agenda-day-cell .dot-row {
+.agenda-cell {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 4px 6px;
   display: flex;
-  gap: 2px;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+.agenda-cell:hover {
+  border-color: var(--accent-blue);
+}
+
+.agenda-cell-day {
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.agenda-cell-dots {
+  display: flex;
+  gap: 3px;
   margin-top: 2px;
 }
 
 .agenda-dot {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 999px;
 }
 
-.agenda-day-cell.today {
-  outline: 2px solid var(--accent-primary);
-  outline-offset: -1px;
+.agenda-dot-ecg { background: #4caf50; }
+.agenda-dot-holter { background: #ffb300; }
+.agenda-dot-consulenza { background: #e91e63; }
+
+.agenda-cell.other-month .agenda-cell-day {
+  color: rgba(0, 0, 0, 0.25);
 }
 
-.agenda-day-cell.selected {
-  background: rgba(37, 99, 235, 0.1);
+.agenda-cell.today {
+  box-shadow: 0 0 0 2px #1b78ff;
 }
 
-.agenda-day-panel {
-  background: var(--bg-quad-soft);
-  border-radius: 14px;
-  padding: 8px 10px 10px;
-  flex: 1;
-  min-height: 0;
+/* MODALI GENERICI */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
 }
 
-.agenda-day-header {
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-bottom: 4px;
+.modal.hidden {
+  display: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.modal-panel {
+  position: relative;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 14px 16px 16px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+  width: min(420px, 92vw);
+  max-height: 88vh;
+  overflow: auto;
+}
+
+.modal-panel-wide {
+  width: min(600px, 96vw);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.modal-close {
+  border: none;
+  border-radius: 999px;
+  width: 26px;
+  height: 26px;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.06);
+  font-size: 1.1rem;
+}
+
+.modal-form label {
+  display: block;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+.modal-form input,
+.modal-form textarea {
+  width: 100%;
+  margin-top: 2px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+}
+
+/* Agenda modal lista */
+.agenda-modal-body {
+  font-size: 0.8rem;
 }
 
 .agenda-day-list {
   list-style: none;
   padding: 0;
-  margin: 0;
-  font-size: 0.8rem;
-  max-height: 150px;
-  overflow-y: auto;
+  margin: 4px 0 0;
 }
 
-.agenda-event {
+.agenda-day-item {
+  background: var(--bg-card-soft);
   border-radius: 10px;
   padding: 6px 8px;
-  margin-bottom: 5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: #111827;
-}
-
-.agenda-event-time {
-  font-weight: 600;
-  margin-right: 6px;
-}
-
-.agenda-event-info {
-  flex: 1;
-}
-
-/* colori evento */
-.event-ecg       { background: rgba(56, 189, 248, 0.25); }
-.event-holter    { background: rgba(251, 191, 36, 0.28); }
-.event-prelievo  { background: rgba(134, 239, 172, 0.28); }
-.event-consulenza{ background: rgba(244, 114, 182, 0.28); }
-.event-generico  { background: rgba(148, 163, 184, 0.28); }
-
-/* MODALI */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 30;
-}
-
-.modal {
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 18px 18px 16px;
-  width: min(420px, 92vw);
-  box-shadow: var(--shadow-soft);
-}
-
-.modal h2 {
-  margin: 0 0 10px;
-  font-size: 1.05rem;
-}
-
-.modal-label {
-  display: block;
-  font-size: 0.8rem;
   margin-bottom: 6px;
+  border-left: 4px solid var(--accent-blue);
 }
 
-.modal-label input,
-.modal-label textarea,
-.modal-label select {
-  margin-top: 3px;
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  padding: 6px 8px;
-  font-family: inherit;
-  font-size: 0.85rem;
+.agenda-day-time {
+  font-weight: 600;
 }
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 10px;
+.agenda-day-title {
+  margin: 2px 0 0;
 }
-
-/* FLOATING CHAT BUTTON */
-.fab-chat {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  width: 46px;
-  height: 46px;
-  border-radius: 999px;
-  border: none;
-  background: #22c55e;
-  color: #ffffff;
-  font-size: 1.5rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 18px 36px rgba(22, 163, 74, 0.6);
-  cursor: pointer;
-}
-
-/* SEZIONI DETTAGLIO */
-.sezione-dettaglio {
-  position: fixed;
-  inset: 0;
-  background: var(--bg-page);
-  z-index: 40;
-  overflow-y: auto;
-}
-
-.sezione-inner {
-  max-width: 1024px;
-  margin: 20px auto;
-  padding: 0 16px 24px;
-}
-
-.sezione-inner h2 {
-  margin-top: 10px;
-}
-
-.sezione-subtitle {
-  font-size: 0.9rem;
+.agenda-day-service {
+  font-size: 0.75rem;
   color: var(--txt-muted);
 }
 
-.sezione-label select {
-  margin-left: 6px;
+/* WHATSAPP BUBBLE */
+.whatsapp-bubble {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 1.4rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  z-index: 30;
 }
+/* MOBILE VERSION – INVARIATA (solo adattata ai nuovi colori di sfondo) */
 
-/* BOTTONI */
-.btn-primary,
-.btn-secondary,
-.btn-pill {
-  font-size: 0.85rem;
-}
-
-/* MOBILE DASHBOARD (uguale a prima) */
 .m-header {
   padding: 14px 16px 6px;
   display: flex;
@@ -671,38 +632,42 @@ body {
 .m-logo {
   height: 32px;
   width: auto;
+  border-radius: 8px;
 }
 
 .m-hamburger {
   border: none;
-  background: rgba(15, 23, 42, 0.1);
-  width: 34px;
-  height: 34px;
+  background: rgba(0, 0, 0, 0.35);
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
 
-.m-hamburger span,
+.m-hamburger span {
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  position: relative;
+}
 .m-hamburger span::before,
 .m-hamburger span::after {
   content: "";
-  display: block;
-  width: 18px;
+  position: absolute;
+  width: 16px;
   height: 2px;
   border-radius: 999px;
-  background: #0f172a;
-  position: relative;
+  background: #ffffff;
+  left: 0;
 }
-
 .m-hamburger span::before {
-  position: absolute;
   top: -5px;
 }
-
 .m-hamburger span::after {
-  position: absolute;
   top: 5px;
 }
 
@@ -716,21 +681,27 @@ body {
   gap: 10px;
 }
 
+/* Card base mobile */
 .m-card {
   position: relative;
   border-radius: 18px;
   padding: 10px 12px;
-  border: none;
-  color: #ffffff;
-  min-height: 86px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
   text-align: left;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 86px;
+  color: #ffffff;
 }
 
 .m-card-label {
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  opacity: 0.9;
 }
 
 .m-card-title {
@@ -747,6 +718,7 @@ body {
   padding: 2px 6px;
   border-radius: 999px;
   font-size: 0.65rem;
+  font-weight: 600;
   text-align: center;
   background: rgba(0, 0, 0, 0.25);
 }
@@ -759,28 +731,42 @@ body {
   opacity: 0.22;
 }
 
+/* Card larga mobile (Archivio file) */
 .m-card-wide {
   grid-column: 1 / -1;
 }
 
-.m-card-green  { background: var(--card-green); }
-.m-card-blue   { background: var(--card-blue); }
-.m-card-pink   { background: var(--card-pink); }
-.m-card-teal   { background: var(--card-teal); }
+/* COLORI CARD MOBILE – come desktop */
+.m-card-green { background: var(--card-green); }
+.m-card-blue { background: var(--card-blue); }
+.m-card-pink { background: var(--card-pink); }
+.m-card-teal { background: var(--card-teal); }
 .m-card-yellow { background: var(--card-yellow); }
-.m-card-cyan   { background: var(--card-cyan); }
+.m-card-cyan { background: var(--card-cyan); }
 .m-card-orange { background: var(--card-orange); }
 .m-card-green2 { background: var(--card-green2); }
-.m-card-blue2  { background: linear-gradient(135deg, #2563eb, #4f46e5); }
+.m-card-blue2 { background: var(--card-blue2); }
 .m-card-purple { background: var(--card-purple); }
-.m-card-dark   { background: var(--card-dark); }
+.m-card-dark { background: var(--card-dark); }
 
 /* RESPONSIVE */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
+  .desk-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+}
+
+@media (max-width: 768px) {
   .desktop-dashboard {
     display: none;
   }
+
   .mobile-dashboard {
     display: block;
+  }
+
+  body {
+    background: radial-gradient(circle at top left, #0d47a1 0, #041427 50%, #020711 100%);
   }
 }
