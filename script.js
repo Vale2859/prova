@@ -1,581 +1,690 @@
 // script.js
 
-// ---------- UTILITÀ DATA ----------
-function formatDateIT(date) {
-  return date.toLocaleDateString("it-IT", {
+document.addEventListener("DOMContentLoaded", () => {
+  impostaDataOggi();
+  setupNavigazioneSezioni();
+  inizializzaPanoramica();
+  inizializzaPromozioni();
+  inizializzaAgenda();
+  setupModali();
+  setupFabChat();
+});
+
+/* =======================
+   DATA OGGI HEADER
+   ======================= */
+function impostaDataOggi() {
+  const el = document.getElementById("today-label");
+  if (!el) return;
+  const oggi = new Date();
+  const formatter = new Intl.DateTimeFormat("it-IT", {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",
+    year: "numeric",
   });
+  el.textContent = formatter.format(oggi);
 }
 
-function toISODate(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+/* =======================
+   NAVIGAZIONE SEZIONI
+   ======================= */
+
+// dati demo per assenze e turni (come prima)
+const assenzeDemo = [
+  { nome: "Mario Rossi", dal: "2025-11-29", al: "2025-11-30", tipo: "Ferie", stato: "approvato" },
+  { nome: "Lucia Bianchi", dal: "2025-11-28", al: "2025-11-28", tipo: "Permesso", stato: "approvato" },
+  { nome: "Giuseppe Neri", dal: "2025-12-03", al: "2025-12-05", tipo: "Malattia", stato: "approvato" },
+  { nome: "Mario Rossi", dal: "2025-12-10", al: "2025-12-12", tipo: "Ferie", stato: "approvato" },
+  { nome: "Test in attesa", dal: "2025-12-01", al: "2025-12-01", tipo: "Permesso", stato: "in attesa" },
+];
+
+const turniDemo = [
+  { data: "2025-11-30", farmacia: "Farmacia Montesano", orario: "08:00 – 20:00", appoggio: "Farmacia Centrale", note: "Turno ordinario diurno." },
+  { data: "2025-12-01", farmacia: "Farmacia Centrale", orario: "08:00 – 20:00", appoggio: "Farmacia Montesano", note: "Turno di scambio tra farmacie." },
+];
+
+const oggiISO = (() => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+})();
+
+function parseISO(dateStr) {
+  const [y, m, d] = dateStr.split("-");
+  return new Date(Number(y), Number(m) - 1, Number(d));
 }
 
-function fromISO(iso) {
-  const [y, m, d] = iso.split("-").map(Number);
-  return new Date(y, m - 1, d);
+function formatShortDateIT(iso) {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}`;
 }
 
-// ---------- STATO ----------
-let promos = [];
-let giornate = [];
-let agendaEvents = []; // {date, start, end, name, reason, tag}
-let agendaCurrentMonth = new Date();
-agendaCurrentMonth.setDate(1);
-
-let idleContentTimer = null;
-let idleAgendaTimer = null;
-
-// ---------- INIT ----------
-document.addEventListener("DOMContentLoaded", () => {
-  initTopbarDate();
-  seedDemoData();
-  renderPromos();
-  renderGiornate();
-  initAgenda();
-  initContentIdleMonitoring();
-});
-
-// ---------- TOPBAR ----------
-function initTopbarDate() {
-  const el = document.getElementById("topbar-date");
-  const now = new Date();
-  el.textContent = formatDateIT(now);
+function formatLongDateIT(iso) {
+  const [y, m, d] = iso.split("-");
+  const date = new Date(Number(y), Number(m) - 1, Number(d));
+  return new Intl.DateTimeFormat("it-IT", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+  }).format(date);
 }
 
-// ---------- DEMO DATA ----------
-function seedDemoData() {
-  const todayISO = toISODate(new Date());
+function formatRangeIT(dalISO, alISO) {
+  const d1 = formatShortDateIT(dalISO);
+  const d2 = formatShortDateIT(alISO);
+  return d1 === d2 ? d1 : `${d1} → ${d2}`;
+}
 
-  promos = [
-    {
-      id: crypto.randomUUID(),
-      tipo: "promo",
-      titolo: "Promo colesterolo",
-      descrizione: "Test + misurazione saturazione. Sconto 20%.",
-      data: todayISO,
+function setupNavigazioneSezioni() {
+  const dashboards = document.querySelectorAll(".mobile-dashboard, .desktop-dashboard");
+  const sezioni = document.querySelectorAll(".sezione-dettaglio");
+
+  dashboards.forEach((d) => {
+    const comp = window.getComputedStyle(d);
+    d.dataset.displayOriginal = comp.display || "block";
+  });
+
+  function mostraDashboard() {
+    sezioni.forEach((sec) => (sec.style.display = "none"));
+    dashboards.forEach((d) => (d.style.display = d.dataset.displayOriginal || "block"));
+    window.scrollTo(0, 0);
+  }
+
+  function mostraSezione(id) {
+    dashboards.forEach((d) => (d.style.display = "none"));
+    sezioni.forEach((sec) => {
+      sec.style.display = sec.id === `sezione-${id}` ? "block" : "none";
+    });
+
+    if (id === "assenti") renderAssenti();
+    if (id === "turno") renderTurno();
+    window.scrollTo(0, 0);
+  }
+
+  document.querySelectorAll("[data-section]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const id = btn.getAttribute("data-section");
+      if (!id) return;
+      // per desktop aggiorno area contenuti
+      if (window.innerWidth >= 900) {
+        mostraContenutoSezione(id);
+      } else {
+        // su mobile apro sezione dedicata solo per assenti/turno
+        if (id === "assenti" || id === "turno") {
+          e.preventDefault();
+          mostraSezione(id);
+        }
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-close='sezione']").forEach((btn) => {
+    btn.addEventListener("click", mostraDashboard);
+  });
+
+  const ruoloAssSelect = document.getElementById("ruolo-assenti");
+  if (ruoloAssSelect) {
+    ruoloAssSelect.addEventListener("change", renderAssenti);
+  }
+}
+
+/* ASSENTI */
+function renderAssenti() {
+  const containerOggi = document.getElementById("assenti-oggi");
+  const containerNext = document.getElementById("assenti-prossimi");
+  if (!containerOggi || !containerNext) return;
+
+  const ruoloSelect = document.getElementById("ruolo-assenti");
+  const ruolo = ruoloSelect ? ruoloSelect.value : "farmacia";
+
+  let lista = assenzeDemo.filter((a) => a.stato === "approvato");
+
+  if (ruolo === "dipendente") {
+    lista = lista.filter((a) => a.nome === "Mario Rossi");
+  }
+
+  const oggiDate = parseISO(oggiISO);
+  const oggiList = [];
+  const nextList = [];
+
+  lista.forEach((a) => {
+    const dal = parseISO(a.dal);
+    const al = parseISO(a.al);
+    if (oggiDate >= dal && oggiDate <= al) oggiList.push(a);
+    else if (oggiDate < dal) nextList.push(a);
+  });
+
+  nextList.sort((a, b) => parseISO(a.dal) - parseISO(b.dal));
+
+  let htmlOggi = "<h3>Assenti oggi</h3>";
+  if (!oggiList.length) {
+    htmlOggi += "<p>Nessuno assente oggi.</p>";
+  } else {
+    htmlOggi += "<ul>";
+    oggiList.forEach((a) => {
+      htmlOggi += `<li><strong>${a.nome}</strong> – ${a.tipo} (${formatRangeIT(a.dal, a.al)})</li>`;
+    });
+    htmlOggi += "</ul>";
+  }
+
+  let htmlNext = "<h3>Assenze prossimi giorni</h3>";
+  if (!nextList.length) {
+    htmlNext += "<p>Non ci sono altre assenze approvate.</p>";
+  } else {
+    htmlNext += "<ul>";
+    nextList.forEach((a) => {
+      htmlNext += `<li><strong>${a.nome}</strong> – ${a.tipo} (${formatRangeIT(a.dal, a.al)})</li>`;
+    });
+    htmlNext += "</ul>";
+  }
+
+  containerOggi.innerHTML = htmlOggi;
+  containerNext.innerHTML = htmlNext;
+}
+
+/* TURNO */
+function renderTurno() {
+  const boxOggi = document.getElementById("turno-oggi");
+  const boxNext = document.getElementById("turno-prossimi");
+  if (!boxOggi || !boxNext) return;
+
+  let turnoOggi = turniDemo.find((t) => t.data === oggiISO) || turniDemo[0];
+  const altri = turniDemo.filter((t) => t !== turnoOggi);
+
+  boxOggi.innerHTML = `
+    <h3>Turno di oggi</h3>
+    <p><strong>${turnoOggi.farmacia}</strong> – ${formatLongDateIT(turnoOggi.data)}</p>
+    <p>Orario: <strong>${turnoOggi.orario}</strong></p>
+    <p>Appoggio: <strong>${turnoOggi.appoggio}</strong></p>
+    <p>${turnoOggi.note}</p>
+  `;
+
+  let htmlNext = "<h3>Prossimi turni</h3>";
+  if (!altri.length) {
+    htmlNext += "<p>Non ci sono altri turni in elenco.</p>";
+  } else {
+    htmlNext += "<ul>";
+    altri.forEach((t) => {
+      htmlNext += `<li><strong>${formatShortDateIT(t.data)}</strong> – ${t.farmacia} (${t.orario}) · Appoggio: ${t.appoggio}</li>`;
+    });
+    htmlNext += "</ul>";
+  }
+  boxNext.innerHTML = htmlNext;
+}
+
+/* =======================
+   AREA CONTENUTI
+   ======================= */
+
+let inactivityTimer = null;
+
+function resetInactivityTimer() {
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(inizializzaPanoramica, 20000); // 20 sec
+}
+
+function inizializzaPanoramica() {
+  const container = document.getElementById("area-contenuti-inner");
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="panorama-grid">
+      <div class="panorama-tile">
+        <div class="panorama-icon" style="background:#bbf7d0;">🩺</div>
+        <div class="panorama-text">
+          <h3>Servizi di oggi</h3>
+          <p>Controlla subito gli appuntamenti e i servizi programmati.</p>
+        </div>
+      </div>
+      <div class="panorama-tile">
+        <div class="panorama-icon" style="background:#dbeafe;">📅</div>
+        <div class="panorama-text">
+          <h3>Assenze confermate</h3>
+          <p>Vedi chi manca oggi e nei prossimi giorni.</p>
+        </div>
+      </div>
+      <div class="panorama-tile">
+        <div class="panorama-icon" style="background:#fee2e2;">📢</div>
+        <div class="panorama-text">
+          <h3>Comunicazioni</h3>
+          <p>Avvisi rapidi per lo staff: turni, note operative, memo.</p>
+        </div>
+      </div>
+      <div class="panorama-tile">
+        <div class="panorama-icon" style="background:#e0f2fe;">🏷️</div>
+        <div class="panorama-text">
+          <h3>Offerte & giornate</h3>
+          <p>Promo attive e giornate dedicate ai servizi.</p>
+        </div>
+      </div>
+    </div>
+    <div class="panorama-small">
+      Suggerimento: tocca una card nella sezione in alto a sinistra per vedere i dettagli
+      qui a destra. Se non tocchi nulla per 20 secondi torni a questa vista.
+    </div>
+  `;
+}
+
+function mostraContenutoSezione(sectionId) {
+  const container = document.getElementById("area-contenuti-inner");
+  if (!container) return;
+
+  resetInactivityTimer();
+
+  const sezioniInfo = {
+    assenti: {
+      titolo: "Assenti / Permessi",
+      descrizione: "Qui vedrai un elenco veloce delle assenze approvate con indicazione di chi, quando e che tipo di permesso.",
     },
-  ];
+    turno: {
+      titolo: "Farmacia di turno",
+      descrizione: "Riepilogo sintetico della farmacia di turno oggi, con orari di servizio e farmacia di appoggio.",
+    },
+    comunicazioni: {
+      titolo: "Comunicazioni interne",
+      descrizione: "Spazio dedicato agli avvisi rapidi per il team: note operative, promemoria, indicazioni del titolare.",
+    },
+    procedure: {
+      titolo: "Procedure",
+      descrizione: "Accesso alle procedure interne della farmacia: protocolli, check-list e istruzioni aggiornate.",
+    },
+    logistica: {
+      titolo: "Logistica",
+      descrizione: "Gestione rapida di consegne, ritiri, corrieri e materiale di consumo.",
+    },
+    magazzino: {
+      titolo: "Magazziniera",
+      descrizione: "Controlli periodici di scorte, inventari, resi e sistemazione scaffali.",
+    },
+    scadenze: {
+      titolo: "Prodotti in scadenza",
+      descrizione: "Elenco prodotti in scadenza da monitorare e smaltire, con priorità sui più urgenti.",
+    },
+    consumabili: {
+      titolo: "Consumabili",
+      descrizione: "Stato di carta, sacchetti, etichette, DPI, materiali per i servizi e altro.",
+    },
+    archivio: {
+      titolo: "Archivio file",
+      descrizione: "Spazio dedicato a documenti, report, schede operative e tutto il materiale digitale della farmacia.",
+    },
+  };
 
-  giornate = [
+  const info = sezioniInfo[sectionId] || {
+    titolo: "Sezione",
+    descrizione: "Dettagli sezione non configurata.",
+  };
+
+  container.innerHTML = `
+    <div class="area-section-pill">SEZIONE ATTIVA</div>
+    <h3 class="area-section-title">${info.titolo}</h3>
+    <p>${info.descrizione}</p>
+    <p style="font-size:0.85rem;color:var(--txt-muted);margin-top:6px;">
+      In una versione successiva qui potrai vedere tabelle, elenchi e moduli dedicati
+      a questa funzione, con pulsanti grandi e ben leggibili per il touch screen.
+    </p>
+  `;
+}
+
+/* =======================
+   PROMOZIONI & GIORNATE
+   ======================= */
+
+let promoDati = {
+  offerte: [],
+  giornate: [
     {
-      id: crypto.randomUUID(),
       tipo: "giornata",
       titolo: "Giornata ECO",
-      descrizione: "Elettrocardiogramma con referto cardiologo.",
-      data: todayISO,
+      data: oggiISO,
+      dettagli: "Ecocardiogramma con referto cardiologo.",
     },
-  ];
+  ],
+};
 
-  agendaEvents = [
-    {
-      id: crypto.randomUUID(),
-      date: todayISO,
-      start: "09:00",
-      end: "09:30",
-      name: "Rossi Maria",
-      reason: "ECG",
-      tag: "ecg",
-    },
-    {
-      id: crypto.randomUUID(),
-      date: todayISO,
-      start: "10:30",
-      end: "11:00",
-      name: "Bianchi Luca",
-      reason: "Holter pressione",
-      tag: "holter",
-    },
-  ];
-}
+function inizializzaPromozioni() {
+  renderListePromo();
 
-// =============== PROMO & GIORNATE ===============
-function renderPromos() {
-  const list = document.getElementById("promoList");
-  list.innerHTML = "";
-
-  const sorted = [...promos].sort((a, b) => a.data.localeCompare(b.data));
-
-  if (!sorted.length) {
-    const li = document.createElement("li");
-    li.className = "empty-text";
-    li.textContent = "Nessuna offerta inserita.";
-    list.appendChild(li);
-    return;
-  }
-
-  sorted.forEach((p) => {
-    const li = document.createElement("li");
-    li.className = "promo-item promo";
-    li.dataset.id = p.id;
-
-    const title = document.createElement("div");
-    title.className = "promo-title";
-    title.textContent = `🔥 ${p.titolo}`;
-
-    const date = document.createElement("div");
-    date.className = "promo-date";
-    date.textContent = new Date(p.data).toLocaleDateString("it-IT");
-
-    const desc = document.createElement("div");
-    desc.className = "promo-desc";
-    desc.textContent = p.descrizione;
-
-    const tag = document.createElement("div");
-    tag.className = "promo-tag promo";
-    tag.textContent = "Offerta";
-
-    const del = document.createElement("button");
-    del.className = "promo-delete";
-    del.textContent = "🗑";
-    del.addEventListener("click", (e) => {
-      e.stopPropagation();
-      promos = promos.filter((x) => x.id !== p.id);
-      renderPromos();
-      updateIdleSummary();
+  document.querySelectorAll("[data-open='promo-modal']").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tipo = btn.getAttribute("data-type");
+      apriModalPromo(tipo);
     });
-
-    li.append(title, date, desc, tag, del);
-    list.appendChild(li);
   });
 
-  updateIdleSummary();
+  const salvaBtn = document.getElementById("promo-salva");
+  if (salvaBtn) salvaBtn.addEventListener("click", salvaPromo);
 }
 
-function renderGiornate() {
-  const list = document.getElementById("giornateList");
-  list.innerHTML = "";
+function renderListePromo() {
+  const ulOfferte = document.getElementById("lista-offerte");
+  const ulGiornate = document.getElementById("lista-giornate");
+  if (!ulOfferte || !ulGiornate) return;
 
-  const sorted = [...giornate].sort((a, b) => a.data.localeCompare(b.data));
+  const offerte = [...promoDati.offerte].sort((a, b) => a.data.localeCompare(b.data));
+  const giornate = [...promoDati.giornate].sort((a, b) => a.data.localeCompare(b.data));
 
-  if (!sorted.length) {
-    const li = document.createElement("li");
-    li.className = "empty-text";
-    li.textContent = "Nessuna giornata programmata.";
-    list.appendChild(li);
-    return;
-  }
+  ulOfferte.innerHTML = offerte.length
+    ? offerte.map((p, idx) => promoItemHTML(p, "offerta", idx)).join("")
+    : '<li class="promo-empty">Nessuna offerta inserita.</li>';
 
-  sorted.forEach((g) => {
-    const li = document.createElement("li");
-    li.className = "promo-item giornata";
-    li.dataset.id = g.id;
+  ulGiornate.innerHTML = giornate.length
+    ? giornate.map((p, idx) => promoItemHTML(p, "giornata", idx)).join("")
+    : '<li class="promo-empty">Nessuna giornata programmata.</li>';
 
-    const title = document.createElement("div");
-    title.className = "promo-title";
-    title.textContent = `📆 ${g.titolo}`;
-
-    const date = document.createElement("div");
-    date.className = "promo-date";
-    date.textContent = new Date(g.data).toLocaleDateString("it-IT");
-
-    const desc = document.createElement("div");
-    desc.className = "promo-desc";
-    desc.textContent = g.descrizione;
-
-    const tag = document.createElement("div");
-    tag.className = "promo-tag giornata";
-    tag.textContent = "Giornata";
-
-    const del = document.createElement("button");
-    del.className = "promo-delete";
-    del.textContent = "🗑";
-    del.addEventListener("click", (e) => {
-      e.stopPropagation();
-      giornate = giornate.filter((x) => x.id !== g.id);
-      renderGiornate();
-      updateIdleSummary();
-      renderAgendaMonth(); // aggiorna pallini
+  // cestini
+  document.querySelectorAll(".promo-delete").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const tipo = btn.dataset.tipo;
+      const index = Number(btn.dataset.index);
+      if (!tipo) return;
+      promoDati[tipo === "offerta" ? "offerte" : "giornate"].splice(index, 1);
+      renderListePromo();
     });
-
-    li.append(title, date, desc, tag, del);
-    list.appendChild(li);
   });
-
-  updateIdleSummary();
-  renderAgendaMonth(); // aggiornare i punti sotto i giorni
 }
 
-// popup unico
-function openPromoPopup(tipoPreselezionato) {
-  resetPromoPopup();
-  const modal = document.getElementById("promoPopup");
-  modal.classList.remove("hidden");
-  document.getElementById("promoTypeSelect").value = tipoPreselezionato || "promo";
-  document.getElementById("promoPopupTitle").textContent =
-    tipoPreselezionato === "giornata" ? "Nuova giornata in farmacia" : "Nuova offerta";
+function promoItemHTML(p, tipo, index) {
+  const emoji = tipo === "offerta" ? "🏷️" : "📆";
+  const tagClass = tipo === "offerta" ? "offerta" : "giornata";
+  const dataLabel = p.data ? formatShortDateIT(p.data) : "";
+  return `
+    <li class="promo-item">
+      <button class="promo-delete" data-tipo="${tipo}" data-index="${index}" title="Elimina">🗑️</button>
+      <strong>${emoji} ${p.titolo}</strong>
+      <div class="promo-meta">${dataLabel}${p.dettagli ? " · " + p.dettagli : ""}</div>
+      <span class="promo-tag ${tagClass}">${tipo === "offerta" ? "OFFERTA" : "GIORNATA"}</span>
+    </li>
+  `;
 }
 
-function closePromoPopup() {
-  document.getElementById("promoPopup").classList.add("hidden");
+function apriModalPromo(tipo) {
+  const modal = document.getElementById("promo-modal");
+  if (!modal) return;
+  modal.style.display = "flex";
+
+  const title = document.getElementById("promo-modal-title");
+  const typeLabel = document.getElementById("promo-modal-type-label");
+  if (tipo === "offerta") {
+    title.textContent = "Aggiungi offerta";
+    typeLabel.textContent = "Offerta in corso";
+  } else {
+    title.textContent = "Aggiungi giornata in farmacia";
+    typeLabel.textContent = "Giornata in farmacia";
+  }
+  modal.dataset.tipo = tipo;
+  document.getElementById("promo-titolo").value = "";
+  document.getElementById("promo-data").value = "";
+  document.getElementById("promo-dettagli").value = "";
 }
 
-function resetPromoPopup() {
-  document.getElementById("promoTitleInput").value = "";
-  document.getElementById("promoDescInput").value = "";
-  document.getElementById("promoDateInput").value = "";
-}
+function salvaPromo() {
+  const modal = document.getElementById("promo-modal");
+  if (!modal) return;
+  const tipo = modal.dataset.tipo || "offerta";
 
-// salva
-function savePromo() {
-  const tipo = document.getElementById("promoTypeSelect").value;
-  const titolo = document.getElementById("promoTitleInput").value.trim();
-  const desc = document.getElementById("promoDescInput").value.trim();
-  const data = document.getElementById("promoDateInput").value;
+  const titolo = document.getElementById("promo-titolo").value.trim();
+  const data = document.getElementById("promo-data").value;
+  const dettagli = document.getElementById("promo-dettagli").value.trim();
 
   if (!titolo || !data) {
     alert("Inserisci almeno titolo e data.");
     return;
   }
 
-  const item = {
-    id: crypto.randomUUID(),
-    tipo,
-    titolo,
-    descrizione: desc,
-    data,
-  };
+  const obj = { tipo, titolo, data, dettagli };
+  if (tipo === "offerta") promoDati.offerte.push(obj);
+  else promoDati.giornate.push(obj);
 
-  if (tipo === "promo") promos.push(item);
-  else giornate.push(item);
-
-  closePromoPopup();
-  renderPromos();
-  renderGiornate();
+  modal.style.display = "none";
+  renderListePromo();
 }
 
-// ---------- AREA CONTENUTI + IDLE ----------
-function initContentIdleMonitoring() {
-  const reset = () => {
-    hideIdleOverlay();
-    if (idleContentTimer) clearTimeout(idleContentTimer);
-    idleContentTimer = setTimeout(showIdleOverlay, 20000); // 20 secondi
-  };
+/* =======================
+   AGENDA SERVIZI
+   ======================= */
 
-  document.addEventListener("click", reset);
-  reset();
+let agendaState = {
+  currentMonth: (() => {
+    const d = new Date();
+    return { year: d.getFullYear(), month: d.getMonth() }; // 0-based
+  })(),
+  selectedDate: oggiISO,
+  eventi: [
+    { data: oggiISO, orario: "08:00 – 09:00", nome: "Rossi Maria", servizio: "ECG", tipo: "ecg" },
+    { data: oggiISO, orario: "09:30 – 10:30", nome: "Bianchi Luca", servizio: "Holter pressorio", tipo: "holter" },
+    { data: oggiISO, orario: "11:00 – 11:30", nome: "Verdi Anna", servizio: "Prelievo profilo lipidico", tipo: "prelievo" },
+    { data: oggiISO, orario: "17:00 – 17:30", nome: "Gialli Paola", servizio: "Consulenza nutrizionale", tipo: "consulenza" },
+  ],
+};
 
-  // click sulle card Q1
-  document.querySelectorAll(".q1-card").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const section = btn.dataset.section;
-      loadSectionContent(section);
-    });
-  });
-}
+function inizializzaAgenda() {
+  const prev = document.getElementById("month-prev");
+  const next = document.getElementById("month-next");
+  if (prev) prev.addEventListener("click", () => cambiaMese(-1));
+  if (next) next.addEventListener("click", () => cambiaMese(1));
 
-function loadSectionContent(section) {
-  const area = document.getElementById("contentArea");
-  area.innerHTML = "";
-
-  const h = document.createElement("h3");
-  h.textContent = sezioneTitolo(section);
-
-  const p = document.createElement("p");
-  p.textContent = sezioneDescrizione(section);
-
-  area.append(h, p);
-}
-
-function sezioneTitolo(section) {
-  switch (section) {
-    case "assenti": return "Assenti / Permessi approvati";
-    case "turno": return "Farmacia di turno oggi";
-    case "comunicazioni": return "Comunicazioni interne";
-    case "procedure": return "Procedure operative";
-    case "logistica": return "Logistica";
-    case "magazzino": return "Magazziniera";
-    case "scadenze": return "Prodotti in scadenza";
-    case "consumabili": return "Consumabili";
-    case "archivio": return "Archivio file";
-    default: return "Dettagli sezione";
+  const btnNuovo = document.getElementById("btn-nuovo-app");
+  if (btnNuovo) {
+    btnNuovo.addEventListener("click", () => apriModalAgenda(agendaState.selectedDate));
   }
+
+  renderAgenda();
 }
 
-function sezioneDescrizione(section) {
-  const base =
-    "Qui in futuro vedrai una tabella dedicata con tutti i dati di questa sezione.";
-  return base;
-}
-
-function showIdleOverlay() {
-  const overlay = document.getElementById("contentIdleOverlay");
-  overlay.classList.remove("hidden");
-  updateIdleSummary();
-}
-
-function hideIdleOverlay() {
-  const overlay = document.getElementById("contentIdleOverlay");
-  overlay.classList.add("hidden");
-}
-
-// riepilogo overlay
-function updateIdleSummary() {
-  const ul = document.getElementById("idleSummaryList");
-  if (!ul) return;
-  ul.innerHTML = "";
-
-  if (promos.length) {
-    const li = document.createElement("li");
-    li.textContent = `Promo attive: ${promos.length}`;
-    ul.appendChild(li);
+function cambiaMese(delta) {
+  let { year, month } = agendaState.currentMonth;
+  month += delta;
+  if (month < 0) {
+    month = 11;
+    year--;
+  } else if (month > 11) {
+    month = 0;
+    year++;
   }
-  if (giornate.length) {
-    const li = document.createElement("li");
-    li.textContent = `Giornate in programma: ${giornate.length}`;
-    ul.appendChild(li);
-  }
-  const todayISO = toISODate(new Date());
-  const todayEv = agendaEvents.filter((e) => e.date === todayISO);
-  if (todayEv.length) {
-    const li = document.createElement("li");
-    li.textContent = `Appuntamenti oggi: ${todayEv.length}`;
-    ul.appendChild(li);
-  }
-  if (!ul.children.length) {
-    const li = document.createElement("li");
-    li.textContent = "Nessun dato inserito al momento.";
-    ul.appendChild(li);
-  }
+  agendaState.currentMonth = { year, month };
+  const firstDay = new Date(year, month, 1);
+  const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(firstDay.getDate()).padStart(2, "0")}`;
+  agendaState.selectedDate = iso;
+  renderAgenda();
 }
 
-// ---------- AGENDA ----------
-function initAgenda() {
-  document.getElementById("monthPrevBtn").addEventListener("click", () => {
-    agendaCurrentMonth.setMonth(agendaCurrentMonth.getMonth() - 1);
-    renderAgendaMonth();
-  });
-  document.getElementById("monthNextBtn").addEventListener("click", () => {
-    agendaCurrentMonth.setMonth(agendaCurrentMonth.getMonth() + 1);
-    renderAgendaMonth();
-  });
-  document.getElementById("backToMonthBtn").addEventListener("click", () => {
-    showMonthView();
-  });
-  document.getElementById("newAppointmentBtn").addEventListener("click", () => {
-    openAppointmentPopup();
-  });
+function renderAgenda() {
+  const { year, month } = agendaState.currentMonth;
+  const monthLabelEl = document.getElementById("agenda-month-label");
+  const grid = document.getElementById("agenda-month-grid");
+  if (!monthLabelEl || !grid) return;
 
-  renderAgendaMonth();
-  initAgendaIdleTimer();
-}
-
-function initAgendaIdleTimer() {
-  const container = document.querySelector(".panel-q4");
-  const reset = () => {
-    if (idleAgendaTimer) clearTimeout(idleAgendaTimer);
-    idleAgendaTimer = setTimeout(() => {
-      showMonthView();
-    }, 120000); // 2 minuti
-  };
-
-  container.addEventListener("click", reset);
-  reset();
-}
-
-function renderAgendaMonth() {
-  const monthLabel = document.getElementById("agendaMonthLabel");
-  const view = document.getElementById("agendaMonthView");
-  const dayView = document.getElementById("agendaDayView");
-
-  const monthName = agendaCurrentMonth.toLocaleDateString("it-IT", {
+  const monthName = new Intl.DateTimeFormat("it-IT", {
     month: "long",
     year: "numeric",
+  }).format(new Date(year, month, 1));
+  monthLabelEl.textContent = monthName;
+
+  grid.innerHTML = "";
+
+  const dayNames = ["lu", "ma", "me", "gi", "ve", "sa", "do"];
+  dayNames.forEach((name) => {
+    const el = document.createElement("div");
+    el.textContent = name.toUpperCase();
+    el.className = "agenda-day-name";
+    grid.appendChild(el);
   });
-  monthLabel.textContent = monthName;
 
-  view.innerHTML = "";
-  view.classList.remove("hidden");
-  dayView.classList.add("hidden");
+  const first = new Date(year, month, 1);
+  let startIdx = first.getDay() - 1;
+  if (startIdx < 0) startIdx = 6;
 
-  const firstDay = new Date(agendaCurrentMonth);
-  const startWeekday = (firstDay.getDay() + 6) % 7; // lun=0...dom=6
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const daysInMonth = new Date(
-    agendaCurrentMonth.getFullYear(),
-    agendaCurrentMonth.getMonth() + 1,
-    0
-  ).getDate();
-
-  // celle vuote prima
-  for (let i = 0; i < startWeekday; i++) {
-    const cell = document.createElement("div");
-    cell.className = "agenda-day-cell";
-    cell.style.visibility = "hidden";
-    view.appendChild(cell);
+  for (let i = 0; i < startIdx; i++) {
+    const empty = document.createElement("div");
+    grid.appendChild(empty);
   }
-
-  const todayISO = toISODate(new Date());
 
   for (let d = 1; d <= daysInMonth; d++) {
-    const date = new Date(
-      agendaCurrentMonth.getFullYear(),
-      agendaCurrentMonth.getMonth(),
-      d
-    );
-    const iso = toISODate(date);
-
+    const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const cell = document.createElement("div");
     cell.className = "agenda-day-cell";
-    if (iso === todayISO) cell.classList.add("today");
+    if (iso === oggiISO) cell.classList.add("today");
+    if (iso === agendaState.selectedDate) cell.classList.add("selected");
 
-    const num = document.createElement("div");
-    num.className = "day-number";
-    num.textContent = d;
+    const numSpan = document.createElement("span");
+    numSpan.textContent = d;
+    cell.appendChild(numSpan);
 
-    const dotsRow = document.createElement("div");
-    dotsRow.className = "day-dot-row";
-
-    // generare pallini dai giorni e giornate
-    const eventsInDay = agendaEvents.filter((e) => e.date === iso);
-    const hasECG = eventsInDay.some((e) => e.tag === "ecg");
-    const hasHolter = eventsInDay.some((e) => e.tag === "holter");
-    const hasAltro = eventsInDay.some(
-      (e) => e.tag !== "ecg" && e.tag !== "holter"
-    );
-
-    if (hasECG) {
-      const dot = document.createElement("div");
-      dot.className = "day-dot ecg";
-      dotsRow.appendChild(dot);
-    }
-    if (hasHolter) {
-      const dot = document.createElement("div");
-      dot.className = "day-dot holter";
-      dotsRow.appendChild(dot);
-    }
-    if (hasAltro) {
-      const dot = document.createElement("div");
-      dot.className = "day-dot altro";
-      dotsRow.appendChild(dot);
+    const eventiGiorno = agendaState.eventi.filter((e) => e.data === iso);
+    if (eventiGiorno.length) {
+      const dotsRow = document.createElement("div");
+      dotsRow.className = "dot-row";
+      const colors = {
+        ecg: "#38bdf8",
+        holter: "#fbbf24",
+        prelievo: "#4ade80",
+        consulenza: "#f472b6",
+        generico: "#94a3b8",
+      };
+      eventiGiorno.slice(0, 4).forEach((e) => {
+        const dot = document.createElement("div");
+        dot.className = "agenda-dot";
+        dot.style.background = colors[e.tipo] || colors.generico;
+        dotsRow.appendChild(dot);
+      });
+      cell.appendChild(dotsRow);
     }
 
-    const dayGiornate = giornate.filter((g) => g.data === iso);
-    if (dayGiornate.length && !hasAltro) {
-      const dot = document.createElement("div");
-      dot.className = "day-dot altro";
-      dotsRow.appendChild(dot);
-    }
-
-    cell.append(num, dotsRow);
-    cell.addEventListener("click", () => openDayView(iso));
-    view.appendChild(cell);
-  }
-}
-
-function showMonthView() {
-  document.getElementById("agendaMonthView").classList.remove("hidden");
-  document.getElementById("agendaDayView").classList.add("hidden");
-}
-
-function openDayView(isoDate) {
-  const monthView = document.getElementById("agendaMonthView");
-  const dayView = document.getElementById("agendaDayView");
-  monthView.classList.add("hidden");
-  dayView.classList.remove("hidden");
-
-  const label = document.getElementById("agendaDayLabel");
-  label.textContent = formatDateIT(fromISO(isoDate));
-
-  const slotsContainer = document.getElementById("agendaDaySlots");
-  slotsContainer.innerHTML = "";
-
-  const eventsInDay = agendaEvents.filter((e) => e.date === isoDate);
-
-  const hours = [];
-  for (let h = 8; h <= 19; h++) {
-    hours.push(`${String(h).padStart(2, "0")}:00`);
-  }
-
-  hours.forEach((hour) => {
-    const slot = document.createElement("div");
-    slot.className = "agenda-slot";
-
-    const time = document.createElement("div");
-    time.className = "slot-time";
-    time.textContent = hour;
-
-    const body = document.createElement("div");
-    body.className = "slot-body empty";
-    body.textContent = "Tocca per aggiungere";
-
-    const event = eventsInDay.find((e) => e.start === hour);
-    if (event) {
-      body.classList.remove("empty");
-      body.classList.add("has-event", event.tag || "altro");
-      body.innerHTML = `
-        <div class="slot-title">${event.reason}</div>
-        <div class="slot-sub">${event.name} · ${event.start}–${event.end}</div>
-      `;
-    }
-
-    body.addEventListener("click", () => {
-      openAppointmentPopup(isoDate, hour);
+    cell.addEventListener("click", () => {
+      agendaState.selectedDate = iso;
+      renderAgenda();
     });
 
-    slot.append(time, body);
-    slotsContainer.appendChild(slot);
-  });
+    grid.appendChild(cell);
+  }
+
+  renderAgendaGiorno();
 }
 
-// ---------- POPUP APPUNTAMENTO ----------
-function openAppointmentPopup(dateISO, startTime) {
-  const modal = document.getElementById("appointmentPopup");
-  modal.classList.remove("hidden");
+function renderAgendaGiorno() {
+  const label = document.getElementById("agenda-day-label");
+  const list = document.getElementById("agenda-day-list");
+  if (!label || !list) return;
 
-  const todayISO = dateISO || toISODate(new Date());
-  document.getElementById("apptDateInput").value = todayISO;
-  document.getElementById("apptStartInput").value = startTime || "";
-  document.getElementById("apptEndInput").value = "";
-  document.getElementById("apptNameInput").value = "";
-  document.getElementById("apptReasonInput").value = "";
-}
+  label.textContent = `Vista giorno – ${formatLongDateIT(agendaState.selectedDate)}`;
 
-function closeAppointmentPopup() {
-  document.getElementById("appointmentPopup").classList.add("hidden");
-}
+  const eventiGiorno = agendaState.eventi
+    .filter((e) => e.data === agendaState.selectedDate)
+    .sort((a, b) => (a.orario || "").localeCompare(b.orario || ""));
 
-function saveAppointment() {
-  const date = document.getElementById("apptDateInput").value;
-  const start = document.getElementById("apptStartInput").value;
-  const end = document.getElementById("apptEndInput").value || start;
-  const name = document.getElementById("apptNameInput").value.trim();
-  const reason = document.getElementById("apptReasonInput").value.trim();
-
-  if (!date || !start || !name || !reason) {
-    alert("Compila data, orario, nome e motivo.");
+  if (!eventiGiorno.length) {
+    list.innerHTML = "<li>Nessun appuntamento inserito per questo giorno.</li>";
     return;
   }
 
-  const lower = reason.toLowerCase();
-  let tag = "altro";
-  if (lower.includes("ecg")) tag = "ecg";
-  else if (lower.includes("holter")) tag = "holter";
+  const colorClass = (tipo) => {
+    if (tipo === "ecg") return "event-ecg";
+    if (tipo === "holter") return "event-holter";
+    if (tipo === "prelievo") return "event-prelievo";
+    if (tipo === "consulenza") return "event-consulenza";
+    return "event-generico";
+  };
 
-  agendaEvents.push({
-    id: crypto.randomUUID(),
-    date,
-    start,
-    end,
-    name,
-    reason,
-    tag,
+  list.innerHTML = eventiGiorno
+    .map(
+      (e) => `
+    <li class="agenda-event ${colorClass(e.tipo)}">
+      <span class="agenda-event-time">${e.orario || ""}</span>
+      <div class="agenda-event-info">
+        <div><strong>${e.servizio}</strong> – ${e.nome}</div>
+      </div>
+    </li>`
+    )
+    .join("");
+}
+
+function apriModalAgenda(dataIso) {
+  const modal = document.getElementById("agenda-modal");
+  if (!modal) return;
+  modal.style.display = "flex";
+  document.getElementById("agenda-data").value = dataIso || oggiISO;
+  document.getElementById("agenda-orario").value = "";
+  document.getElementById("agenda-nome").value = "";
+  document.getElementById("agenda-servizio").value = "";
+}
+
+function salvaAgenda() {
+  const data = document.getElementById("agenda-data").value;
+  const orario = document.getElementById("agenda-orario").value.trim();
+  const nome = document.getElementById("agenda-nome").value.trim();
+  const servizio = document.getElementById("agenda-servizio").value.trim();
+
+  if (!data || !nome || !servizio) {
+    alert("Inserisci almeno data, nome e motivo/servizio.");
+    return;
+  }
+
+  const tipo = servizio.toLowerCase().includes("ecg")
+    ? "ecg"
+    : servizio.toLowerCase().includes("holter")
+    ? "holter"
+    : servizio.toLowerCase().includes("consul")
+    ? "consulenza"
+    : servizio.toLowerCase().includes("preliev")
+    ? "prelievo"
+    : "generico";
+
+  agendaState.eventi.push({ data, orario, nome, servizio, tipo });
+  agendaState.selectedDate = data;
+  const modal = document.getElementById("agenda-modal");
+  if (modal) modal.style.display = "none";
+  agendaState.currentMonth = {
+    year: parseISO(data).getFullYear(),
+    month: parseISO(data).getMonth(),
+  };
+  renderAgenda();
+}
+
+/* =======================
+   MODALI GENERICI
+   ======================= */
+
+function setupModali() {
+  document.querySelectorAll("[data-close-modal]").forEach((btn) => {
+    const id = btn.getAttribute("data-close-modal");
+    btn.addEventListener("click", () => {
+      const modal = document.getElementById(id);
+      if (modal) modal.style.display = "none";
+    });
   });
 
-  closeAppointmentPopup();
-  renderAgendaMonth();
-  openDayView(date);
+  const agendaSalva = document.getElementById("agenda-salva");
+  if (agendaSalva) agendaSalva.addEventListener("click", salvaAgenda);
 }
 
-// ---------- WHATSAPP ----------
-function openWhatsApp() {
-  // metti qui il numero reale della farmacia
-  const phone = "390000000000"; // es. 39 + numero
-  const url = `https://wa.me/${phone}`;
-  window.open(url, "_blank");
+/* =======================
+   FLOATING CHAT BTN
+   ======================= */
+
+function setupFabChat() {
+  const btn = document.getElementById("fab-chat");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    // per ora solo messaggio; in futuro potrai sostituire con link a WhatsApp Web
+    alert(
+      "In futuro qui potrai aprire direttamente la chat WhatsApp della farmacia.\nPer ora è solo un pulsante dimostrativo."
+    );
+  });
 }
+
+/* =======================
+   TIMER PANORAMICA
+   ======================= */
+document.addEventListener("click", (e) => {
+  const withinArea = e.target.closest("#area-contenuti-inner");
+  const isSectionCard = e.target.closest(".section-card");
+  if (withinArea || isSectionCard) {
+    resetInactivityTimer();
+  }
+});
