@@ -1,8 +1,122 @@
 // script.js
 
-// =========================
-// UTILITY DATE
-// =========================
+document.addEventListener("DOMContentLoaded", () => {
+  initSezioni();
+  initAreaContenuti();
+  initPromoEGiornate();
+  initAgenda();
+  initModal();
+  bindMobileCards();
+});
+
+/* =======================
+   DATI DEMO
+   ======================= */
+
+// Sezioni per Q1 (collegate a contenuti Q2)
+const SEZIONI = [
+  { id: "assenti", titolo: "Assenti / Permessi", icon: "📅" },
+  { id: "turno", titolo: "Farmacia di turno", icon: "⏰" },
+  { id: "comunicazioni", titolo: "Comunicazioni", icon: "📢" },
+  { id: "procedure", titolo: "Procedure", icon: "📚" },
+  { id: "logistica", titolo: "Logistica", icon: "📦" },
+  { id: "magazzino", titolo: "Magazziniera", icon: "📋" },
+  { id: "scadenze", titolo: "Prodotti in scadenza", icon: "⏳" },
+  { id: "consumabili", titolo: "Consumabili", icon: "🧪" },
+  { id: "consegne", titolo: "Consegne / Ritiri", icon: "🚚" },
+  // se vuoi altre sezioni, aggiungile qui
+];
+
+// Offerte demo
+let offerte = [
+  {
+    id: 1,
+    titolo: "Sconto 20% dermocosmesi",
+    dal: "2025-11-25",
+    al: "2025-12-10",
+    nota: "Linea viso selezionata",
+  },
+  {
+    id: 2,
+    titolo: "Promo integratori inverno",
+    dal: "2025-10-15",
+    al: "2025-11-15",
+    nota: "Offerta scaduta di esempio",
+  },
+];
+
+let nextOffertaId = 3;
+
+// Giornate in farmacia demo
+let giornate = [
+  {
+    id: 1,
+    titolo: "Giornata HOLTER",
+    dal: "2025-12-03",
+    al: "2025-12-03",
+    nota: "Solo su prenotazione",
+  },
+  {
+    id: 2,
+    titolo: "Giornata ECO",
+    dal: "2025-12-10",
+    al: "2025-12-10",
+    nota: "Visita con cardiologo",
+  },
+  {
+    id: 3,
+    titolo: "Giornata glicemia",
+    dal: "2025-11-15",
+    al: "2025-11-15",
+    nota: "Esempio già conclusa",
+  },
+];
+
+let nextGiornataId = 4;
+
+// Appuntamenti agenda
+let appuntamenti = [
+  {
+    id: 1,
+    data: "2025-12-03",
+    ora: "09:00",
+    nome: "Mario Rossi",
+    motivo: "HOLTER",
+    telefono: "3331234567",
+  },
+  {
+    id: 2,
+    data: "2025-12-03",
+    ora: "10:30",
+    nome: "Lucia Bianchi",
+    motivo: "HOLTER",
+    telefono: "3339876543",
+  },
+  {
+    id: 3,
+    data: "2025-12-10",
+    ora: "11:00",
+    nome: "Giuseppe Neri",
+    motivo: "ECO",
+    telefono: "3201112233",
+  },
+];
+
+let nextAppId = 4;
+
+// Stato Area Contenuti
+let currentContentId = "panoramica"; // oppure id sezione
+let contenutiInactivityTimer = null;
+const CONTENUTI_TIMEOUT_MS = 20000; // 20 secondi
+
+// Stato Agenda
+let agendaYear;
+let agendaMonth; // 0-11
+
+/* =======================
+   UTILS DATE
+   ======================= */
+
 function todayISO() {
   const d = new Date();
   const y = d.getFullYear();
@@ -11,911 +125,951 @@ function todayISO() {
   return `${y}-${m}-${day}`;
 }
 
-function toISO(dateStr) {
-  // assume 'YYYY-MM-DD'
-  return dateStr;
+function parseISO(dateStr) {
+  const [y, m, d] = dateStr.split("-");
+  return new Date(Number(y), Number(m) - 1, Number(d));
 }
 
-function formatDateIT(iso) {
-  if (!iso) return "";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
+function formatShortIT(dateStr) {
+  const [y, m, d] = dateStr.split("-");
+  return `${d}/${m}`;
 }
 
-function formatDayLabel(iso) {
-  const [y, m, d] = iso.split("-");
-  const date = new Date(Number(y), Number(m) - 1, Number(d));
-  return date.toLocaleDateString("it-IT", {
+function dateDiffInDays(from, to) {
+  const ms = parseISO(to) - parseISO(from);
+  return ms / (1000 * 60 * 60 * 24);
+}
+
+/* =======================
+   MODAL GENERICO
+   ======================= */
+
+let modalBackdrop, modalTitle, modalBody, modalFooter, modalCloseBtn;
+
+function initModal() {
+  modalBackdrop = document.getElementById("modal-backdrop");
+  modalTitle = document.getElementById("modal-title");
+  modalBody = document.getElementById("modal-body");
+  modalFooter = document.getElementById("modal-footer");
+  modalCloseBtn = document.getElementById("modal-close");
+
+  if (modalCloseBtn) {
+    modalCloseBtn.addEventListener("click", hideModal);
+  }
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) hideModal();
+    });
+  }
+}
+
+function showModal(title, bodyHtml, footerButtons = []) {
+  if (!modalBackdrop) return;
+  modalTitle.textContent = title;
+  modalBody.innerHTML = bodyHtml;
+
+  modalFooter.innerHTML = "";
+  footerButtons.forEach((btnCfg) => {
+    const btn = document.createElement("button");
+    btn.textContent = btnCfg.label;
+    btn.className = btnCfg.className || "btn-primary";
+    btn.addEventListener("click", btnCfg.onClick);
+    modalFooter.appendChild(btn);
+  });
+
+  modalBackdrop.classList.remove("hidden");
+}
+
+function hideModal() {
+  if (!modalBackdrop) return;
+  modalBackdrop.classList.add("hidden");
+}
+/* =======================
+   Q1 – SEZIONI
+   ======================= */
+
+function initSezioni() {
+  const grid = document.getElementById("sezioni-grid");
+  if (!grid) return;
+
+  grid.innerHTML = "";
+  SEZIONI.slice(0, 9).forEach((s) => {
+    const btn = document.createElement("button");
+    btn.className = "section-card";
+    btn.dataset.sectionId = s.id;
+
+    btn.innerHTML = `
+      <div class="section-card-label">Sezione</div>
+      <div class="section-card-title">${s.titolo}</div>
+      <div class="section-card-icon">${s.icon}</div>
+    `;
+
+    btn.addEventListener("click", () => {
+      mostraSezioneInContenuti(s.id);
+    });
+
+    grid.appendChild(btn);
+  });
+}
+
+/* =======================
+   Q2 – AREA CONTENUTI
+   ======================= */
+
+function initAreaContenuti() {
+  mostraPanoramicaRapida();
+  setupInactivityReset();
+}
+
+function setupInactivityReset() {
+  const wrapper = document.getElementById("contenuti-wrapper");
+  if (!wrapper) return;
+
+  wrapper.addEventListener("click", () => {
+    if (currentContentId !== "panoramica") {
+      resetContenutiTimer();
+    }
+  });
+}
+
+function resetContenutiTimer() {
+  if (contenutiInactivityTimer) {
+    clearTimeout(contenutiInactivityTimer);
+  }
+  contenutiInactivityTimer = setTimeout(() => {
+    mostraPanoramicaRapida();
+  }, CONTENUTI_TIMEOUT_MS);
+}
+
+function mostraPanoramicaRapida() {
+  const titleEl = document.getElementById("contenuti-title");
+  const bodyEl = document.getElementById("contenuti-body");
+  if (!titleEl || !bodyEl) return;
+
+  currentContentId = "panoramica";
+
+  titleEl.textContent = "Panoramica rapida";
+
+  const oggi = todayISO();
+
+  const offerteAttive = offerte.filter((o) => o.al >= oggi);
+  const giornateAttive = giornate.filter((g) => g.al >= oggi);
+
+  const appuntamentiOggi = appuntamenti.filter((a) => a.data === oggi);
+
+  const html = `
+    <div class="panoramica-grid">
+      <div class="panoramica-card">
+        <div class="panoramica-label">Offerte attive</div>
+        <div class="panoramica-value">${offerteAttive.length}</div>
+        <div class="panoramica-extra">Promozioni in corso oggi o prossimi giorni.</div>
+      </div>
+      <div class="panoramica-card">
+        <div class="panoramica-label">Giornate in programma</div>
+        <div class="panoramica-value">${giornateAttive.length}</div>
+        <div class="panoramica-extra">Servizi speciali pianificati.</div>
+      </div>
+      <div class="panoramica-card">
+        <div class="panoramica-label">Appuntamenti di oggi</div>
+        <div class="panoramica-value">${appuntamentiOggi.length}</div>
+        <div class="panoramica-extra">Agenda servizi per la data odierna.</div>
+      </div>
+    </div>
+  `;
+
+  bodyEl.innerHTML = html;
+}
+
+function mostraSezioneInContenuti(sectionId) {
+  const titleEl = document.getElementById("contenuti-title");
+  const bodyEl = document.getElementById("contenuti-body");
+  if (!titleEl || !bodyEl) return;
+
+  currentContentId = sectionId;
+  resetContenutiTimer();
+
+  const sezione = SEZIONI.find((s) => s.id === sectionId);
+  titleEl.textContent = sezione ? sezione.titolo : "Dettaglio";
+
+  let html = "";
+
+  switch (sectionId) {
+    case "assenti":
+      html = `
+        <p><strong>Assenti / Permessi</strong></p>
+        <p>Qui in futuro vedrai in tempo reale chi è assente oggi e i permessi approvati.</p>
+        <ul>
+          <li>Vista rapida assenti oggi.</li>
+          <li>Calendario ferie per mese.</li>
+          <li>Richieste permesso da approvare.</li>
+        </ul>
+      `;
+      break;
+
+    case "turno":
+      html = `
+        <p><strong>Farmacia di turno</strong></p>
+        <p>In questa sezione verranno riportati i turni della farmacia e gli appoggi.</p>
+        <p style="font-size:0.85rem; color:#7c8b90;">
+          (In futuro si potrà valutare un collegamento automatico con il sito dei turni, se Federfarma fornirà un accesso dati strutturato.)
+        </p>
+      `;
+      break;
+
+    case "comunicazioni":
+      html = `
+        <p><strong>Comunicazioni interne</strong></p>
+        <p>Spazio per messaggi rapidi tra titolare e collaboratori.</p>
+        <ul>
+          <li>Note di servizio.</li>
+          <li>Avvisi urgenti.</li>
+          <li>Promemoria giornalieri.</li>
+        </ul>
+      `;
+      break;
+
+    case "procedure":
+      html = `
+        <p><strong>Procedure</strong></p>
+        <p>Elenco strutturato delle procedure operative (cassa, magazzino, servizi...).</p>
+        <ul>
+          <li>Chiusura cassa serale.</li>
+          <li>Gestione resi grossista.</li>
+          <li>Procedure CUP / servizi.</li>
+        </ul>
+      `;
+      break;
+
+    case "logistica":
+      html = `
+        <p><strong>Logistica</strong></p>
+        <p>Gestione espositori, materiale marketing, consegne extra e allestimenti.</p>
+      `;
+      break;
+
+    case "magazzino":
+      html = `
+        <p><strong>Magazziniera</strong></p>
+        <p>Inventari rapidi, controllo scorte e gestione resi.</p>
+      `;
+      break;
+
+    case "scadenze":
+      html = renderScadenzeDettaglio();
+      break;
+
+    case "consumabili":
+      html = `
+        <p><strong>Consumabili</strong></p>
+        <p>Monitoraggio stato consumabili (sacchetti, carta scontrino, guanti...).</p>
+      `;
+      break;
+
+    case "consegne":
+      html = `
+        <p><strong>Consegne / Ritiri</strong></p>
+        <p>Riepilogo delle consegne programmate per oggi e i ritiri da effettuare.</p>
+      `;
+      break;
+
+    default:
+      html = `<p>Contenuto in lavorazione.</p>`;
+      break;
+  }
+
+  bodyEl.innerHTML = html;
+}
+
+/* =======================
+   SCADENZE (SEZIONE)
+   ======================= */
+
+// demo prodotti con scadenza
+let scadenzeProdotti = [
+  {
+    nome: "Omeprazolo 20mg cps",
+    scadenza: "2026-02-10",
+    pezzi: 4,
+  },
+  {
+    nome: "Vitamina C 1000mg",
+    scadenza: "2026-01-05",
+    pezzi: 6,
+  },
+  {
+    nome: "Spray nasale bimbo",
+    scadenza: "2025-12-20",
+    pezzi: 3,
+  },
+];
+
+function renderScadenzeDettaglio() {
+  const oggi = todayISO();
+
+  const entro60 = scadenzeProdotti.filter((p) => {
+    const diff = dateDiffInDays(oggi, p.scadenza);
+    return diff >= 0 && diff <= 60;
+  });
+
+  let html = `
+    <p><strong>Prodotti in scadenza (entro 60 giorni)</strong></p>
+  `;
+
+  if (entro60.length === 0) {
+    html += `<p style="font-size:0.9rem;">Nessun prodotto in scadenza entro 60 giorni.</p>`;
+  } else {
+    html += `<ul style="padding-left:16px; font-size:0.9rem;">`;
+    entro60.forEach((p) => {
+      html += `<li>${p.nome} – ${p.pezzi} pz (scad. ${formatShortIT(p.scadenza)})</li>`;
+    });
+    html += `</ul>`;
+  }
+
+  html += `
+    <button class="btn-primary" onclick="apriPopupNuovaScadenza()">
+      + Inserisci nuova scadenza
+    </button>
+  `;
+  return html;
+}
+
+function apriPopupNuovaScadenza() {
+  const body = `
+    <div class="form-row">
+      <label>
+        Nome prodotto
+        <input type="text" id="scad-nome" placeholder="Es. Omeprazolo 20mg" />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        Data scadenza
+        <input type="date" id="scad-data" />
+      </label>
+      <label>
+        N. pezzi
+        <input type="number" id="scad-pezzi" min="1" value="1" />
+      </label>
+    </div>
+  `;
+
+  showModal("Inserisci nuova scadenza", body, [
+    {
+      label: "Annulla",
+      className: "btn-ghost",
+      onClick: hideModal,
+    },
+    {
+      label: "Salva",
+      className: "btn-primary",
+      onClick: () => {
+        const nome = document.getElementById("scad-nome").value.trim();
+        const data = document.getElementById("scad-data").value;
+        const pezzi = Number(document.getElementById("scad-pezzi").value || "0");
+
+        if (!nome || !data || pezzi <= 0) {
+          alert("Compila nome, data e numero pezzi.");
+          return;
+        }
+
+        scadenzeProdotti.push({ nome, scadenza: data, pezzi });
+        hideModal();
+        // aggiorna area contenuti se aperta
+        if (currentContentId === "scadenze") {
+          mostraSezioneInContenuti("scadenze");
+        }
+      },
+    },
+  ]);
+}
+/* =======================
+   Q3 – PROMOZIONI & GIORNATE
+   ======================= */
+
+function initPromoEGiornate() {
+  renderOfferteEGiornate();
+
+  const btnAddOfferta = document.getElementById("btn-add-offerta");
+  const btnVediOfferte = document.getElementById("btn-vedi-offerte");
+  const btnAddGiornata = document.getElementById("btn-add-giornata");
+  const btnGAttive = document.getElementById("btn-giornate-attive");
+  const btnGConcluse = document.getElementById("btn-giornate-concluse");
+
+  if (btnAddOfferta) {
+    btnAddOfferta.addEventListener("click", () => apriPopupOfferta());
+  }
+
+  if (btnVediOfferte) {
+    btnVediOfferte.addEventListener("click", () => apriPopupElencoOfferte());
+  }
+
+  if (btnAddGiornata) {
+    btnAddGiornata.addEventListener("click", () => apriPopupGiornata());
+  }
+
+  if (btnGAttive) {
+    btnGAttive.addEventListener("click", () =>
+      apriPopupElencoGiornate("attive")
+    );
+  }
+
+  if (btnGConcluse) {
+    btnGConcluse.addEventListener("click", () =>
+      apriPopupElencoGiornate("concluse")
+    );
+  }
+}
+
+function renderOfferteEGiornate() {
+  const oggi = todayISO();
+  const contOff = document.getElementById("lista-offerte");
+  const contGio = document.getElementById("lista-giornate");
+  if (!contOff || !contGio) return;
+
+  contOff.innerHTML = "";
+  contGio.innerHTML = "";
+
+  // Offerte (tutte, ma badge diversa se scadute)
+  offerte.forEach((o) => {
+    const isScaduta = o.al < oggi;
+    const item = document.createElement("div");
+    item.className = "promo-item";
+    item.dataset.offertaId = o.id;
+
+    item.innerHTML = `
+      <div class="promo-item-title">${o.titolo}</div>
+      <div class="promo-item-meta">
+        Dal ${formatShortIT(o.dal)} al ${formatShortIT(o.al)}
+      </div>
+      <div class="promo-item-meta">${o.nota || ""}</div>
+      <div class="promo-item-badge ${isScaduta ? "scaduta" : "attiva"}">
+        ${isScaduta ? "Offerta scaduta" : "Offerta attiva"}
+      </div>
+    `;
+
+    item.addEventListener("click", () => apriPopupOfferta(o));
+    contOff.appendChild(item);
+  });
+
+  // Giornate
+  giornate.forEach((g) => {
+    const isScaduta = g.al < oggi;
+    const item = document.createElement("div");
+    item.className = "promo-item";
+    item.dataset.giornataId = g.id;
+
+    item.innerHTML = `
+      <div class="promo-item-title">${g.titolo}</div>
+      <div class="promo-item-meta">
+        ${formatShortIT(g.dal)} – ${formatShortIT(g.al)}
+      </div>
+      <div class="promo-item-meta">${g.nota || ""}</div>
+      <div class="promo-item-badge ${isScaduta ? "scaduta" : "attiva"}">
+        ${isScaduta ? "Giornata conclusa" : "Giornata attiva"}
+      </div>
+    `;
+
+    item.addEventListener("click", () => apriPopupGiornata(g));
+    contGio.appendChild(item);
+  });
+
+  // aggiorna agenda (giornate evidenziate)
+  renderAgendaGrid();
+}
+
+/* Offerta singola: crea / modifica */
+function apriPopupOfferta(offerta) {
+  const isEdit = !!offerta;
+
+  const body = `
+    <div class="form-row">
+      <label>
+        Titolo offerta
+        <input type="text" id="off-titolo" value="${offerta ? offerta.titolo.replace(/"/g, "&quot;") : ""}" />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        Dal
+        <input type="date" id="off-dal" value="${offerta ? offerta.dal : ""}" />
+      </label>
+      <label>
+        Al
+        <input type="date" id="off-al" value="${offerta ? offerta.al : ""}" />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        Note
+        <textarea id="off-nota" rows="2">${offerta ? (offerta.nota || "") : ""}</textarea>
+      </label>
+    </div>
+  `;
+
+  const buttons = [
+    {
+      label: "Annulla",
+      className: "btn-ghost",
+      onClick: hideModal,
+    },
+    {
+      label: isEdit ? "Salva modifiche" : "Crea offerta",
+      className: "btn-primary",
+      onClick: () => {
+        const titolo = document.getElementById("off-titolo").value.trim();
+        const dal = document.getElementById("off-dal").value;
+        const al = document.getElementById("off-al").value;
+        const nota = document.getElementById("off-nota").value.trim();
+
+        if (!titolo || !dal || !al) {
+          alert("Compila titolo e intervallo (dal-al).");
+          return;
+        }
+
+        if (isEdit) {
+          offerta.titolo = titolo;
+          offerta.dal = dal;
+          offerta.al = al;
+          offerta.nota = nota;
+        } else {
+          offerte.push({
+            id: nextOffertaId++,
+            titolo,
+            dal,
+            al,
+            nota,
+          });
+        }
+
+        hideModal();
+        renderOfferteEGiornate();
+      },
+    },
+  ];
+
+  if (isEdit) {
+    buttons.splice(1, 0, {
+      label: "Elimina",
+      className: "btn-ghost",
+      onClick: () => {
+        if (confirm("Vuoi eliminare questa offerta?")) {
+          offerte = offerte.filter((o) => o !== offerta);
+          hideModal();
+          renderOfferteEGiornate();
+        }
+      },
+    });
+  }
+
+  showModal(isEdit ? "Modifica offerta" : "Nuova offerta", body, buttons);
+}
+
+/* Elenco offerte: in corso + scadute */
+function apriPopupElencoOfferte() {
+  const oggi = todayISO();
+
+  const attive = offerte.filter((o) => o.al >= oggi);
+  const scadute = offerte.filter((o) => o.al < oggi);
+
+  let body = `<p><strong>Offerte in corso</strong></p>`;
+  if (attive.length === 0) {
+    body += `<p style="font-size:0.85rem;">Nessuna offerta attiva.</p>`;
+  } else {
+    body += `<ul style="font-size:0.85rem;">`;
+    attive.forEach((o) => {
+      body += `<li>${o.titolo} (${formatShortIT(o.dal)} - ${formatShortIT(o.al)})</li>`;
+    });
+    body += `</ul>`;
+  }
+
+  body += `<hr style="margin:8px 0;" />`;
+
+  body += `<p><strong>Offerte scadute</strong></p>`;
+  if (scadute.length === 0) {
+    body += `<p style="font-size:0.85rem;">Nessuna offerta scaduta.</p>`;
+  } else {
+    body += `<ul style="font-size:0.85rem;">`;
+    scadute.forEach((o) => {
+      body += `<li>${o.titolo} (${formatShortIT(o.dal)} - ${formatShortIT(o.al)})</li>`;
+    });
+    body += `</ul>`;
+  }
+
+  showModal("Riepilogo offerte", body, [
+    {
+      label: "Chiudi",
+      className: "btn-primary",
+      onClick: hideModal,
+    },
+  ]);
+}
+
+/* Giornata singola: crea / modifica */
+function apriPopupGiornata(giornata) {
+  const isEdit = !!giornata;
+
+  const body = `
+    <div class="form-row">
+      <label>
+        Titolo giornata
+        <input type="text" id="gio-titolo" value="${giornata ? giornata.titolo.replace(/"/g, "&quot;") : ""}" />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        Dal
+        <input type="date" id="gio-dal" value="${giornata ? giornata.dal : ""}" />
+      </label>
+      <label>
+        Al
+        <input type="date" id="gio-al" value="${giornata ? giornata.al : ""}" />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        Note
+        <textarea id="gio-nota" rows="2">${giornata ? (giornata.nota || "") : ""}</textarea>
+      </label>
+    </div>
+  `;
+
+  const buttons = [
+    {
+      label: "Annulla",
+      className: "btn-ghost",
+      onClick: hideModal,
+    },
+    {
+      label: isEdit ? "Salva modifiche" : "Crea giornata",
+      className: "btn-primary",
+      onClick: () => {
+        const titolo = document.getElementById("gio-titolo").value.trim();
+        const dal = document.getElementById("gio-dal").value;
+        const al = document.getElementById("gio-al").value;
+        const nota = document.getElementById("gio-nota").value.trim();
+
+        if (!titolo || !dal || !al) {
+          alert("Compila titolo e intervallo (dal-al).");
+          return;
+        }
+
+        if (isEdit) {
+          giornata.titolo = titolo;
+          giornata.dal = dal;
+          giornata.al = al;
+          giornata.nota = nota;
+        } else {
+          giornate.push({
+            id: nextGiornataId++,
+            titolo,
+            dal,
+            al,
+            nota,
+          });
+        }
+
+        hideModal();
+        renderOfferteEGiornate();
+      },
+    },
+  ];
+
+  if (isEdit) {
+    buttons.splice(1, 0, {
+      label: "Elimina",
+      className: "btn-ghost",
+      onClick: () => {
+        if (confirm("Vuoi eliminare questa giornata?")) {
+          giornate = giornate.filter((g) => g !== giornata);
+          hideModal();
+          renderOfferteEGiornate();
+        }
+      },
+    });
+  }
+
+  showModal(isEdit ? "Modifica giornata" : "Nuova giornata", body, buttons);
+}
+
+/* Elenco giornate (attive / concluse) */
+function apriPopupElencoGiornate(tipo) {
+  const oggi = todayISO();
+  let elenco;
+  let titolo;
+
+  if (tipo === "attive") {
+    titolo = "Giornate attive";
+    elenco = giornate.filter((g) => g.al >= oggi);
+  } else {
+    titolo = "Giornate concluse";
+    elenco = giornate.filter((g) => g.al < oggi);
+  }
+
+  let body = "";
+  if (elenco.length === 0) {
+    body = `<p style="font-size:0.9rem;">Nessuna giornata trovata.</p>`;
+  } else {
+    body = `<ul style="font-size:0.9rem;">`;
+    elenco.forEach((g) => {
+      body += `<li>${g.titolo} (${formatShortIT(g.dal)} - ${formatShortIT(g.al)})</li>`;
+    });
+    body += `</ul>`;
+  }
+
+  showModal(titolo, body, [
+    {
+      label: "Chiudi",
+      className: "btn-primary",
+      onClick: hideModal,
+    },
+  ]);
+}
+
+/* =======================
+   Q4 – AGENDA
+   ======================= */
+
+function initAgenda() {
+  const today = new Date();
+  agendaYear = today.getFullYear();
+  agendaMonth = today.getMonth();
+
+  const btnPrev = document.getElementById("agenda-prev");
+  const btnNext = document.getElementById("agenda-next");
+
+  if (btnPrev) {
+    btnPrev.addEventListener("click", () => {
+      agendaMonth--;
+      if (agendaMonth < 0) {
+        agendaMonth = 11;
+        agendaYear--;
+      }
+      renderAgendaGrid();
+    });
+  }
+
+  if (btnNext) {
+    btnNext.addEventListener("click", () => {
+      agendaMonth++;
+      if (agendaMonth > 11) {
+        agendaMonth = 0;
+        agendaYear++;
+      }
+      renderAgendaGrid();
+    });
+  }
+
+  renderAgendaGrid();
+}
+
+function renderAgendaGrid() {
+  const cont = document.getElementById("agenda-grid");
+  const monthLabel = document.getElementById("agenda-month-label");
+  if (!cont || !monthLabel) return;
+
+  const monthNames = [
+    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+  ];
+
+  monthLabel.textContent = `${monthNames[agendaMonth]} ${agendaYear}`;
+
+  cont.innerHTML = "";
+
+  const weekdaysRow = document.createElement("div");
+  weekdaysRow.className = "agenda-weekdays";
+  ["Lu", "Ma", "Me", "Gi", "Ve", "Sa", "Do"].forEach((d) => {
+    const span = document.createElement("div");
+    span.textContent = d;
+    weekdaysRow.appendChild(span);
+  });
+
+  const daysGrid = document.createElement("div");
+  daysGrid.className = "agenda-days";
+
+  const firstDay = new Date(agendaYear, agendaMonth, 1);
+  const startWeekday = (firstDay.getDay() + 6) % 7; // lun=0
+  const daysInMonth = new Date(agendaYear, agendaMonth + 1, 0).getDate();
+
+  for (let i = 0; i < startWeekday; i++) {
+    const empty = document.createElement("div");
+    empty.className = "agenda-day agenda-day-empty";
+    daysGrid.appendChild(empty);
+  }
+
+  const oggi = todayISO();
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(agendaYear, agendaMonth, day);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(day).padStart(2, "0");
+    const iso = `${y}-${m}-${dd}`;
+
+    const cell = document.createElement("div");
+    cell.className = "agenda-day";
+    cell.dataset.date = iso;
+
+    if (iso === oggi) {
+      cell.classList.add("today");
+    }
+
+    // giornata in farmacia?
+    const hasGiornata = giornate.some((g) => iso >= g.dal && iso <= g.al && g.al >= oggi);
+    if (hasGiornata) {
+      cell.classList.add("has-giornata");
+    }
+
+    const dayNumber = document.createElement("div");
+    dayNumber.className = "agenda-day-number";
+    dayNumber.textContent = day;
+
+    const meta = document.createElement("div");
+    meta.className = "agenda-day-meta";
+
+    const apptCount = appuntamenti.filter((a) => a.data === iso).length;
+    if (apptCount > 0) {
+      meta.textContent = `${apptCount} appt`;
+    } else if (hasGiornata) {
+      meta.textContent = "Giornata";
+    } else {
+      meta.textContent = "";
+    }
+
+    cell.appendChild(dayNumber);
+    cell.appendChild(meta);
+
+    cell.addEventListener("click", () => apriPopupGiornoAgenda(iso));
+
+    daysGrid.appendChild(cell);
+  }
+
+  cont.appendChild(weekdaysRow);
+  cont.appendChild(daysGrid);
+}
+
+function apriPopupGiornoAgenda(dateISO) {
+  const giorno = parseISO(dateISO);
+  const formatter = new Intl.DateTimeFormat("it-IT", {
     weekday: "long",
     day: "2-digit",
     month: "2-digit",
-    year: "numeric"
+    year: "numeric",
   });
-}
+  const labelData = formatter.format(giorno);
 
-// =========================
-// LOCAL STORAGE
-// =========================
-const LS_KEYS = {
-  USERS: "fm_utenti",
-  SESSION: "fm_sessione",
-  OFFERTE: "fm_offerte",
-  GIORNATE: "fm_giornate",
-  AGENDA: "fm_agenda"
-};
+  const giornateInGiorno = giornate.filter(
+    (g) => dateISO >= g.dal && dateISO <= g.al
+  );
 
-function loadLS(key, fallback) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : fallback;
-  } catch {
-    return fallback;
-  }
-}
+  const appt = appuntamenti
+    .filter((a) => a.data === dateISO)
+    .sort((a, b) => (a.ora || "").localeCompare(b.ora || ""));
 
-function saveLS(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
-}
+  let body = `<p><strong>${labelData}</strong></p>`;
 
-// =========================
-// STATO GLOBALE
-// =========================
-let utenti = loadLS(LS_KEYS.USERS, []);
-let sessione = loadLS(LS_KEYS.SESSION, null);
-let offerte = loadLS(LS_KEYS.OFFERTE, []);
-let giornate = loadLS(LS_KEYS.GIORNATE, []);
-let agenda = loadLS(LS_KEYS.AGENDA, []);
-
-let currentMonth = (() => {
-  const d = new Date();
-  return { year: d.getFullYear(), month: d.getMonth() }; // 0-based
-})();
-
-let panoramicaTimer = null;
-// =========================
-// INIT
-// =========================
-document.addEventListener("DOMContentLoaded", () => {
-  setupAuthTabs();
-  setupAuth();
-  setupDashboard();
-  decideInitialScreen();
-});
-
-// =========================
-// AUTH UI
-// =========================
-function setupAuthTabs() {
-  const tabs = document.querySelectorAll(".auth-tab");
-  const panels = {
-    login: document.getElementById("auth-panel-login"),
-    register: document.getElementById("auth-panel-register")
-  };
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const id = tab.dataset.authTab;
-      tabs.forEach((t) => t.classList.remove("auth-tab--active"));
-      tab.classList.add("auth-tab--active");
-
-      Object.entries(panels).forEach(([key, panel]) => {
-        panel.classList.toggle("auth-panel--active", key === id);
-      });
+  if (giornateInGiorno.length > 0) {
+    body += `<p><strong>Giornate in farmacia:</strong></p><ul>`;
+    giornateInGiorno.forEach((g) => {
+      body += `<li>${g.titolo} (${formatShortIT(g.dal)} - ${formatShortIT(g.al)})</li>`;
     });
-  });
-}
-
-function setupAuth() {
-  // login classico
-  const loginForm = document.getElementById("login-form");
-  if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const username = document.getElementById("login-username").value.trim();
-      const password = document.getElementById("login-password").value;
-
-      let user =
-        utenti.find((u) => u.username === username && u.password === password) ||
-        null;
-
-      if (!user) {
-        // fallback demo farmacia
-        user = { ruolo: "farmacia", fullname: "Farmacia Montesano" };
-      }
-
-      startSession(user);
-    });
+    body += `</ul>`;
   }
 
-  // accesso veloce demo
-  document.querySelectorAll("[data-demo-login]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const value = btn.dataset.demoLogin;
-      let user;
-      if (value === "farmacia") {
-        user = { ruolo: "farmacia", fullname: "Farmacia Montesano" };
-      } else if (value === "titolare") {
-        user = { ruolo: "titolare", fullname: "Valerio Montesano" };
-      } else {
-        user = { ruolo: "dipendente", fullname: value };
-      }
-      startSession(user);
-    });
-  });
+  body += `<p><strong>Appuntamenti</strong></p>`;
 
-  // registrazione
-  const regForm = document.getElementById("register-form");
-  if (regForm) {
-    regForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const ruolo = document.getElementById("reg-role").value;
-      const fullname = document.getElementById("reg-fullname").value.trim();
-      const username = document.getElementById("reg-username").value.trim();
-      const password = document.getElementById("reg-password").value;
-      const phone = document.getElementById("reg-phone").value.trim();
-      const email = document.getElementById("reg-email").value.trim();
-
-      if (!ruolo || !fullname || !username || !password) {
-        alert("Compila tutti i campi obbligatori.");
-        return;
-      }
-
-      if (ruolo === "cliente" && !phone) {
-        alert("Per i clienti il telefono è obbligatorio.");
-        return;
-      }
-
-      if (utenti.some((u) => u.username === username)) {
-        alert("Username già utilizzato.");
-        return;
-      }
-
-      utenti.push({ ruolo, fullname, username, password, phone, email });
-      saveLS(LS_KEYS.USERS, utenti);
-      alert("Utente registrato. Ora puoi effettuare il login.");
-
-      // passa al tab login
-      document.querySelector('[data-auth-tab="login"]').click();
-      document.getElementById("login-username").value = username;
-    });
-  }
-}
-
-function startSession(user) {
-  sessione = user;
-  saveLS(LS_KEYS.SESSION, sessione);
-  document.getElementById("topbar-user-name").textContent =
-    `${user.fullname || "Utente"} (${user.ruolo || "demo"})`;
-  document.getElementById("auth-screen").style.display = "none";
-  document.getElementById("dashboard-screen").style.display = "flex";
-  refreshAllViews();
-}
-
-function endSession() {
-  sessione = null;
-  saveLS(LS_KEYS.SESSION, null);
-  document.getElementById("auth-screen").style.display = "flex";
-  document.getElementById("dashboard-screen").style.display = "none";
-}
-
-function decideInitialScreen() {
-  if (sessione) {
-    document.getElementById("auth-screen").style.display = "none";
-    document.getElementById("dashboard-screen").style.display = "flex";
-    document.getElementById("topbar-user-name").textContent =
-      `${sessione.fullname || "Utente"} (${sessione.ruolo || "demo"})`;
-    refreshAllViews();
+  if (appt.length === 0) {
+    body += `<p style="font-size:0.9rem;">Nessun appuntamento registrato.</p>`;
   } else {
-    document.getElementById("auth-screen").style.display = "flex";
-    document.getElementById("dashboard-screen").style.display = "none";
-  }
-}
-// =========================
-// DASHBOARD SETUP
-// =========================
-function setupDashboard() {
-  // logout
-  const btnLogout = document.getElementById("btn-logout");
-  if (btnLogout) {
-    btnLogout.addEventListener("click", () => {
-      endSession();
+    body += `<ul style="font-size:0.9rem;">`;
+    appt.forEach((a) => {
+      body += `<li>${a.ora} – ${a.nome} (${a.motivo}) · ${a.telefono}</li>`;
     });
+    body += `</ul>`;
   }
 
-  // sezione contenuti (click card)
-  document.querySelectorAll("[data-section]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.section;
-      showSectionContent(id);
-    });
-  });
-
-  // modali promo
-  document.getElementById("btn-add-offerta").addEventListener("click", () =>
-    openOffertaModal()
-  );
-  document.getElementById("btn-add-giornata").addEventListener("click", () =>
-    openGiornataModal()
-  );
-  document.getElementById("btn-all-promos").addEventListener("click", () =>
-    openPromosModal()
-  );
-
-  // modale appuntamento
-  document.getElementById("btn-new-appt").addEventListener("click", () =>
-    openApptModal()
-  );
-
-  // chiusura modali generica
-  document.querySelectorAll("[data-close]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.close;
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add("hidden");
-    });
-  });
-
-  // submit modali
-  document
-    .getElementById("form-offerta")
-    .addEventListener("submit", onSubmitOfferta);
-
-  document
-    .getElementById("form-giornata")
-    .addEventListener("submit", onSubmitGiornata);
-
-  document
-    .getElementById("form-appt")
-    .addEventListener("submit", onSubmitAppt);
-
-  // navigazione mese agenda
-  document
-    .getElementById("btn-month-prev")
-    .addEventListener("click", () => changeMonth(-1));
-  document
-    .getElementById("btn-month-next")
-    .addEventListener("click", () => changeMonth(1));
-
-  // fab placeholder
-  document.getElementById("fab-quick").addEventListener("click", () => {
-    alert("In futuro qui potrai aggiungere azioni rapide.");
-  });
-}
-
-function refreshAllViews() {
-  renderPromos();
-  renderAgenda();
-  renderPanoramica();
-}
-
-// =========================
-// PANORAMICA VS SEZIONI
-// =========================
-function vistaSezioneHtml(id) {
-  const map = {
-    assenti: {
-      titolo: "Assenti / Permessi",
-      testo:
-        "Qui vedrai elenco assenze approvate, permessi e richieste del personale."
-    },
-    turno: {
-      titolo: "Farmacia di turno",
-      testo:
-        "Turni di oggi, prossimi turni e farmacie di appoggio in chiaro per tutti."
-    },
-    comunicazioni: {
-      titolo: "Comunicazioni interne",
-      testo:
-        "Messaggi rapidi tra titolare e personale: note operative, avvisi, memo."
-    },
-    procedure: {
-      titolo: "Procedure",
-      testo:
-        "Procedure standard, protocolli operativi, schede da consultare rapidamente."
-    },
-    logistica: {
-      titolo: "Logistica",
-      testo:
-        "Consegne, ritiri, corrieri e materiali: qui avrai lo stato aggiornato."
-    },
-    magazziniera: {
-      titolo: "Magazziniera",
-      testo:
-        "Inventari, resi, giacenze critiche: in futuro questa sezione sarà il loro pannello."
-    },
-    scadenze: {
-      titolo: "Prodotti in scadenza",
-      testo:
-        "Elenco prodotti in scadenza con priorità di smaltimento e note per il banco."
-    },
-    consumabili: {
-      titolo: "Consumabili",
-      testo:
-        "Guanti, aghi, carta, modulistica: livelli, riordino e storico consumi."
-    },
-    archivio: {
-      titolo: "Consegne / Archivio file",
-      testo:
-        "Documenti, moduli, allegati, consegne ai corrieri e storico caricamenti."
-    }
-  };
-
-  const info = map[id] || {
-    titolo: "Sezione",
-    testo: "Contenuti in arrivo per questa sezione."
-  };
-
-  return `
-    <h2>${info.titolo}</h2>
-    <p>${info.testo}</p>
-    <p style="margin-top:8px;font-size:0.8rem;opacity:0.65;">
-      Suggerimento: se non tocchi nulla per 20 secondi, la panoramica rapida tornerà automaticamente.
-    </p>
+  body += `
+    <hr style="margin:8px 0;" />
+    <p><strong>Nuovo appuntamento</strong></p>
+    <div class="form-row">
+      <label>
+        Data
+        <input type="date" id="app-data" value="${dateISO}" />
+      </label>
+      <label>
+        Ora
+        <input type="time" id="app-ora" />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        Nome e cognome
+        <input type="text" id="app-nome" placeholder="Es. Mario Rossi" />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        Motivo
+        <input type="text" id="app-motivo" placeholder="Es. HOLTER, ECO..." />
+      </label>
+    </div>
+    <div class="form-row">
+      <label>
+        Telefono
+        <input type="tel" id="app-tel" placeholder="Es. 3331234567" />
+      </label>
+    </div>
   `;
+
+  showModal("Agenda – " + labelData, body, [
+    {
+      label: "Chiudi",
+      className: "btn-ghost",
+      onClick: hideModal,
+    },
+    {
+      label: "Salva appuntamento",
+      className: "btn-primary",
+      onClick: () => {
+        const data = document.getElementById("app-data").value;
+        const ora = document.getElementById("app-ora").value;
+        const nome = document.getElementById("app-nome").value.trim();
+        const motivo = document.getElementById("app-motivo").value.trim();
+        const tel = document.getElementById("app-tel").value.trim();
+
+        if (!data || !ora || !nome || !motivo || !tel) {
+          alert("Compila tutti i campi (data, ora, nome, motivo, telefono).");
+          return;
+        }
+
+        appuntamenti.push({
+          id: nextAppId++,
+          data,
+          ora,
+          nome,
+          motivo,
+          telefono: tel,
+        });
+
+        hideModal();
+        renderAgendaGrid();
+      },
+    },
+  ]);
 }
 
-function showSectionContent(id) {
-  const pano = document.getElementById("panoramica-wrapper");
-  const content = document.getElementById("section-content");
-  if (!pano || !content) return;
+/* =======================
+   MOBILE – TAP CARD → AREA CONTENUTI
+   ======================= */
 
-  if (panoramicaTimer) clearTimeout(panoramicaTimer);
-
-  pano.style.display = "none";
-  content.style.display = "block";
-  content.innerHTML = vistaSezioneHtml(id);
-
-  panoramicaTimer = setTimeout(() => {
-    content.style.display = "none";
-    pano.style.display = "block";
-  }, 20000);
-}
-
-function renderPanoramica() {
-  const today = todayISO();
-  const serviziOggi = agenda.filter((a) => a.data === today).length;
-  const offerteAttive = offerte.filter((o) => !isScaduta(o)).length;
-  const assenzeFittizie = 0; // placeholder
-  const scadenzeFittizie = 0;
-  const comunicazioniFittizie = 1;
-
-  document.getElementById("p-servizi-oggi").textContent = serviziOggi;
-  document.getElementById("p-offerte").textContent = offerteAttive;
-  document.getElementById("p-assenze").textContent = assenzeFittizie;
-  document.getElementById("p-scadenze").textContent = scadenzeFittizie;
-  document.getElementById("p-comunicazioni").textContent = comunicazioniFittizie;
-}
-// =========================
-// PROMOZIONI & GIORNATE
-// =========================
-function isScaduta(item) {
-  if (!item.al) return false;
-  return item.al < todayISO();
-}
-
-function renderPromos() {
-  const offCont = document.getElementById("offerte-list");
-  const gioCont = document.getElementById("giornate-list");
-  offCont.innerHTML = "";
-  gioCont.innerHTML = "";
-
-  if (!offerte.length) {
-    offCont.innerHTML =
-      '<div class="promo-empty">Nessuna offerta in corso.</div>';
-  } else {
-    offerte.forEach((o) => {
-      const div = document.createElement("div");
-      const scaduta = isScaduta(o);
-      div.className = "promo-item" + (scaduta ? " promo-item--expired" : "");
-      div.innerHTML = `
-        <div>
-          <div class="promo-title">${o.titolo}</div>
-          <span class="promo-date">${formatDateIT(o.dal)} → ${formatDateIT(
-        o.al
-      )}</span>
-        </div>
-        <div class="promo-actions">
-          <span class="promo-tag">${
-            scaduta ? "OFFERTA SCADUTA" : "OFFERTA"
-          }</span>
-          <button class="icon-button" data-edit-offerta="${o.id}">✏️</button>
-          <button class="icon-button" data-del-offerta="${o.id}">🗑</button>
-        </div>
-      `;
-      offCont.appendChild(div);
-    });
-  }
-
-  if (!giornate.length) {
-    gioCont.innerHTML =
-      '<div class="promo-empty">Nessuna giornata programmata.</div>';
-  } else {
-    giornate.forEach((g) => {
-      const div = document.createElement("div");
-      const scaduta = isScaduta(g);
-      div.className = "promo-item" + (scaduta ? " promo-item--expired" : "");
-      div.innerHTML = `
-        <div>
-          <div class="promo-title">${g.titolo}</div>
-          <span class="promo-date">${formatDateIT(g.dal)} → ${formatDateIT(
-        g.al
-      )}</span>
-        </div>
-        <div class="promo-actions">
-          <span class="promo-tag">${
-            scaduta ? "GIORNATA CONCLUSA" : "GIORNATA"
-          }</span>
-          <button class="icon-button" data-edit-giornata="${g.id}">✏️</button>
-          <button class="icon-button" data-del-giornata="${g.id}">🗑</button>
-        </div>
-      `;
-      gioCont.appendChild(div);
-    });
-  }
-
-  // delega eventi edit/del
-  offCont.querySelectorAll("[data-edit-offerta]").forEach((btn) =>
-    btn.addEventListener("click", () =>
-      openOffertaModal(btn.dataset.editOfferta)
-    )
-  );
-  offCont.querySelectorAll("[data-del-offerta]").forEach((btn) =>
-    btn.addEventListener("click", () => deleteOfferta(btn.dataset.delOfferta))
-  );
-
-  gioCont.querySelectorAll("[data-edit-giornata]").forEach((btn) =>
-    btn.addEventListener("click", () =>
-      openGiornataModal(btn.dataset.editGiornata)
-    )
-  );
-  gioCont.querySelectorAll("[data-del-giornata]").forEach((btn) =>
-    btn.addEventListener("click", () =>
-      deleteGiornata(btn.dataset.delGiornata)
-    )
-  );
-}
-
-// OFFERTA
-function openOffertaModal(id = null) {
-  const modal = document.getElementById("modal-offerta");
-  const title = document.getElementById("modal-offerta-title");
-  const inputId = document.getElementById("offerta-id");
-  const t = document.getElementById("offerta-titolo");
-  const from = document.getElementById("offerta-from");
-  const to = document.getElementById("offerta-to");
-  const note = document.getElementById("offerta-note");
-
-  if (id) {
-    const off = offerte.find((o) => o.id === id);
-    inputId.value = off.id;
-    t.value = off.titolo;
-    from.value = off.dal;
-    to.value = off.al;
-    note.value = off.note || "";
-    title.textContent = "Modifica offerta";
-  } else {
-    inputId.value = "";
-    t.value = "";
-    from.value = todayISO();
-    to.value = todayISO();
-    note.value = "";
-    title.textContent = "Nuova offerta in corso";
-  }
-
-  modal.classList.remove("hidden");
-}
-
-function onSubmitOfferta(e) {
-  e.preventDefault();
-  const id = document.getElementById("offerta-id").value;
-  const titolo = document.getElementById("offerta-titolo").value.trim();
-  const dal = document.getElementById("offerta-from").value;
-  const al = document.getElementById("offerta-to").value;
-  const note = document.getElementById("offerta-note").value.trim();
-  if (!titolo || !dal || !al) {
-    alert("Compila tutti i campi obbligatori.");
-    return;
-  }
-  if (al < dal) {
-    alert("La data 'al' deve essere successiva o uguale a 'dal'.");
-    return;
-  }
-
-  if (id) {
-    const off = offerte.find((o) => o.id === id);
-    off.titolo = titolo;
-    off.dal = dal;
-    off.al = al;
-    off.note = note;
-  } else {
-    offerte.push({
-      id: crypto.randomUUID(),
-      titolo,
-      dal,
-      al,
-      note
-    });
-  }
-
-  saveLS(LS_KEYS.OFFERTE, offerte);
-  document.getElementById("modal-offerta").classList.add("hidden");
-  renderPromos();
-  renderPanoramica();
-}
-
-function deleteOfferta(id) {
-  if (!confirm("Eliminare questa offerta?")) return;
-  offerte = offerte.filter((o) => o.id !== id);
-  saveLS(LS_KEYS.OFFERTE, offerte);
-  renderPromos();
-  renderPanoramica();
-}
-// GIORNATA
-function openGiornataModal(id = null) {
-  const modal = document.getElementById("modal-giornata");
-  const title = document.getElementById("modal-giornata-title");
-  const inputId = document.getElementById("giornata-id");
-  const t = document.getElementById("giornata-titolo");
-  const from = document.getElementById("giornata-from");
-  const to = document.getElementById("giornata-to");
-  const note = document.getElementById("giornata-note");
-
-  if (id) {
-    const g = giornate.find((x) => x.id === id);
-    inputId.value = g.id;
-    t.value = g.titolo;
-    from.value = g.dal;
-    to.value = g.al;
-    note.value = g.note || "";
-    title.textContent = "Modifica giornata in farmacia";
-  } else {
-    inputId.value = "";
-    t.value = "";
-    from.value = todayISO();
-    to.value = todayISO();
-    note.value = "";
-    title.textContent = "Nuova giornata in farmacia";
-  }
-
-  modal.classList.remove("hidden");
-}
-
-function onSubmitGiornata(e) {
-  e.preventDefault();
-  const id = document.getElementById("giornata-id").value;
-  const titolo = document.getElementById("giornata-titolo").value.trim();
-  const dal = document.getElementById("giornata-from").value;
-  const al = document.getElementById("giornata-to").value;
-  const note = document.getElementById("giornata-note").value.trim();
-  if (!titolo || !dal || !al) {
-    alert("Compila tutti i campi obbligatori.");
-    return;
-  }
-  if (al < dal) {
-    alert("La data 'al' deve essere successiva o uguale a 'dal'.");
-    return;
-  }
-
-  if (id) {
-    const g = giornate.find((x) => x.id === id);
-    g.titolo = titolo;
-    g.dal = dal;
-    g.al = al;
-    g.note = note;
-    // aggiorna agenda legata alla giornata
-    agenda = agenda.filter((a) => a.giornataId !== id);
-    addGiornataToAgenda(g);
-  } else {
-    const gid = crypto.randomUUID();
-    const g = { id: gid, titolo, dal, al, note };
-    giornate.push(g);
-    addGiornataToAgenda(g);
-  }
-
-  saveLS(LS_KEYS.GIORNATE, giornate);
-  saveLS(LS_KEYS.AGENDA, agenda);
-  document.getElementById("modal-giornata").classList.add("hidden");
-  renderPromos();
-  renderAgenda();
-}
-
-function deleteGiornata(id) {
-  if (!confirm("Eliminare questa giornata e gli slot agenda collegati?")) return;
-  giornate = giornate.filter((g) => g.id !== id);
-  agenda = agenda.filter((a) => a.giornataId !== id);
-  saveLS(LS_KEYS.GIORNATE, giornate);
-  saveLS(LS_KEYS.AGENDA, agenda);
-  renderPromos();
-  renderAgenda();
-}
-
-function addGiornataToAgenda(g) {
-  const start = new Date(g.dal);
-  const end = new Date(g.al);
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const iso = d.toISOString().slice(0, 10);
-    agenda.push({
-      id: crypto.randomUUID(),
-      data: iso,
-      oraDa: "08:00",
-      oraA: "20:00",
-      nome: g.titolo,
-      servizio: "Giornata in farmacia",
-      telefono: "",
-      tipo: "giornata",
-      giornataId: g.id
-    });
-  }
-}
-
-// MODALE PROMOS
-function openPromosModal() {
-  const m = document.getElementById("modal-promos");
-  const offAtt = document.getElementById("modal-offerte-attive");
-  const offScad = document.getElementById("modal-offerte-scadute");
-  const gioAtt = document.getElementById("modal-giornate-attive");
-  const gioScad = document.getElementById("modal-giornate-scadute");
-
-  offAtt.innerHTML = "";
-  offScad.innerHTML = "";
-  gioAtt.innerHTML = "";
-  gioScad.innerHTML = "";
-
-  const renderList = (arr, container, emptyText) => {
-    if (!arr.length) {
-      container.innerHTML = `<div class="promo-empty">${emptyText}</div>`;
-      return;
-    }
-    arr
-      .slice()
-      .sort((a, b) => a.dal.localeCompare(b.dal))
-      .forEach((item) => {
-        const div = document.createElement("div");
-        div.className = "promo-item";
-        div.innerHTML = `
-          <div>
-            <div class="promo-title">${item.titolo}</div>
-            <span class="promo-date">${formatDateIT(item.dal)} → ${formatDateIT(
-          item.al
-        )}</span>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-  };
-
-  renderList(
-    offerte.filter((o) => !isScaduta(o)),
-    offAtt,
-    "Nessuna offerta attiva."
-  );
-  renderList(
-    offerte.filter((o) => isScaduta(o)),
-    offScad,
-    "Nessuna offerta scaduta."
-  );
-  renderList(
-    giornate.filter((g) => !isScaduta(g)),
-    gioAtt,
-    "Nessuna giornata in programma."
-  );
-  renderList(
-    giornate.filter((g) => isScaduta(g)),
-    gioScad,
-    "Nessuna giornata conclusa."
-  );
-
-  m.classList.remove("hidden");
-}
-
-// =========================
-// AGENDA
-// =========================
-function changeMonth(delta) {
-  currentMonth.month += delta;
-  if (currentMonth.month < 0) {
-    currentMonth.month = 11;
-    currentMonth.year--;
-  } else if (currentMonth.month > 11) {
-    currentMonth.month = 0;
-    currentMonth.year++;
-  }
-  renderAgenda();
-}
-
-function renderAgenda() {
-  const label = document.getElementById("agenda-month-label");
-  const cal = document.getElementById("agenda-calendar");
-  const date = new Date(currentMonth.year, currentMonth.month, 1);
-  const monthLabel = date.toLocaleDateString("it-IT", {
-    month: "long",
-    year: "numeric"
-  });
-  label.textContent = monthLabel;
-
-  const firstDay = new Date(currentMonth.year, currentMonth.month, 1);
-  const startWeekday = (firstDay.getDay() + 6) % 7; // lun=0
-  const daysInMonth = new Date(
-    currentMonth.year,
-    currentMonth.month + 1,
-    0
-  ).getDate();
-
-  let html = '<table class="calendar-grid"><thead><tr>';
-  ["LU", "MA", "ME", "GI", "VE", "SA", "DO"].forEach((d) => {
-    html += `<th>${d}</th>`;
-  });
-  html += "</tr></thead><tbody><tr>";
-
-  let cell = 0;
-  for (let i = 0; i < startWeekday; i++, cell++) {
-    html += `<td></td>`;
-  }
-
-  const today = todayISO();
-  for (let day = 1; day <= daysInMonth; day++, cell++) {
-    if (cell > 0 && cell % 7 === 0) html += "</tr><tr>";
-    const iso = `${currentMonth.year}-${String(currentMonth.month + 1).padStart(
-      2,
-      "0"
-    )}-${String(day).padStart(2, "0")}`;
-    const dayEvents = agenda.filter((a) => a.data === iso);
-    const hasEvents = dayEvents.length > 0;
-
-    const classes = ["calendar-day"];
-    if (iso === today) classes.push("calendar-day--today");
-    if (!hasEvents) {
-      // nothing
-    } else {
-      classes.push("calendar-day--has-events");
-    }
-
-    html += `<td>
-      <div class="${classes.join(" ")}" data-date-iso="${iso}">
-        <span>${day}</span>
-      </div>
-    </td>`;
-  }
-
-  while (cell % 7 !== 0) {
-    html += "<td></td>";
-    cell++;
-  }
-
-  html += "</tr></tbody></table>";
-  cal.innerHTML = html;
-
-  // attach events click + long press
-  cal.querySelectorAll(".calendar-day").forEach((el) => {
-    const iso = el.dataset.dateIso;
-    let pressTimer = null;
-
-    el.addEventListener("mousedown", () => {
-      pressTimer = setTimeout(() => {
-        openDayModal(iso);
-      }, 500);
-    });
-
-    ["mouseup", "mouseleave"].forEach((ev) =>
-      el.addEventListener(ev, () => {
-        if (pressTimer) clearTimeout(pressTimer);
-      })
-    );
-
-    el.addEventListener("click", () => {
-      openDayModal(iso);
+function bindMobileCards() {
+  const cards = document.querySelectorAll(".m-card[data-section]");
+  cards.forEach((card) => {
+    card.addEventListener("click", () => {
+      const id = card.getAttribute("data-section");
+      // Per ora, semplicemente mostro la sezione in area contenuti
+      // (utile se un giorno vorrai la stessa struttura su mobile)
+      mostraSezioneInContenuti(id);
     });
   });
-}
-
-function openDayModal(iso) {
-  const modal = document.getElementById("modal-day");
-  const title = document.getElementById("modal-day-title");
-  const list = document.getElementById("modal-day-list");
-
-  const items = agenda
-    .filter((a) => a.data === iso)
-    .sort((a, b) => a.oraDa.localeCompare(b.oraDa));
-
-  title.textContent = `Appuntamenti – ${formatDayLabel(iso)}`;
-  list.innerHTML = "";
-
-  if (!items.length) {
-    list.innerHTML = "<li>Nessun appuntamento.</li>";
-  } else {
-    items.forEach((a) => {
-      const li = document.createElement("li");
-      li.className = "day-popup-row";
-      li.innerHTML = `
-        <span class="day-popup-time">${a.oraDa} – ${a.oraA}</span>
-        <span class="day-popup-main">${a.nome} – ${a.servizio}</span>
-        <span class="day-popup-phone">${a.telefono || ""}</span>
-      `;
-      list.appendChild(li);
-    });
-  }
-
-  modal.classList.remove("hidden");
-}
-
-function openApptModal(id = null) {
-  const modal = document.getElementById("modal-appt");
-  const title = document.getElementById("modal-appt-title");
-  const inputId = document.getElementById("appt-id");
-  const date = document.getElementById("appt-date");
-  const from = document.getElementById("appt-from");
-  const to = document.getElementById("appt-to");
-  const name = document.getElementById("appt-name");
-  const service = document.getElementById("appt-service");
-  const phone = document.getElementById("appt-phone");
-
-  if (id) {
-    const a = agenda.find((x) => x.id === id);
-    inputId.value = a.id;
-    date.value = a.data;
-    from.value = a.oraDa;
-    to.value = a.oraA;
-    name.value = a.nome;
-    service.value = a.servizio;
-    phone.value = a.telefono;
-    title.textContent = "Modifica appuntamento";
-  } else {
-    inputId.value = "";
-    date.value = todayISO();
-    from.value = "09:00";
-    to.value = "09:30";
-    name.value = "";
-    service.value = "";
-    phone.value = "";
-    title.textContent = "Nuovo appuntamento";
-  }
-
-  modal.classList.remove("hidden");
-}
-
-function onSubmitAppt(e) {
-  e.preventDefault();
-  const id = document.getElementById("appt-id").value;
-  const data = document.getElementById("appt-date").value;
-  const from = document.getElementById("appt-from").value;
-  const to = document.getElementById("appt-to").value;
-  const name = document.getElementById("appt-name").value.trim();
-  const service = document.getElementById("appt-service").value.trim();
-  const phone = document.getElementById("appt-phone").value.trim();
-
-  if (!data || !from || !to || !name || !service || !phone) {
-    alert("Compila tutti i campi obbligatori.");
-    return;
-  }
-
-  if (to <= from) {
-    alert("L'ora di fine deve essere successiva a quella di inizio.");
-    return;
-  }
-
-  if (id) {
-    const a = agenda.find((x) => x.id === id);
-    a.data = data;
-    a.oraDa = from;
-    a.oraA = to;
-    a.nome = name;
-    a.servizio = service;
-    a.telefono = phone;
-  } else {
-    agenda.push({
-      id: crypto.randomUUID(),
-      data,
-      oraDa: from,
-      oraA: to,
-      nome: name,
-      servizio: service,
-      telefono: phone,
-      tipo: "appuntamento"
-    });
-  }
-
-  saveLS(LS_KEYS.AGENDA, agenda);
-  document.getElementById("modal-appt").classList.add("hidden");
-  renderAgenda();
-  renderPanoramica();
 }
