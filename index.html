@@ -9,240 +9,323 @@
 <body>
   <div class="app-shell">
 
-    <!-- ======================
-         VISTA MOBILE (CARD) – INVARIATA
-         ====================== -->
-    <div class="mobile-dashboard">
-      <header class="m-header">
-        <div class="m-logo-wrap">
-          <img src="logo.jpg" alt="Farmacia Montesano" class="m-logo" />
-        </div>
-        <button class="m-hamburger" aria-label="Menu">
-          <span></span>
+    <!-- =========================
+         HEADER MINIMO
+         ========================= -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="hamburger" id="menuToggle" aria-label="Menù">
+          <span></span><span></span><span></span>
         </button>
-      </header>
+        <span class="topbar-title">PORTALE FARMACIA MONTESANO</span>
+        <span class="topbar-subtitle" id="topbar-subtitle">Dashboard principale</span>
+      </div>
+      <div class="topbar-right">
+        <span id="current-role-label" class="role-label">Demo – Farmacia</span>
+        <button id="logoutBtn" class="link-ghost">Esci</button>
+      </div>
+    </header>
 
-      <main class="m-main">
-        <section class="m-card-grid">
+    <!-- =========================
+         SCHERMATA AUTH (LOGIN / REGISTER)
+         ========================= -->
+    <main id="auth-screen" class="auth-screen">
+      <section class="auth-card">
+        <div class="auth-columns">
+          <!-- LOGIN -->
+          <div class="auth-column">
+            <h1 class="auth-title">Accedi</h1>
+            <p class="auth-text">
+              Per ora è una demo: puoi entrare velocemente come farmacia o come utente registrato.
+            </p>
 
-          <!-- RIGA 1 -->
-          <button class="m-card m-card-green" data-section="assenti">
-            <div class="m-card-label">NUOVI</div>
-            <div class="m-card-title">Assenti / Permessi</div>
-            <div class="m-card-badge">2</div>
-            <div class="m-card-icon">📅</div>
-          </button>
+            <div class="auth-quick-login">
+              <h2 class="auth-subtitle">Accesso rapido</h2>
+              <button class="btn-primary auth-btn" data-demo-role="farmacia">
+                Entra come Farmacia (demo)
+              </button>
+              <button class="btn-outline auth-btn" data-demo-role="titolare">
+                Entra come Titolare (demo)
+              </button>
+            </div>
 
-          <button class="m-card m-card-blue" data-section="turno">
-            <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Farmacia di turno</div>
-            <div class="m-card-badge">1</div>
-            <div class="m-card-icon">⏰</div>
-          </button>
+            <div class="auth-registered">
+              <h2 class="auth-subtitle">Utenti registrati</h2>
+              <label class="auth-label">
+                Seleziona utente
+                <select id="login-user-select" class="auth-select">
+                  <option value="">— Nessun utente registrato —</option>
+                </select>
+              </label>
+              <button id="loginExistingBtn" class="btn-primary auth-btn">
+                Entra
+              </button>
+            </div>
+          </div>
+                    <!-- REGISTER -->
+          <div class="auth-column auth-column-register">
+            <h1 class="auth-title">Registrazione</h1>
+            <p class="auth-text">
+              Registra un nuovo <strong>dipendente</strong> o un <strong>cliente</strong>.
+              Per il login non servirà la password (solo per promemoria).
+            </p>
 
-          <!-- RIGA 2 -->
-          <button class="m-card m-card-pink" data-section="comunicazioni">
-            <div class="m-card-label">NUOVA</div>
-            <div class="m-card-title">Comunicazioni</div>
-            <div class="m-card-badge">1</div>
-            <div class="m-card-icon">📢</div>
-          </button>
+            <form id="register-form" class="auth-form">
+              <div class="auth-row">
+                <label class="auth-label">
+                  Tipo utente
+                  <select id="reg-role" class="auth-select" required>
+                    <option value="">— Seleziona —</option>
+                    <option value="dipendente">Dipendente</option>
+                    <option value="cliente">Cliente</option>
+                  </select>
+                </label>
+              </div>
 
-          <button class="m-card m-card-teal" data-section="procedure">
-            <div class="m-card-label">NUOVE</div>
-            <div class="m-card-title">Procedure</div>
-            <div class="m-card-icon">📚</div>
-          </button>
+              <div class="auth-row">
+                <label class="auth-label">
+                  Nome e cognome
+                  <input id="reg-name" type="text" class="auth-input" required />
+                </label>
+              </div>
 
-          <!-- RIGA 3 -->
-          <button class="m-card m-card-yellow" data-section="logistica">
-            <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Logistica</div>
-            <div class="m-card-badge">1</div>
-            <div class="m-card-icon">📦</div>
-          </button>
+              <div class="auth-row">
+                <label class="auth-label">
+                  Username
+                  <input id="reg-username" type="text" class="auth-input" required />
+                </label>
+              </div>
 
-          <button class="m-card m-card-cyan" data-section="magazzino">
-            <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Magazziniera</div>
-            <div class="m-card-badge">2</div>
-            <div class="m-card-icon">📋</div>
-          </button>
+              <div class="auth-row">
+                <label class="auth-label">
+                  Password (solo promemoria)
+                  <input id="reg-password" type="password" class="auth-input" required />
+                </label>
+              </div>
 
-          <!-- RIGA 4 -->
-          <button class="m-card m-card-orange" data-section="scadenze">
-            <div class="m-card-label">NUOVI</div>
-            <div class="m-card-title">Prodotti in scadenza</div>
-            <div class="m-card-icon">⏳</div>
-          </button>
+              <div class="auth-row">
+                <label class="auth-label">
+                  Cellulare
+                  <input id="reg-phone" type="tel" class="auth-input" required />
+                </label>
+              </div>
 
-          <button class="m-card m-card-green2" data-section="consumabili">
-            <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Consumabili</div>
-            <div class="m-card-icon">🧪</div>
-          </button>
+              <div class="auth-row">
+                <label class="auth-label">
+                  Email (facoltativa)
+                  <input id="reg-email" type="email" class="auth-input" />
+                </label>
+              </div>
 
-          <!-- RIGA 5 -->
-          <button class="m-card m-card-blue2" data-section="consegne">
-            <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Consegne / Ritiri</div>
-            <div class="m-card-icon">🚚</div>
-          </button>
-
-          <button class="m-card m-card-purple" data-section="cassa">
-            <div class="m-card-label">NUOVO</div>
-            <div class="m-card-title">Cambio cassa</div>
-            <div class="m-card-icon">💶</div>
-          </button>
-
-          <!-- RIGA 6 -->
-          <button class="m-card m-card-dark m-card-wide" data-section="archivio">
-            <div class="m-card-title">Archivio file</div>
-            <div class="m-card-icon">🗄️</div>
-          </button>
-
-        </section>
-      </main>
-    </div>
-
-    <!-- ======================
-         VISTA DESKTOP (4 QUADRANTI)
-         ====================== -->
-    <div class="desktop-dashboard">
-      <header class="app-header">
-        <div class="app-header-main">
-          <h1>PORTALE FARMACIA MONTESANO</h1>
-          <span class="app-header__subtitle">Dashboard principale</span>
+              <button type="submit" class="btn-primary auth-btn">
+                Registra utente
+              </button>
+              <p id="register-message" class="auth-message"></p>
+            </form>
+          </div>
         </div>
-        <div class="app-header-extra">
-          <span class="app-user-pill">Demo – Farmacia</span>
-        </div>
-      </header>
+      </section>
+    </main>
+        <!-- =========================
+         DASHBOARD
+         ========================= -->
+    <main id="dashboard-screen" class="dashboard-screen" style="display:none;">
+      <div class="dashboard-grid">
 
-      <main class="desktop-grid">
-
-        <!-- Q1 – ALTO SINISTRA – SEZIONI FARMACIA -->
-        <section class="quadrant quadrant-sezioni">
-          <div class="quadrant-header">
+        <!-- Q1 – SEZIONI FARMACIA -->
+        <section class="panel panel-sezioni">
+          <header class="panel-header">
             <h2>Sezioni farmacia</h2>
-            <span class="quadrant-subtitle">Accesso rapido alle aree operative</span>
-          </div>
+            <p>Accesso rapido alle aree operative.</p>
+          </header>
 
-          <div id="sezioni-grid" class="sezioni-grid">
-            <!-- card generate da JS -->
+          <div class="sezioni-grid">
+            <button class="section-card section-green" data-section="assenti">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Assenti / Permessi</span>
+            </button>
+            <button class="section-card section-blue" data-section="turno">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Farmacia di turno</span>
+            </button>
+            <button class="section-card section-pink" data-section="comunicazioni">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Comunicazioni</span>
+            </button>
+
+            <button class="section-card section-teal" data-section="procedure">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Procedure</span>
+            </button>
+            <button class="section-card section-amber" data-section="logistica">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Logistica</span>
+            </button>
+            <button class="section-card section-cyan" data-section="magazzino">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Magazziniera</span>
+            </button>
+
+            <button class="section-card section-orange" data-section="scadenze">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Prodotti in scadenza</span>
+            </button>
+            <button class="section-card section-lime" data-section="consumabili">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Consumabili</span>
+            </button>
+            <button class="section-card section-violet" data-section="archivio">
+              <span class="section-label">Sezione</span>
+              <span class="section-title">Consegne / Archivio file</span>
+            </button>
           </div>
         </section>
-
-        <!-- Q2 – ALTO DESTRA – AREA CONTENUTI -->
-        <section class="quadrant quadrant-contenuti">
-          <div class="quadrant-header">
+                <!-- Q2 – AREA CONTENUTI / PANORAMICA RAPIDA -->
+        <section class="panel panel-area-contenuti">
+          <header class="panel-header">
             <h2>Area contenuti</h2>
-            <span class="quadrant-subtitle">
-              Panoramica rapida e dettagli delle sezioni
-            </span>
+            <p>Panoramica rapida e dettagli delle sezioni.</p>
+          </header>
+
+          <!-- Vista panoramica -->
+          <div id="panoramica-rapida" class="panoramica-grid">
+            <article class="pan-box" data-pan-id="servizi-oggi">
+              <div class="pan-icon">📅</div>
+              <div class="pan-main">
+                <h3>Servizi di oggi</h3>
+                <p><span id="pan-servizi-oggi-count">0</span> appuntamenti e servizi programmati.</p>
+              </div>
+            </article>
+
+            <article class="pan-box" data-pan-id="assenze">
+              <div class="pan-icon">🙋‍♀️</div>
+              <div class="pan-main">
+                <h3>Assenze confermate</h3>
+                <p><span id="pan-assenze-count">0</span> chi manca oggi e nei prossimi giorni.</p>
+              </div>
+            </article>
+
+            <article class="pan-box" data-pan-id="offerte">
+              <div class="pan-icon">💥</div>
+              <div class="pan-main">
+                <h3>Offerte attive</h3>
+                <p><span id="pan-offerte-count">0</span> promozioni in corso.</p>
+              </div>
+            </article>
+
+            <article class="pan-box" data-pan-id="comunicazioni">
+              <div class="pan-icon">💬</div>
+              <div class="pan-main">
+                <h3>Comunicazioni non lette</h3>
+                <p><span id="pan-comunicazioni-count">0</span> note operative interne.</p>
+              </div>
+            </article>
           </div>
-          <div id="contenuti-wrapper" class="contenuti-wrapper">
-            <div id="contenuti-title" class="contenuti-title">Panoramica rapida</div>
-            <div id="contenuti-body" class="contenuti-body">
-              <!-- Panoramica rapida o contenuti sezione -->
+
+          <!-- Vista dettaglio sezione -->
+          <div id="detail-area" class="detail-area" style="display:none;">
+            <header class="detail-header">
+              <h3 id="detail-title">Dettaglio sezione</h3>
+              <button id="back-to-panoramica" class="link-ghost">← Torna alla panoramica</button>
+            </header>
+            <div id="detail-content" class="detail-content">
+              <!-- riempito via JS in base alla card -->
             </div>
           </div>
         </section>
 
-        <!-- Q3 – BASSO SINISTRA – PROMOZIONI & GIORNATE -->
-        <section class="quadrant quadrant-promozioni">
-          <div class="quadrant-header">
+        <!-- Q3 – PROMOZIONI & GIORNATE -->
+        <section class="panel panel-promozioni">
+          <header class="panel-header">
             <h2>Promozioni & giornate in farmacia</h2>
-            <span class="quadrant-subtitle">Offerte e palinsesto servizi</span>
-          </div>
-
-          <div class="promo-grid">
-            <!-- COLONNA OFFERTE -->
+            <p>Cosa stiamo offrendo e cosa c’è in programma.</p>
+          </header>
+                    <div class="promo-grid">
             <div class="promo-column">
-              <div class="promo-header-line">
+              <div class="promo-header-row">
                 <h3>Offerte in corso</h3>
-                <button id="btn-add-offerta" class="btn-ghost small">+ Aggiungi</button>
+                <button id="btn-add-offerta" class="btn-small">+ Aggiungi</button>
               </div>
-              <div id="lista-offerte" class="promo-list">
-                <!-- offerte attive / scadute -->
-              </div>
-              <div class="promo-footer-line">
-                <button id="btn-vedi-offerte" class="btn-link-underline">
-                  Vedi tutte le offerte
-                </button>
-              </div>
+              <ul id="offerte-list" class="promo-list">
+                <li class="promo-empty">Nessuna offerta in corso.</li>
+              </ul>
+              <button id="btn-vedi-tutte-offerte" class="link-ghost small-inline">
+                Vedi tutte le offerte
+              </button>
             </div>
 
-            <!-- COLONNA GIORNATE -->
             <div class="promo-column">
-              <div class="promo-header-line">
+              <div class="promo-header-row">
                 <h3>Giornate in farmacia</h3>
-                <button id="btn-add-giornata" class="btn-ghost small">+ Aggiungi</button>
+                <button id="btn-add-giornata" class="btn-small">+ Aggiungi</button>
               </div>
-              <div id="lista-giornate" class="promo-list">
-                <!-- giornate attive / concluse -->
-              </div>
-              <div class="promo-footer-line promo-footer-double">
-                <button id="btn-giornate-attive" class="btn-link-underline">
+              <ul id="giornate-list" class="promo-list">
+                <li class="promo-empty">Nessuna giornata programmata.</li>
+              </ul>
+              <div class="promo-buttons-row">
+                <button id="btn-giornate-attive" class="link-ghost small-inline">
                   Giornate attive
                 </button>
-                <button id="btn-giornate-concluse" class="btn-link-underline">
+                <button id="btn-giornate-scadute" class="link-ghost small-inline">
                   Giornate concluse
                 </button>
               </div>
             </div>
           </div>
         </section>
-                <!-- Q4 – BASSO DESTRA – AGENDA SERVIZI -->
-        <section class="quadrant quadrant-agenda">
-          <div class="quadrant-header">
-            <h2>Agenda servizi</h2>
-            <span class="quadrant-subtitle">
-              Appuntamenti e giornate speciali
-            </span>
-          </div>
 
-          <div class="agenda-header">
-            <button id="agenda-prev" class="btn-ghost small">&lt;</button>
-            <div id="agenda-month-label" class="agenda-month-label">Mese</div>
-            <button id="agenda-next" class="btn-ghost small">&gt;</button>
-            <div class="agenda-legend">
-              <span class="legend-item">
-                <span class="legend-dot legend-today"></span>Oggi
-              </span>
-              <span class="legend-item">
-                <span class="legend-dot legend-giornata"></span>Giornata in farmacia
-              </span>
+        <!-- Q4 – AGENDA SERVIZI -->
+        <section class="panel panel-agenda">
+          <header class="panel-header panel-header-agenda">
+            <div>
+              <h2>Agenda servizi</h2>
+              <p>Gestione appuntamenti, servizi ed esami.</p>
             </div>
-          </div>
+            <div class="agenda-header-right">
+              <button id="btn-new-appointment" class="btn-primary btn-small">
+                + Nuovo appuntamento
+              </button>
+              <div class="month-switcher">
+                <button id="prev-month" class="month-arrow">‹</button>
+                <span id="month-label">novembre 2025</span>
+                <button id="next-month" class="month-arrow">›</button>
+              </div>
+            </div>
+          </header>
 
-          <div id="agenda-grid" class="agenda-grid">
-            <!-- calendario generato da JS -->
+          <div class="agenda-calendar" id="agenda-calendar">
+            <!-- calendario mese generato via JS -->
           </div>
         </section>
+      </div>
 
-      </main>
-    </div>
+      <!-- Floating azioni rapide -->
+      <button id="quickActionsBtn" class="fab">
+        ⚙️
+      </button>
+    </main>
 
-    <!-- ======================
-         MODAL GENERICO
-         ====================== -->
-    <div id="modal-backdrop" class="modal-backdrop hidden">
-      <div class="modal">
-        <div class="modal-header">
-          <h3 id="modal-title">Titolo</h3>
-          <button id="modal-close" class="modal-close-btn" aria-label="Chiudi">×</button>
-        </div>
+    <!-- =========================
+         MODALI GENERICHE
+         ========================= -->
+
+    <!-- Modal base -->
+    <div id="modal-backdrop" class="modal-backdrop" style="display:none;">
+      <div class="modal" role="dialog" aria-modal="true">
+        <header class="modal-header">
+          <h2 id="modal-title">Titolo</h2>
+          <button id="modal-close" class="modal-close" aria-label="Chiudi">×</button>
+        </header>
         <div id="modal-body" class="modal-body">
-          <!-- contenuto dinamico -->
+          <!-- Contenuto dinamico -->
         </div>
-        <div id="modal-footer" class="modal-footer">
-          <!-- pulsanti dinamici -->
-        </div>
+        <footer id="modal-footer" class="modal-footer">
+          <!-- Bottoni dinamici -->
+        </footer>
       </div>
     </div>
 
-  </div> <!-- fine app-shell -->
+  </div> <!-- /app-shell -->
 
   <script src="script.js"></script>
 </body>
