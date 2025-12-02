@@ -7,358 +7,382 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- =========================
-       WRAPPER LOGIN / APP
-       ========================= -->
-  <div id="authContainer" class="auth-wrapper">
-    <div class="auth-card">
-      <h1 class="auth-title">Portale Farmacia Montesano</h1>
-      <p class="auth-subtitle">Accesso demo – niente password complicate, solo per provare il portale.</p>
+<div id="app">
 
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-tab="login">Login</button>
-        <button class="auth-tab" data-tab="register">Registrati</button>
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" aria-label="Menu principale">
+        <span></span>
+      </button>
+      <div class="topbar-title-wrap">
+        <div class="topbar-title">PORTALE FARMACIA MONTESANO</div>
+        <div class="topbar-subtitle" id="topbar-subtitle">Accesso non effettuato</div>
       </div>
+    </div>
 
-      <!-- LOGIN -->
-      <form id="loginForm" class="auth-form auth-form--active" autocomplete="off">
-        <label class="auth-label">
-          Username
-          <input type="text" id="loginUsername" required />
+    <div class="topbar-center quick-links">
+      <a href="mailto:info@farmaciamontesano.it" target="_blank" class="quick-link-btn">
+        ✉️ <span>Mail</span>
+      </a>
+      <a href="https://www.google.com" target="_blank" class="quick-link-btn">
+        💊 <span>Medybox</span>
+      </a>
+      <a href="https://web.whatsapp.com" target="_blank" class="quick-link-btn">
+        💬 <span>WhatsApp</span>
+      </a>
+      <a href="https://www.google.com" target="_blank" class="quick-link-btn">
+        🚚 <span>Pharmercure</span>
+      </a>
+    </div>
+
+    <div class="topbar-right">
+      <span class="user-label" id="user-label">Ospite</span>
+      <button class="link-button" id="btn-esci" type="button">Esci</button>
+    </div>
+  </header>
+
+  <!-- ============ AUTH VIEW ============ -->
+  <section id="view-auth" class="auth-view app-view">
+    <div class="auth-card">
+      <h2>Login</h2>
+      <p class="auth-sub">Inserisci le tue credenziali.</p>
+      <form id="login-form" class="auth-form">
+        <label class="field">
+          <span>Username</span>
+          <input type="text" id="login-username" autocomplete="username" />
         </label>
-        <label class="auth-label">
-          Password
-          <input type="password" id="loginPassword" required />
+        <label class="field">
+          <span>Password</span>
+          <input type="password" id="login-password" autocomplete="current-password" />
         </label>
-
-        <button type="submit" class="btn-primary btn-full auth-main-btn">
-          Entra
-        </button>
-
-        <div class="auth-demo">
-          <p>Oppure accesso rapido demo:</p>
-          <div class="auth-demo-buttons">
-            <button type="button" class="btn-chip" data-demo-role="farmacia">Farmacia</button>
-            <button type="button" class="btn-chip" data-demo-role="titolare">Titolare</button>
-            <button type="button" class="btn-chip" data-demo-role="dipendente">Dipendente</button>
-          </div>
-        </div>
-
-        <p class="auth-hint">
-          Utenti demo predefiniti (esempio):<br/>
-          <strong>farmacia / 1234</strong> · <strong>titolare / 1234</strong>
-        </p>
-
-        <p id="loginError" class="auth-error hidden"></p>
+        <button type="submit" class="primary full-width">Entra</button>
       </form>
 
-      <!-- REGISTER -->
-      <form id="registerForm" class="auth-form" autocomplete="off">
-        <div class="auth-row">
-          <label class="auth-label">
-            Nome e cognome
-            <input type="text" id="regName" required />
-          </label>
-        </div>
-
-        <div class="auth-row">
-          <label class="auth-label">
-            Username
-            <input type="text" id="regUsername" required />
-          </label>
-          <label class="auth-label">
-            Password
-            <input type="password" id="regPassword" required />
-          </label>
-        </div>
-
-        <div class="auth-row">
-          <label class="auth-label">
-            Ruolo
-            <select id="regRole" required>
-              <option value="">Seleziona…</option>
-              <option value="cliente">Cliente</option>
-              <option value="dipendente">Dipendente</option>
-            </select>
-          </label>
-          <label class="auth-label">
-            Cellulare (solo clienti)
-            <input type="tel" id="regPhone" placeholder="Es. 333 1234567" />
-          </label>
-        </div>
-
-        <label class="auth-label">
-          Email (facoltativa)
-          <input type="email" id="regEmail" placeholder="nome@email.it" />
-        </label>
-
-        <button type="submit" class="btn-primary btn-full auth-main-btn">
-          Crea account
+      <div class="auth-demo">
+        <p><strong>Utenti già pronti</strong></p>
+        <p>Farmacia: <code>farmacia / farmacia</code></p>
+        <p>Titolare: <code>titolare / titolare</code></p>
+        <p>Dipendenti: <code>fazzino / 1234</code> ecc.</p>
+        <button type="button" id="btn-demo-farmacia" class="small-primary full-width">
+          Entra come Farmacia
         </button>
+      </div>
+    </div>
 
-        <p id="registerError" class="auth-error hidden"></p>
-        <p id="registerOk" class="auth-ok hidden">✅ Registrazione demo completata, ora puoi fare login.</p>
+    <div class="auth-card">
+      <h2>Registrazione</h2>
+      <p class="auth-sub">Per clienti e dipendenti.</p>
+      <form id="register-form" class="auth-form">
+        <label class="field">
+          <span>Nome e cognome</span>
+          <input type="text" id="reg-fullname" />
+        </label>
+        <label class="field">
+          <span>Ruolo</span>
+          <select id="reg-role">
+            <option value="cliente">Cliente</option>
+            <option value="dipendente">Dipendente</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Telefono (obbligatorio per i clienti)</span>
+          <input type="tel" id="reg-phone" />
+        </label>
+        <label class="field">
+          <span>Email (facoltativa)</span>
+          <input type="email" id="reg-email" />
+        </label>
+        <label class="field">
+          <span>Username</span>
+          <input type="text" id="reg-username" autocomplete="username" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input type="password" id="reg-password" autocomplete="new-password" />
+        </label>
+        <button type="submit" class="primary full-width">Registrati</button>
       </form>
     </div>
-  </div>
+  </section>
+    <!-- ============ VIEW FARMACIA ============ -->
+  <main id="view-farmacia" class="dashboard-grid app-view hidden">
 
-  <!-- =========================
-       APP INTERA
-       ========================= -->
-  <div id="app" class="app-shell hidden">
-        <!-- HEADER DESKTOP -->
-    <header class="app-header">
-      <div class="app-header-left">
-        <button id="hamburger" class="hamburger-btn" aria-label="Menu">
-          <span></span>
-        </button>
+    <!-- Q1 – SEZIONI FARMACIA -->
+    <section class="panel panel-q1">
+      <header class="panel-header">
         <div>
-          <h1>Portale Farmacia Montesano</h1>
-          <span class="app-header__subtitle">Dashboard principale</span>
+          <h2>Sezioni farmacia</h2>
+          <p>Accesso rapido alle aree operative.</p>
         </div>
-      </div>
-
-      <div class="app-header-right">
-        <div class="quick-links">
-          <button class="quick-link" data-q="mail" title="Apri email farmacia">✉️</button>
-          <button class="quick-link" data-q="whatsapp" title="WhatsApp farmacia">💬</button>
-          <button class="quick-link" data-q="medybox" title="Medybox">🩺</button>
-          <button class="quick-link" data-q="pharmercure" title="Pharmercure">🚚</button>
-        </div>
-        <div id="currentUserBadge" class="user-badge">Utente</div>
-      </div>
-    </header>
-
-    <!-- SIDEBAR SEMPLICE -->
-    <aside id="sidebar" class="sidebar">
-      <button id="closeSidebar" class="sidebar-close">×</button>
-      <div class="sidebar-user">
-        <div class="sidebar-user-role" id="sidebarUserRole">Ruolo</div>
-        <div class="sidebar-user-name" id="sidebarUserName">Nome utente</div>
-      </div>
-      <nav class="sidebar-nav">
-        <button class="sidebar-link" data-nav="farmacia">Dashboard Farmacia</button>
-        <button class="sidebar-link" data-nav="titolare">Area Titolare</button>
-        <button class="sidebar-link" data-nav="dipendente">Area Dipendenti</button>
-        <button class="sidebar-link" data-nav="cliente">Area Clienti</button>
-      </nav>
-      <button id="logoutBtn" class="btn-secondary btn-full sidebar-logout">Logout</button>
-    </aside>
-
-    <!-- ======================
-         VISTA MOBILE (CARD)
-         ====================== -->
-    <div class="mobile-dashboard">
-      <header class="m-header">
-        <div class="m-logo-wrap">
-          <span class="m-logo-text">Farmacia Montesano</span>
-        </div>
-        <button class="m-hamburger" aria-label="Menu mobile">
-          <span></span>
-        </button>
       </header>
 
-      <main class="m-main">
-        <section class="m-card-grid">
-          <!-- RIGA 1 -->
-          <button class="m-card m-card-green" data-section="assenti">
-            <div class="m-card-label">Nuovi</div>
-            <div class="m-card-title">Assenti / Permessi</div>
-            <div class="m-card-badge">2</div>
-            <div class="m-card-icon">📅</div>
-          </button>
+      <div class="sezioni-grid">
+        <button class="sec-card sec-green" data-section="assenti">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Assenti / Permessi</span>
+        </button>
+        <button class="sec-card sec-blue" data-section="turno">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Farmacia di turno</span>
+        </button>
+        <button class="sec-card sec-pink" data-section="comunicazioni">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Comunicazioni interne</span>
+        </button>
+        <button class="sec-card sec-teal" data-section="procedure">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Procedure</span>
+        </button>
+        <button class="sec-card sec-orange" data-section="logistica">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Logistica</span>
+        </button>
+        <button class="sec-card sec-cyan" data-section="magazzino">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Magazziniera</span>
+        </button>
+        <button class="sec-card sec-red" data-section="scadenze">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Prodotti in scadenza</span>
+        </button>
+        <button class="sec-card sec-lime" data-section="consumabili">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Consumabili</span>
+        </button>
+        <button class="sec-card sec-purple" data-section="consegne">
+          <span class="sec-label">Sezione</span>
+          <span class="sec-title">Consegne / Archivio</span>
+        </button>
+      </div>
+    </section>
 
-          <button class="m-card m-card-blue" data-section="turno">
-            <div class="m-card-label">Oggi</div>
-            <div class="m-card-title">Farmacia di turno</div>
-            <div class="m-card-badge">1</div>
-            <div class="m-card-icon">⏰</div>
-          </button>
-
-          <!-- RIGA 2 -->
-          <button class="m-card m-card-pink" data-section="comunicazioni">
-            <div class="m-card-label">Nuove</div>
-            <div class="m-card-title">Comunicazioni</div>
-            <div class="m-card-badge">3</div>
-            <div class="m-card-icon">📢</div>
-          </button>
-
-          <button class="m-card m-card-teal" data-section="procedure">
-            <div class="m-card-label">Utili</div>
-            <div class="m-card-title">Procedure</div>
-            <div class="m-card-icon">📚</div>
-          </button>
-
-          <!-- RIGA 3 -->
-          <button class="m-card m-card-yellow" data-section="logistica">
-            <div class="m-card-label">Info</div>
-            <div class="m-card-title">Logistica</div>
-            <div class="m-card-icon">📦</div>
-          </button>
-
-          <button class="m-card m-card-cyan" data-section="magazzino">
-            <div class="m-card-label">Scorte</div>
-            <div class="m-card-title">Magazzino</div>
-            <div class="m-card-icon">📋</div>
-          </button>
-
-          <!-- RIGA 4 -->
-          <button class="m-card m-card-orange" data-section="scadenze">
-            <div class="m-card-label">Attenzione</div>
-            <div class="m-card-title">Prodotti in scadenza</div>
-            <div class="m-card-icon">⏳</div>
-          </button>
-
-          <button class="m-card m-card-green2" data-section="consumabili">
-            <div class="m-card-label">Check</div>
-            <div class="m-card-title">Consumabili</div>
-            <div class="m-card-icon">🧪</div>
-          </button>
-
-          <!-- RIGA 5 -->
-          <button class="m-card m-card-blue2" data-section="consegne">
-            <div class="m-card-label">Oggi</div>
-            <div class="m-card-title">Consegne / Ritiri</div>
-            <div class="m-card-icon">🚚</div>
-          </button>
-
-          <button class="m-card m-card-purple" data-section="cassa">
-            <div class="m-card-label">Banco</div>
-            <div class="m-card-title">Cambio cassa</div>
-            <div class="m-card-icon">💶</div>
-          </button>
-
-          <!-- RIGA 6: ARCHIVIO -->
-          <button class="m-card m-card-dark m-card-wide" data-section="archivio">
-            <div class="m-card-title">Archivio file</div>
-            <div class="m-card-icon">🗄️</div>
-          </button>
-        </section>
-      </main>
-    </div>
-        <!-- ======================
-         VISTA DESKTOP – FARMACIA
-         ====================== -->
-    <main id="farmaciaDashboard" class="dashboard">
-
-      <!-- QUADRANTE 1 – SEZIONI FARMACIA -->
-      <section class="quad quad-1">
-        <h2 class="quad-title">Sezioni farmacia</h2>
-        <div class="section-cards-grid">
-          <button class="section-card" data-section="assenti">📅 Assenti / Permessi</button>
-          <button class="section-card" data-section="turno">⏰ Farmacia di turno</button>
-          <button class="section-card" data-section="comunicazioni">💬 Comunicazioni interne</button>
-          <button class="section-card" data-section="procedure">📚 Procedure</button>
-          <button class="section-card" data-section="logistica">📦 Logistica</button>
-          <button class="section-card" data-section="magazzino">📋 Magazzino</button>
-          <button class="section-card" data-section="scadenze">⏳ Prodotti in scadenza</button>
-          <button class="section-card" data-section="consumabili">🧪 Consumabili</button>
-          <button class="section-card" data-section="consegne">🚚 Consegne / Ritiri</button>
+    <!-- Q2 – AREA CONTENUTI -->
+    <section class="panel panel-q2">
+      <header class="panel-header">
+        <div>
+          <h2>Area contenuti</h2>
+          <p>Panoramica rapida e dettaglio sezioni.</p>
         </div>
-      </section>
+      </header>
 
-      <!-- QUADRANTE 2 – PROMO & GIORNATE -->
-      <section class="quad quad-2">
-        <h2 class="quad-title">Promozioni & Giornate in farmacia</h2>
-
-        <div class="quad-row">
-          <div class="quad-column">
-            <div class="quad-column-header">
-              <span>Offerte in corso</span>
-              <button id="btnAddOfferta" class="btn-small">+ Aggiungi</button>
+      <div class="area-content-wrapper">
+        <!-- Panoramica -->
+        <div id="panoramica-box" class="area-panorama">
+          <h3>Panoramica rapida</h3>
+          <p class="hint-text">
+            Vedi al volo cosa succede oggi. Dopo 20 secondi senza click torni qui in automatico.
+          </p>
+          <div class="panorama-tiles">
+            <div class="p-tile" id="tile-servizi-oggi">
+              <div class="p-icon">📆</div>
+              <div class="p-main">
+                <div class="p-title">Servizi di oggi</div>
+                <div class="p-value" id="val-servizi-oggi">0</div>
+                <div class="p-sub">
+                  Appuntamenti e servizi programmati per la giornata in corso.
+                </div>
+              </div>
             </div>
-            <ul id="listaOfferte" class="simple-list"></ul>
-            <button id="btnVediOfferte" class="btn-link-small">Vedi tutte le offerte</button>
-          </div>
-
-          <div class="quad-column">
-            <div class="quad-column-header">
-              <span>Giornate in farmacia</span>
-              <button id="btnAddGiornata" class="btn-small">+ Aggiungi</button>
+            <div class="p-tile" id="tile-assenze-oggi">
+              <div class="p-icon">🧑‍⚕️</div>
+              <div class="p-main">
+                <div class="p-title">Assenze confermate</div>
+                <div class="p-value" id="val-assenze-oggi">0</div>
+                <div class="p-sub">
+                  Assenti e permessi approvati per oggi.
+                </div>
+              </div>
             </div>
-            <ul id="listaGiornate" class="simple-list"></ul>
-            <button id="btnVediGiornate" class="btn-link-small">Vedi tutte le giornate</button>
+            <div class="p-tile" id="tile-scadenze-60">
+              <div class="p-icon">⏳</div>
+              <div class="p-main">
+                <div class="p-title">Scadenze entro 60 giorni</div>
+                <div class="p-value" id="val-scadenze-60">0</div>
+                <div class="p-sub">
+                  Prodotti che diventeranno critici a breve.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
 
-      <!-- QUADRANTE 3 – AREA CONTENUTI -->
-      <section class="quad quad-3">
-        <h2 class="quad-title">Area contenuti</h2>
-        <div id="areaContenuti" class="area-contenuti">
-          <!-- Panoramica rapida di default -->
-          <div id="panoramicaRapida" class="panoramica-rapida">
-            <h3>Panoramica rapida</h3>
-            <div class="pan-row">
-              <div class="pan-box">
-                <span class="pan-label">Servizi di oggi</span>
-                <span id="panServiziOggi" class="pan-value">ECG · Holter pressorio</span>
-              </div>
-              <div class="pan-box">
-                <span class="pan-label">Assenze confermate</span>
-                <span id="panAssenzeOggi" class="pan-value">2 assenti</span>
-              </div>
-            </div>
-            <div class="pan-row">
-              <div class="pan-box">
-                <span class="pan-label">Prodotti in scadenza (&lt; 60gg)</span>
-                <span id="panScadenze" class="pan-value">5 articoli da controllare</span>
-              </div>
-              <div class="pan-box">
-                <span class="pan-label">Promozioni attive</span>
-                <span id="panPromo" class="pan-value">3 promo in corso</span>
-              </div>
-            </div>
-            <p class="pan-hint">
-              Clicca una card in <strong>Sezioni farmacia</strong> per vedere i dettagli qui.
-              Dopo 20 secondi senza tocchi tornerai a questa panoramica.
-            </p>
+        <!-- Dettaglio sezione -->
+        <div id="sezione-dettaglio" class="area-detail hidden">
+          <header class="detail-header">
+            <h3 id="detail-title">Dettaglio sezione</h3>
+            <button id="btn-back-panorama" class="small-secondary" type="button">
+              Torna a panoramica
+            </button>
+          </header>
+          <div id="detail-content" class="detail-body">
+            <!-- Contenuto dinamico da JS -->
           </div>
         </div>
-      </section>
-
-      <!-- QUADRANTE 4 – AGENDA SERVIZI -->
-      <section class="quad quad-4">
-        <h2 class="quad-title">Agenda servizi</h2>
-        <div class="agenda-header">
-          <button id="agendaPrevMonth" class="btn-circle">‹</button>
-          <span id="agendaMonthLabel" class="agenda-month-label">Mese anno</span>
-          <button id="agendaNextMonth" class="btn-circle">›</button>
-          <button id="agendaToday" class="btn-small">Oggi</button>
+      </div>
+    </section>
+        <!-- Q3 – PROMOZIONI E GIORNATE -->
+    <section class="panel panel-q3">
+      <header class="panel-header">
+        <div>
+          <h2>Promozioni &amp; giornate in farmacia</h2>
+          <p>Offerte, giornate speciali e scadenze prodotti.</p>
         </div>
-        <div class="agenda-grid" id="agendaGrid"></div>
-      </section>
-
-    </main>
-
-    <!-- PAGINE PER ALTRI RUOLI (SEMPLICI PLACEHOLDER) -->
-    <main id="titolareDashboard" class="role-dashboard hidden">
-      <h2>Area Titolare (demo)</h2>
-      <p>Qui potrai in futuro avere report, statistiche, approvazione permessi, ecc.</p>
-    </main>
-
-    <main id="dipendenteDashboard" class="role-dashboard hidden">
-      <h2>Area Dipendente (demo)</h2>
-      <p>Qui ogni dipendente vedrà i propri turni, permessi richiesti e comunicazioni.</p>
-    </main>
-
-    <main id="clienteDashboard" class="role-dashboard hidden">
-      <h2>Area Cliente (demo)</h2>
-      <p>Spazio dedicato ai clienti: prenotazioni servizi, promozioni personalizzate, ecc.</p>
-    </main>
-
-    <!-- MODAL GENERICO -->
-    <div id="modalOverlay" class="modal-overlay hidden">
-      <div class="modal">
-        <div class="modal-header">
-          <h3 id="modalTitle">Titolo</h3>
-          <button id="modalClose" class="modal-close">×</button>
+        <div class="panel-actions">
+          <button id="btn-add-offerta" class="small-primary" type="button">+ Offerta</button>
+          <button id="btn-add-giornata" class="small-primary" type="button">+ Giornata</button>
+          <button id="btn-view-all-promo" class="small-secondary" type="button">
+            Vedi tutte
+          </button>
         </div>
-        <div id="modalBody" class="modal-body"></div>
+      </header>
+
+      <div class="promo-grid">
+        <div class="promo-column">
+          <h3>Offerte attive</h3>
+          <ul id="lista-offerte-attive" class="simple-list"></ul>
+          <h4 class="subsection-title">Offerte scadute</h4>
+          <ul id="lista-offerte-scadute" class="simple-list simple-list-muted"></ul>
+        </div>
+
+        <div class="promo-column">
+          <h3>Giornate in farmacia</h3>
+          <p class="hint-text">
+            Clicca una giornata per prendere e vedere appuntamenti (slot da 30 min).
+          </p>
+          <ul id="lista-giornate-attive" class="simple-list"></ul>
+          <h4 class="subsection-title">Giornate concluse</h4>
+          <ul id="lista-giornate-scadute" class="simple-list simple-list-muted"></ul>
+        </div>
+      </div>
+
+      <div class="promo-bottom-actions">
+        <button id="btn-add-scadenza" class="small-primary" type="button">
+          + Inserisci nuova scadenza prodotto
+        </button>
+      </div>
+    </section>
+
+    <!-- Q4 – AGENDA SERVIZI -->
+    <section class="panel panel-q4">
+      <header class="panel-header">
+        <div>
+          <h2>Agenda servizi</h2>
+          <p>Calendario mensile con giornate evidenziate.</p>
+        </div>
+        <div class="panel-actions">
+          <button id="btn-prev-month" class="small-secondary" type="button">◀</button>
+          <span id="agenda-month-label" class="month-label">Mese Anno</span>
+          <button id="btn-next-month" class="small-secondary" type="button">▶</button>
+        </div>
+      </header>
+
+      <div class="agenda-calendar">
+        <div class="agenda-weekdays">
+          <span>Lu</span><span>Ma</span><span>Me</span><span>Gi</span><span>Ve</span><span>Sa</span><span>Do</span>
+        </div>
+        <div id="agenda-days" class="agenda-days">
+          <!-- Giorni generati da JS -->
+        </div>
+        <p class="hint-text small">
+          Clicca un giorno per vedere e aggiungere appuntamenti.
+          I giorni con giornate in farmacia sono evidenziati in rosso.
+        </p>
+      </div>
+    </section>
+
+  </main>
+    <!-- ============ VIEW TITOLARE ============ -->
+  <main id="view-titolare" class="app-view hidden">
+    <section class="role-layout">
+      <div class="role-panel">
+        <h2>Dashboard Titolare</h2>
+        <p>Panoramica numerica della farmacia.</p>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Offerte totali</div>
+            <div class="stat-value" id="stat-offerte-tot">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Giornate programmate</div>
+            <div class="stat-value" id="stat-giornate-tot">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Appuntamenti totali</div>
+            <div class="stat-value" id="stat-appuntamenti-tot">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Prodotti &lt; 60 gg</div>
+            <div class="stat-value" id="stat-scadenze-tot">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-panel">
+        <h2>Dipendenti</h2>
+        <p>Elenco dipendenti registrati nel portale.</p>
+        <ul id="lista-dipendenti-titolare" class="simple-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ VIEW DIPENDENTE ============ -->
+  <main id="view-dipendente" class="app-view hidden">
+    <section class="role-layout">
+      <div class="role-panel">
+        <h2 id="dipendente-title">Area dipendente</h2>
+        <p>Promemoria del giorno e informazioni rapide.</p>
+        <div class="simple-box">
+          <h3>Promemoria del giorno</h3>
+          <ul class="simple-list">
+            <li>Controlla eventuali comunicazioni interne.</li>
+            <li>Verifica le tue assenze / permessi registrati.</li>
+            <li>Consulta i servizi e gli appuntamenti di oggi.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="role-panel">
+        <h2>Appuntamenti di oggi</h2>
+        <ul id="lista-appuntamenti-dip" class="simple-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ VIEW CLIENTE ============ -->
+  <main id="view-cliente" class="app-view hidden">
+    <section class="role-layout">
+      <div class="role-panel">
+        <h2 id="cliente-title">Area cliente</h2>
+        <p>I tuoi appuntamenti e servizi in farmacia.</p>
+        <div class="simple-box">
+          <h3>I tuoi dati</h3>
+          <p id="cliente-dati"></p>
+        </div>
+      </div>
+
+      <div class="role-panel">
+        <h2>Appuntamenti futuri</h2>
+        <ul id="lista-appuntamenti-cli" class="simple-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ MODALE GENERICA ============ -->
+  <div id="modal-backdrop" class="modal-backdrop hidden">
+    <div class="modal">
+      <header class="modal-header">
+        <h3 id="modal-title">Titolo modal</h3>
+        <button id="modal-close" type="button" class="link-button">Chiudi</button>
+      </header>
+      <div id="modal-body" class="modal-body">
+        <!-- Contenuto dinamico da JS -->
       </div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+</div> <!-- fine #app -->
+
+<script src="script.js"></script>
 </body>
 </html>
