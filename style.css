@@ -263,6 +263,7 @@ body {
 .auth-demo p {
   margin: 2px 0;
 }
+
 /* DASHBOARD FARMACIA – 4 QUADRANTI */
 
 .dashboard-grid {
@@ -453,6 +454,14 @@ body {
 
 .detail-body {
   font-size: 0.82rem;
+}
+
+/* Toolbar interna alla sezione (pulsanti in alto a destra) */
+.detail-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 
 /* PROMOZIONI & GIORNATE (Q3) */
@@ -717,6 +726,11 @@ body {
 .small {
   font-size: 0.78rem;
 }
+
+.txt-muted {
+  color: var(--txt-muted);
+}
+
 /* RESPONSIVE */
 
 @media (max-width: 1100px) {
