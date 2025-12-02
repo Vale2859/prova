@@ -1400,3 +1400,42 @@ function updateClienteView() {
     lista.appendChild(li);
   });
 }
+// === PULSANTE QUICK ACTION CENTRALE ===
+document.addEventListener("DOMContentLoaded", () => {
+  const quickBtn = document.getElementById("quick-btn");
+  const quickMenu = document.getElementById("quick-menu");
+
+  if (!quickBtn || !quickMenu) return;
+
+  // Clic sul pallino "+"
+  quickBtn.addEventListener("click", (e) => {
+    e.stopPropagation();          // non far chiudere subito il menu
+    quickMenu.classList.toggle("hidden");
+  });
+
+  // Se clicchi fuori, chiude il menu
+  document.addEventListener("click", () => {
+    quickMenu.classList.add("hidden");
+  });
+
+  // Clic sulle voci del menu
+  quickMenu.querySelectorAll("button").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const action = btn.getAttribute("data-action");
+
+      // Per ora facciamo solo vedere che funziona
+      if (action === "nuova-assenza") {
+        alert("Azione rapida: nuova assenza");
+      } else if (action === "nuova-nota") {
+        alert("Azione rapida: nota magazzino");
+      } else if (action === "nuovo-app") {
+        alert("Azione rapida: nuovo appuntamento");
+      } else if (action === "nuova-com") {
+        alert("Azione rapida: comunicazione interna");
+      }
+
+      quickMenu.classList.add("hidden");
+    });
+  });
+});
