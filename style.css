@@ -795,7 +795,7 @@ body {
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 4px 18px rgba(0,0,0,0.15);
-  z-index: 999;
+  z-index: 500;
   transition: 0.25s;
 }
 
