@@ -775,7 +775,6 @@ body {
     grid-template-columns: 1fr;
   }
 }
-/* ==== TASTO CENTRALE MIGLIORATO === */
 #quick-btn {
   position: absolute;
   top: 50%;
@@ -784,6 +783,7 @@ body {
   height: 70px;
   transform: translate(-50%, -50%);
   
+  /* stile morbido iOS */
   background: rgba(255,255,255,0.75);
   backdrop-filter: blur(12px);
   
@@ -801,9 +801,22 @@ body {
   cursor: pointer;
   transition: transform .22s ease, box-shadow .22s ease;
 
-  z-index: 500; /* QUI LO ABBIAMO ABBASSATO */
+  z-index: 500; /* IMPORTANTE */
 }
 
+#quick-btn:hover {
+  transform: translate(-50%, -50%) scale(1.07);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+}
+
+/* animazione del + */
+#quick-btn span {
+  transition: transform .2s ease;
+}
+
+#quick-btn:hover span {
+  transform: rotate(90deg);
+}
 #quick-btn:hover {
   transform: translate(-50%, -50%) scale(1.07);
   box-shadow: 0 12px 28px rgba(0,0,0,0.22);
