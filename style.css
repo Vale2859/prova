@@ -881,3 +881,47 @@ body {
     z-index: 4900 !important;
     position: fixed !important;
 }
+/* ===== SOLO SU TELEFONO: tasto laterale ===== */
+@media (max-width: 780px) {
+
+  /* Il bottone diventa una linguetta laterale */
+  #quick-btn {
+    position: fixed;              /* segue lo schermo mentre scrolli */
+    top: 50%;
+    right: 8px;
+    left: auto;
+    transform: translateY(-50%);
+
+    width: 46px;
+    height: 60px;
+
+    background: rgba(255,255,255,0.35);
+    backdrop-filter: blur(10px);
+    border-radius: 18px 0 0 18px;  /* arrotondato solo lato interno */
+    border: 1px solid rgba(255,255,255,0.8);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 26px;
+    font-weight: 600;
+
+    z-index: 500;                 /* sotto alle modali */
+  }
+
+  #quick-btn:hover {
+    transform: translateY(-50%) scale(1.03);
+  }
+
+  /* Il menu esce affianco alla linguetta */
+  #quick-menu {
+    position: fixed;
+    top: 50%;
+    right: 60px;                  /* si stacca un po' dalla linguetta */
+    left: auto;
+    transform: translateY(-50%);
+    z-index: 600;
+  }
+}
