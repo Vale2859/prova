@@ -775,8 +775,7 @@ body {
     grid-template-columns: 1fr;
   }
 }
-/* === PULSANTE RAPIDO CENTRALE === */
-
+/* ==== TASTO CENTRALE MIGLIORATO === */
 #quick-btn {
   position: absolute;
   top: 50%;
@@ -784,21 +783,39 @@ body {
   width: 70px;
   height: 70px;
   transform: translate(-50%, -50%);
-  background: #ffffffcc;
-  backdrop-filter: blur(8px);
-  border-radius: 50%;
-  border: 2px solid #ddd;
+  
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(12px);
+  
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.8);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 35px;
-  font-weight: bold;
+
+  font-size: 38px;
+  font-weight: 600;
+
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.15);
-  z-index: 500;
-  transition: 0.25s;
+  transition: transform .22s ease, box-shadow .22s ease;
+
+  z-index: 500; /* QUI LO ABBIAMO ABBASSATO */
 }
 
+#quick-btn:hover {
+  transform: translate(-50%, -50%) scale(1.07);
+  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+}
+
+#quick-btn span {
+  transition: transform .2s ease;
+}
+
+#quick-btn:hover span {
+  transform: rotate(90deg);
+}
 #quick-btn:hover {
   background: #fff;
   transform: translate(-50%, -50%) scale(1.07);
@@ -838,4 +855,16 @@ body {
 
 #quick-menu button:hover {
   background: #eaeaea;
+}
+
+/* FORZA LE MODALI SOPRA TUTTO */
+[id*="modal"], [class*="modal"] {
+    z-index: 5000 !important;
+    position: relative !important;
+}
+
+[id*="backdrop"], [class*="backdrop"], 
+[id*="overlay"], [class*="overlay"] {
+    z-index: 4900 !important;
+    position: fixed !important;
 }
