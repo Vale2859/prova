@@ -869,7 +869,89 @@ body {
 #quick-menu button:hover {
   background: #eaeaea;
 }
+/* ===== MENU RADIALE STILE ASSISTIVETOUCH ===== */
 
+#quick-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 220px;
+  border-radius: 32px;
+  background: rgba(15, 20, 35, 0.92);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.45);
+  padding: 18px;
+  z-index: 600;           /* sopra il tasto centrale, sotto le modali */
+  color: #fff;
+}
+
+#quick-menu.hidden {
+  display: none;
+}
+
+/* bottoni interni circolari */
+
+.qm-btn {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  color: #fff;
+  gap: 2px;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.qm-btn span {
+  font-size: 22px;
+}
+
+.qm-btn:hover {
+  background: rgba(255,255,255,0.18);
+  transform: scale(1.06);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.55);
+}
+
+/* posizioni intorno al centro */
+
+.qm-top {
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.qm-right {
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+}
+
+.qm-bottom {
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.qm-left {
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+}
+
+/* piccola animazione del + quando il menu è aperto */
+
+#quick-btn.open span {
+  transform: rotate(45deg);
+}
 /* FORZA LE MODALI SOPRA TUTTO */
 [id*="modal"], [class*="modal"] {
     z-index: 5000 !important;
