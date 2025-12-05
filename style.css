@@ -551,66 +551,6 @@ body {
   margin-top: 6px;
 }
 
-/* AGENDA (Q4) */
-
-.agenda-calendar {
-  background: var(--bg-panel-soft);
-  border-radius: var(--radius-md);
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.agenda-weekdays {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  font-size: 0.75rem;
-  text-align: center;
-  margin-bottom: 4px;
-  color: var(--txt-muted);
-}
-
-.agenda-days {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: 24px;
-  gap: 3px;
-  font-size: 0.78rem;
-  flex: 1;
-}
-
-.day-cell {
-  border-radius: 6px;
-  text-align: center;
-  line-height: 24px;
-  cursor: pointer;
-  background: #fff;
-}
-
-.day-cell.empty {
-  background: transparent;
-  cursor: default;
-}
-
-.day-cell.today {
-  border: 2px solid var(--accent-green);
-  font-weight: 700;
-}
-
-.day-cell.giornata {
-  border: 2px solid var(--accent-red);
-}
-
-.day-cell:hover:not(.empty) {
-  background: #e8f5e9;
-}
-
-.month-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
 /* ROLE LAYOUT */
 
 .role-layout {
@@ -775,244 +715,11 @@ body {
     grid-template-columns: 1fr;
   }
 }
-#quick-btn {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 70px;
-  height: 70px;
-  transform: translate(-50%, -50%);
-  
-  /* stile morbido iOS */
-  background: rgba(255,255,255,0.75);
-  backdrop-filter: blur(12px);
-  
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.8);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.18);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 38px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: transform .22s ease, box-shadow .22s ease;
-
-  z-index: 500; /* IMPORTANTE */
-}
-
-#quick-btn:hover {
-  transform: translate(-50%, -50%) scale(1.07);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
-}
-
-/* animazione del + */
-#quick-btn span {
-  transition: transform .2s ease;
-}
-
-#quick-btn:hover span {
-  transform: rotate(90deg);
-}
-#quick-btn:hover {
-  transform: translate(-50%, -50%) scale(1.07);
-  box-shadow: 0 12px 28px rgba(0,0,0,0.22);
-}
-
-#quick-btn span {
-  transition: transform .2s ease;
-}
-
-#quick-btn:hover span {
-  transform: rotate(90deg);
-}
-#quick-btn:hover {
-  background: #fff;
-  transform: translate(-50%, -50%) scale(1.07);
-}
-
-/* MENU RAPIDO SOTTO IL PULSANTE */
-
-#quick-menu {
-  position: absolute;
-  top: calc(50% + 90px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ffffffcc;
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  padding: 10px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 998;
-}
-
-#quick-menu.hidden {
-  display: none;
-}
-
-#quick-menu button {
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: #f4f4f4;
-  font-size: 15px;
-  text-align: left;
-}
-
-#quick-menu button:hover {
-  background: #eaeaea;
-}
-/* ===== MENU RADIALE STILE ASSISTIVETOUCH ===== */
-
-#quick-menu {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 220px;
-  height: 220px;
-  border-radius: 32px;
-  background: rgba(15, 20, 35, 0.92);
-  box-shadow: 0 18px 45px rgba(0,0,0,0.45);
-  padding: 18px;
-  z-index: 600;           /* sopra il tasto centrale, sotto le modali */
-  color: #fff;
-}
-
-#quick-menu.hidden {
-  display: none;
-}
-
-/* bottoni interni circolari */
-
-.qm-btn {
-  position: absolute;
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255,255,255,0.10);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 13px;
-  color: #fff;
-  gap: 2px;
-  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
-}
-
-.qm-btn span {
-  font-size: 22px;
-}
-
-.qm-btn:hover {
-  background: rgba(255,255,255,0.18);
-  transform: scale(1.06);
-  box-shadow: 0 10px 26px rgba(0,0,0,0.55);
-}
-
-/* posizioni intorno al centro */
-
-.qm-top {
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.qm-right {
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-}
-
-.qm-bottom {
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.qm-left {
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-}
-
-/* piccola animazione del + quando il menu è aperto */
-
-#quick-btn.open span {
-  transform: rotate(45deg);
-}
-/* FORZA LE MODALI SOPRA TUTTO */
-[id*="modal"], [class*="modal"] {
-    z-index: 5000 !important;
-    position: relative !important;
-}
-
-[id*="backdrop"], [class*="backdrop"], 
-[id*="overlay"], [class*="overlay"] {
-    z-index: 4900 !important;
-    position: fixed !important;
-}
-/* ===== SOLO SU TELEFONO: tasto laterale ===== */
-@media (max-width: 780px) {
-
-  /* Il bottone diventa una linguetta laterale */
-  #quick-btn {
-    position: fixed;              /* segue lo schermo mentre scrolli */
-    top: 50%;
-    right: 8px;
-    left: auto;
-    transform: translateY(-50%);
-
-    width: 46px;
-    height: 60px;
-
-    background: rgba(255,255,255,0.35);
-    backdrop-filter: blur(10px);
-    border-radius: 18px 0 0 18px;  /* arrotondato solo lato interno */
-    border: 1px solid rgba(255,255,255,0.8);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 26px;
-    font-weight: 600;
-
-    z-index: 500;                 /* sotto alle modali */
-  }
-
-  #quick-btn:hover {
-    transform: translateY(-50%) scale(1.03);
-  }
-
-  /* Il menu esce affianco alla linguetta */
-  #quick-menu {
-    position: fixed;
-    top: 50%;
-    right: 60px;                  /* si stacca un po' dalla linguetta */
-    left: auto;
-    transform: translateY(-50%);
-    z-index: 600;
-  }
-}
 /* =========================================================
    QUICK BUTTON + MENU RADIALE – VERSIONE TONDA VERDE
-   (sovrascrive gli stili precedenti di #quick-btn e #quick-menu)
    ========================================================= */
 
-/* TASTO + CENTRALE – rotondo, semi-trasparente, stessa misura */
 #quick-btn {
   position: absolute;
   top: 50%;
@@ -1021,7 +728,7 @@ body {
   height: 70px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: rgba(0, 180, 120, 0.22);   /* verde chiaro trasparente */
+  background: rgba(0, 180, 120, 0.22);
   border: 1px solid rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(18px);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
@@ -1036,14 +743,13 @@ body {
 
   cursor: pointer;
   transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
-  z-index: 500;  /* sotto le modali, sopra la dashboard */
+  z-index: 500;
 }
 
 #quick-btn span {
   transition: transform 0.22s ease;
 }
 
-/* quando il menu è aperto, il + si gira un po' */
 #quick-btn.open span {
   transform: rotate(45deg);
 }
@@ -1054,12 +760,13 @@ body {
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
 }
 
-/* MENU RADIALE – grande cerchio verde trasparente */
+/* MENU RADIALE */
+
 #quick-menu {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 260px;             /* cerchio più grande = circa il doppio del bottone */
+  width: 260px;
   height: 260px;
   transform: translate(-50%, -50%);
   border-radius: 50%;
@@ -1071,16 +778,13 @@ body {
   backdrop-filter: blur(18px);
   box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
 
-  z-index: 600;             /* sopra il tasto, sotto le modali */
-  pointer-events: auto;
+  z-index: 600;
 }
 
-/* quando è nascosto */
 #quick-menu.hidden {
   display: none;
 }
 
-/* piccolo bordo interno per effetto "anello" */
 #quick-menu::before {
   content: "";
   position: absolute;
@@ -1090,7 +794,8 @@ body {
   box-shadow: inset 0 0 0 1px rgba(0, 120, 80, 0.12);
 }
 
-/* BOTTONCINI INTERNI – tutti partono dal centro e poi li spostiamo sul cerchio */
+/* BOTTONI DEL MENU RADIALE */
+
 #quick-menu .qm-btn {
   position: absolute;
   top: 50%;
@@ -1123,18 +828,12 @@ body {
   font-size: 22px;
 }
 
-/* Hover sui bottoni */
 #quick-menu .qm-btn:hover {
   transform: translate(-50%, -50%) scale(1.07);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
 }
 
-/* ---------------------------------------------------------
-   POSIZIONI SUL CERCHIO (7 voci)
-   Se hai meno voci funziona lo stesso, semplicemente
-   non userà alcune posizioni.
-   Raggio = 90px dal centro.
-   --------------------------------------------------------- */
+/* POSIZIONI SUL CERCHIO (7 VOCI, RAGGIO 90PX) */
 
 #quick-menu .qm-btn:nth-child(1) {
   transform: translate(-50%, -50%) rotate(-90deg) translate(90px) rotate(90deg);
@@ -1158,7 +857,8 @@ body {
   transform: translate(-50%, -50%) rotate(222deg) translate(90px) rotate(-222deg);
 }
 
-/* COLORI VIVACI DIVERSI PER OGNI ICONE */
+/* COLORI DIVERSI PER OGNI PULSANTE */
+
 #quick-menu .qm-btn:nth-child(1) {
   background: radial-gradient(circle at 30% 20%, #fff, #ffe7c7);
 }
@@ -1181,19 +881,28 @@ body {
   background: radial-gradient(circle at 30% 20%, #fff, #dff9ff);
 }
 
-/* ---------------------------------------------------------
-   SOLO SU TELEFONO (schermo stretto) – tasto laterale
-   Manteniamo la tua versione "linguetta" ma rotonda/verde
-   --------------------------------------------------------- */
-@media (max-width: 780px) {
+/* MODALI SEMPRE SOPRA */
 
+[id*="modal"], [class*="modal"] {
+  z-index: 5000 !important;
+  position: relative !important;
+}
+
+[id*="backdrop"], [class*="backdrop"],
+[id*="overlay"], [class*="overlay"] {
+  z-index: 4900 !important;
+  position: fixed !important;
+}
+
+/* QUICK BUTTON SU TELEFONO */
+
+@media (max-width: 780px) {
   #quick-btn {
     position: fixed;
     top: 50%;
     right: 8px;
     left: auto;
     transform: translateY(-50%);
-
     width: 54px;
     height: 54px;
     border-radius: 50%;
@@ -1218,202 +927,12 @@ body {
    AGENDA STILE WIDGET MAC
    ========================= */
 
-/* nascondo le vecchie intestazioni del calendario mensile */
-.agenda-weekdays {
-  display: none;
-}
-
-/* il contenitore giorni ora ospita il widget */
-.agenda-days {
-  flex: 1;
-}
-
-/* layout principale del widget: giorno grande + prossimi giorni */
-.agenda-widget {
-  display: grid;
-  grid-template-columns: 2fr 1.3fr;
-  gap: 10px;
-  height: 100%;
-}
-
-/* colonna sinistra: oggi/focus */
-.aw-left {
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  cursor: pointer;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.aw-left:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
-}
-
-/* data grande a sinistra */
-.aw-date-big {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-}
-
-.aw-weekday {
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #18a26a;
-}
-
-.aw-day {
-  font-size: 2.8rem;
-  font-weight: 800;
-  line-height: 1;
-}
-
-.aw-month {
-  font-size: 0.9rem;
-  color: var(--txt-muted);
-}
-
-/* lista appuntamenti del giorno */
-.aw-events {
-  margin-top: 10px;
-}
-
-.aw-events h4 {
-  margin: 0 0 6px;
-  font-size: 0.85rem;
-}
-
-.aw-events-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  max-height: 150px;
-  overflow: auto;
-}
-
-.aw-event-row {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 7px;
-  border-radius: 10px;
-  background: #f9f5ee;
-  font-size: 0.8rem;
-  margin-bottom: 4px;
-}
-
-.aw-event-time {
-  font-weight: 600;
-  min-width: 50px;
-}
-
-.aw-event-title {
-  flex: 1;
-}
-
-.aw-event-empty {
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: #f2f2f2;
-  font-size: 0.8rem;
-  color: var(--txt-muted);
-}
-
-/* colonna destra: prossimi giorni */
-.aw-right {
-  background: rgba(255, 255, 255, 0.85);
-  border-radius: 18px;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-}
-
-.aw-right h4 {
-  margin: 0 0 6px;
-  font-size: 0.85rem;
-}
-
-.aw-next-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.aw-next-day {
-  border-radius: 12px;
-  padding: 6px 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  cursor: pointer;
-  background: rgba(245, 241, 232, 0.9);
-  transition: background 0.18s ease, transform 0.18s ease;
-}
-
-.aw-next-day:hover {
-  background: #e8f5e9;
-  transform: translateY(-1px);
-}
-
-.aw-next-main {
-  display: flex;
-  flex-direction: column;
-}
-
-.aw-next-weekday {
-  font-weight: 600;
-}
-
-.aw-next-date {
-  font-size: 0.76rem;
-  color: var(--txt-muted);
-}
-
-.aw-next-count {
-  font-size: 0.75rem;
-  padding: 3px 7px;
-  border-radius: 999px;
-  background: #e3f3eb;
-  color: #12724b;
-  font-weight: 600;
-}
-
-.aw-next-day.has-events {
-  border: 1px solid rgba(24, 162, 106, 0.45);
-}
-
-/* responsivo: su telefono le due colonne vanno in verticale */
-@media (max-width: 780px) {
-  .agenda-widget {
-    grid-template-columns: 1fr;
-  }
-
-  .aw-left {
-    order: 1;
-  }
-
-  .aw-right {
-    order: 2;
-  }
-}
-/* === NUOVO WIDGET AGENDA GRANDISSIMO (Q4) === */
-
 .panel-q4 {
   display: flex;
   flex-direction: column;
 }
 
-/* contenitore che occupa TUTTO il riquadro in basso a destra */
+/* contenitore grande nel Q4 */
 .agenda-widget {
   flex: 1;
   margin-top: 6px;
@@ -1421,11 +940,11 @@ body {
   border-radius: var(--radius-md);
   padding: 10px;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr; /* metà oggi, metà prossimi giorni */
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 10px;
 }
 
-/* colonne interne bianche con ombra morbida */
+/* colonne interne bianche */
 .agenda-column {
   background: #ffffff;
   border-radius: var(--radius-md);
@@ -1437,10 +956,11 @@ body {
 }
 
 /* intestazione oggi */
+
 .agenda-today-header {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   margin-bottom: 8px;
 }
 
@@ -1451,12 +971,41 @@ body {
   color: var(--accent-green);
 }
 
+/* qui dentro JS disegna il giorno in grande */
+
 .agenda-today-date {
-  font-size: 0.95rem;
-  font-weight: 700;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
 }
 
-/* lista appuntamenti del giorno: occupa tutta l'altezza, scroll se serve */
+.agenda-day-big {
+  font-size: 3.1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.agenda-day-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.agenda-day-weekday {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent-green);
+}
+
+.agenda-day-month {
+  font-size: 0.85rem;
+  color: var(--txt-muted);
+}
+
+/* lista appuntamenti del giorno */
+
 .agenda-today-list {
   flex: 1;
   overflow-y: auto;
@@ -1473,6 +1022,7 @@ body {
   flex-direction: column;
   gap: 2px;
   font-size: 0.8rem;
+  cursor: pointer;
 }
 
 .agenda-app-time {
@@ -1495,6 +1045,7 @@ body {
 }
 
 /* intestazione prossimi giorni */
+
 .agenda-next-header {
   display: flex;
   justify-content: space-between;
@@ -1504,7 +1055,8 @@ body {
   margin-bottom: 8px;
 }
 
-/* lista prossimi giorni: colonne grandi */
+/* lista prossimi giorni */
+
 .agenda-next-list {
   flex: 1;
   overflow-y: auto;
@@ -1513,7 +1065,6 @@ body {
   gap: 8px;
 }
 
-/* card di ogni prossimo giorno */
 .agenda-next-day-card {
   border: none;
   background: linear-gradient(135deg, #e3f8ee, #f5fff8);
@@ -1548,7 +1099,8 @@ body {
   margin-top: 2px;
 }
 
-/* data grande in alto a destra nel pannello */
+/* pillola data in alto a destra */
+
 .agenda-header-date {
   font-size: 0.8rem;
   font-weight: 600;
@@ -1559,6 +1111,7 @@ body {
 }
 
 /* responsive: sul telefono le due colonne vanno una sotto l'altra */
+
 @media (max-width: 780px) {
   .agenda-widget {
     grid-template-columns: 1fr;
