@@ -1,8 +1,6 @@
 // ===== STATO E COSTANTI =====
 let currentUser = null;
 let panoramicaTimer = null;
-/* offset in giorni rispetto ad oggi (non usato ma tenuto per futuro) */
-let agendaDayOffset = 0;
 
 const STORAGE_KEYS = {
   UTENTI: "fm_utenti",
@@ -33,7 +31,6 @@ function loadData(key, fallback) {
 function saveData(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
 }
-
 // ===== DATE HELPER =====
 function todayISO() {
   const d = new Date();
@@ -66,7 +63,6 @@ function diffDays(fromIso, toIso) {
   const ms = b.getTime() - a.getTime();
   return Math.round(ms / (1000 * 60 * 60 * 24));
 }
-
 // ===== UTENTI =====
 function initDemoUsers() {
   let utenti = loadData(STORAGE_KEYS.UTENTI, []);
@@ -74,7 +70,6 @@ function initDemoUsers() {
     utenti = [
       { username: "farmacia", password: "farmacia", ruolo: "farmacia", nome: "Farmacia Montesano", telefono: "", email: "" },
       { username: "titolare", password: "titolare", ruolo: "titolare", nome: "Titolare", telefono: "", email: "" },
-
       { username: "fazzino", password: "1234", ruolo: "dipendente", nome: "Fazzino Cosimo", telefono: "", email: "" },
       { username: "rizzelli", password: "1234", ruolo: "dipendente", nome: "Rizzelli Patrizia", telefono: "", email: "" },
       { username: "andrisani", password: "1234", ruolo: "dipendente", nome: "Andrisani Daniela", telefono: "", email: "" },
@@ -90,12 +85,12 @@ function initDemoUsers() {
 function getAllUsers() {
   return loadData(STORAGE_KEYS.UTENTI, []);
 }
-
 // ===== BOOTSTRAP =====
 document.addEventListener("DOMContentLoaded", () => {
   initDemoUsers();
   setupAuth();
   setupFarmaciaDashboard();
+  setupQuickButton();   // tasto centrale +
 });
 
 // ===== AUTH + ROUTING =====
@@ -112,8 +107,7 @@ function setupAuth() {
   const btnEsci = document.getElementById("btn-esci");
   const userLabel = document.getElementById("user-label");
   const topSubtitle = document.getElementById("topbar-subtitle");
-
-  function showView(viewId) {
+    function showView(viewId) {
     const views = [viewAuth, viewFarmacia, viewTitolare, viewDip, viewCli];
     views.forEach((v) => v && v.classList.add("hidden"));
     const v = document.getElementById(viewId);
@@ -146,8 +140,7 @@ function setupAuth() {
       updateClienteView();
     }
   }
-
-  // Login
+    // Login
   if (loginForm) {
     loginForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -173,8 +166,7 @@ function setupAuth() {
       if (f) loginAs(f);
     });
   }
-
-  // Registrazione
+    // Registrazione
   if (regForm) {
     regForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -215,10 +207,9 @@ function setupAuth() {
     });
   }
 
-  loginAs(null);
+  loginAs(null); // vista iniziale
 }
-
-// Aggiorna viste in base all'utente
+// ==== AGGIORNA VISTE IN BASE AL RUOLO ====
 function updateAllViews() {
   if (!currentUser) return;
   if (currentUser.ruolo === "farmacia") updateFarmaciaView();
@@ -231,10 +222,15 @@ function updateAllViews() {
 function setupFarmaciaDashboard() {
   setupSezioniListeners();
   setupPromoGiornateListeners();
-  setupAgendaWidgetInteractions();
+  setupAgendaListeners();
 }
 
-// Panoramica vs dettaglio
+function updateFarmaciaView() {
+  updatePanoramica();
+  renderPromoAndGiornate();
+  renderAgenda();
+}
+// ===== PANORAMICA / DETTAGLIO SEZIONI =====
 function resetPanoramicaTimer() {
   if (panoramicaTimer) clearTimeout(panoramicaTimer);
   panoramicaTimer = setTimeout(() => {
@@ -267,7 +263,6 @@ function showSezioneDettaglio(title, html) {
 
   resetPanoramicaTimer();
 }
-
 function updatePanoramica() {
   const valServ = document.getElementById("val-servizi-oggi");
   const valAssenze = document.getElementById("val-assenze-oggi");
@@ -290,6 +285,22 @@ function updatePanoramica() {
   if (valScad) valScad.textContent = entro60;
 }
 
+/*  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    DA QUI IN POI CI SONO:
+    - setupSezioniListeners + openSection
+    - gestione promozioni/giornate/scadenze
+    - AGENDA stile Mac (renderAgenda + openModalAgendaDay)
+    - viste Titolare / Dipendente / Cliente
+    - QUICK BUTTON radiale (setupQuickButton)
+    <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  */
+
+/* Per non farti scrollare chilometri in un solo messaggio,
+   nel prossimo messaggio ti mando:
+   - script.js pezzi 11/20 fino a 20/20
+   con tutto il resto del codice completo.
+
+   Tu intanto incolla questi primi 10 pezzi in cima al file.
+*/
 // Sezioni Q1 – SOLO RIEPILOGO, NIENTE FORM
 function setupSezioniListeners() {
   const secButtons = document.querySelectorAll(".sec-card");
@@ -312,28 +323,288 @@ function openSection(sec) {
   resetPanoramicaTimer();
   const oggi = todayISO();
 
-  // ... (TUTTE LE SEZIONI SONO IDENTICHE A QUELLE CHE HAI GIÀ)
-  // Per brevità non ricommento ogni blocco: il codice è lo stesso
-  // che mi hai incollato, non l'ho modificato.
+  // ASSENTI / PERMESSI
+  if (sec === "assenti") {
+    const assenze = loadData(STORAGE_KEYS.ASSENZE, []);
+    let listHtml = "";
+    if (assenze.length === 0) {
+      listHtml = "<p>Nessuna assenza registrata.</p>";
+    } else {
+      listHtml = '<ul class="simple-list">';
+      assenze
+        .sort((a, b) => parseISO(a.dal) - parseISO(b.dal))
+        .forEach((a) => {
+          listHtml += `<li>
+            <div class="row-main">
+              <span class="row-title">${a.nome} – ${a.tipo}</span>
+              <span class="row-sub">${formatDateShortIT(a.dal)} → ${formatDateShortIT(a.al)}</span>
+            </div>
+          </li>`;
+        });
+      listHtml += "</ul>";
+    }
 
-  // (qui dentro lascia invariato tutto da "if (sec === 'assenti')" 
-  // fino alla fine della funzione openSection, come nel tuo script)
+    const html = `
+      <p><strong>Assenti / permessi approvati</strong></p>
+      ${listHtml}
+      <p class="hint-text small">
+        L'inserimento e la modifica delle assenze verranno gestiti in una schermata dedicata.
+      </p>
+    `;
+    showSezioneDettaglio("Assenti / Permessi", html);
+  }
+    // FARMACIA DI TURNO
+  else if (sec === "turno") {
+    const turnoKey = "fm_turno";
+    const turno = loadData(turnoKey, {
+      farmacia: "Farmacia Montesano",
+      appoggio: "Farmacia Centrale",
+      orario: "08:00 – 20:00",
+      note: ""
+    });
+
+    const html = `
+      <p><strong>Farmacia di turno</strong></p>
+      <p>Oggi: <strong>${turno.farmacia}</strong></p>
+      <p>Appoggio: <strong>${turno.appoggio}</strong></p>
+      <p>Orario: <strong>${turno.orario}</strong></p>
+      <p class="small">${turno.note || ""}</p>
+      <p class="hint-text small">
+        La modifica dei dati di turno sarà disponibile in un pannello di configurazione.
+      </p>
+    `;
+    showSezioneDettaglio("Farmacia di turno", html);
+  }
+
+  // COMUNICAZIONI INTERNE
+  else if (sec === "comunicazioni") {
+    const comunicazioni = loadData(STORAGE_KEYS.COMUNICAZIONI, []);
+    let listHtml = "";
+    if (comunicazioni.length === 0) {
+      listHtml = "<p>Nessuna comunicazione inserita.</p>";
+    } else {
+      listHtml = '<ul class="simple-list">';
+      comunicazioni
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .forEach((c) => {
+          const data = new Date(c.timestamp);
+          const hh = String(data.getHours()).padStart(2, "0");
+          const mm = String(data.getMinutes()).padStart(2, "0");
+          listHtml += `<li>
+            <div class="row-main">
+              <span class="row-title">${c.autore || "Anonimo"} – ${hh}:${mm}</span>
+              <span class="row-sub">${c.testo}</span>
+            </div>
+          </li>`;
+        });
+      listHtml += "</ul>";
+    }
+
+    const html = `
+      <p><strong>Comunicazioni interne</strong></p>
+      ${listHtml}
+      <p class="hint-text small">
+        L'invio di nuove comunicazioni sarà gestito in una sezione dedicata tipo chat interna.
+      </p>
+    `;
+    showSezioneDettaglio("Comunicazioni interne", html);
+  }
+
+  // PROCEDURE
+  else if (sec === "procedure") {
+    const procedure = loadData(STORAGE_KEYS.PROCEDURE, []);
+    let listHtml = "";
+    if (procedure.length === 0) {
+      listHtml = "<p>Nessuna procedura salvata.</p>";
+    } else {
+      listHtml = '<ul class="simple-list">';
+      procedure.forEach((p) => {
+        listHtml += `<li>
+          <div class="row-main">
+            <span class="row-title">${p.titolo}</span>
+            <span class="row-sub">${p.descrizione}</span>
+          </div>
+        </li>`;
+      });
+      listHtml += "</ul>";
+    }
+    const html = `
+      <p><strong>Procedure operative</strong></p>
+      ${listHtml}
+      <p class="hint-text small">
+        La creazione e modifica delle procedure verrà ottimizzata con un editor dedicato.
+      </p>
+    `;
+    showSezioneDettaglio("Procedure", html);
+  }
+    // LOGISTICA
+  else if (sec === "logistica") {
+    const logistica = loadData(STORAGE_KEYS.LOGISTICA, []);
+    let listHtml = "";
+    if (logistica.length === 0) {
+      listHtml = "<p>Nessuna nota di logistica.</p>";
+    } else {
+      listHtml = '<ul class="simple-list">';
+      logistica.forEach((l) => {
+        listHtml += `<li>
+          <div class="row-main">
+            <span class="row-title">${l.titolo}</span>
+            <span class="row-sub">${l.det}</span>
+          </div>
+        </li>`;
+      });
+      listHtml += "</ul>";
+    }
+    const html = `
+      <p><strong>Logistica e movimentazione</strong></p>
+      ${listHtml}
+      <p class="hint-text small">
+        L'inserimento delle note logistiche sarà gestito con una maschera semplice e veloce.
+      </p>
+    `;
+    showSezioneDettaglio("Logistica", html);
+  }
+
+  // MAGAZZINIERA
+  else if (sec === "magazzino") {
+    const note = loadData(STORAGE_KEYS.MAGAZZINO_NOTE, []);
+    const scadenze = loadData(STORAGE_KEYS.SCADENZE, []);
+
+    let listNote = "";
+    if (note.length === 0) {
+      listNote = "<p>Nessuna nota magazzino.</p>";
+    } else {
+      listNote = '<ul class="simple-list">';
+      note.forEach((n) => {
+        listNote += `<li>
+          <div class="row-main">
+            <span class="row-title">${n.titolo}</span>
+            <span class="row-sub">${n.testo}</span>
+          </div>
+        </li>`;
+      });
+      listNote += "</ul>";
+    }
+
+    let listScad = "";
+    if (scadenze.length === 0) {
+      listScad = "<p>Nessuna scadenza registrata.</p>";
+    } else {
+      listScad = '<ul class="simple-list">';
+      scadenze
+        .sort((a, b) => parseISO(a.dataScadenza) - parseISO(b.dataScadenza))
+        .forEach((s) => {
+          listScad += `<li>
+            <div class="row-main">
+              <span class="row-title">${s.nome}</span>
+              <span class="row-sub">Scade il ${formatDateShortIT(s.dataScadenza)} · ${s.pezzi} pz</span>
+            </div>
+          </li>`;
+        });
+      listScad += "</ul>";
+    }
+
+    const html = `
+      <p><strong>Magazziniera – note veloci e scadenze</strong></p>
+      <h4 class="subsection-title">Note magazzino</h4>
+      ${listNote}
+      <h4 class="subsection-title">Scadenze registrate</h4>
+      ${listScad}
+      <p class="hint-text small">
+        La compilazione delle note e delle scadenze sarà ottimizzata con una maschera separata.
+      </p>
+    `;
+    showSezioneDettaglio("Magazziniera", html);
+  }
+
+  // PRODOTTI IN SCADENZA
+  else if (sec === "scadenze") {
+    const scadenze = loadData(STORAGE_KEYS.SCADENZE, []);
+    if (scadenze.length === 0) {
+      showSezioneDettaglio(
+        "Prodotti in scadenza",
+        "<p>Nessuna scadenza registrata.</p>"
+      );
+      return;
+    }
+    let htmlList = '<ul class="simple-list">';
+    scadenze
+      .sort((a, b) => parseISO(a.dataScadenza) - parseISO(b.dataScadenza))
+      .forEach((s) => {
+        htmlList += `<li>
+          <div class="row-main">
+            <span class="row-title">${s.nome}</span>
+            <span class="row-sub">Scadenza: ${formatDateShortIT(s.dataScadenza)} · ${s.pezzi} pz</span>
+          </div>
+        </li>`;
+      });
+    htmlList += "</ul>";
+    const html = `
+      <p><strong>Prodotti in scadenza</strong></p>
+      ${htmlList}
+      <p class="hint-text small">
+        La registrazione delle scadenze continuerà ad essere gestita dall'area promozioni / scadenze.
+      </p>
+    `;
+    showSezioneDettaglio("Prodotti in scadenza", html);
+  }
+
+  // CONSUMABILI
+  else if (sec === "consumabili") {
+    const cons = loadData(STORAGE_KEYS.CONSUMABILI, []);
+    let listHtml = "";
+    if (cons.length === 0) {
+      listHtml = "<p>Nessun consumabile registrato.</p>";
+    } else {
+      listHtml = '<ul class="simple-list">';
+      cons.forEach((c) => {
+        listHtml += `<li>
+          <div class="row-main">
+            <span class="row-title">${c.nome}</span>
+            <span class="row-sub">Scorta: ${c.scorta}</span>
+          </div>
+        </li>`;
+      });
+      listHtml += "</ul>";
+    }
+    const html = `
+      <p><strong>Consumabili</strong></p>
+      ${listHtml}
+      <p class="hint-text small">
+        L'aggiornamento delle scorte dei consumabili sarà gestito in una sezione dedicata.
+      </p>
+    `;
+    showSezioneDettaglio("Consumabili", html);
+  }
+
+  // CONSEGNE / ARCHIVIO
+  else if (sec === "consegne") {
+    const cons = loadData(STORAGE_KEYS.CONSEGNE, []);
+    let listHtml = "";
+    if (cons.length === 0) {
+      listHtml = "<p>Nessuna consegna / ritiro registrato.</p>";
+    } else {
+      listHtml = '<ul class="simple-list">';
+      cons.forEach((c) => {
+        listHtml += `<li>
+          <div class="row-main">
+            <span class="row-title">${c.titolo}</span>
+            <span class="row-sub">${formatDateShortIT(c.data)} – ${c.note}</span>
+          </div>
+        </li>`;
+      });
+      listHtml += "</ul>";
+    }
+    const html = `
+      <p><strong>Consegne / Archivio</strong></p>
+      ${listHtml}
+      <p class="hint-text small">
+        L'inserimento di nuove consegne sarà gestito come archivio strutturato in una fase successiva.
+      </p>
+    `;
+    showSezioneDettaglio("Consegne / Archivio", html);
+  }
 }
-
-/* --- per non farti scorrere 200 righe, riassumo:
-   DA QUI FINO A PRIMA DI "updateFarmaciaView()" è IDENTICO al tuo,
-   copialo uguale a come l'hai incollato (assenze, turno, comunicazioni,
-   procedure, logistica, magazzino, scadenze, consumabili, consegne).
-   --- */
-
-/* ======================= FINE openSection ======================= */
-
-function updateFarmaciaView() {
-  updatePanoramica();
-  renderPromoAndGiornate();
-  renderAgenda();          // alias del widget
-}
-
 // ===== MODALE GENERICA =====
 function openModal(title, innerHtml, onReady) {
   const mb = document.getElementById("modal-backdrop");
@@ -351,13 +622,413 @@ function closeModal() {
   if (mb) mb.classList.add("hidden");
 }
 
-/* ===== PROMOZIONI & GIORNATE – da qui fino a renderPromoAndGiornate()
-   lascia TUTTO identico al tuo file: openModalOfferta, openModalGiornata,
-   openModalScadenza, openModalTuttePromo ecc. Non ho cambiato nulla.    */
+// ===== PROMOZIONI & GIORNATE (Q3) =====
+function setupPromoGiornateListeners() {
+  const btnAddOff = document.getElementById("btn-add-offerta");
+  const btnAddGio = document.getElementById("btn-add-giornata");
+  const btnViewAll = document.getElementById("btn-view-all-promo");
+  const btnAddScad = document.getElementById("btn-add-scadenza");
+  const modalBackdrop = document.getElementById("modal-backdrop");
+  const modalClose = document.getElementById("modal-close");
 
-/* =================== INIZIO SEZIONE AGENDA (NUOVA) =================== */
+  if (btnAddOff) btnAddOff.addEventListener("click", () => openModalOfferta());
+  if (btnAddGio) btnAddGio.addEventListener("click", () => openModalGiornata());
+  if (btnViewAll) btnViewAll.addEventListener("click", () => openModalTuttePromo());
+  if (btnAddScad) btnAddScad.addEventListener("click", () => openModalScadenza());
 
-// helper nome giorno
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) closeModal();
+    });
+  }
+  if (modalClose) modalClose.addEventListener("click", closeModal);
+}
+// Offerte
+function openModalOfferta(existingId) {
+  const offerte = loadData(STORAGE_KEYS.OFFERTE, []);
+  let off = null;
+  if (existingId) off = offerte.find((o) => o.id === existingId);
+
+  const html = `
+    <form id="form-offerta">
+      <label class="field">
+        <span>Nome offerta</span>
+        <input type="text" id="off-nome" value="${off ? off.nome : ""}" />
+      </label>
+      <div class="inline-row">
+        <label class="field">
+          <span>Dal</span>
+          <input type="date" id="off-dal" value="${off ? off.dal : ""}" />
+        </label>
+        <label class="field">
+          <span>Al</span>
+          <input type="date" id="off-al" value="${off ? off.al : ""}" />
+        </label>
+      </div>
+      <label class="field">
+        <span>Note</span>
+        <input type="text" id="off-note" value="${off ? (off.note || "") : ""}" />
+      </label>
+      <button type="submit" class="primary">Salva offerta</button>
+    </form>
+  `;
+  openModal(existingId ? "Modifica offerta" : "Nuova offerta", html, () => {
+    const form = document.getElementById("form-offerta");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nome = document.getElementById("off-nome").value.trim();
+      const dal = document.getElementById("off-dal").value;
+      const al = document.getElementById("off-al").value;
+      const note = document.getElementById("off-note").value.trim();
+      if (!nome || !dal || !al) {
+        alert("Compila almeno nome, dal e al.");
+        return;
+      }
+      let all = loadData(STORAGE_KEYS.OFFERTE, []);
+      if (off) {
+        off.nome = nome;
+        off.dal = dal;
+        off.al = al;
+        off.note = note;
+      } else {
+        all.push({ id: "off_" + Date.now(), nome, dal, al, note });
+      }
+      saveData(STORAGE_KEYS.OFFERTE, all);
+      closeModal();
+      renderPromoAndGiornate();
+      updateTitolareView();
+    });
+  });
+}
+
+// Giornate
+function openModalGiornata(existingId) {
+  const giornate = loadData(STORAGE_KEYS.GIORNATE, []);
+  let gio = null;
+  if (existingId) gio = giornate.find((g) => g.id === existingId);
+
+  const html = `
+    <form id="form-giornata">
+      <label class="field">
+        <span>Nome giornata</span>
+        <input type="text" id="gio-nome" value="${gio ? gio.nome : ""}" />
+      </label>
+      <div class="inline-row">
+        <label class="field">
+          <span>Dal</span>
+          <input type="date" id="gio-dal" value="${gio ? gio.dal : ""}" />
+        </label>
+        <label class="field">
+          <span>Al</span>
+          <input type="date" id="gio-al" value="${gio ? gio.al : ""}" />
+        </label>
+      </div>
+      <label class="field">
+        <span>Note</span>
+        <input type="text" id="gio-note" value="${gio ? (gio.note || "") : ""}" />
+      </label>
+      <p class="small">
+        La giornata viene evidenziata in agenda sul giorno di inizio.
+      </p>
+      <button type="submit" class="primary">Salva giornata</button>
+    </form>
+  `;
+  openModal(existingId ? "Modifica giornata" : "Nuova giornata", html, () => {
+    const form = document.getElementById("form-giornata");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nome = document.getElementById("gio-nome").value.trim();
+      const dal = document.getElementById("gio-dal").value;
+      const al = document.getElementById("gio-al").value;
+      const note = document.getElementById("gio-note").value.trim();
+      if (!nome || !dal || !al) {
+        alert("Compila almeno nome, dal e al.");
+        return;
+      }
+      let all = loadData(STORAGE_KEYS.GIORNATE, []);
+      if (gio) {
+        gio.nome = nome;
+        gio.dal = dal;
+        gio.al = al;
+        gio.note = note;
+      } else {
+        all.push({ id: "gio_" + Date.now(), nome, dal, al, note });
+      }
+      saveData(STORAGE_KEYS.GIORNATE, all);
+      closeModal();
+      renderPromoAndGiornate();
+      renderAgenda();
+      updateTitolareView();
+    });
+  });
+}
+// Scadenze prodotti
+function openModalScadenza() {
+  const html = `
+    <form id="form-scadenza">
+      <label class="field">
+        <span>Mese di scadenza</span>
+        <input type="month" id="scad-mese" />
+      </label>
+      <div id="scad-items-wrap">
+        <div class="inline-row">
+          <label class="field">
+            <span>Nome prodotto</span>
+            <input type="text" class="scad-nome" />
+          </label>
+          <label class="field">
+            <span>Pezzi</span>
+            <input type="number" min="1" class="scad-pezzi" />
+          </label>
+        </div>
+      </div>
+      <button type="button" id="btn-add-riga-scad" class="small-secondary">+ Altro prodotto</button>
+      <button type="submit" class="primary">Salva scadenze</button>
+    </form>
+  `;
+  openModal("Nuove scadenze prodotti", html, () => {
+    const wrap = document.getElementById("scad-items-wrap");
+    const btnAdd = document.getElementById("btn-add-riga-scad");
+    if (btnAdd && wrap) {
+      btnAdd.addEventListener("click", () => {
+        const div = document.createElement("div");
+        div.className = "inline-row";
+        div.innerHTML = `
+          <label class="field">
+            <span>Nome prodotto</span>
+            <input type="text" class="scad-nome" />
+          </label>
+          <label class="field">
+            <span>Pezzi</span>
+            <input type="number" min="1" class="scad-pezzi" />
+          </label>`;
+        wrap.appendChild(div);
+      });
+    }
+
+    const form = document.getElementById("form-scadenza");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const meseVal = document.getElementById("scad-mese").value;
+      if (!meseVal) {
+        alert("Seleziona il mese.");
+        return;
+      }
+      const [year, month] = meseVal.split("-");
+      const baseDate = new Date(Number(year), Number(month) - 1, 1);
+
+      const nomi = Array.from(document.querySelectorAll(".scad-nome"));
+      const pezzi = Array.from(document.querySelectorAll(".scad-pezzi"));
+      const scadenze = loadData(STORAGE_KEYS.SCADENZE, []);
+
+      for (let i = 0; i < nomi.length; i++) {
+        const nome = nomi[i].value.trim();
+        const pz = Number(pezzi[i].value || 0);
+        if (!nome || !pz) continue;
+
+        const day = 28;
+        const date = new Date(baseDate.getFullYear(), baseDate.getMonth(), day);
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        const d = String(date.getDate()).padStart(2, "0");
+        const iso = `${y}-${m}-${d}`;
+
+        scadenze.push({
+          id: "scad_" + Date.now() + "_" + i,
+          nome,
+          pezzi: pz,
+          dataScadenza: iso
+        });
+      }
+      saveData(STORAGE_KEYS.SCADENZE, scadenze);
+      closeModal();
+      renderPromoAndGiornate();
+      updatePanoramica();
+      updateTitolareView();
+    });
+  });
+}
+
+// Render elenchi promo/giornate
+function renderPromoAndGiornate() {
+  const oggi = todayISO();
+  const offerte = loadData(STORAGE_KEYS.OFFERTE, []);
+  const giornate = loadData(STORAGE_KEYS.GIORNATE, []);
+  const scadenze = loadData(STORAGE_KEYS.SCADENZE, []);
+
+  const offAtt = offerte.filter((o) => isDateInRange(oggi, o.dal, o.al));
+  const offScad = offerte.filter((o) => parseISO(oggi) > parseISO(o.al));
+
+  const listOffAtt = document.getElementById("lista-offerte-attive");
+  const listOffScad = document.getElementById("lista-offerte-scadute");
+  if (listOffAtt) {
+    listOffAtt.innerHTML = "";
+    offAtt.forEach((o) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="row-main">
+          <span class="row-title">${o.nome}</span>
+          <span class="row-sub">${formatDateShortIT(o.dal)} → ${formatDateShortIT(o.al)}</span>
+        </div>
+        <div class="row-actions">
+          <button class="icon-btn" data-edit-off="${o.id}" title="Modifica">✏️</button>
+          <button class="icon-btn" data-del-off="${o.id}" title="Elimina">🗑️</button>
+        </div>`;
+      listOffAtt.appendChild(li);
+    });
+  }
+  if (listOffScad) {
+    listOffScad.innerHTML = "";
+    offScad.forEach((o) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="row-main">
+          <span class="row-title">${o.nome}</span>
+          <span class="row-sub">Offerta scaduta (${formatDateShortIT(o.dal)} → ${formatDateShortIT(o.al)})</span>
+        </div>
+        <span class="tag-status">Scaduta</span>`;
+      listOffScad.appendChild(li);
+    });
+  }
+    const gioAttive = giornate.filter((g) => parseISO(oggi) <= parseISO(g.al));
+  const gioScad = giornate.filter((g) => parseISO(oggi) > parseISO(g.al));
+
+  const listGioAtt = document.getElementById("lista-giornate-attive");
+  const listGioScad = document.getElementById("lista-giornate-scadute");
+  if (listGioAtt) {
+    listGioAtt.innerHTML = "";
+    gioAttive.forEach((g) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="row-main">
+          <span class="row-title">${g.nome}</span>
+          <span class="row-sub">${formatDateShortIT(g.dal)} → ${formatDateShortIT(g.al)}</span>
+        </div>
+        <div class="row-actions">
+          <button class="icon-btn" data-open-gio="${g.id}" title="Appuntamenti">📆</button>
+          <button class="icon-btn" data-edit-gio="${g.id}" title="Modifica">✏️</button>
+          <button class="icon-btn" data-del-gio="${g.id}" title="Elimina">🗑️</button>
+        </div>`;
+      listGioAtt.appendChild(li);
+    });
+  }
+  if (listGioScad) {
+    listGioScad.innerHTML = "";
+    gioScad.forEach((g) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div class="row-main">
+          <span class="row-title">${g.nome}</span>
+          <span class="row-sub">Giornata conclusa (${formatDateShortIT(g.dal)} → ${formatDateShortIT(g.al)})</span>
+        </div>
+        <span class="tag-status">Conclusa</span>`;
+      listGioScad.appendChild(li);
+    });
+  }
+
+  // Azioni
+  document.querySelectorAll("[data-edit-off]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-edit-off");
+      openModalOfferta(id);
+    });
+  });
+  document.querySelectorAll("[data-del-off]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-del-off");
+      let all = loadData(STORAGE_KEYS.OFFERTE, []);
+      all = all.filter((o) => o.id !== id);
+      saveData(STORAGE_KEYS.OFFERTE, all);
+      renderPromoAndGiornate();
+      updateTitolareView();
+    });
+  });
+  document.querySelectorAll("[data-edit-gio]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-edit-gio");
+      openModalGiornata(id);
+    });
+  });
+  document.querySelectorAll("[data-del-gio]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-del-gio");
+      let all = loadData(STORAGE_KEYS.GIORNATE, []);
+      all = all.filter((g) => g.id !== id);
+      saveData(STORAGE_KEYS.GIORNATE, all);
+      renderPromoAndGiornate();
+      renderAgenda();
+      updateTitolareView();
+    });
+  });
+  document.querySelectorAll("[data-open-gio]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-open-gio");
+      openModalGiornata(id);
+    });
+  });
+
+  // aggiornamento stat scadenze per titolare
+  const oggi2 = todayISO();
+  const entro60 = scadenze.filter((s) => {
+    const diff = diffDays(oggi2, s.dataScadenza);
+    return diff >= 0 && diff <= 60;
+  }).length;
+  const elStat = document.getElementById("stat-scadenze-tot");
+  if (elStat) elStat.textContent = entro60;
+}
+
+// Vedi tutte
+function openModalTuttePromo() {
+  const oggi = todayISO();
+  const offerte = loadData(STORAGE_KEYS.OFFERTE, []);
+  const giornate = loadData(STORAGE_KEYS.GIORNATE, []);
+
+  const offAtt = offerte.filter((o) => isDateInRange(oggi, o.dal, o.al));
+  const offScad = offerte.filter((o) => parseISO(oggi) > parseISO(o.al));
+  const gioAtt = giornate.filter((g) => parseISO(oggi) <= parseISO(g.al));
+  const gioScad = giornate.filter((g) => parseISO(oggi) > parseISO(g.al));
+    let html = `<p class="small"><strong>Offerte in corso</strong></p><ul class="simple-list">`;
+  if (offAtt.length === 0) {
+    html += `<li><span>Nessuna offerta attiva.</span></li>`;
+  } else {
+    offAtt.forEach((o) => {
+      html += `<li><div class="row-main"><span class="row-title">${o.nome}</span><span class="row-sub">${formatDateShortIT(o.dal)} → ${formatDateShortIT(o.al)}</span></div></li>`;
+    });
+  }
+  html += `</ul><p class="small"><strong>Offerte scadute</strong></p><ul class="simple-list simple-list-muted">`;
+  if (offScad.length === 0) {
+    html += `<li><span>Nessuna offerta scaduta.</span></li>`;
+  } else {
+    offScad.forEach((o) => {
+      html += `<li><div class="row-main"><span class="row-title">${o.nome}</span><span class="row-sub">${formatDateShortIT(o.dal)} → ${formatDateShortIT(o.al)}</span></div></li>`;
+    });
+  }
+  html += `</ul><hr/><p class="small"><strong>Giornate attive</strong></p><ul class="simple-list">`;
+  if (gioAtt.length === 0) {
+    html += `<li><span>Nessuna giornata attiva.</span></li>`;
+  } else {
+    gioAtt.forEach((g) => {
+      html += `<li><div class="row-main"><span class="row-title">${g.nome}</span><span class="row-sub">${formatDateShortIT(g.dal)} → ${formatDateShortIT(g.al)}</span></div></li>`;
+    });
+  }
+  html += `</ul><p class="small"><strong>Giornate concluse</strong></p><ul class="simple-list simple-list-muted">`;
+  if (gioScad.length === 0) {
+    html += `<li><span>Nessuna giornata conclusa.</span></li>`;
+  } else {
+    gioScad.forEach((g) => {
+      html += `<li><div class="row-main"><span class="row-title">${g.nome}</span><span class="row-sub">${formatDateShortIT(g.dal)} → ${formatDateShortIT(g.al)}</span></div></li>`;
+    });
+  }
+  html += `</ul>`;
+
+  openModal("Tutte le promozioni e giornate", html);
+}
+
+// ===== AGENDA (Q4) – WIDGET STILE MAC =====
+function setupAgendaListeners() {
+  // al momento nessun pulsante prev/next, solo render di oggi
+}
+
 function weekdayNameIT(date) {
   const giorni = [
     "Domenica",
@@ -371,11 +1042,7 @@ function weekdayNameIT(date) {
   return giorni[date.getDay()];
 }
 
-/**
- * Render del widget agenda in basso a destra
- * (stile Mac: giorno grande + prossimi giorni)
- */
-function renderAgendaWidget() {
+function renderAgenda() {
   const todayDateEl   = document.getElementById("agenda-today-date");
   const todayListEl   = document.getElementById("agenda-today-list");
   const nextListEl    = document.getElementById("agenda-next-list");
@@ -388,7 +1055,7 @@ function renderAgendaWidget() {
   const todayDate = new Date(Number(y), Number(m) - 1, Number(d));
 
   const app = loadData(STORAGE_KEYS.APPUNTAMENTI, []).sort((a, b) => {
-    if (a.data === b.data) return a.ora.localeCompare(b.ora);
+    if (a.data === b.data) return (a.ora || "").localeCompare(b.ora || "");
     return a.data.localeCompare(b.data);
   });
 
@@ -396,29 +1063,17 @@ function renderAgendaWidget() {
     "gennaio","febbraio","marzo","aprile","maggio","giugno",
     "luglio","agosto","settembre","ottobre","novembre","dicembre"
   ];
+  const giornoLabel =
+    `${weekdayNameIT(todayDate).toUpperCase()} ${Number(d)} ` +
+    `${monthNamesFull[Number(m) - 1]} ${y}`;
 
-  const weekdayUpper = weekdayNameIT(todayDate).toUpperCase();
-  const dayNumber = Number(d);
-  const monthName = monthNamesFull[Number(m) - 1];
+  todayDateEl.textContent  = giornoLabel;
+  if (headerDateEl) headerDateEl.textContent = giornoLabel;
 
-  // parte sinistra: giorno grande + mese
-  todayDateEl.innerHTML = `
-    <div class="agenda-day-big">${dayNumber}</div>
-    <div class="agenda-day-info">
-      <div class="agenda-day-weekday">${weekdayUpper}</div>
-      <div class="agenda-day-month">${monthName} ${y}</div>
-    </div>
-  `;
-
-  // pillola in alto a destra
-  if (headerDateEl) {
-    headerDateEl.textContent = `${weekdayUpper} ${dayNumber} ${monthName} ${y}`;
-  }
-
-  // ===== COLONNA SINISTRA: APPUNTAMENTI DI OGGI =====
+  // COLONNA SINISTRA – APPUNTAMENTI DI OGGI
   const todayApps = app.filter((a) => a.data === todayIso);
-
   todayListEl.innerHTML = "";
+
   if (todayApps.length === 0) {
     todayListEl.innerHTML = `<p class="agenda-empty">Nessun appuntamento per oggi.</p>`;
   } else {
@@ -426,8 +1081,8 @@ function renderAgendaWidget() {
       const card = document.createElement("div");
       card.className = "agenda-app-card";
       card.innerHTML = `
-        <div class="agenda-app-time">${a.ora || "--:--"}</div>
-        <div class="agenda-app-main">${a.nome}</div>
+        <div class="agenda-app-time">${a.ora || ""}</div>
+        <div class="agenda-app-main">${a.nome || ""}</div>
         <div class="agenda-app-sub">
           ${a.telefono || ""} ${a.motivo ? " · " + a.motivo : ""}
         </div>
@@ -437,9 +1092,9 @@ function renderAgendaWidget() {
     });
   }
 
-  // ===== COLONNA DESTRA: PROSSIMI 4 GIORNI =====
+  // COLONNA DESTRA – PROSSIMI 2 GIORNI
   nextListEl.innerHTML = "";
-  for (let offset = 1; offset <= 4; offset++) {
+  for (let offset = 1; offset <= 2; offset++) {
     const dt = new Date(todayDate);
     dt.setDate(dt.getDate() + offset);
 
@@ -465,63 +1120,31 @@ function renderAgendaWidget() {
   }
 }
 
-/**
- * Alias per compatibilità con vecchie chiamate
- */
-function renderAgenda() {
-  renderAgendaWidget();
-}
-
-/**
- * Modale "giorno" stile vista calendario:
- * elenco appuntamenti del giorno cliccato
- */
 function openModalAgendaDay(iso) {
-  const d = parseISO(iso);
-  const monthNamesFull = [
-    "gennaio","febbraio","marzo","aprile","maggio","giugno",
-    "luglio","agosto","settembre","ottobre","novembre","dicembre"
-  ];
-  const titoloData =
-    `${weekdayNameIT(d)} ${d.getDate()} ${monthNamesFull[d.getMonth()]} ${d.getFullYear()}`;
-
-  const apps = loadData(STORAGE_KEYS.APPUNTAMENTI, [])
-    .filter((a) => a.data === iso)
+  const app = loadData(STORAGE_KEYS.APPUNTAMENTI, []).filter(a => a.data === iso)
     .sort((a, b) => (a.ora || "").localeCompare(b.ora || ""));
 
-  let html = `<p class="small"><strong>${titoloData}</strong></p>`;
+  const d = parseISO(iso);
+  const titolo = `${weekdayNameIT(d)} ${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}`;
 
-  if (apps.length === 0) {
-    html += `<p>Nessun appuntamento per questo giorno.</p>`;
+  let html = `<p class="small">Agenda servizi per <strong>${titolo}</strong></p>`;
+  if (app.length === 0) {
+    html += `<p>Nessun appuntamento per questa data.</p>`;
   } else {
     html += `<ul class="simple-list">`;
-    apps.forEach((a) => {
-      html += `
-        <li>
-          <div class="row-main">
-            <span class="row-title">${a.ora || "--:--"} – ${a.nome}</span>
-            <span class="row-sub">
-              ${a.telefono || ""} ${a.motivo ? " · " + a.motivo : ""}
-            </span>
-          </div>
-        </li>`;
+    app.forEach(a => {
+      html += `<li>
+        <div class="row-main">
+          <span class="row-title">${a.ora || ""} – ${a.nome || ""}</span>
+          <span class="row-sub">${a.telefono || ""} · ${a.motivo || ""}</span>
+        </div>
+      </li>`;
     });
     html += `</ul>`;
   }
 
-  openModal("Agenda del giorno", html);
+  openModal("Agenda servizi – dettaglio giorno", html);
 }
-
-/**
- * Inizializza il widget agenda
- */
-function setupAgendaWidgetInteractions() {
-  // render iniziale quando la dashboard viene caricata
-  renderAgendaWidget();
-}
-
-/* =================== FINE SEZIONE AGENDA =================== */
-
 // ===== VISTE RUOLI =====
 function updateTitolareView() {
   if (!currentUser || currentUser.ruolo !== "titolare") return;
@@ -627,9 +1250,8 @@ function updateClienteView() {
     lista.appendChild(li);
   });
 }
-
 // === PULSANTE QUICK ACTION CENTRALE + MENU RADIALE ===
-document.addEventListener("DOMContentLoaded", () => {
+function setupQuickButton() {
   const quickBtn = document.getElementById("quick-btn");
   const quickMenu = document.getElementById("quick-menu");
 
@@ -638,8 +1260,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // clic sul tasto centrale
   quickBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    quickMenu.classList.toggle("hidden");
-    quickBtn.classList.toggle("open");
+    const isHidden = quickMenu.classList.contains("hidden");
+    if (isHidden) {
+      quickMenu.classList.remove("hidden");
+      quickBtn.classList.add("open");
+    } else {
+      quickMenu.classList.add("hidden");
+      quickBtn.classList.remove("open");
+    }
   });
 
   // clic fuori: chiude il menu
@@ -648,30 +1276,29 @@ document.addEventListener("DOMContentLoaded", () => {
     quickBtn.classList.remove("open");
   });
 
+  // evita che il click interno chiuda subito
+  quickMenu.addEventListener("click", (e) => {
+    e.stopPropagation();
+  });
+
   // azioni dei pulsanti del menu
   quickMenu.querySelectorAll(".qm-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const action = btn.getAttribute("data-action");
 
-      if (action === "nuova-com") {
-        alert("Azione rapida: nuova comunicazione interna");
+      if (action === "nuova-assenza") {
+        openSection("assenti");
       } else if (action === "nuovo-app") {
-        alert("Azione rapida: nuovo appuntamento");
-      } else if (action === "consegne") {
-        alert("Azione rapida: consegna / ritiro");
-      } else if (action === "consumabili") {
-        alert("Azione rapida: aggiornamento consumabili");
-      } else if (action === "scadenza") {
-        alert("Azione rapida: nuova scadenza prodotto");
-      } else if (action === "procedura") {
-        alert("Azione rapida: nuova procedura");
-      } else if (action === "cambio-farmacia") {
-        alert("Azione rapida: cambio farmacia");
+        alert("Azione rapida: nuovo appuntamento (da collegare alla maschera appuntamenti)");
+      } else if (action === "nuova-nota") {
+        openSection("magazzino");
+      } else if (action === "nuova-com") {
+        openSection("comunicazioni");
       }
 
       quickMenu.classList.add("hidden");
       quickBtn.classList.remove("open");
     });
   });
-});
+}
