@@ -113,27 +113,44 @@
       <span>+</span>
     </div>
 
-<div id="quick-menu" class="hidden">
-  <button class="qm-btn qm-top" data-action="nuova-assenza">
-    <span>🧑‍⚕️</span>
-    <small>Assenze</small>
-  </button>
+    <!-- MENU RADIALE A 7 ICONE -->
+    <div id="quick-menu" class="hidden">
+      <button class="qm-btn" data-action="nuova-com">
+        <span>💬</span>
+        <small>Comunic.</small>
+      </button>
 
-  <button class="qm-btn qm-right" data-action="nuovo-app">
-    <span>📆</span>
-    <small>Appunt.</small>
-  </button>
+      <button class="qm-btn" data-action="nuovo-app">
+        <span>📆</span>
+        <small>Appunt.</small>
+      </button>
 
-  <button class="qm-btn qm-bottom" data-action="nuova-nota">
-    <span>📦</span>
-    <small>Magazzino</small>
-  </button>
+      <button class="qm-btn" data-action="consegne">
+        <span>📦</span>
+        <small>Consegne</small>
+      </button>
 
-  <button class="qm-btn qm-left" data-action="nuova-com">
-    <span>💬</span>
-    <small>Comunic.</small>
-  </button>
-</div>    
+      <button class="qm-btn" data-action="consumabili">
+        <span>🧻</span>
+        <small>Consumab.</small>
+      </button>
+
+      <button class="qm-btn" data-action="scadenza">
+        <span>⏰</span>
+        <small>Scadenza</small>
+      </button>
+
+      <button class="qm-btn" data-action="procedura">
+        <span>📄</span>
+        <small>Procedura</small>
+      </button>
+
+      <button class="qm-btn" data-action="cambio-farmacia">
+        <span>🏥</span>
+        <small>Cambio far.</small>
+      </button>
+    </div>
+
     <!-- Q1 – SEZIONI FARMACIA -->
     <section class="panel panel-q1">
       <header class="panel-header">
@@ -290,7 +307,7 @@
       </div>
     </section>
 
-       <!-- Q4 – AGENDA SERVIZI (NUOVO WIDGET) -->
+    <!-- Q4 – AGENDA SERVIZI – STILE WIDGET MAC -->
     <section class="panel panel-q4">
       <header class="panel-header">
         <div>
@@ -298,14 +315,13 @@
           <p>Appuntamenti del giorno e prossimi giorni.</p>
         </div>
         <div class="panel-actions">
-          <!-- data grande in alto a destra -->
           <span id="agenda-header-date" class="agenda-header-date"></span>
         </div>
       </header>
 
       <div class="agenda-widget">
         <!-- COLONNA SINISTRA: OGGI -->
-        <div class="agenda-column agenda-today">
+        <div class="agenda-column agenda-today" id="agenda-today-column">
           <div class="agenda-today-header">
             <span class="agenda-today-label">Oggi</span>
             <span id="agenda-today-date" class="agenda-today-date"></span>
@@ -316,7 +332,7 @@
         </div>
 
         <!-- COLONNA DESTRA: PROSSIMI GIORNI -->
-        <div class="agenda-column agenda-next">
+        <div class="agenda-column agenda-next" id="agenda-next-column">
           <div class="agenda-next-header">
             <span>Prossimi giorni</span>
           </div>
