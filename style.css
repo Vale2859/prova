@@ -1406,3 +1406,162 @@ body {
     order: 2;
   }
 }
+/* === NUOVO WIDGET AGENDA GRANDISSIMO (Q4) === */
+
+.panel-q4 {
+  display: flex;
+  flex-direction: column;
+}
+
+/* contenitore che occupa TUTTO il riquadro in basso a destra */
+.agenda-widget {
+  flex: 1;
+  margin-top: 6px;
+  background: var(--bg-panel-soft);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr; /* metà oggi, metà prossimi giorni */
+  gap: 10px;
+}
+
+/* colonne interne bianche con ombra morbida */
+.agenda-column {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* intestazione oggi */
+.agenda-today-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.agenda-today-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--accent-green);
+}
+
+.agenda-today-date {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* lista appuntamenti del giorno: occupa tutta l'altezza, scroll se serve */
+.agenda-today-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.agenda-app-card {
+  border-radius: 12px;
+  padding: 7px 9px;
+  background: var(--bg-panel-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8rem;
+}
+
+.agenda-app-time {
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+.agenda-app-main {
+  font-size: 0.8rem;
+}
+
+.agenda-app-sub {
+  font-size: 0.75rem;
+  color: var(--txt-muted);
+}
+
+.agenda-empty {
+  font-size: 0.8rem;
+  color: var(--txt-muted);
+}
+
+/* intestazione prossimi giorni */
+.agenda-next-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* lista prossimi giorni: colonne grandi */
+.agenda-next-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* card di ogni prossimo giorno */
+.agenda-next-day-card {
+  border: none;
+  background: linear-gradient(135deg, #e3f8ee, #f5fff8);
+  border-radius: 14px;
+  padding: 8px 10px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.agenda-next-day-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.12);
+}
+
+.and-day {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.and-date {
+  font-size: 0.8rem;
+  color: var(--txt-muted);
+}
+
+.and-count {
+  font-size: 0.78rem;
+  margin-top: 2px;
+}
+
+/* data grande in alto a destra nel pannello */
+.agenda-header-date {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e9fff4;
+  color: var(--accent-green);
+}
+
+/* responsive: sul telefono le due colonne vanno una sotto l'altra */
+@media (max-width: 780px) {
+  .agenda-widget {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+}
