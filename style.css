@@ -1007,3 +1007,209 @@ body {
     z-index: 600;
   }
 }
+/* =========================================================
+   QUICK BUTTON + MENU RADIALE – VERSIONE TONDA VERDE
+   (sovrascrive gli stili precedenti di #quick-btn e #quick-menu)
+   ========================================================= */
+
+/* TASTO + CENTRALE – rotondo, semi-trasparente, stessa misura */
+#quick-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(0, 180, 120, 0.22);   /* verde chiaro trasparente */
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 36px;
+  font-weight: 600;
+  color: #0b6240;
+
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+  z-index: 500;  /* sotto le modali, sopra la dashboard */
+}
+
+#quick-btn span {
+  transition: transform 0.22s ease;
+}
+
+/* quando il menu è aperto, il + si gira un po' */
+#quick-btn.open span {
+  transform: rotate(45deg);
+}
+
+#quick-btn:hover {
+  background: rgba(0, 200, 135, 0.30);
+  transform: translate(-50%, -50%) scale(1.05);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.26);
+}
+
+/* MENU RADIALE – grande cerchio verde trasparente */
+#quick-menu {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 260px;             /* cerchio più grande = circa il doppio del bottone */
+  height: 260px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+
+  background: radial-gradient(circle at 50% 50%,
+              rgba(255, 255, 255, 0.85) 0,
+              rgba(0, 190, 130, 0.20) 55%,
+              rgba(0, 150, 100, 0.28) 100%);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+
+  z-index: 600;             /* sopra il tasto, sotto le modali */
+  pointer-events: auto;
+}
+
+/* quando è nascosto */
+#quick-menu.hidden {
+  display: none;
+}
+
+/* piccolo bordo interno per effetto "anello" */
+#quick-menu::before {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 0 0 1px rgba(0, 120, 80, 0.12);
+}
+
+/* BOTTONCINI INTERNI – tutti partono dal centro e poi li spostiamo sul cerchio */
+#quick-menu .qm-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: none;
+
+  background: #ffffff;
+  color: #1f2630;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px;
+
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+#quick-menu .qm-btn span {
+  font-size: 22px;
+}
+
+/* Hover sui bottoni */
+#quick-menu .qm-btn:hover {
+  transform: translate(-50%, -50%) scale(1.07);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------------------------------------------------------
+   POSIZIONI SUL CERCHIO (7 voci)
+   Se hai meno voci funziona lo stesso, semplicemente
+   non userà alcune posizioni.
+   Raggio = 90px dal centro.
+   --------------------------------------------------------- */
+
+#quick-menu .qm-btn:nth-child(1) {
+  transform: translate(-50%, -50%) rotate(-90deg) translate(90px) rotate(90deg);
+}
+#quick-menu .qm-btn:nth-child(2) {
+  transform: translate(-50%, -50%) rotate(-38deg) translate(90px) rotate(38deg);
+}
+#quick-menu .qm-btn:nth-child(3) {
+  transform: translate(-50%, -50%) rotate(14deg) translate(90px) rotate(-14deg);
+}
+#quick-menu .qm-btn:nth-child(4) {
+  transform: translate(-50%, -50%) rotate(66deg) translate(90px) rotate(-66deg);
+}
+#quick-menu .qm-btn:nth-child(5) {
+  transform: translate(-50%, -50%) rotate(118deg) translate(90px) rotate(-118deg);
+}
+#quick-menu .qm-btn:nth-child(6) {
+  transform: translate(-50%, -50%) rotate(170deg) translate(90px) rotate(-170deg);
+}
+#quick-menu .qm-btn:nth-child(7) {
+  transform: translate(-50%, -50%) rotate(222deg) translate(90px) rotate(-222deg);
+}
+
+/* COLORI VIVACI DIVERSI PER OGNI ICONE */
+#quick-menu .qm-btn:nth-child(1) {
+  background: radial-gradient(circle at 30% 20%, #fff, #ffe7c7);
+}
+#quick-menu .qm-btn:nth-child(2) {
+  background: radial-gradient(circle at 30% 20%, #fff, #ffd6e9);
+}
+#quick-menu .qm-btn:nth-child(3) {
+  background: radial-gradient(circle at 30% 20%, #fff, #d7f0ff);
+}
+#quick-menu .qm-btn:nth-child(4) {
+  background: radial-gradient(circle at 30% 20%, #fff, #e3ffd5);
+}
+#quick-menu .qm-btn:nth-child(5) {
+  background: radial-gradient(circle at 30% 20%, #fff, #ffe6d9);
+}
+#quick-menu .qm-btn:nth-child(6) {
+  background: radial-gradient(circle at 30% 20%, #fff, #e7e0ff);
+}
+#quick-menu .qm-btn:nth-child(7) {
+  background: radial-gradient(circle at 30% 20%, #fff, #dff9ff);
+}
+
+/* ---------------------------------------------------------
+   SOLO SU TELEFONO (schermo stretto) – tasto laterale
+   Manteniamo la tua versione "linguetta" ma rotonda/verde
+   --------------------------------------------------------- */
+@media (max-width: 780px) {
+
+  #quick-btn {
+    position: fixed;
+    top: 50%;
+    right: 8px;
+    left: auto;
+    transform: translateY(-50%);
+
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: rgba(0, 200, 135, 0.30);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+  }
+
+  #quick-btn:hover {
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  #quick-menu {
+    position: fixed;
+    top: 50%;
+    right: 80px;
+    left: auto;
+    transform: translateY(-50%);
+  }
+}
