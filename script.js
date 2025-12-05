@@ -1026,20 +1026,20 @@ function openModalTuttePromo() {
   openModal("Tutte le promozioni e giornate", html);
 }
 
-// ===== AGENDA (Q4) =====
+// ===== AGENDA (Q4) – VERSIONE WIDGET =====
 function setupAgendaListeners() {
   const btnPrev = document.getElementById("btn-prev-month");
   const btnNext = document.getElementById("btn-next-month");
 
   if (btnPrev) {
     btnPrev.addEventListener("click", () => {
-      agendaMonthOffset -= 1;
+      agendaDayOffset -= 1; // giorno precedente
       renderAgenda();
     });
   }
   if (btnNext) {
     btnNext.addEventListener("click", () => {
-      agendaMonthOffset += 1;
+      agendaDayOffset += 1; // giorno successivo
       renderAgenda();
     });
   }
