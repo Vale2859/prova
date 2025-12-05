@@ -41,7 +41,8 @@
       <button class="link-button" id="btn-esci" type="button">Esci</button>
     </div>
   </header>
-    <!-- ============ AUTH VIEW ============ -->
+
+  <!-- ============ AUTH VIEW ============ -->
   <section id="view-auth" class="auth-view app-view">
     <div class="auth-card">
       <h2>Login</h2>
@@ -104,35 +105,35 @@
       </form>
     </div>
   </section>
-    <!-- ============ VIEW FARMACIA ============ -->
+
+  <!-- ============ VIEW FARMACIA ============ -->
   <main id="view-farmacia" class="dashboard-grid app-view hidden">
     <!-- PULSANTE RAPIDO CENTRALE -->
     <div id="quick-btn">
       <span>+</span>
     </div>
 
-    <div id="quick-menu" class="hidden">
-      <button class="qm-btn" data-action="nuova-assenza">
-        <span>🧑‍⚕️</span>
-        <small>Assenze</small>
-      </button>
+<div id="quick-menu" class="hidden">
+  <button class="qm-btn qm-top" data-action="nuova-assenza">
+    <span>🧑‍⚕️</span>
+    <small>Assenze</small>
+  </button>
 
-      <button class="qm-btn" data-action="nuovo-app">
-        <span>📆</span>
-        <small>Appunt.</small>
-      </button>
+  <button class="qm-btn qm-right" data-action="nuovo-app">
+    <span>📆</span>
+    <small>Appunt.</small>
+  </button>
 
-      <button class="qm-btn" data-action="nuova-nota">
-        <span>📦</span>
-        <small>Magazzino</small>
-      </button>
+  <button class="qm-btn qm-bottom" data-action="nuova-nota">
+    <span>📦</span>
+    <small>Magazzino</small>
+  </button>
 
-      <button class="qm-btn" data-action="nuova-com">
-        <span>💬</span>
-        <small>Comunic.</small>
-      </button>
-    </div>
-
+  <button class="qm-btn qm-left" data-action="nuova-com">
+    <span>💬</span>
+    <small>Comunic.</small>
+  </button>
+</div>    
     <!-- Q1 – SEZIONI FARMACIA -->
     <section class="panel panel-q1">
       <header class="panel-header">
@@ -246,7 +247,8 @@
         </div>
       </div>
     </section>
-        <!-- Q3 – PROMOZIONI E GIORNATE -->
+
+    <!-- Q3 – PROMOZIONI E GIORNATE -->
     <section class="panel panel-q3">
       <header class="panel-header">
         <div>
@@ -288,7 +290,7 @@
       </div>
     </section>
 
-    <!-- Q4 – AGENDA SERVIZI (STILE WIDGET MAC) -->
+       <!-- Q4 – AGENDA SERVIZI (NUOVO WIDGET) -->
     <section class="panel panel-q4">
       <header class="panel-header">
         <div>
@@ -296,6 +298,7 @@
           <p>Appuntamenti del giorno e prossimi giorni.</p>
         </div>
         <div class="panel-actions">
+          <!-- data grande in alto a destra -->
           <span id="agenda-header-date" class="agenda-header-date"></span>
         </div>
       </header>
@@ -323,8 +326,10 @@
         </div>
       </div>
     </section>
+  
   </main>
-    <!-- ============ VIEW TITOLARE ============ -->
+
+  <!-- ============ VIEW TITOLARE ============ -->
   <main id="view-titolare" class="app-view hidden">
     <section class="role-layout">
       <div class="role-panel">
@@ -380,7 +385,8 @@
       </div>
     </section>
   </main>
-    <!-- ============ VIEW CLIENTE ============ -->
+
+  <!-- ============ VIEW CLIENTE ============ -->
   <main id="view-cliente" class="app-view hidden">
     <section class="role-layout">
       <div class="role-panel">
