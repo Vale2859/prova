@@ -41,8 +41,7 @@
       <button class="link-button" id="btn-esci" type="button">Esci</button>
     </div>
   </header>
-
-  <!-- ============ AUTH VIEW ============ -->
+    <!-- ============ AUTH VIEW ============ -->
   <section id="view-auth" class="auth-view app-view">
     <div class="auth-card">
       <h2>Login</h2>
@@ -105,19 +104,17 @@
       </form>
     </div>
   </section>
-
-  <!-- ============ VIEW FARMACIA ============ -->
+    <!-- ============ VIEW FARMACIA ============ -->
   <main id="view-farmacia" class="dashboard-grid app-view hidden">
     <!-- PULSANTE RAPIDO CENTRALE -->
     <div id="quick-btn">
       <span>+</span>
     </div>
 
-    <!-- MENU RADIALE A 7 ICONE -->
     <div id="quick-menu" class="hidden">
-      <button class="qm-btn" data-action="nuova-com">
-        <span>💬</span>
-        <small>Comunic.</small>
+      <button class="qm-btn" data-action="nuova-assenza">
+        <span>🧑‍⚕️</span>
+        <small>Assenze</small>
       </button>
 
       <button class="qm-btn" data-action="nuovo-app">
@@ -125,29 +122,14 @@
         <small>Appunt.</small>
       </button>
 
-      <button class="qm-btn" data-action="consegne">
+      <button class="qm-btn" data-action="nuova-nota">
         <span>📦</span>
-        <small>Consegne</small>
+        <small>Magazzino</small>
       </button>
 
-      <button class="qm-btn" data-action="consumabili">
-        <span>🧻</span>
-        <small>Consumab.</small>
-      </button>
-
-      <button class="qm-btn" data-action="scadenza">
-        <span>⏰</span>
-        <small>Scadenza</small>
-      </button>
-
-      <button class="qm-btn" data-action="procedura">
-        <span>📄</span>
-        <small>Procedura</small>
-      </button>
-
-      <button class="qm-btn" data-action="cambio-farmacia">
-        <span>🏥</span>
-        <small>Cambio far.</small>
+      <button class="qm-btn" data-action="nuova-com">
+        <span>💬</span>
+        <small>Comunic.</small>
       </button>
     </div>
 
@@ -264,8 +246,7 @@
         </div>
       </div>
     </section>
-
-    <!-- Q3 – PROMOZIONI E GIORNATE -->
+        <!-- Q3 – PROMOZIONI E GIORNATE -->
     <section class="panel panel-q3">
       <header class="panel-header">
         <div>
@@ -307,7 +288,7 @@
       </div>
     </section>
 
-    <!-- Q4 – AGENDA SERVIZI – STILE WIDGET MAC -->
+    <!-- Q4 – AGENDA SERVIZI (STILE WIDGET MAC) -->
     <section class="panel panel-q4">
       <header class="panel-header">
         <div>
@@ -321,7 +302,7 @@
 
       <div class="agenda-widget">
         <!-- COLONNA SINISTRA: OGGI -->
-        <div class="agenda-column agenda-today" id="agenda-today-column">
+        <div class="agenda-column agenda-today">
           <div class="agenda-today-header">
             <span class="agenda-today-label">Oggi</span>
             <span id="agenda-today-date" class="agenda-today-date"></span>
@@ -332,7 +313,7 @@
         </div>
 
         <!-- COLONNA DESTRA: PROSSIMI GIORNI -->
-        <div class="agenda-column agenda-next" id="agenda-next-column">
+        <div class="agenda-column agenda-next">
           <div class="agenda-next-header">
             <span>Prossimi giorni</span>
           </div>
@@ -342,10 +323,8 @@
         </div>
       </div>
     </section>
-  
   </main>
-
-  <!-- ============ VIEW TITOLARE ============ -->
+    <!-- ============ VIEW TITOLARE ============ -->
   <main id="view-titolare" class="app-view hidden">
     <section class="role-layout">
       <div class="role-panel">
@@ -401,8 +380,7 @@
       </div>
     </section>
   </main>
-
-  <!-- ============ VIEW CLIENTE ============ -->
+    <!-- ============ VIEW CLIENTE ============ -->
   <main id="view-cliente" class="app-view hidden">
     <section class="role-layout">
       <div class="role-panel">
