@@ -1045,340 +1045,99 @@ function setupAgendaListeners() {
   }
 }
 
+// piccolo helper per il nome del giorno in italiano
+function weekdayNameIT(date) {
+  const giorni = [
+    "Domenica",
+    "Lunedì",
+    "Martedì",
+    "Mercoledì",
+    "Giovedì",
+    "Venerdì",
+    "Sabato"
+  ];
+  return giorni[date.getDay()];
+}
+
 function renderAgenda() {
-  const label = document.getElementById("agenda-month-label");
-  const daysWrap = document.getElementById("agenda-days");
-  if (!label || !daysWrap) return;
+  const todayDateEl   = document.getElementById("agenda-today-date");
+  const todayListEl   = document.getElementById("agenda-today-list");
+  const nextListEl    = document.getElementById("agenda-next-list");
+  const headerDateEl  = document.getElementById("agenda-header-date");
 
-  // giorno "focus" = oggi ± offset
-  const focusDate = new Date();
-  focusDate.setDate(focusDate.getDate() + agendaDayOffset);
+  if (!todayDateEl || !todayListEl || !nextListEl) return;
 
-  const year = focusDate.getFullYear();
-  const month = focusDate.getMonth();
-  const dayNum = focusDate.getDate();
+  const todayIso = todayISO(); // "YYYY-MM-DD"
+  const [y, m, d] = todayIso.split("-");
+  const todayDate = new Date(Number(y), Number(m) - 1, Number(d));
 
-  // converto in ISO (YYYY-MM-DD) per cercare appuntamenti
-  const mStr = String(month + 1).padStart(2, "0");
-  const dStr = String(dayNum).padStart(2, "0");
-  const focusIso = `${year}-${mStr}-${dStr}`;
+  const app = loadData(STORAGE_KEYS.APPUNTAMENTI, []).sort((a, b) => {
+    if (a.data === b.data) return a.ora.localeCompare(b.ora);
+    return a.data.localeCompare(b.data);
+  });
 
-  const weekdayNames = [
-    "Lunedì", "Martedì", "Mercoledì",
-    "Giovedì", "Venerdì", "Sabato", "Domenica"
+  // etichetta data tipo: VENERDÌ 5 dicembre 2025
+  const monthNamesFull = [
+    "gennaio","febbraio","marzo","aprile","maggio","giugno",
+    "luglio","agosto","settembre","ottobre","novembre","dicembre"
   ];
-  const monthNames = [
-    "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
-    "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"
-  ];
+  const giornoLabel =
+    `${weekdayNameIT(todayDate).toUpperCase()} ${Number(d)} ` +
+    `${monthNamesFull[Number(m) - 1]} ${y}`;
 
-  const weekday = weekdayNames[(focusDate.getDay() + 6) % 7];
-  const monthName = monthNames[month];
+  todayDateEl.textContent  = giornoLabel;
+  if (headerDateEl) headerDateEl.textContent = giornoLabel;
 
-  // etichetta in alto del pannello
-  if (label) {
-    label.textContent = `${weekday} ${dayNum} ${monthName} ${year}`;
-  }
+  // ===== COLONNA SINISTRA: APPUNTAMENTI DI OGGI =====
+  const todayApps = app.filter((a) => a.data === todayIso);
 
-  const appuntamenti = loadData(STORAGE_KEYS.APPUNTAMENTI, []);
-
-  // appuntamenti del giorno "focus"
-  const appOggi = appuntamenti
-    .filter((a) => a.data === focusIso)
-    .sort((a, b) => (a.ora || "").localeCompare(b.ora || ""));
-
-  let eventiHtml = "";
-
-  if (appOggi.length === 0) {
-    eventiHtml = `
-      <li class="aw-event-empty">
-        Nessun appuntamento per questo giorno.
-      </li>`;
+  todayListEl.innerHTML = "";
+  if (todayApps.length === 0) {
+    todayListEl.innerHTML = `<p class="agenda-empty">Nessun appuntamento per oggi.</p>`;
   } else {
-    eventiHtml = appOggi
-      .map((a) => {
-        const ora = a.ora || "--:--";
-        const titolo = a.nome || "Appuntamento";
-        return `
-          <li class="aw-event-row">
-            <span class="aw-event-time">${ora}</span>
-            <span class="aw-event-title">${titolo}</span>
-          </li>`;
-      })
-      .join("");
-  }
-
-  // prossimi 3 giorni
-  let nextDaysHtml = "";
-  for (let i = 1; i <= 3; i++) {
-    const d = new Date(focusDate);
-    d.setDate(d.getDate() + i);
-
-    const y2 = d.getFullYear();
-    const m2 = String(d.getMonth() + 1).padStart(2, "0");
-    const dd2 = String(d.getDate()).padStart(2, "0");
-    const iso = `${y2}-${m2}-${dd2}`;
-
-    const weekday2 = weekdayNames[(d.getDay() + 6) % 7];
-    const month2 = monthNames[d.getMonth()];
-
-    const appDay = appuntamenti.filter((a) => a.data === iso);
-    const count = appDay.length;
-
-    nextDaysHtml += `
-      <div class="aw-next-day ${count > 0 ? "has-events" : ""}" data-date="${iso}">
-        <div class="aw-next-main">
-          <span class="aw-next-weekday">${weekday2}</span>
-          <span class="aw-next-date">${dd2} ${month2}</span>
+    todayApps.forEach((a) => {
+      const card = document.createElement("div");
+      card.className = "agenda-app-card";
+      card.innerHTML = `
+        <div class="agenda-app-time">${a.ora}</div>
+        <div class="agenda-app-main">${a.nome}</div>
+        <div class="agenda-app-sub">
+          ${a.telefono || ""} ${a.motivo ? " · " + a.motivo : ""}
         </div>
-        <span class="aw-next-count">${count} appt</span>
-      </div>`;
-  }
-
-  // costruisco il widget dentro #agenda-days
-  daysWrap.innerHTML = `
-    <div class="agenda-widget">
-      <div class="aw-left" data-date="${focusIso}">
-        <div class="aw-date-big">
-          <div>
-            <div class="aw-weekday">${weekday.toUpperCase()}</div>
-            <div class="aw-month">${monthName} ${year}</div>
-          </div>
-          <div class="aw-day">${dayNum}</div>
-        </div>
-        <div class="aw-events">
-          <h4>Appuntamenti del giorno</h4>
-          <ul class="aw-events-list">
-            ${eventiHtml}
-          </ul>
-        </div>
-      </div>
-      <div class="aw-right">
-        <h4>Prossimi giorni</h4>
-        <div class="aw-next-list">
-          ${nextDaysHtml}
-        </div>
-      </div>
-    </div>
-  `;
-
-  // clic sulla parte sinistra → dettagli del giorno focus
-  const leftBox = daysWrap.querySelector(".aw-left");
-  if (leftBox) {
-    leftBox.addEventListener("click", () => {
-      openModalAgendaDay(focusIso);
+      `;
+      // cliccando la card apro la modale dettagli del giorno
+      card.addEventListener("click", () => openModalAgendaDay(todayIso));
+      todayListEl.appendChild(card);
     });
   }
 
-  // clic sui prossimi giorni → dettagli di quel giorno
-  daysWrap.querySelectorAll(".aw-next-day").forEach((el) => {
-    el.addEventListener("click", () => {
-      const iso = el.getAttribute("data-date");
-      openModalAgendaDay(iso);
-    });
-  });
-}
-// Appuntamenti per giorno
-function openModalAgendaDay(iso) {
-  const app = loadData(STORAGE_KEYS.APPUNTAMENTI, []);
-  const dayList = app
-    .filter((a) => a.data === iso)
-    .sort((a, b) => a.ora.localeCompare(b.ora));
+  // ===== COLONNA DESTRA: PROSSIMI 4 GIORNI =====
+  nextListEl.innerHTML = "";
+  for (let offset = 1; offset <= 4; offset++) {
+    const dt = new Date(todayDate);
+    dt.setDate(dt.getDate() + offset);
 
-  const niceDate = formatDateShortIT(iso);
-  let html = `
-    <p class="small">
-      Appuntamenti per il giorno <strong>${niceDate}</strong>.
-    </p>
-    <ul class="simple-list">
-  `;
-  if (dayList.length === 0) {
-    html += `<li><span>Nessun appuntamento.</span></li>`;
-  } else {
-    dayList.forEach((a) => {
-      html += `
-        <li>
-          <div class="row-main">
-            <span class="row-title">${a.ora} – ${a.nome}</span>
-            <span class="row-sub">${a.telefono || ""} · ${a.motivo || ""}</span>
-          </div>
-        </li>`;
-    });
+    const yy  = dt.getFullYear();
+    const mm  = String(dt.getMonth() + 1).padStart(2, "0");
+    const dd  = String(dt.getDate()).padStart(2, "0");
+    const iso = `${yy}-${mm}-${dd}`;
+
+    const count = app.filter((a) => a.data === iso).length;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "agenda-next-day-card";
+    btn.innerHTML = `
+      <span class="and-day">${weekdayNameIT(dt)}</span>
+      <span class="and-date">${dd}/${mm}</span>
+      <span class="and-count">
+        ${count > 0 ? count + " appuntamento" + (count > 1 ? "i" : "") : "Nessun appuntamento"}
+      </span>
+    `;
+    btn.addEventListener("click", () => openModalAgendaDay(iso));
+    nextListEl.appendChild(btn);
   }
-  html += `</ul>
-    <button type="button" id="btn-new-app-day" class="primary full-width">
-      + Nuovo appuntamento
-    </button>
-  `;
-  openModal(`Agenda del ${niceDate}`, html, () => {
-    const btn = document.getElementById("btn-new-app-day");
-    if (btn) {
-      btn.addEventListener("click", () => openModalNewAppointment(iso));
-    }
-  });
 }
-
-function openModalNewAppointment(iso) {
-  const html = `
-    <form id="form-app">
-      <p class="small">Inserisci i dati dell'appuntamento.</p>
-      <label class="field">
-        <span>Nome e cognome</span>
-        <input type="text" id="app-nome" />
-      </label>
-      <label class="field">
-        <span>Telefono</span>
-        <input type="tel" id="app-tel" />
-      </label>
-      <label class="field">
-        <span>Motivo</span>
-        <input type="text" id="app-motivo" />
-      </label>
-      <label class="field">
-        <span>Orario</span>
-        <input type="time" id="app-ora" />
-      </label>
-      <button type="submit" class="primary">Salva appuntamento</button>
-    </form>
-  `;
-  openModal("Nuovo appuntamento", html, () => {
-    const form = document.getElementById("form-app");
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nome = document.getElementById("app-nome").value.trim();
-      const tel = document.getElementById("app-tel").value.trim();
-      const motivo = document.getElementById("app-motivo").value.trim();
-      const ora = document.getElementById("app-ora").value;
-
-      if (!nome || !ora) {
-        alert("Nome e orario sono obbligatori.");
-        return;
-      }
-
-      const app = loadData(STORAGE_KEYS.APPUNTAMENTI, []);
-      app.push({
-        id: "app_" + Date.now(),
-        data: iso,
-        ora,
-        nome,
-        telefono: tel,
-        motivo,
-        giornataId: null,
-        clienteUsername: null
-      });
-      saveData(STORAGE_KEYS.APPUNTAMENTI, app);
-      closeModal();
-      renderAgenda();
-      updatePanoramica();
-      updateTitolareView();
-      updateDipendenteView();
-      updateClienteView();
-    });
-  });
-}
-
-// Giornata → appuntamenti
-function openModalGiornataAppuntamenti(g) {
-  const giornate = loadData(STORAGE_KEYS.GIORNATE, []);
-  const gio = giornate.find((x) => x.id === g);
-  if (!gio) return;
-  const data = gio.dal;
-  const app = loadData(STORAGE_KEYS.APPUNTAMENTI, []);
-  const list = app
-    .filter((a) => a.data === data && a.giornataId === gio.id)
-    .sort((a, b) => a.ora.localeCompare(b.ora));
-
-  let html = `
-    <p class="small">
-      Appuntamenti per la giornata <strong>${gio.nome}</strong> (${formatDateShortIT(gio.dal)}).
-    </p>
-    <ul class="simple-list">
-  `;
-  if (list.length === 0) {
-    html += `<li><span>Nessun appuntamento inserito.</span></li>`;
-  } else {
-    list.forEach((a) => {
-      html += `
-        <li>
-          <div class="row-main">
-            <span class="row-title">${a.ora} – ${a.nome}</span>
-            <span class="row-sub">${a.telefono || ""} · ${a.motivo || ""}</span>
-          </div>
-        </li>`;
-    });
-  }
-  html += `</ul>
-    <button type="button" id="btn-new-app-gio" class="primary full-width">
-      + Nuovo appuntamento per la giornata
-    </button>
-  `;
-  openModal(`Giornata: ${gio.nome}`, html, () => {
-    const btn = document.getElementById("btn-new-app-gio");
-    if (btn) {
-      btn.addEventListener("click", () => openModalNewAppForGiornata(gio));
-    }
-  });
-}
-
-function openModalNewAppForGiornata(gio) {
-  const html = `
-    <form id="form-app-gio">
-      <label class="field">
-        <span>Nome e cognome</span>
-        <input type="text" id="appg-nome" />
-      </label>
-      <label class="field">
-        <span>Telefono</span>
-        <input type="tel" id="appg-tel" />
-      </label>
-      <label class="field">
-        <span>Motivo</span>
-        <input type="text" id="appg-motivo" />
-      </label>
-      <label class="field">
-        <span>Orario (8:30 – 20:00, slot 30 min)</span>
-        <input type="time" id="appg-ora" step="1800" />
-      </label>
-      <button type="submit" class="primary">Salva appuntamento</button>
-    </form>
-  `;
-  openModal("Nuovo appuntamento giornata", html, () => {
-    const form = document.getElementById("form-app-gio");
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nome = document.getElementById("appg-nome").value.trim();
-      const tel = document.getElementById("appg-tel").value.trim();
-      const motivo = document.getElementById("appg-motivo").value.trim();
-      const ora = document.getElementById("appg-ora").value;
-
-      if (!nome || !ora) {
-        alert("Nome e orario sono obbligatori.");
-        return;
-      }
-
-      const app = loadData(STORAGE_KEYS.APPUNTAMENTI, []);
-      app.push({
-        id: "app_" + Date.now(),
-        data: gio.dal,
-        ora,
-        nome,
-        telefono: tel,
-        motivo,
-        giornataId: gio.id,
-        clienteUsername: null
-      });
-      saveData(STORAGE_KEYS.APPUNTAMENTI, app);
-      closeModal();
-      renderPromoAndGiornate();
-      renderAgenda();
-      updatePanoramica();
-      updateTitolareView();
-      updateDipendenteView();
-      updateClienteView();
-    });
-  });
-}
-
 // ===== VISTE RUOLI =====
 function updateTitolareView() {
   if (!currentUser || currentUser.ruolo !== "titolare") return;
