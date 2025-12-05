@@ -1,7 +1,8 @@
 // ===== STATO E COSTANTI =====
 let currentUser = null;
 let panoramicaTimer = null;
-let agendaMonthOffset = 0;
+/* offset in giorni rispetto ad oggi per il widget */
+let agendaDayOffset = 0;
 
 const STORAGE_KEYS = {
   UTENTI: "fm_utenti",
