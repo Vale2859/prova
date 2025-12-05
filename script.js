@@ -1050,51 +1050,134 @@ function renderAgenda() {
   const daysWrap = document.getElementById("agenda-days");
   if (!label || !daysWrap) return;
 
-  const base = new Date();
-  base.setMonth(base.getMonth() + agendaMonthOffset);
-  const year = base.getFullYear();
-  const month = base.getMonth();
+  // giorno "focus" = oggi ± offset
+  const focusDate = new Date();
+  focusDate.setDate(focusDate.getDate() + agendaDayOffset);
 
-  const monthNames = [
-    "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
-    "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+  const year = focusDate.getFullYear();
+  const month = focusDate.getMonth();
+  const dayNum = focusDate.getDate();
+
+  // converto in ISO (YYYY-MM-DD) per cercare appuntamenti
+  const mStr = String(month + 1).padStart(2, "0");
+  const dStr = String(dayNum).padStart(2, "0");
+  const focusIso = `${year}-${mStr}-${dStr}`;
+
+  const weekdayNames = [
+    "Lunedì", "Martedì", "Mercoledì",
+    "Giovedì", "Venerdì", "Sabato", "Domenica"
   ];
-  label.textContent = `${monthNames[month]} ${year}`;
+  const monthNames = [
+    "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+    "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"
+  ];
 
-  const giornate = loadData(STORAGE_KEYS.GIORNATE, []);
-  const oggi = todayISO();
+  const weekday = weekdayNames[(focusDate.getDay() + 6) % 7];
+  const monthName = monthNames[month];
 
-  const first = new Date(year, month, 1);
-  const firstWeekday = (first.getDay() + 6) % 7;
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-  daysWrap.innerHTML = "";
-  for (let i = 0; i < firstWeekday; i++) {
-    const span = document.createElement("div");
-    span.className = "day-cell empty";
-    daysWrap.appendChild(span);
+  // etichetta in alto del pannello
+  if (label) {
+    label.textContent = `${weekday} ${dayNum} ${monthName} ${year}`;
   }
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const date = new Date(year, month, d);
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(d).padStart(2, "0");
-    const iso = `${y}-${m}-${day}`;
+  const appuntamenti = loadData(STORAGE_KEYS.APPUNTAMENTI, []);
 
-    const cell = document.createElement("div");
-    cell.className = "day-cell";
-    cell.textContent = d.toString();
+  // appuntamenti del giorno "focus"
+  const appOggi = appuntamenti
+    .filter((a) => a.data === focusIso)
+    .sort((a, b) => (a.ora || "").localeCompare(b.ora || ""));
 
-    if (iso === oggi) cell.classList.add("today");
-    const hasGiornata = giornate.some((g) => isDateInRange(iso, g.dal, g.al));
-    if (hasGiornata) cell.classList.add("giornata");
+  let eventiHtml = "";
 
-    cell.addEventListener("click", () => openModalAgendaDay(iso));
-    daysWrap.appendChild(cell);
+  if (appOggi.length === 0) {
+    eventiHtml = `
+      <li class="aw-event-empty">
+        Nessun appuntamento per questo giorno.
+      </li>`;
+  } else {
+    eventiHtml = appOggi
+      .map((a) => {
+        const ora = a.ora || "--:--";
+        const titolo = a.nome || "Appuntamento";
+        return `
+          <li class="aw-event-row">
+            <span class="aw-event-time">${ora}</span>
+            <span class="aw-event-title">${titolo}</span>
+          </li>`;
+      })
+      .join("");
   }
+
+  // prossimi 3 giorni
+  let nextDaysHtml = "";
+  for (let i = 1; i <= 3; i++) {
+    const d = new Date(focusDate);
+    d.setDate(d.getDate() + i);
+
+    const y2 = d.getFullYear();
+    const m2 = String(d.getMonth() + 1).padStart(2, "0");
+    const dd2 = String(d.getDate()).padStart(2, "0");
+    const iso = `${y2}-${m2}-${dd2}`;
+
+    const weekday2 = weekdayNames[(d.getDay() + 6) % 7];
+    const month2 = monthNames[d.getMonth()];
+
+    const appDay = appuntamenti.filter((a) => a.data === iso);
+    const count = appDay.length;
+
+    nextDaysHtml += `
+      <div class="aw-next-day ${count > 0 ? "has-events" : ""}" data-date="${iso}">
+        <div class="aw-next-main">
+          <span class="aw-next-weekday">${weekday2}</span>
+          <span class="aw-next-date">${dd2} ${month2}</span>
+        </div>
+        <span class="aw-next-count">${count} appt</span>
+      </div>`;
+  }
+
+  // costruisco il widget dentro #agenda-days
+  daysWrap.innerHTML = `
+    <div class="agenda-widget">
+      <div class="aw-left" data-date="${focusIso}">
+        <div class="aw-date-big">
+          <div>
+            <div class="aw-weekday">${weekday.toUpperCase()}</div>
+            <div class="aw-month">${monthName} ${year}</div>
+          </div>
+          <div class="aw-day">${dayNum}</div>
+        </div>
+        <div class="aw-events">
+          <h4>Appuntamenti del giorno</h4>
+          <ul class="aw-events-list">
+            ${eventiHtml}
+          </ul>
+        </div>
+      </div>
+      <div class="aw-right">
+        <h4>Prossimi giorni</h4>
+        <div class="aw-next-list">
+          ${nextDaysHtml}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // clic sulla parte sinistra → dettagli del giorno focus
+  const leftBox = daysWrap.querySelector(".aw-left");
+  if (leftBox) {
+    leftBox.addEventListener("click", () => {
+      openModalAgendaDay(focusIso);
+    });
+  }
+
+  // clic sui prossimi giorni → dettagli di quel giorno
+  daysWrap.querySelectorAll(".aw-next-day").forEach((el) => {
+    el.addEventListener("click", () => {
+      const iso = el.getAttribute("data-date");
+      openModalAgendaDay(iso);
+    });
+  });
 }
-
 // Appuntamenti per giorno
 function openModalAgendaDay(iso) {
   const app = loadData(STORAGE_KEYS.APPUNTAMENTI, []);
